@@ -5,6 +5,15 @@
 
 ---
 
+## [v1.4.2] - 2026-10-27
+
+### Fixed（修復）
+
+- **Host 端 RPC 在 DSH 0.2.x 完全沒掛上，面板一直顯示「host 連線失敗 / `transport failure for /project-brain/preview: HTTP 405`」，啟動按鈕也報 `/project-brain/init: HTTP 405`**。DSH 0.2.x 的 Connection RPC 註冊，會用「讀到 `connection` 服務的那個 Context」當 owner，再去呼叫 `owner.webServer.register(route)` 掛上 HTTP 路由；本外掛的 `inject` 清單只有 `tools/fs/sandboxPolicy/connection/sessions/llm`，主 Context 直接讀 `connection` 時 owner 沒有 `webServer`，路由註冊在 `effect` 內拋錯、被 `try/catch` 吞成一行 warn，於是 Host 端根本沒有 `/project-brain/*` 這條 prefix 路由，Client 每次呼叫只會拿到 404/405。改為在 `ctx.inject(["connection", "webServer"], …)` 的子 Context 裡才讀 `connection` 並完成註冊（與 `dsh-cursor-acp`、`billion-context` 等外掛的作法一致），另加防重複掛載的旗標；`connection` 真的缺席時行為不變，仍只 warn，不影響已註冊的 20 個 `project_*` 工具。
+- 版本升到 `1.4.2`。
+
+---
+
 ## [v1.4.1] - 2026-10-27
 
 ### Changed（變更）

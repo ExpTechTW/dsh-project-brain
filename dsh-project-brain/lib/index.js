@@ -12893,25 +12893,45 @@ function applyImpl(ctx, config) {
     } catch {
     }
   }
-  try {
-    registerConnectionRpc({
-      connection,
-      ctx,
-      fs,
-      sandboxPolicy,
-      tools,
-      logger: ctx.logger,
-      getMemoryConfig: memoryRuntime.get,
-      updateSettings: memoryRuntime.updateSettings,
-      settingsWritable: memoryRuntime.settingsWritable,
-      getLlm: llmRuntime.get,
-      resolveEmbeddingCredential: memoryRuntime.resolveCredential
-    });
-  } catch (e) {
-    if (ctx.logger) try {
-      ctx.logger.warn("[dsh-project-brain] connection RPC registration failed:", String(e && e.message || e));
-    } catch {
+  let connectionRpcMounted = false;
+  const mountConnectionRpc = (rpcCtx) => {
+    if (connectionRpcMounted) return;
+    let rpcConnection;
+    try {
+      rpcConnection = rpcCtx && rpcCtx.connection ? rpcCtx.connection : connection;
+    } catch (e) {
+      rpcConnection = connection;
     }
+    try {
+      const mounted = registerConnectionRpc({
+        connection: rpcConnection,
+        ctx,
+        fs,
+        sandboxPolicy,
+        tools,
+        logger: ctx.logger,
+        getMemoryConfig: memoryRuntime.get,
+        updateSettings: memoryRuntime.updateSettings,
+        settingsWritable: memoryRuntime.settingsWritable,
+        getLlm: llmRuntime.get,
+        resolveEmbeddingCredential: memoryRuntime.resolveCredential
+      });
+      if (mounted) connectionRpcMounted = true;
+    } catch (e) {
+      if (ctx.logger) try {
+        ctx.logger.warn("[dsh-project-brain] connection RPC registration failed:", String(e && e.message || e));
+      } catch {
+      }
+    }
+  };
+  if (typeof ctx.inject === "function") {
+    try {
+      ctx.inject(["connection", "webServer"], mountConnectionRpc);
+    } catch (e) {
+      mountConnectionRpc(ctx);
+    }
+  } else {
+    mountConnectionRpc(ctx);
   }
   try {
     if (ctx.on) {

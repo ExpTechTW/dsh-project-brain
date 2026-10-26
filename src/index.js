@@ -177,22 +177,49 @@ function applyImpl(ctx, config) {
   // Canonical runtime bridge. This is the primary data path for published
   // builds: it resolves the live Session header instead of relying on a
   // sessionId map frozen into the client bundle at build time.
-  try {
-    registerConnectionRpc({
-      connection,
-      ctx,
-      fs,
-      sandboxPolicy,
-      tools,
-      logger: ctx.logger,
-      getMemoryConfig: memoryRuntime.get,
-      updateSettings: memoryRuntime.updateSettings,
-      settingsWritable: memoryRuntime.settingsWritable,
-      getLlm: llmRuntime.get,
-      resolveEmbeddingCredential: memoryRuntime.resolveCredential,
-    });
-  } catch (e) {
-    if (ctx.logger) try { ctx.logger.warn("[dsh-project-brain] connection RPC registration failed:", String((e && e.message) || e)); } catch {}
+  //
+  // v1.4.2 fix: DSH 0.2.x 的 Connection RPC 註冊，會用「讀到 connection 的那個
+  //   Context」當 owner 去呼叫 `owner.webServer.register(route)`。若在外掛主 ctx
+  //   直接讀 connection，owner 就是本外掛（inject 清單沒有 webServer），
+  //   `owner.webServer` 是 undefined → 路由註冊在 effect 裡炸掉、被這層 try/catch
+  //   吞成 warn，Host 端就沒有 /project-brain/* 路由，Client 每次呼叫只會收到
+  //   HTTP 405。因此在 `webServer` 就緒的子 Context 裡才讀 connection。
+  let connectionRpcMounted = false;
+  const mountConnectionRpc = (rpcCtx) => {
+    if (connectionRpcMounted) return;
+    let rpcConnection;
+    try {
+      rpcConnection = rpcCtx && rpcCtx.connection ? rpcCtx.connection : connection;
+    } catch (e) {
+      rpcConnection = connection;
+    }
+    try {
+      const mounted = registerConnectionRpc({
+        connection: rpcConnection,
+        ctx,
+        fs,
+        sandboxPolicy,
+        tools,
+        logger: ctx.logger,
+        getMemoryConfig: memoryRuntime.get,
+        updateSettings: memoryRuntime.updateSettings,
+        settingsWritable: memoryRuntime.settingsWritable,
+        getLlm: llmRuntime.get,
+        resolveEmbeddingCredential: memoryRuntime.resolveCredential,
+      });
+      if (mounted) connectionRpcMounted = true;
+    } catch (e) {
+      if (ctx.logger) try { ctx.logger.warn("[dsh-project-brain] connection RPC registration failed:", String((e && e.message) || e)); } catch {}
+    }
+  };
+  if (typeof ctx.inject === "function") {
+    try {
+      ctx.inject(["connection", "webServer"], mountConnectionRpc);
+    } catch (e) {
+      mountConnectionRpc(ctx);
+    }
+  } else {
+    mountConnectionRpc(ctx);
   }
 
   // 3) preview.changed -> 清 aggregator 快取
