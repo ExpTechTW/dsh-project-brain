@@ -2,7 +2,7 @@
 
 **English** · [繁體中文](./README.zh-TW.md)
 
-[![Version](https://img.shields.io/badge/version-1.4.3-blue)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.4.4-blue)](./CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D22.19-339933)](./package.json)
 [![Status](https://img.shields.io/badge/status-stable-success)](./RELEASE_CHECKLIST.md)
@@ -11,7 +11,7 @@
 
 Instead of making every new conversation rediscover the repository, dsh-project-brain stores structured knowledge inside the project itself and keeps getting more useful as the project evolves.
 
-> Current release: `1.4.3` — the Host-side RPC channel now falls back to a direct `webServer` route when DSH's `connection.rpc.handle` is unusable, so the sidebar/preview/init calls stop failing with HTTP 405.
+> Current release: `1.4.4` — the Host RPC bridge survives DSH 0.2.1-rc.3 (direct `webServer` route fallback) and no longer trips over services the plugin does not inject.
 
 **v1.3.1 新特性**：📦 **匯入匯出 / 備份恢復**
 - Dashboard 頂部新增 **💾 備份 / 📥 恢復 / ↶ 回滾** 三個按鈕（與專案名 + techStack chip 同一行）

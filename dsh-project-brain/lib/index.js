@@ -10697,6 +10697,14 @@ async function resolveRpcProjectPath(ctx, payload) {
   await sleep(PROJECT_PATH_RETRY_DELAY_MS);
   return getCwdBySession(ctx, sid);
 }
+function readOptionalService(ctx, name2) {
+  if (!ctx) return null;
+  try {
+    return ctx[name2] || null;
+  } catch (error) {
+    return null;
+  }
+}
 var ENDPOINT_SEGMENT_PATTERN = /^[A-Za-z0-9_$.-]+$/;
 var RPC_BODY_LIMIT_BYTES = 64 * 1024 * 1024;
 function endpointFromPath(channel, pathname) {
@@ -10952,7 +10960,7 @@ function registerConnectionRpc({ connection, webCtx, ctx, fs, sandboxPolicy, too
         toolResult = await suggestTool.execute(args, {
           session,
           sessionId: payload && payload.sessionId,
-          agent: ctx && ctx.agent || null,
+          agent: readOptionalService(ctx, "agent"),
           ctx
         });
       } catch (error) {

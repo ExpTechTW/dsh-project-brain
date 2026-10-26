@@ -150,6 +150,17 @@ async function resolveRpcProjectPath(ctx, payload) {
   return getCwdBySession(ctx, sid);
 }
 
+function readOptionalService(ctx, name) {
+  if (!ctx) return null;
+  try {
+    return ctx[name] || null;
+  } catch (error) {
+    // Service not declared in this plugin's inject list: cordis throws
+    // `cannot get property "<name>" without inject` instead of returning undefined.
+    return null;
+  }
+}
+
 const ENDPOINT_SEGMENT_PATTERN = /^[A-Za-z0-9_$.-]+$/;
 const RPC_BODY_LIMIT_BYTES = 64 * 1024 * 1024;
 
@@ -437,7 +448,7 @@ export function registerConnectionRpc({ connection, webCtx, ctx, fs, sandboxPoli
           toolResult = await suggestTool.execute(args, {
             session: session,
             sessionId: payload && payload.sessionId,
-            agent: (ctx && ctx.agent) || null,
+            agent: readOptionalService(ctx, "agent"),
             ctx: ctx,
           });
         } catch (error) {

@@ -5,6 +5,17 @@
 
 ---
 
+## [v1.4.4] - 2026-10-27
+
+### Fixed（修復）
+
+- **面板開始收到 `RPC ok=false · internal · cannot get property "agent" without inject`**：`file`/`suggest` 分支在呼叫 `project_suggest_next` 時把 `agent: ctx.agent` 直接塞進工具上下文，但本外掛的 `inject` 清單只有 `tools/fs/sandboxPolicy/connection/webServer/sessions/llm`，cordis 對未注入的服務是**拋錯**而不是回 `undefined`，於是整個 RPC 被包成 `internal` 錯誤回給面板。改為 `readOptionalService(ctx, "agent")`：包 `try/catch`，拿不到就回 `null`。
+- 順手掃過全部 `ctx.<service>` 直接取值點，其餘都已經走 `ctx.get(...)` 或 `try/catch`（`shell`、`agents`、`clientModules`、`harness` 皆同），只有這一處是裸取。
+- 沙盒實測（獨立 `DSH_HOME`、`dsh braincheck --port 0`）：`settings` 回 `ok:true`，`preview`／`git`／`suggest`／`export.run`／`backup.list`／`import.preview`／`action` 皆回正常的 workspace 解析錯誤（沙盒內沒有 Session），**不再出現任何 `without inject`**。
+- 版本升到 `1.4.4`。
+
+---
+
 ## [v1.4.3] - 2026-10-27
 
 ### Fixed（修復）
