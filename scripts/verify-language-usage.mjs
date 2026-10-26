@@ -1,7 +1,7 @@
-// scripts/verify-language-usage.mjs — 临时验证脚本（与 src/client.js 内联 helper 同语义）
-// v1.1.x-fix：语言使用率归一化（按文件数降序 + 百分比 + 长尾聚合）
-// 目的：在不打包 client.js 的情况下验证 formatLanguagesUsage 的语义
-// 真实函数定义在 src/client.js；本脚本复制实现用于离线验证，失败说明逻辑漂移。
+// scripts/verify-language-usage.mjs — 臨時驗證指令碼（與 src/client.js 內聯 helper 同語義）
+// v1.1.x-fix：語言使用率歸一化（按檔案數降序 + 百分比 + 長尾聚合）
+// 目的：在不打包 client.js 的情況下驗證 formatLanguagesUsage 的語義
+// 真實函式定義在 src/client.js；本指令碼複製實現用於離線驗證，失敗說明邏輯漂移。
 
 function formatLanguagesUsage(languages, opts) {
   const obj = languages && typeof languages === "object" ? languages : {};
@@ -26,12 +26,12 @@ function formatLanguagesUsage(languages, opts) {
   return { top, tail, total, distinctCount: entries.length };
 }
 
-// ─── 真实数据：dsh-project-brain 仓库当前 .project-brain/project.json 的 languages 字段 ───
+// ─── 真實資料：dsh-project-brain 倉庫當前 .project-brain/project.json 的 languages 欄位 ───
 const realCase = { javascript: 72, c: 1, go: 1, java: 2, python: 1, rust: 1 };
 
 const cases = [
   {
-    name: "真实场景：dsh-project-brain 6 种语言（无长尾）",
+    name: "真實場景：dsh-project-brain 6 種語言（無長尾）",
     input: realCase,
     expected: {
       distinctCount: 6,
@@ -48,7 +48,7 @@ const cases = [
     },
   },
   {
-    name: "长尾聚合：10 种语言，topN=8",
+    name: "長尾聚合：10 種語言，topN=8",
     input: { js: 100, ts: 50, py: 30, go: 20, java: 15, rs: 12, c: 10, rb: 8, php: 5, swift: 3 },
     expected: {
       distinctCount: 10,
@@ -58,23 +58,23 @@ const cases = [
     },
   },
   {
-    name: "空输入",
+    name: "空輸入",
     input: {},
     expected: { distinctCount: 0, total: 0, top: [], tail: null },
   },
   {
-    name: "null/undefined 输入",
+    name: "null/undefined 輸入",
     input: null,
     expected: { distinctCount: 0, total: 0, top: [], tail: null },
   },
   {
-    name: "mergeTail=false：全展开",
+    name: "mergeTail=false：全展開",
     input: { a: 1, b: 1, c: 1, d: 1, e: 1, f: 1, g: 1, h: 1, i: 1 },
     opts: { topN: 3, mergeTail: false },
     expected: { distinctCount: 9, topLen: 9, tail: null },
   },
   {
-    name: "零计数项被过滤",
+    name: "零計數項被過濾",
     input: { js: 10, py: 0, ts: 5 },
     expected: { distinctCount: 2, total: 15 },
   },

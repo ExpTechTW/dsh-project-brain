@@ -68,7 +68,7 @@ const timeline = await readJsonl(mockFs, brainPath(projectPath, "timeline.jsonl"
 
 console.log("Loaded:", projectJson?.name, "| memories:", memories.length, "| todos:", todos.length, "| timeline:", timeline.length);
 
-const question = "plugins 项目主要做了什么";
+const question = "plugins 專案主要做了什麼";
 const tokens = tokenize(question);
 const memSources = memories.map((m) => ({
   kind: "memory", id: m.id, type: m.type, title: m.title,

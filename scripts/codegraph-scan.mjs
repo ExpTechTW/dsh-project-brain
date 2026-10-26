@@ -1,7 +1,7 @@
 // codegraph-scan.mjs — tree-sitter AST → codegraph.json
-// P0.3a + v0.4.8：调用图 + API endpoint 提取 + DB schema 识别
-// v0.4.8 扩展：支持 6 种语言（JS/TS/Python/Go/Java/Rust/C/C++）的 AST 分析
-// 输出 schema：
+// P0.3a + v0.4.8：呼叫圖 + API endpoint 提取 + DB schema 識別
+// v0.4.8 擴充套件：支援 6 種語言（JS/TS/Python/Go/Java/Rust/C/C++）的 AST 分析
+// 輸出 schema：
 // {
 //   "scannedAt": <ms>, "durationMs": <ms>,
 //   "files": [{path, language, imports, exports, functions}],
@@ -21,7 +21,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync, statSync } from "no
 import { readdir } from "node:fs/promises";
 import { join, relative, dirname, extname, basename } from "node:path";
 
-// ─── tree-sitter 懒加载（6 语言）───
+// ─── tree-sitter 懶載入（6 語言）───
 let _grammars = null;
 async function loadGrammars() {
   if (_grammars) return _grammars;
@@ -46,7 +46,7 @@ async function loadGrammars() {
   return _grammars;
 }
 
-// ─── 扫描配置 ───
+// ─── 掃描配置 ───
 const IGNORE_DIRS = new Set([
   "node_modules", ".git", "dist", "build", "__pycache__",
   ".venv", "venv", ".next", "target", ".DS_Store",
@@ -61,7 +61,7 @@ const MAX_FILE_BYTES = 512 * 1024;
 const CALL_GRAPH_DEPTH = 6;
 const CALL_GRAPH_TOP_CHAINS = 5;
 
-// ─── 语言检测 ───
+// ─── 語言檢測 ───
 function detectLang(p) {
   const e = extname(p);
   if ([".ts", ".tsx"].includes(e)) return "typescript";
@@ -79,7 +79,7 @@ function pickParserForLang(lang, grammars) {
   return grammars[lang] || null;
 }
 
-// ─── 文件遍历 ───
+// ─── 檔案遍歷 ───
 async function* walkFiles(root) {
   const stack = ["."];
   while (stack.length) {
@@ -101,7 +101,7 @@ async function* walkFiles(root) {
   }
 }
 
-// ─── 通用 import 规范化：去掉 .js/.ts 后缀（AST 节点原样）───
+// ─── 通用 import 規範化：去掉 .js/.ts 字尾（AST 節點原樣）───
 function resolveImport(fromFile, spec) {
   if (spec.startsWith(".") || spec.startsWith("/")) {
     const fromDir = dirname(fromFile);
@@ -111,7 +111,7 @@ function resolveImport(fromFile, spec) {
 }
 
 // ════════════════════════════════════════════════════════════
-// 语言分发器：每种语言一个抽取器，返回 {imports, exports, functions}
+// 語言分發器：每種語言一個抽取器，返回 {imports, exports, functions}
 // ════════════════════════════════════════════════════════════
 
 // ─── JavaScript / TypeScript（共用 grammar）───
@@ -130,7 +130,7 @@ function extractJsLike(rootNode) {
       if (fn && fn.type === "identifier" && fn.text === "require") {
         const arg = node.childForFieldName("arguments") || node.child(2);
         if (arg) {
-          // 兼容形如 ("user") / ('user') / ("user") 等括号+引号
+          // 相容形如 ("user") / ('user') / ("user") 等括號+引號
           const cleaned = arg.text.replace(/^[\s('"`]+|[\s)'"`]+$/g, "").replace(/^['"]|['"]$/g, "");
           imports.add(cleaned);
         }
@@ -145,7 +145,7 @@ function extractJsLike(rootNode) {
         }
       }
     }
-    // CommonJS: module.exports = { foo, bar } → 视为 export
+    // CommonJS: module.exports = { foo, bar } → 視為 export
     if (node.type === "expression_statement") {
       const text = node.text || "";
       if (/module\.exports\s*=/.test(text)) {
@@ -154,7 +154,7 @@ function extractJsLike(rootNode) {
           const names = m[1].split(",").map((s) => s.trim().split(/\s+as\s+|\s*:\s*/).pop()).filter(Boolean);
           for (const n of names) exports.add(n);
         } else {
-          // module.exports = app 等单值
+          // module.exports = app 等單值
           const single = text.match(/module\.exports\s*=\s*(\w+)/);
           if (single) exports.add(single[1]);
         }
@@ -230,12 +230,12 @@ function extractGo(rootNode) {
     if (!node) return;
     // import "x" / import ( "x"; "y" )
     if (node.type === "import_spec" || node.type === "import_declaration") {
-      // 单行 import_spec
+      // 單行 import_spec
       if (node.type === "import_spec") {
         const path = node.childForFieldName("path") || node.childForFieldName("name");
         if (path) imports.add((path.text || "").replace(/^['"]|['"]$/g, ""));
       } else {
-        // import_declaration：扫所有 child 中的 string
+        // import_declaration：掃所有 child 中的 string
         for (let i = 0; i < node.childCount; i++) {
           const c = node.child(i);
           if (!c) continue;
@@ -249,7 +249,7 @@ function extractGo(rootNode) {
         }
       }
     }
-    // function / method → Go 大写开头的 identifier 即导出
+    // function / method → Go 大寫開頭的 identifier 即匯出
     if (node.type === "function_declaration" || node.type === "method_declaration") {
       const nameNode = node.childForFieldName("name");
       if (nameNode) {
@@ -257,7 +257,7 @@ function extractGo(rootNode) {
         if (/^[A-Z]/.test(nameNode.text)) exports.add(nameNode.text);
       }
     }
-    // type X struct / type X interface → 视作"导出"
+    // type X struct / type X interface → 視作"匯出"
     if (node.type === "type_declaration") {
       for (let i = 0; i < node.childCount; i++) {
         const c = node.child(i);
@@ -286,7 +286,7 @@ function extractJava(rootNode) {
       const m = text.match(/import\s+(?:static\s+)?([\w.]+(?:\.\*)?)\s*;?/);
       if (m) imports.add(m[1]);
     }
-    // package declaration → 也算 import 的语义邻居，但非 import；忽略
+    // package declaration → 也算 import 的語義鄰居，但非 import；忽略
     if (node.type === "class_declaration" || node.type === "interface_declaration" || node.type === "enum_declaration" || node.type === "record_declaration") {
       const nameNode = node.childForFieldName("name");
       if (nameNode) exports.add(nameNode.text);
@@ -321,7 +321,7 @@ function extractRust(rootNode) {
       const nameNode = node.childForFieldName("name");
       if (nameNode) {
         functions.push({ name: nameNode.text, line: node.startPosition.row + 1, endLine: node.endPosition.row + 1 });
-        // 是否有 pub 修饰符
+        // 是否有 pub 修飾符
         const text = node.text || "";
         if (/^\s*pub\s+/m.test(text) || /^pub\s+fn/.test(text)) exports.add(nameNode.text);
       }
@@ -387,7 +387,7 @@ const EXTRACTORS = {
 };
 
 // ════════════════════════════════════════════════════════════
-// API endpoint 抽取（按语言分发）
+// API endpoint 抽取（按語言分發）
 // ════════════════════════════════════════════════════════════
 
 const HTTP_SERVER_NAMES_JS = new Set([
@@ -438,7 +438,7 @@ function extractPythonApiEndpoints(filePath, rootNode) {
   function visit(node) {
     if (!node) return;
     if (node.type === "decorated_definition") {
-      // Python tree-sitter: decorated_definition 的 decorator/definition 字段名不存在，按子节点类型找
+      // Python tree-sitter: decorated_definition 的 decorator/definition 欄位名不存在，按子節點型別找
       let dec = null, def = null;
       for (let i = 0; i < node.childCount; i++) {
         const c = node.child(i);
@@ -498,7 +498,7 @@ function extractGoApiEndpoints(filePath, rootNode) {
   return endpoints;
 }
 
-// Java Spring: @RequestMapping / @GetMapping / @PostMapping 注解方法
+// Java Spring: @RequestMapping / @GetMapping / @PostMapping 註解方法
 function extractJavaApiEndpoints(filePath, rootNode) {
   const endpoints = [];
   function visit(node) {
@@ -534,7 +534,7 @@ const API_EXTRACTORS = {
 };
 
 // ════════════════════════════════════════════════════════════
-// DB schema 识别（按语言分发）
+// DB schema 識別（按語言分發）
 // ════════════════════════════════════════════════════════════
 
 function extractPrisma(rootNode, filePath) {
@@ -600,7 +600,7 @@ function extractGoGorm(rootNode, filePath) {
       for (let i = 0; i < node.childCount; i++) {
         const c = node.child(i);
         if (!c || c.type !== "type_spec") continue;
-        // Go tree-sitter: type_spec 没有名为 'name' 的字段，type_identifier 是兄弟
+        // Go tree-sitter: type_spec 沒有名為 'name' 的欄位，type_identifier 是兄弟
         const nameNode = c.childForFieldName("name") || (() => {
           for (let j = 0; j < c.childCount; j++) {
             const cc = c.child(j);
@@ -632,7 +632,7 @@ function extractGoGorm(rootNode, filePath) {
 // Java: JPA @Entity + @Table / @Column
 function extractJavaJpa(rootNode, filePath) {
   const models = [];
-  // Java 注解分散在 modifiers 节点内；用全文模式扫描更稳
+  // Java 註解分散在 modifiers 節點內；用全文模式掃描更穩
   function visit(node) {
     if (!node) return;
     if (node.type === "class_declaration") {
@@ -662,7 +662,7 @@ function extractRustDiesel(rootNode, filePath) {
       if (!nameNode) return;
       const text = node.text || "";
       if (/derive\([^)]*(?:Queryable|Insertable|Table)[^)]*\)|#\[table_name\s*=/i.test(text)) {
-        // 简单计数：pub 行
+        // 簡單計數：pub 行
         const fields = (text.match(/^\s*pub\s+\w+/gm) || []).length;
         models.push({ name: nameNode.text, framework: "diesel", file: filePath, line: node.startPosition.row + 1, fieldCount: fields });
       }
@@ -683,7 +683,7 @@ function extractDbModels(filePath, rootNode, language) {
 }
 
 // ════════════════════════════════════════════════════════════
-// 调用图构建（BFS + DFS 最长链）
+// 呼叫圖構建（BFS + DFS 最長鏈）
 // ════════════════════════════════════════════════════════════
 function buildCallGraph(files) {
   const byPath = new Map();
@@ -760,7 +760,7 @@ async function main(projectPathArg) {
   const grammars = await loadGrammars();
   const TS = grammars.TS;
 
-  // 读取 config.json（可选）—— languages 白名单
+  // 讀取 config.json（可選）—— languages 白名單
   let enabledLangs = null;
   const cfgPath = join(projectPath, ".project-brain", "config.json");
   try {
@@ -841,7 +841,7 @@ async function main(projectPathArg) {
   return codegraph;
 }
 
-// 仅当作为 CLI 直接运行时执行；被 import 时不自动跑
+// 僅當作為 CLI 直接執行時執行；被 import 時不自動跑
 if (import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith("codegraph-scan.mjs")) {
   main().catch((e) => { console.error(e); process.exit(1); });
 }

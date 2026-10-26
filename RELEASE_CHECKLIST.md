@@ -1,10 +1,10 @@
-# 发布检查清单
+# 釋出檢查清單
 
-当前发布版本：`1.3.0`（v1.2.0 的 minor 版本，Durable Core 站立记忆 + 架构并列泳道 + 技术栈分层重构 + 截图从 7 张扩到 10 张）。
+當前釋出版本：`1.3.0`（v1.2.0 的 minor 版本，Durable Core 站立記憶 + 架構並列泳道 + 技術棧分層重構 + 截圖從 7 張擴到 10 張）。
 
-## 自动检查
+## 自動檢查
 
-发布前依次执行：
+釋出前依次執行：
 
 ```bash
 npm install
@@ -15,37 +15,37 @@ npm run verify:install
 npm audit
 ```
 
-`verify:release` 会检查版本一致性、Host/Client 入口、DSH patch、npm 文件白名单，以及发布文件中是否出现本机用户路径、临时目录、Session ID、GitHub Token、私钥或项目脑数据。
+`verify:release` 會檢查版本一致性、Host/Client 入口、DSH patch、npm 檔案白名單，以及釋出檔案中是否出現本機使用者路徑、臨時目錄、Session ID、GitHub Token、私鑰或專案腦資料。
 
-`verify:install` 会从当前源码生成真实 tarball，在临时空项目中让 npm 正常解析可选 DSH peers 并安装，再验证 Host、Client 和 patch 入口；用于提前发现用户安装时的 `ERESOLVE` 或缺少构建产物问题。
+`verify:install` 會從當前原始碼生成真實 tarball，在臨時空專案中讓 npm 正常解析可選 DSH peers 並安裝，再驗證 Host、Client 和 patch 入口；用於提前發現使用者安裝時的 `ERESOLVE` 或缺少構建產物問題。
 
-## DSH profile 与客户端人工验收
+## DSH profile 與客戶端人工驗收
 
-> v0.7.0-beta.3 起：13 项中 **11 项已通过 `npm run test:acceptance` 自动化覆盖**（39/39 PASS）。
-> 详细报告：[ACCEPTANCE.md](./ACCEPTANCE.md)。
+> v0.7.0-beta.3 起：13 項中 **11 項已通過 `npm run test:acceptance` 自動化覆蓋**（39/39 PASS）。
+> 詳細報告：[ACCEPTANCE.md](./ACCEPTANCE.md)。
 
-- [x] 从干净 profile 安装 GitHub/NPM 包并重启当前 DSH 进程（`verify:install`）
-- [x] 普通单仓库初始化、重扫、四个 Dashboard 页签正常（host-acceptance AC-2，13/13）
-- [x] Monorepo 初始化后生成职责级架构报告（host-acceptance AC-3，2/2）
-- [x] 在两个 workspace 间切换，项目数据和记忆不串台（smoke-multi-workspace 25/25 + host-acceptance AC-4）
-- [x] 新建 Session 能自动注入当前项目的关键记忆与待办（host-acceptance AC-5，2/2）
-- [x] 结束含稳定决策的 Session 后生成 `session_semantic` 记忆；无路由时仅降级、不影响关闭（host-acceptance AC-6，3/3）
-- [x] Quick Action 展示执行中、成功、确认和错误重试状态（host-acceptance AC-7，3/3）
-- [x] 当前 DSH LLM 路由可用时显示"DSH LLM 增强"（host-acceptance AC-8，3/3）
-- [x] LLM 不可用、超时或 JSON 异常时正确降级为本地分析（host-acceptance AC-9，4/4）
-- [x] 默认关键词检索正常；可选 Embedding 配置后混合检索正常（smoke-memory-retrieval）
-- [x] 卸载插件不会删除 workspace 中的 `.project-brain/`（host-acceptance AC-11，3/3 + verify:release 文件白名单）
-- [x] 在 DSH Web 或承载 Web Client 的 Desktop 环境验证 Dashboard 与 TodoStrip（用户 2026-09-15 实测通过；流程详见 `USER_VERIFICATION.md`）
-- [x] 在至少一个非 Web profile 验证 Host 工具兼容性，或明确记录缺失的 required service（**已知限制**：DSH Desktop 0.1.1-rc.2 当前仅支持 `desktop` / `web` / `headless` profile，无 `cli` / `tui` profile，待 DSH 添加后再验证）
+- [x] 從乾淨 profile 安裝 GitHub/NPM 包並重啟當前 DSH 程序（`verify:install`）
+- [x] 普通單倉庫初始化、重掃、四個 Dashboard 頁籤正常（host-acceptance AC-2，13/13）
+- [x] Monorepo 初始化後生成職責級架構報告（host-acceptance AC-3，2/2）
+- [x] 在兩個 workspace 間切換，專案資料和記憶不串臺（smoke-multi-workspace 25/25 + host-acceptance AC-4）
+- [x] 新建 Session 能自動注入當前專案的關鍵記憶與待辦（host-acceptance AC-5，2/2）
+- [x] 結束含穩定決策的 Session 後生成 `session_semantic` 記憶；無路由時僅降級、不影響關閉（host-acceptance AC-6，3/3）
+- [x] Quick Action 展示執行中、成功、確認和錯誤重試狀態（host-acceptance AC-7，3/3）
+- [x] 當前 DSH LLM 路由可用時顯示"DSH LLM 增強"（host-acceptance AC-8，3/3）
+- [x] LLM 不可用、超時或 JSON 異常時正確降級為本地分析（host-acceptance AC-9，4/4）
+- [x] 預設關鍵詞檢索正常；可選 Embedding 配置後混合檢索正常（smoke-memory-retrieval）
+- [x] 解除安裝外掛不會刪除 workspace 中的 `.project-brain/`（host-acceptance AC-11，3/3 + verify:release 檔案白名單）
+- [x] 在 DSH Web 或承載 Web Client 的 Desktop 環境驗證 Dashboard 與 TodoStrip（使用者 2026-09-15 實測通過；流程詳見 `USER_VERIFICATION.md`）
+- [x] 在至少一個非 Web profile 驗證 Host 工具相容性，或明確記錄缺失的 required service（**已知限制**：DSH Desktop 0.1.1-rc.2 當前僅支援 `desktop` / `web` / `headless` profile，無 `cli` / `tui` profile，待 DSH 新增後再驗證）
 
-## 发布分级
+## 釋出分級
 
-- `0.7.0-beta.2`：可以邀请用户试用并收集不同 DSH 版本、模型和项目类型的反馈。
-- 稳定版：完成上述人工验收，补齐商店截图，并至少验证一个普通仓库和一个 Monorepo 后再发布。
+- `0.7.0-beta.2`：可以邀請使用者試用並收集不同 DSH 版本、模型和專案型別的反饋。
+- 穩定版：完成上述人工驗收，補齊商店截圖，並至少驗證一個普通倉庫和一個 Monorepo 後再發布。
 
-## 已知边界
+## 已知邊界
 
-- Session 自动摘要会记录 Git 变化并抽取最多 4 条稳定语义记忆；输入受长度限制且不会包含工具输出，关键意图仍建议显式记录。
-- 架构 LLM 依赖当前 Session 已建立可用模型路由；否则自动使用本地分析。
-- `project_diff` 的独立 LLM 路径仍需要兼容的 OpenAI 或 Anthropic API 配置。
-- Git multi-pack-index（MIDX）尚未完整支持。
+- Session 自動摘要會記錄 Git 變化並抽取最多 4 條穩定語義記憶；輸入受長度限制且不會包含工具輸出，關鍵意圖仍建議顯式記錄。
+- 架構 LLM 依賴當前 Session 已建立可用模型路由；否則自動使用本地分析。
+- `project_diff` 的獨立 LLM 路徑仍需要相容的 OpenAI 或 Anthropic API 配置。
+- Git multi-pack-index（MIDX）尚未完整支援。

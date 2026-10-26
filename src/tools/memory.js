@@ -1,6 +1,6 @@
 // project_memory_add / project_memory_list Tools
-// P0.4 工具面补全：此前 memory 只有 CLI（brain-memory.mjs），Agent 无法在会话内写入。
-// 数据格式与 CLI 一致（memory.jsonl 每行一个 JSON）。
+// P0.4 工具面補全：此前 memory 只有 CLI（brain-memory.mjs），Agent 無法在會話內寫入。
+// 資料格式與 CLI 一致（memory.jsonl 每行一個 JSON）。
 
 import { defineTool } from "@deepseek-ai/dsh-tools";
 import { brainPath, appendJsonl, readJsonl, writeJsonl } from "../host/store/brain-files.js";
@@ -39,20 +39,20 @@ export function buildMemoryAddTool({ fs, sandboxPolicy, getLlm }) {
   return defineTool({
     name: "project_memory_add",
     description:
-      "dsh-project-brain: 写入一条跨会话仍为真的项目记忆（decision/requirement/architecture/bug/lesson/preference）。" +
-      "用户明确表达的长期协作口径与工作偏好用 preference。" +
-      "不要写入 changelog、本次改了哪些文件或会话流水账；进行中的工作用 project_todo_*。" +
-      " content 必须自包含：不要出现「这个/那个/上面说的」这类指代词，换成它真正指的东西。" +
-      " importance 0~1。工具可能因规则或模型确认拒绝，不要改写成 changelog 再试。",
+      "dsh-project-brain: 寫入一條跨會話仍為真的專案記憶（decision/requirement/architecture/bug/lesson/preference）。" +
+      "使用者明確表達的長期協作口徑與工作偏好用 preference。" +
+      "不要寫入 changelog、本次改了哪些檔案或會話流水賬；進行中的工作用 project_todo_*。" +
+      " content 必須自包含：不要出現「這個/那個/上面說的」這類指代詞，換成它真正指的東西。" +
+      " importance 0~1。工具可能因規則或模型確認拒絕，不要改寫成 changelog 再試。",
     parameters: {
-      type: { type: "string", description: "记忆类型，枚举：" + MEMORY_TYPES.join(" | ") },
-      title: { type: "string", description: "标题（一句话，<=200 字符）" },
-      content: { type: "string", description: "正文：what + why（决策需含理由与被否方案）" },
-      importance: { type: "number", description: "重要性 0~1，默认 0.5" },
-      confidence: { type: "number", description: "可信度 0~1，默认 0.7" },
-      relatedFiles: { type: "array", items: { type: "string" }, description: "相关文件路径（可选）" },
-      tags: { type: "array", items: { type: "string" }, description: "标签（可选）" },
-      path: { type: "string", description: "项目根路径（默认从 session cwd 推断）" },
+      type: { type: "string", description: "記憶型別，列舉：" + MEMORY_TYPES.join(" | ") },
+      title: { type: "string", description: "標題（一句話，<=200 字元）" },
+      content: { type: "string", description: "正文：what + why（決策需含理由與被否方案）" },
+      importance: { type: "number", description: "重要性 0~1，預設 0.5" },
+      confidence: { type: "number", description: "可信度 0~1，預設 0.7" },
+      relatedFiles: { type: "array", items: { type: "string" }, description: "相關檔案路徑（可選）" },
+      tags: { type: "array", items: { type: "string" }, description: "標籤（可選）" },
+      path: { type: "string", description: "專案根路徑（預設從 session cwd 推斷）" },
     },
     output: {
       schema: {
@@ -78,7 +78,7 @@ export function buildMemoryAddTool({ fs, sandboxPolicy, getLlm }) {
         const projectPath = resolveProjectPath(args, exec, sandboxPolicy);
         const type = normalizeMemoryType(args && args.type);
         if (!type) {
-          return { ok: false, code: "E_INVALID_TYPE", message: "type 必须是 " + MEMORY_TYPES.join("/") + " 之一" };
+          return { ok: false, code: "E_INVALID_TYPE", message: "type 必須是 " + MEMORY_TYPES.join("/") + " 之一" };
         }
         if (!args || !args.title || !String(args.title).trim()) {
           return { ok: false, code: "E_NO_TITLE", message: "title 必填" };
@@ -119,7 +119,7 @@ export function buildMemoryAddTool({ fs, sandboxPolicy, getLlm }) {
           const entry = admitted.entry;
           await appendJsonl(fs, brainPath(projectPath, "timeline.jsonl"), {
             id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-            title: "新增记忆[" + entry.type + "]：" + entry.title,
+            title: "新增記憶[" + entry.type + "]：" + entry.title,
             eventType: "memory",
             occurredAt: now,
           });
@@ -139,14 +139,14 @@ export function buildMemoryListTool({ fs, sandboxPolicy }) {
   return defineTool({
     name: "project_memory_list",
     description:
-      "dsh-project-brain: 读取当前项目的项目记忆，按重要度排序返回（可按 type 过滤）。" +
-      "回答“为什么这么设计/之前踩过什么坑”类问题前先调用。",
+      "dsh-project-brain: 讀取當前專案的專案記憶，按重要度排序返回（可按 type 過濾）。" +
+      "回答“為什麼這麼設計/之前踩過什麼坑”類問題前先呼叫。",
     parameters: {
-      type: { type: "string", description: "只看该类型（可选）：" + MEMORY_TYPES.join(" | ") },
-      limit: { type: "number", description: "返回条数上限，默认 10" },
-      includeArchived: { type: "boolean", description: "是否包含 archived/superseded 记忆，默认 false" },
-      layer: { type: "string", description: "active（默认 Core）| dormant | all（active+dormant）" },
-      path: { type: "string", description: "项目根路径（默认从 session cwd 推断）" },
+      type: { type: "string", description: "只看該型別（可選）：" + MEMORY_TYPES.join(" | ") },
+      limit: { type: "number", description: "返回條數上限，預設 10" },
+      includeArchived: { type: "boolean", description: "是否包含 archived/superseded 記憶，預設 false" },
+      layer: { type: "string", description: "active（預設 Core）| dormant | all（active+dormant）" },
+      path: { type: "string", description: "專案根路徑（預設從 session cwd 推斷）" },
     },
     output: {
       schema: {
@@ -216,19 +216,19 @@ export function buildMemoryListTool({ fs, sandboxPolicy }) {
 }
 
 // ─── project_memory_archive ───
-// 软删除一条记忆（status → archived）。isActiveMemory 会过滤掉，injector / retrieval 都不再看到它。
-// 但 .project-brain/memory.jsonl 中保留这条记录，便于追溯。
-// 使用场景：用户/agent 发现记忆错误、过时或与现实冲突时主动清理。
+// 軟刪除一條記憶（status → archived）。isActiveMemory 會過濾掉，injector / retrieval 都不再看到它。
+// 但 .project-brain/memory.jsonl 中保留這條記錄，便於追溯。
+// 使用場景：使用者/agent 發現記憶錯誤、過時或與現實衝突時主動清理。
 export function buildMemoryArchiveTool({ fs, sandboxPolicy }) {
   return defineTool({
     name: "project_memory_archive",
     description:
-      "dsh-project-brain: 归档一条项目记忆（status → archived，从检索/注入中移除但保留记录）。" +
-      "用于修正错误/过时/与现实冲突的记忆。需传入 id 前缀或精确 id。",
+      "dsh-project-brain: 歸檔一條專案記憶（status → archived，從檢索/注入中移除但保留記錄）。" +
+      "用於修正錯誤/過時/與現實衝突的記憶。需傳入 id 字首或精確 id。",
     parameters: {
-      id: { type: "string", description: "记忆 id 或其前缀（唯一匹配）" },
-      reason: { type: "string", description: "归档原因（记入 source 字段用于追溯）" },
-      path: { type: "string", description: "项目根路径（默认从 session cwd 推断）" },
+      id: { type: "string", description: "記憶 id 或其字首（唯一匹配）" },
+      reason: { type: "string", description: "歸檔原因（記入 source 欄位用於追溯）" },
+      path: { type: "string", description: "專案根路徑（預設從 session cwd 推斷）" },
     },
     output: {
       schema: {
@@ -258,16 +258,16 @@ export function buildMemoryArchiveTool({ fs, sandboxPolicy }) {
           return { ok: false, code: "E_NO_ID", message: "id 必填" };
         }
         const now = Date.now();
-        // 读整表到写回之间要独占，否则和并发的 admit / 人工编辑互相覆盖。
+        // 讀整表到寫回之間要獨佔，否則和併發的 admit / 人工編輯互相覆蓋。
         const archived = await withWriteLock(brainTxKey(projectPath, "memory.jsonl"), async () => {
           const memories = await readJsonl(fs, brainPath(projectPath, "memory.jsonl"));
-          // 唯一匹配：id 等于或以 prefix 开头
+          // 唯一匹配：id 等於或以 prefix 開頭
           const matches = memories.filter((m) => m && m.id && (m.id === idPrefix || m.id.indexOf(idPrefix) === 0) && isRetrievableMemory(m));
           if (matches.length === 0) {
-            return { ok: false, code: "E_NOT_FOUND", message: `未找到 id=${idPrefix} 的活跃记忆` };
+            return { ok: false, code: "E_NOT_FOUND", message: `未找到 id=${idPrefix} 的活躍記憶` };
           }
           if (matches.length > 1) {
-            return { ok: false, code: "E_AMBIGUOUS_ID", message: `id=${idPrefix} 匹配到 ${matches.length} 条，请提供更精确的 id` };
+            return { ok: false, code: "E_AMBIGUOUS_ID", message: `id=${idPrefix} 匹配到 ${matches.length} 條，請提供更精確的 id` };
           }
           const hit = matches[0];
           const updated = memories.map((m) => {
@@ -288,7 +288,7 @@ export function buildMemoryArchiveTool({ fs, sandboxPolicy }) {
         // timeline 事件
         await appendJsonl(fs, brainPath(projectPath, "timeline.jsonl"), {
           id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-          title: "归档记忆[" + target.type + "]：" + target.title + (reason ? "（" + reason + "）" : ""),
+          title: "歸檔記憶[" + target.type + "]：" + target.title + (reason ? "（" + reason + "）" : ""),
           eventType: "memory_archive",
           occurredAt: now,
           detail: "id=" + target.id + (reason ? " reason=" + reason : ""),
@@ -303,25 +303,25 @@ export function buildMemoryArchiveTool({ fs, sandboxPolicy }) {
 }
 
 // ─── project_memory_supersede ───
-// 用一条新记忆替换一条旧记忆。旧记忆 status → superseded，source.supersededBy 指向新记忆。
-// 新记忆正常 append。fingerprint 去重：若已有相同 fingerprint 的记忆，会被去重跳过。
+// 用一條新記憶替換一條舊記憶。舊記憶 status → superseded，source.supersededBy 指向新記憶。
+// 新記憶正常 append。fingerprint 去重：若已有相同 fingerprint 的記憶，會被去重跳過。
 export function buildMemorySupersedeTool({ fs, sandboxPolicy }) {
   return defineTool({
     name: "project_memory_supersede",
     description:
-      "dsh-project-brain: 用新记忆替换旧记忆（旧记忆 → superseded，新记忆正常 append）。" +
-      "用于决策更新、架构变更等场景。新记忆可由 type/title/content 完整指定。",
+      "dsh-project-brain: 用新記憶替換舊記憶（舊記憶 → superseded，新記憶正常 append）。" +
+      "用於決策更新、架構變更等場景。新記憶可由 type/title/content 完整指定。",
     parameters: {
-      oldId: { type: "string", description: "被替换的旧记忆 id 或前缀" },
-      type: { type: "string", description: "新记忆类型（必填）" },
-      title: { type: "string", description: "新记忆标题（必填）" },
-      content: { type: "string", description: "新记忆正文（必填）" },
+      oldId: { type: "string", description: "被替換的舊記憶 id 或字首" },
+      type: { type: "string", description: "新記憶型別（必填）" },
+      title: { type: "string", description: "新記憶標題（必填）" },
+      content: { type: "string", description: "新記憶正文（必填）" },
       importance: { type: "number", description: "重要性 0~1" },
       confidence: { type: "number", description: "可信度 0~1" },
-      relatedFiles: { type: "array", items: { type: "string" }, description: "相关文件路径" },
-      tags: { type: "array", items: { type: "string" }, description: "标签" },
-      reason: { type: "string", description: "替换原因（写入旧记忆的 supersededReason）" },
-      path: { type: "string", description: "项目根路径（默认从 session cwd 推断）" },
+      relatedFiles: { type: "array", items: { type: "string" }, description: "相關檔案路徑" },
+      tags: { type: "array", items: { type: "string" }, description: "標籤" },
+      reason: { type: "string", description: "替換原因（寫入舊記憶的 supersededReason）" },
+      path: { type: "string", description: "專案根路徑（預設從 session cwd 推斷）" },
     },
     output: {
       schema: {
@@ -350,14 +350,14 @@ export function buildMemorySupersedeTool({ fs, sandboxPolicy }) {
         const title = args && typeof args.title === "string" ? args.title.trim() : "";
         const content = args && typeof args.content === "string" ? args.content : "";
         if (!oldId) return { ok: false, code: "E_NO_OLD_ID", message: "oldId 必填" };
-        if (!type) return { ok: false, code: "E_INVALID_TYPE", message: "type 必须是 " + MEMORY_TYPES.join("/") + " 之一" };
+        if (!type) return { ok: false, code: "E_INVALID_TYPE", message: "type 必須是 " + MEMORY_TYPES.join("/") + " 之一" };
         if (!title) return { ok: false, code: "E_NO_TITLE", message: "title 必填" };
         if (!content || String(content).length < 20) return { ok: false, code: "E_NO_CONTENT", message: "content 必填且 ≥ 20 字" };
         const reason = args && typeof args.reason === "string" ? args.reason.trim().slice(0, 500) : "";
         const memories = await readJsonl(fs, brainPath(projectPath, "memory.jsonl"));
         const matches = memories.filter((m) => m && m.id && (m.id === oldId || m.id.indexOf(oldId) === 0) && isRetrievableMemory(m));
-        if (matches.length === 0) return { ok: false, code: "E_OLD_NOT_FOUND", message: `未找到 id=${oldId} 的可检索记忆` };
-        if (matches.length > 1) return { ok: false, code: "E_AMBIGUOUS_ID", message: `oldId=${oldId} 匹配到 ${matches.length} 条，请提供更精确的 id` };
+        if (matches.length === 0) return { ok: false, code: "E_OLD_NOT_FOUND", message: `未找到 id=${oldId} 的可檢索記憶` };
+        if (matches.length > 1) return { ok: false, code: "E_AMBIGUOUS_ID", message: `oldId=${oldId} 匹配到 ${matches.length} 條，請提供更精確的 id` };
         const oldTarget = matches[0];
         const now = Date.now();
         const sessionId = executionSessionId(exec);
@@ -383,8 +383,8 @@ export function buildMemorySupersedeTool({ fs, sandboxPolicy }) {
         }
         const newEntry = admitted.entry || { id: admitted.id, type, title };
         if (reason && admitted.action === "insert") {
-          // 这是整表重写，必须独占。admitMemory 此时已经释放了锁，不会重入；
-          // 不加锁的话，读到写之间任何并发 append 的新记忆都会被整片吞掉。
+          // 這是整表重寫，必須獨佔。admitMemory 此時已經釋放了鎖，不會重入；
+          // 不加鎖的話，讀到寫之間任何併發 append 的新記憶都會被整片吞掉。
           await withWriteLock(brainTxKey(projectPath, "memory.jsonl"), async () => {
             const latest = await readJsonl(fs, brainPath(projectPath, "memory.jsonl"));
             const withReason = latest.map((m) => {
@@ -396,7 +396,7 @@ export function buildMemorySupersedeTool({ fs, sandboxPolicy }) {
         }
         await appendJsonl(fs, brainPath(projectPath, "timeline.jsonl"), {
           id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-          title: "替换记忆[" + oldTarget.type + "→" + newEntry.type + "]：" + newEntry.title + (reason ? "（" + reason + "）" : ""),
+          title: "替換記憶[" + oldTarget.type + "→" + newEntry.type + "]：" + newEntry.title + (reason ? "（" + reason + "）" : ""),
           eventType: "memory_supersede",
           occurredAt: now,
           detail: "oldId=" + oldTarget.id + " newId=" + newEntry.id + (reason ? " reason=" + reason : ""),

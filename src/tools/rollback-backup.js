@@ -1,10 +1,10 @@
-// project_rollback_backup Tool — 从本地 .project-brain.backup-<ts>/ 回滚
+// project_rollback_backup Tool — 從本地 .project-brain.backup-<ts>/ 回滾
 //
-// 与 import 不同：本操作只读本机备份，不需 bundle 文件。
-// 流程（dryRun → apply 两步机制）：
-//   1. dryRun=true  → 校验 backup 存在 → 读取元信息 → 发放 confirmToken
-//   2. UI 显示预览（source / 当前脑 / pre-rollback backup 路径）
-//   3. dryRun=false + confirmToken → 备份当前脑 → 还原 backup → 触发 rescan
+// 與 import 不同：本操作只讀本機備份，不需 bundle 檔案。
+// 流程（dryRun → apply 兩步機制）：
+//   1. dryRun=true  → 校驗 backup 存在 → 讀取元資訊 → 發放 confirmToken
+//   2. UI 顯示預覽（source / 當前腦 / pre-rollback backup 路徑）
+//   3. dryRun=false + confirmToken → 備份當前腦 → 還原 backup → 觸發 rescan
 
 import { defineTool } from "@deepseek-ai/dsh-tools";
 import { resolveProjectPath } from "../host/store/path-resolver.js";
@@ -40,21 +40,21 @@ export function buildRollbackBackupTool({ fs, sandboxPolicy }) {
   return defineTool({
     name: "project_rollback_backup",
     description:
-      "dsh-project-brain: 把当前脑回滚到指定的 .project-brain.backup-<ts>/ 备份。" +
-      "**两步机制**：先 dryRun=true 拿 confirmToken，再 dryRun=false + token 真正执行。" +
-      "回滚前会先把当前脑再备份一次（形成完整历史链），无需传 bundle 文件。",
+      "dsh-project-brain: 把當前腦回滾到指定的 .project-brain.backup-<ts>/ 備份。" +
+      "**兩步機制**：先 dryRun=true 拿 confirmToken，再 dryRun=false + token 真正執行。" +
+      "回滾前會先把當前腦再備份一次（形成完整歷史鏈），無需傳 bundle 檔案。",
     parameters: {
-      path: { type: "string", description: "项目根路径（默认从 session cwd 推断）" },
-      backupTimestamp: { type: "string", description: "备份时间戳，格式 yyyymmdd-hhmmss-mmm（如 20260915-143022-345；旧备份 hhmm-mmm 仍可用）" },
-      dryRun: { type: "boolean", description: "true=仅预览（默认 false）" },
-      confirmToken: { type: "string", description: "dryRun 返回的 token；dryRun=false 时必填" },
+      path: { type: "string", description: "專案根路徑（預設從 session cwd 推斷）" },
+      backupTimestamp: { type: "string", description: "備份時間戳，格式 yyyymmdd-hhmmss-mmm（如 20260915-143022-345；舊備份 hhmm-mmm 仍可用）" },
+      dryRun: { type: "boolean", description: "true=僅預覽（預設 false）" },
+      confirmToken: { type: "string", description: "dryRun 返回的 token；dryRun=false 時必填" },
     },
     output: { schema: baseOutputSchema, render: renderRollback },
     async execute(args, exec) {
       try {
         const projectPath = resolveProjectPath(args, exec, sandboxPolicy);
         if (projectPath === ".") {
-          return { ok: false, code: "E_NO_PATH", message: "无法解析项目路径（请显式传 path）" };
+          return { ok: false, code: "E_NO_PATH", message: "無法解析專案路徑（請顯式傳 path）" };
         }
         const backupTimestamp = args && args.backupTimestamp;
         if (!backupTimestamp) {
@@ -89,8 +89,8 @@ export function buildRollbackBackupTool({ fs, sandboxPolicy }) {
               willBackupCurrentTo: preview.willBackupCurrentTo,
               confirmToken,
               warning: preview.currentBrain && preview.currentBrain.exists
-                ? "回滚前会先把当前脑备份到 " + preview.willBackupCurrentTo + "，可继续回滚。"
-                : "当前脑不存在，回滚后会成为当前脑。",
+                ? "回滾前會先把當前腦備份到 " + preview.willBackupCurrentTo + "，可繼續回滾。"
+                : "當前腦不存在，回滾後會成為當前腦。",
             },
           };
         }
@@ -98,14 +98,14 @@ export function buildRollbackBackupTool({ fs, sandboxPolicy }) {
         // Apply
         const token = args && args.confirmToken;
         if (!token) {
-          return { ok: false, code: "E_CONFIRM_TOKEN_REQUIRED", message: "dryRun=false 必须传 confirmToken（先 dryRun=true 拿到 token）" };
+          return { ok: false, code: "E_CONFIRM_TOKEN_REQUIRED", message: "dryRun=false 必須傳 confirmToken（先 dryRun=true 拿到 token）" };
         }
         const payload = tokenStore.consume(token, { kind: "rollback" });
         if (!payload) {
-          return { ok: false, code: "E_CONFIRM_TOKEN_MISMATCH", message: "confirmToken 无效、已过期或类型不匹配（请重新 dryRun）" };
+          return { ok: false, code: "E_CONFIRM_TOKEN_MISMATCH", message: "confirmToken 無效、已過期或型別不匹配（請重新 dryRun）" };
         }
         if (payload.projectPath !== projectPath || payload.backupTimestamp !== backupTimestamp) {
-          return { ok: false, code: "E_CONFIRM_TOKEN_MISMATCH", message: "confirmToken 与当前参数不匹配（请重新 dryRun）" };
+          return { ok: false, code: "E_CONFIRM_TOKEN_MISMATCH", message: "confirmToken 與當前引數不匹配（請重新 dryRun）" };
         }
 
         let applied;
@@ -124,7 +124,7 @@ export function buildRollbackBackupTool({ fs, sandboxPolicy }) {
           const now = Date.now();
           const event = {
             id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-            title: "回滚到备份 " + backupTimestamp,
+            title: "回滾到備份 " + backupTimestamp,
             eventType: "rollback",
             occurredAt: now,
             payload: {
@@ -145,7 +145,7 @@ export function buildRollbackBackupTool({ fs, sandboxPolicy }) {
             restoredFrom: applied.restoredFrom,
             preRollbackBackupPath: applied.preRollbackBackupPath,
             rescanTriggered: false,
-            warning: "回滚完成。建议手动调 project_rescan 刷新架构与统计。",
+            warning: "回滾完成。建議手動調 project_rescan 重新整理架構與統計。",
           },
         };
       } catch (e) {
@@ -173,16 +173,16 @@ function renderRollback(_args, value) {
         { type: "text", text: `  source backup: ${sb.backupName} (${sb.sizeBytes} bytes, ${sb.memCount} mem / ${sb.todoCount} todo / ${sb.timelineCount} timeline)` },
         { type: "text", text: `  current brain: ${cb.exists
           ? `${cb.memCount} mem / ${cb.todoCount} todo / ${cb.timelineCount} timeline`
-          : "(无)"}` },
-        { type: "text", text: "  pre-rollback backup: " + (d.willBackupCurrentTo || "(无需)") },
-        { type: "text", text: "  confirmToken: " + d.confirmToken + " (5 分钟内传给 dryRun=false)" },
+          : "(無)"}` },
+        { type: "text", text: "  pre-rollback backup: " + (d.willBackupCurrentTo || "(無需)") },
+        { type: "text", text: "  confirmToken: " + d.confirmToken + " (5 分鐘內傳給 dryRun=false)" },
       ];
     }
     if (d.mode === "applied") {
       return [
         { type: "text", text: "dsh-project-brain: rollback APPLIED" },
         { type: "text", text: "  restored from: " + d.restoredFrom },
-        { type: "text", text: "  pre-rollback backup: " + (d.preRollbackBackupPath || "(无)") },
+        { type: "text", text: "  pre-rollback backup: " + (d.preRollbackBackupPath || "(無)") },
         { type: "text", text: "  " + (d.warning || "") },
       ];
     }

@@ -1,12 +1,12 @@
-// smoke-multi-lang.mjs — v0.4.8 验证 6 种语言的 codegraph 扫描
-// 覆盖 JS/TS/Python/Go/Java/Rust/C：
-//   1. 各语言 grammar 可加载
-//   2. 各语言 import / function / export 抽取正确
-//   3. JS/Python API endpoint 抽取正确
-//   4. Go Gin / Java Spring API endpoint 抽取正确
-//   5. Java JPA / Go Gorm DB schema 抽取正确
-//   6. config.json languages 白名单生效
-//   7. 调用图覆盖跨文件 import
+// smoke-multi-lang.mjs — v0.4.8 驗證 6 種語言的 codegraph 掃描
+// 覆蓋 JS/TS/Python/Go/Java/Rust/C：
+//   1. 各語言 grammar 可載入
+//   2. 各語言 import / function / export 抽取正確
+//   3. JS/Python API endpoint 抽取正確
+//   4. Go Gin / Java Spring API endpoint 抽取正確
+//   5. Java JPA / Go Gorm DB schema 抽取正確
+//   6. config.json languages 白名單生效
+//   7. 呼叫圖覆蓋跨檔案 import
 
 import { existsSync, readFileSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
@@ -28,13 +28,13 @@ function cleanup() {
 }
 
 function scanSync() {
-  // CLI 已经把 codegraph.json 写出来了，直接读
+  // CLI 已經把 codegraph.json 寫出來了，直接讀
   return JSON.parse(readFileSync(join(FIXTURE_DIR, ".project-brain", "codegraph.json"), "utf8"));
 }
 
 console.log("[smoke-multi-lang] start");
 
-// ─── 测试 1: 各语言 grammar 可加载 ───
+// ─── 測試 1: 各語言 grammar 可載入 ───
 async function testGrammarLoad() {
   const langs = ["tree-sitter-javascript", "tree-sitter-python", "tree-sitter-go", "tree-sitter-java", "tree-sitter-rust", "tree-sitter-c"];
   for (const pkg of langs) {
@@ -48,7 +48,7 @@ async function testGrammarLoad() {
 }
 await testGrammarLoad();
 
-// ─── 测试 2-6: 完整扫描 + 各维度断言 ───
+// ─── 測試 2-6: 完整掃描 + 各維度斷言 ───
 cleanup();
 import { spawnSync } from "node:child_process";
 let g;
@@ -56,7 +56,7 @@ const cliResult = spawnSync(process.execPath, [join(PLUGIN_DIR, "scripts", "code
 if (cliResult.status === 0) {
   g = scanSync();
 } else {
-  // fallback: 直接 import 调 scanProject（DSH sandbox 拒绝 spawn 时）
+  // fallback: 直接 import 調 scanProject（DSH sandbox 拒絕 spawn 時）
   g = await scanProject(FIXTURE_DIR);
 }
 
@@ -126,7 +126,7 @@ assert(g.callGraph.entrypoints.length > 0, "call graph entrypoints exist");
 const jsEp = g.callGraph.entrypoints.find((e) => e.file === "src/js/index.js");
 assert(jsEp && jsEp.reachable >= 2, `js/index.js reaches user.js (reachable=${jsEp ? jsEp.reachable : 0})`);
 
-// ─── 测试 7: config.json languages 白名单 ───
+// ─── 測試 7: config.json languages 白名單 ───
 const brainDir = join(FIXTURE_DIR, ".project-brain");
 mkdirSync(brainDir, { recursive: true });
 writeFileSync(join(brainDir, "config.json"), JSON.stringify({ languages: ["python", "go"] }));

@@ -1,8 +1,8 @@
-// project_dream Tool — 记忆整理。
-//   mode=light：归档 changelog 体裁、超额 Core 降 dormant、报告标题相似建议。
-//   mode=full ：在 light 的基础上再做一次 vacuum，把过期的归档行与旧时间线
-//               搬到 .project-brain/archive/，让主文件真的变小。
-// 两种模式都禁止 Jaccard merge-and-drop，也都不做不可恢复的删除。
+// project_dream Tool — 記憶整理。
+//   mode=light：歸檔 changelog 體裁、超額 Core 降 dormant、報告標題相似建議。
+//   mode=full ：在 light 的基礎上再做一次 vacuum，把過期的歸檔行與舊時間線
+//               搬到 .project-brain/archive/，讓主檔案真的變小。
+// 兩種模式都禁止 Jaccard merge-and-drop，也都不做不可恢復的刪除。
 
 import { defineTool } from "@deepseek-ai/dsh-tools";
 import { brainPath, readJsonl } from "../host/store/brain-files.js";
@@ -23,14 +23,14 @@ export function buildDreamTool({ fs, sandboxPolicy, getMemoryConfig }) {
   return defineTool({
     name: "project_dream",
     description:
-      "dsh-project-brain: 整理记忆（归档 changelog 体裁、超额 Core 降为 dormant、报告标题相似建议）。" +
-      "默认 dryRun=true；dryRun=false 时只应用归档与休眠，绝不因标题相似删除。" +
-      "mode=full 额外做一次 vacuum：把超期的归档记忆与旧时间线搬到 .project-brain/archive/，" +
-      "主文件变小但数据仍可找回；活跃记忆、置顶、证据链引用与第一屏依赖的锚点都不会被搬走。",
+      "dsh-project-brain: 整理記憶（歸檔 changelog 體裁、超額 Core 降為 dormant、報告標題相似建議）。" +
+      "預設 dryRun=true；dryRun=false 時只應用歸檔與休眠，絕不因標題相似刪除。" +
+      "mode=full 額外做一次 vacuum：把超期的歸檔記憶與舊時間線搬到 .project-brain/archive/，" +
+      "主檔案變小但資料仍可找回；活躍記憶、置頂、證據鏈引用與第一屏依賴的錨點都不會被搬走。",
     parameters: {
-      mode: { type: "string", description: "light（默认，只整理状态）或 full（额外 vacuum 主文件）" },
-      dryRun: { type: "boolean", description: "只返回计划（默认 true）" },
-      path: { type: "string", description: "项目根路径（默认从 session cwd 推断）" },
+      mode: { type: "string", description: "light（預設，只整理狀態）或 full（額外 vacuum 主檔案）" },
+      dryRun: { type: "boolean", description: "只返回計劃（預設 true）" },
+      path: { type: "string", description: "專案根路徑（預設從 session cwd 推斷）" },
     },
     output: { schema: baseOutputSchema, render: (_args, value) => renderDream(value) },
     async execute(args, exec) {
@@ -39,7 +39,7 @@ export function buildDreamTool({ fs, sandboxPolicy, getMemoryConfig }) {
         const mode = (args && args.mode) || "light";
         const dryRun = args && args.dryRun !== false;
         if (mode !== "light" && mode !== "full") {
-          return { ok: true, data: { mode, plannedActions: [], note: "mode 仅支持 light / full（" + mode + " 未实现）" } };
+          return { ok: true, data: { mode, plannedActions: [], note: "mode 僅支援 light / full（" + mode + " 未實現）" } };
         }
 
         const memories = await readJsonl(fs, brainPath(projectPath, "memory.jsonl"));
@@ -51,7 +51,7 @@ export function buildDreamTool({ fs, sandboxPolicy, getMemoryConfig }) {
         const suggestCount = plannedActions.filter((a) => a.action === "suggest_supersede").length;
 
         const memoryConfig = getMemoryConfig ? getMemoryConfig() : {};
-        // full 模式先算一遍 vacuum 计划，dryRun 时也要让用户看到会搬走多少。
+        // full 模式先算一遍 vacuum 計劃，dryRun 時也要讓使用者看到會搬走多少。
         const vacuumPlanned = mode === "full"
           ? await vacuumBrain({ fs, projectPath, config: memoryConfig, now, dryRun: true })
           : null;
@@ -74,8 +74,8 @@ export function buildDreamTool({ fs, sandboxPolicy, getMemoryConfig }) {
                 estimatedMs: 0,
               },
               note: mode === "full"
-                ? "dryRun=true，未写文件；commit 会应用 archive_rule / evict_to_dormant，并把超期死行搬到 archive/。"
-                : "dryRun=true，未写文件；commit 只应用 archive_rule / evict_to_dormant，不会 Jaccard 删除。",
+                ? "dryRun=true，未寫檔案；commit 會應用 archive_rule / evict_to_dormant，並把超期死行搬到 archive/。"
+                : "dryRun=true，未寫檔案；commit 只應用 archive_rule / evict_to_dormant，不會 Jaccard 刪除。",
             },
           };
         }
@@ -88,13 +88,13 @@ export function buildDreamTool({ fs, sandboxPolicy, getMemoryConfig }) {
           return { ok: false, data: { error: { code: "E_DREAM_WRITE_FAILED", message: "write memory.jsonl failed" } } };
         }
 
-        // vacuum 必须在 housekeep 落盘之后跑：housekeep 可能刚把一批记忆标成 archived，
-        // 这一轮才知道它们够不够老。
+        // vacuum 必須在 housekeep 落盤之後跑：housekeep 可能剛把一批記憶標成 archived，
+        // 這一輪才知道它們夠不夠老。
         let vacuum = null;
         if (mode === "full") {
           vacuum = await vacuumBrain({ fs, projectPath, config: memoryConfig, now, dryRun: false });
           if (!vacuum.ok) {
-            return { ok: false, data: { error: { code: vacuum.code || "E_VACUUM_FAILED", message: "vacuum 未能完成，主文件保持原样" } } };
+            return { ok: false, data: { error: { code: vacuum.code || "E_VACUUM_FAILED", message: "vacuum 未能完成，主檔案保持原樣" } } };
           }
         }
 
@@ -106,7 +106,7 @@ export function buildDreamTool({ fs, sandboxPolicy, getMemoryConfig }) {
 
         const vacuumNote = vacuum && vacuum.changed
           ? " vacuum 搬走 " + vacuum.plan.totalEvicted + " 行到 archive/。"
-          : (mode === "full" ? " 没有超期的死行需要搬走。" : "");
+          : (mode === "full" ? " 沒有超期的死行需要搬走。" : "");
 
         return {
           ok: true,
@@ -132,8 +132,8 @@ export function buildDreamTool({ fs, sandboxPolicy, getMemoryConfig }) {
               estimatedMs: Date.now() - now,
             },
             note: (persisted.changed
-              ? "housekeep 已写 memory.jsonl；相似标题仅作为 suggest_supersede。"
-              : "housekeep 无变化，未写文件。") + vacuumNote,
+              ? "housekeep 已寫 memory.jsonl；相似標題僅作為 suggest_supersede。"
+              : "housekeep 無變化，未寫檔案。") + vacuumNote,
           },
         };
       } catch (e) {

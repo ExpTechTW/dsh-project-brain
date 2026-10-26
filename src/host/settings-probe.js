@@ -15,10 +15,10 @@ export async function probeEmbedding({ config, resolveCredential, fetchImpl, sig
   const endpoint = cfg.embeddingBaseURL ? embeddingEndpoint(cfg.embeddingBaseURL) : "";
   const model = cfg.embeddingModel || "";
   if (!cfg.vectorEnabled) {
-    return fail("EMBEDDING_DISABLED", "向量检索未启用，打开开关后再测", { endpoint, model });
+    return fail("EMBEDDING_DISABLED", "向量檢索未啟用，開啟開關後再測", { endpoint, model });
   }
   if (!cfg.embeddingBaseURL || !cfg.embeddingModel) {
-    return fail("EMBEDDING_NOT_CONFIGURED", "需要同时填写 Embedding 地址和模型名", { endpoint, model });
+    return fail("EMBEDDING_NOT_CONFIGURED", "需要同時填寫 Embedding 地址和模型名", { endpoint, model });
   }
   let apiKey = null;
   if (cfg.embeddingApiKeyEnv) {
@@ -26,8 +26,8 @@ export async function probeEmbedding({ config, resolveCredential, fetchImpl, sig
     if (!apiKey) {
       const shown = isEmbeddingEnvRef(cfg.embeddingApiKeyEnv) ? cfg.embeddingApiKeyEnv : redactSecret(cfg.embeddingApiKeyEnv);
       return fail("EMBEDDING_CREDENTIAL_MISSING", isEmbeddingEnvRef(cfg.embeddingApiKeyEnv)
-        ? ("本机没有环境变量 " + shown + "。请在系统或用户环境变量中配置同名项并完全重启 DSH Desktop，或改为直接填写 API Key。")
-        : "未解析到密钥，请直接填写 API Key。", {
+        ? ("本機沒有環境變數 " + shown + "。請在系統或使用者環境變數中配置同名項並完全重啟 DSH Desktop，或改為直接填寫 API Key。")
+        : "未解析到金鑰，請直接填寫 API Key。", {
         endpoint,
         model,
         envName: isEmbeddingEnvRef(cfg.embeddingApiKeyEnv) ? cfg.embeddingApiKeyEnv : undefined,
@@ -48,11 +48,11 @@ export async function probeEmbedding({ config, resolveCredential, fetchImpl, sig
     if (cfg.embeddingDimensions && dimensions !== cfg.embeddingDimensions) {
       return fail(
         "EMBEDDING_DIMENSION_MISMATCH",
-        "返回维度 " + dimensions + " 与配置 " + cfg.embeddingDimensions + " 不一致",
+        "返回維度 " + dimensions + " 與配置 " + cfg.embeddingDimensions + " 不一致",
         Object.assign({}, details, { expected: cfg.embeddingDimensions }),
       );
     }
-    return ok("向量连通，维度 " + dimensions, details);
+    return ok("向量連通，維度 " + dimensions, details);
   } catch (error) {
     return fail(
       (error && error.code) || "EMBEDDING_FAILED",
@@ -64,10 +64,10 @@ export async function probeEmbedding({ config, resolveCredential, fetchImpl, sig
 
 export async function probeSessionLlm({ llm, route, sessionId, timeoutMs } = {}) {
   if (!llm || typeof llm.stream !== "function") {
-    return fail("LLM_SERVICE_UNAVAILABLE", "DSH 未把模型服务暴露给项目脑", {});
+    return fail("LLM_SERVICE_UNAVAILABLE", "DSH 未把模型服務暴露給專案腦", {});
   }
   if (!route || !route.provider || !route.model) {
-    return fail("LLM_SESSION_ROUTE_UNAVAILABLE", "当前会话还没有模型路由，先发一条消息后再测", {});
+    return fail("LLM_SESSION_ROUTE_UNAVAILABLE", "當前會話還沒有模型路由，先發一條訊息後再測", {});
   }
   const started = Date.now();
   const detailsBase = { provider: route.provider, model: route.model };
@@ -85,7 +85,7 @@ export async function probeSessionLlm({ llm, route, sessionId, timeoutMs } = {})
         temperature: 0,
       },
     );
-    return ok("LLM 连通 " + route.provider + "/" + route.model, Object.assign({}, detailsBase, {
+    return ok("LLM 連通 " + route.provider + "/" + route.model, Object.assign({}, detailsBase, {
       latencyMs: Date.now() - started,
       sample: String(text || "").slice(0, 80),
     }));

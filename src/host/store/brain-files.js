@@ -1,14 +1,14 @@
-// brain-files.js - .project-brain/ 文件访问层（基于 DSH fs 服务适配器）
-// 供 Host tools 使用；与 scripts/*.mjs（node:fs 直连）保持相同数据格式。
+// brain-files.js - .project-brain/ 檔案訪問層（基於 DSH fs 服務介面卡）
+// 供 Host tools 使用；與 scripts/*.mjs（node:fs 直連）保持相同資料格式。
 //
-// DSH fs 服务接口（tools 实际可用面）：
+// DSH fs 服務介面（tools 實際可用面）：
 //   fs.resolve(path, { cwd? }) -> target
 //   fs.readText(target) / fs.writeText(target, content)
 //   fs.listDir(target)
-// 本模块只依赖 resolve/readText/writeText（+ 可选 mkdir），全部容错。
+// 本模組只依賴 resolve/readText/writeText（+ 可選 mkdir），全部容錯。
 //
-// fs 只有覆盖写，所以每次 append 都是读全文再写全文。writeText / appendLine
-// 都按路径串行化，保证单个文件上的写入不会互相覆盖。
+// fs 只有覆蓋寫，所以每次 append 都是讀全文再寫全文。writeText / appendLine
+// 都按路徑序列化，保證單個檔案上的寫入不會互相覆蓋。
 
 import { withWriteLock } from "./write-lock.js";
 
@@ -43,10 +43,10 @@ export async function readText(fs, path) {
   }
 }
 
-// v0.3.7：默认取 danger-full-access policy
-//   如果调用方没传 writePolicy 且 fs 上有 sandboxPolicy（host fiber），
-//   自动解析 danger-full-access mode（绕过 workspace 路径限制）。
-//   node fs adapter（测试/CLI 脚本）无 sandboxPolicy → 返回 null（不限）。
+// v0.3.7：預設取 danger-full-access policy
+//   如果呼叫方沒傳 writePolicy 且 fs 上有 sandboxPolicy（host fiber），
+//   自動解析 danger-full-access mode（繞過 workspace 路徑限制）。
+//   node fs adapter（測試/CLI 指令碼）無 sandboxPolicy → 返回 null（不限）。
 function resolveWritePolicy(fs, writePolicy) {
   if (writePolicy) return writePolicy;
   try {
@@ -58,7 +58,7 @@ function resolveWritePolicy(fs, writePolicy) {
   return null;
 }
 
-// 不加锁的底层覆盖写。只有已经持有同一把文件锁的调用方（appendLine）可以直接用它。
+// 不加鎖的底層覆蓋寫。只有已經持有同一把檔案鎖的呼叫方（appendLine）可以直接用它。
 async function writeTextRaw(fs, path, content, writePolicy) {
   const policy = resolveWritePolicy(fs, writePolicy);
   try {
@@ -77,7 +77,7 @@ async function writeTextRaw(fs, path, content, writePolicy) {
     } catch (e) { /* ignore */ }
     const target = await fs.resolve(path);
     // fs.writeText(target, content, expected?, signal?, sandboxPolicy?)
-    // 显式传 policy 作为第 5 参数
+    // 顯式傳 policy 作為第 5 引數
     if (policy) {
       try { await fs.writeText(target, content, undefined, undefined, policy); return true; }
       catch (e) { /* fallthrough: try without policy */ }
@@ -93,39 +93,39 @@ export async function writeText(fs, path, content, writePolicy) {
   return withWriteLock(path, () => writeTextRaw(fs, path, content, writePolicy));
 }
 
-// v0.4.0：appendLine — 直接追加单行内容到文件末尾（避免 O(N) 反序列化）
-//   DSH fs service 没暴露原生 appendFile，但 writeText 是覆盖写。
-//   优化方案：先 readText 拿当前内容（跳过 parseJsonl 反序列化），补换行，
-//   再调 writeText 写"原文 + 新内容"。大文件下仍 O(N) 但避开 JSON.parse/stringify CPU 开销。
-//   注意：仍非真 O(1)；要 O(1) 必须用 shell service spawn 子进程调 node:fs.appendFileSync（DSH Desktop sandbox 可能拦截）。
+// v0.4.0：appendLine — 直接追加單行內容到檔案末尾（避免 O(N) 反序列化）
+//   DSH fs service 沒暴露原生 appendFile，但 writeText 是覆蓋寫。
+//   最佳化方案：先 readText 拿當前內容（跳過 parseJsonl 反序列化），補換行，
+//   再調 writeText 寫"原文 + 新內容"。大檔案下仍 O(N) 但避開 JSON.parse/stringify CPU 開銷。
+//   注意：仍非真 O(1)；要 O(1) 必須用 shell service spawn 子程序調 node:fs.appendFileSync（DSH Desktop sandbox 可能攔截）。
 //
-// 行为保证：
-//   - 文件不存在 → 直接 writeText(line)
-//   - 文件末尾有 "\n" → 直接 writeText(oldContent + line)
-//   - 文件末尾无 "\n" → writeText(oldContent + "\n" + line)（修补换行）
-//   - line 必须自带 "\n" 结尾（appendJsonl 调用方保证）
+// 行為保證：
+//   - 檔案不存在 → 直接 writeText(line)
+//   - 檔案末尾有 "\n" → 直接 writeText(oldContent + line)
+//   - 檔案末尾無 "\n" → writeText(oldContent + "\n" + line)（修補換行）
+//   - line 必須自帶 "\n" 結尾（appendJsonl 呼叫方保證）
 export async function appendLine(fs, path, line, writePolicy) {
   if (line == null) return false;
-  // 确保 line 以 \n 结尾（但不强制要求 — 兼容空行）
+  // 確保 line 以 \n 結尾（但不強制要求 — 相容空行）
   const normalizedLine = String(line).endsWith("\n") ? String(line) : String(line) + "\n";
-  // 读全文和写全文之间不能插进别的写入，否则并发 append 会互相覆盖。
+  // 讀全文和寫全文之間不能插進別的寫入，否則併發 append 會互相覆蓋。
   return withWriteLock(path, async () => {
     try {
       const target = await fs.resolve(path);
       let existing = null;
-      try { existing = await fs.readText(target); } catch (e) { /* 文件不存在或不可读 → 当作空 */ }
+      try { existing = await fs.readText(target); } catch (e) { /* 檔案不存在或不可讀 → 當作空 */ }
       let next;
       if (existing == null || existing === "") {
-        // 文件不存在或空 → 直接写 line
+        // 檔案不存在或空 → 直接寫 line
         next = normalizedLine;
       } else if (existing.endsWith("\n")) {
-        // 文件末尾有换行 → 直接拼接
+        // 檔案末尾有換行 → 直接拼接
         next = existing + normalizedLine;
       } else {
-        // 文件末尾无换行 → 补换行（边界保护）
+        // 檔案末尾無換行 → 補換行（邊界保護）
         next = existing + "\n" + normalizedLine;
       }
-      // 已经持有这把文件锁，必须走不加锁的底层写，否则自己等自己。
+      // 已經持有這把檔案鎖，必須走不加鎖的底層寫，否則自己等自己。
       return writeTextRaw(fs, path, next, writePolicy);
     } catch (e) {
       return false;
@@ -135,7 +135,7 @@ export async function appendLine(fs, path, line, writePolicy) {
 
 export function parseJsonl(text) {
   if (!text) return [];
-  // 去 BOM（UTF-8 BOM 0xFEFF 或 \\r），trim 也清不掉的字符
+  // 去 BOM（UTF-8 BOM 0xFEFF 或 \\r），trim 也清不掉的字元
   let t = String(text);
   if (t.charCodeAt(0) === 0xFEFF) t = t.slice(1);
   const out = [];
@@ -156,16 +156,16 @@ export async function readJsonl(fs, path) {
   return parseJsonl(await readText(fs, path));
 }
 
-// v0.4.0：appendJsonl — 写一条 JSONL entry（用 appendLine 优化版本）
-//   旧实现：readJsonl（O(N) parse）+ push + serializeJsonl + writeText（O(N) serialize）= O(N) + 2× 反序列化开销
-//   新实现：appendLine（只 readText 拿原内容 + 直接拼接新行）= O(N) 一次读 + 一次写，避开 JSON parse/stringify
-//   行为兼容：调用方无需改动；文件格式不变；并发安全（DSH 单线程 host fiber serialize 调用）
+// v0.4.0：appendJsonl — 寫一條 JSONL entry（用 appendLine 最佳化版本）
+//   舊實現：readJsonl（O(N) parse）+ push + serializeJsonl + writeText（O(N) serialize）= O(N) + 2× 反序列化開銷
+//   新實現：appendLine（只 readText 拿原內容 + 直接拼接新行）= O(N) 一次讀 + 一次寫，避開 JSON parse/stringify
+//   行為相容：呼叫方無需改動；檔案格式不變；併發安全（DSH 單執行緒 host fiber serialize 呼叫）
 export async function appendJsonl(fs, path, entry, writePolicy) {
   return appendLine(fs, path, JSON.stringify(entry) + "\n", writePolicy);
 }
 
-// 覆盖写整个 jsonl（dream commit / batch archive 用）
-// items 已按调用方要求排好；不主动 normalize / sort。
+// 覆蓋寫整個 jsonl（dream commit / batch archive 用）
+// items 已按呼叫方要求排好；不主動 normalize / sort。
 export async function writeJsonl(fs, path, items, writePolicy) {
   return writeText(fs, path, serializeJsonl(items || []), writePolicy);
 }
@@ -187,7 +187,7 @@ export async function writeJson(fs, path, obj, writePolicy) {
   return writeText(fs, path, JSON.stringify(obj, null, 2), writePolicy);
 }
 
-// 一次读齐 .project-brain 四类数据（project / timeline / memory / todo）
+// 一次讀齊 .project-brain 四類資料（project / timeline / memory / todo）
 export async function readBrain(fs, projectPath) {
   const [project, timeline, memories, todos] = await Promise.all([
     readJson(fs, brainPath(projectPath, "project.json")),

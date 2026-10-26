@@ -1,5 +1,5 @@
-// verify-init.mjs — 独立复现 project_init 逻辑（Node fs 版）
-// 用途：CLI 调试 / 离线验证 scanner 输出；与 src/scanner.js 保持同逻辑
+// verify-init.mjs — 獨立復現 project_init 邏輯（Node fs 版）
+// 用途：CLI 除錯 / 離線驗證 scanner 輸出；與 src/scanner.js 保持同邏輯
 // 用法：node scripts/verify-init.mjs [projectPath] [--dry-run]
 
 import { promises as fs } from "node:fs";
@@ -130,7 +130,7 @@ async function main() {
     const brainDir = path.join(projectPath, ".project-brain");
     await fs.mkdir(brainDir, { recursive: true });
 
-    // P0.4.1：重跑时保留已有 projectId / createdAt（与 src/tools.js 一致）
+    // P0.4.1：重跑時保留已有 projectId / createdAt（與 src/tools.js 一致）
     const projFile = path.join(brainDir, "project.json");
     let existing = null;
     try {
@@ -147,12 +147,12 @@ async function main() {
     await fs.writeFile(projFile, JSON.stringify(projectData, null, 2), "utf8");
     console.log(`[verify-init] wrote ${projFile} (${isRescan ? "rescan, id preserved" : "first init"})`);
 
-    // P0.4：追加 timeline 事件（记录 init/rescan 扫描）
+    // P0.4：追加 timeline 事件（記錄 init/rescan 掃描）
     try {
       const timelineFile = path.join(brainDir, "timeline.jsonl");
       const timelineEntry = {
         id: "evt-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-        title: isRescan ? "完成重扫（verify-init）" : "完成 project_init 扫描",
+        title: isRescan ? "完成重掃（verify-init）" : "完成 project_init 掃描",
         eventType: isRescan ? "rescan" : "init",
         occurredAt: now,
         detail: `languages=${Object.keys(scan.languages).join("/") || "none"} files=${scan.fileCount}`,

@@ -1,11 +1,11 @@
-// smoke-session-window.mjs — 会话变更窗口（工作树 mtime + 窗口内 commit）
+// smoke-session-window.mjs — 會話變更視窗（工作樹 mtime + 視窗內 commit）
 //
-// 覆盖：
-//   1) sessionWindowStart：上次 session_summary 优先，其次 lastScannedAt/createdAt，最长回看 14 天
-//   2) 非 git 目录：按 mtime 落窗，忽略 node_modules/.project-brain/dist
-//   3) git 仓库：窗口内 commit 的 tree diff 进结果，窗口外 commit 不进
-//   4) 工作树：已跟踪文件改动 = modified，未跟踪新文件 = added
-//   5) maxFiles 截断
+// 覆蓋：
+//   1) sessionWindowStart：上次 session_summary 優先，其次 lastScannedAt/createdAt，最長回看 14 天
+//   2) 非 git 目錄：按 mtime 落窗，忽略 node_modules/.project-brain/dist
+//   3) git 倉庫：視窗內 commit 的 tree diff 進結果，視窗外 commit 不進
+//   4) 工作樹：已跟蹤檔案改動 = modified，未跟蹤新檔案 = added
+//   5) maxFiles 截斷
 
 import assert from "node:assert/strict";
 import { mkdtempSync, mkdirSync, writeFileSync, utimesSync, rmSync } from "node:fs";
@@ -30,19 +30,19 @@ assert.equal(
     project: { createdAt: NOW - 30 * DAY },
   }, NOW),
   NOW - 2 * DAY,
-  "优先取最近一条 session_summary",
+  "優先取最近一條 session_summary",
 );
 
 assert.equal(
   sessionWindowStart({ timeline: [], project: { lastScannedAt: NOW - 2 * DAY, createdAt: NOW - 9 * DAY } }, NOW),
   NOW - 2 * DAY,
-  "无摘要时退回 lastScannedAt",
+  "無摘要時退回 lastScannedAt",
 );
 
 const clamped = sessionWindowStart({ timeline: [{ eventType: "session_summary", occurredAt: NOW - 400 * DAY }] }, NOW);
-assert.ok(clamped >= NOW - 15 * DAY && clamped <= NOW - 13 * DAY, "最长只回看 14 天");
+assert.ok(clamped >= NOW - 15 * DAY && clamped <= NOW - 13 * DAY, "最長只回看 14 天");
 
-// ── 2) 非 git 目录：mtime 落窗 ──
+// ── 2) 非 git 目錄：mtime 落窗 ──
 const plain = mkdtempSync(join(tmpdir(), "dsh-pb-window-plain-"));
 mkdirSync(join(plain, "src"), { recursive: true });
 mkdirSync(join(plain, "node_modules", "pkg"), { recursive: true });
@@ -61,19 +61,19 @@ touch(plain, join("node_modules", "pkg", "index.js"), NOW - 60_000);
 touch(plain, join(".project-brain", "memory.jsonl"), NOW - 60_000);
 
 const plainRes = detectSessionChanges({ projectPath: plain, sinceMs: NOW - DAY, now: NOW });
-assert.ok(plainRes.files.includes("src/fresh.js"), "窗口内文件进结果");
-assert.ok(!plainRes.files.includes("src/old.js"), "窗口外文件不进结果");
+assert.ok(plainRes.files.includes("src/fresh.js"), "視窗內檔案進結果");
+assert.ok(!plainRes.files.includes("src/old.js"), "視窗外檔案不進結果");
 assert.ok(!plainRes.files.some((f) => f.startsWith("node_modules/")), "node_modules 被忽略");
 assert.ok(!plainRes.files.some((f) => f.startsWith(".project-brain/")), ".project-brain 被忽略");
 assert.equal(plainRes.source, "worktree");
-assert.ok(!plainRes.error, "非 git 目录不算错误");
+assert.ok(!plainRes.error, "非 git 目錄不算錯誤");
 
-// 非 git 项目没有 HEAD tree 可比，只能靠「窗口内才出生」识别新增文件；
-// 否则新建文件会被当成 modified，架构的结构化触发永远不生效。
+// 非 git 專案沒有 HEAD tree 可比，只能靠「視窗內才出生」識別新增檔案；
+// 否則新建檔案會被當成 modified，架構的結構化觸發永遠不生效。
 touch(plain, join("src", "brand-new.js"), NOW - 30_000);
 const plainAdded = detectSessionChanges({ projectPath: plain, sinceMs: NOW - DAY, now: NOW });
 assert.equal((plainAdded.changes.find((c) => c.path === "src/brand-new.js") || {}).type, "added");
-assert.equal((plainAdded.changes.find((c) => c.path === "src/fresh.js") || {}).type, "added", "窗口内新建的都算 added");
+assert.equal((plainAdded.changes.find((c) => c.path === "src/fresh.js") || {}).type, "added", "視窗內新建的都算 added");
 
 // ── git fixture ──
 const sha1 = (bytes) => createHash("sha1").update(bytes).digest("hex");
@@ -108,13 +108,13 @@ const gitDir = join(repo, ".git");
 mkdirSync(join(gitDir, "refs", "heads"), { recursive: true });
 mkdirSync(join(gitDir, "objects"), { recursive: true });
 
-// c1（窗口外）：base.js + stale.js
+// c1（視窗外）：base.js + stale.js
 const baseBlob = writeLoose(gitDir, "blob", "base v1");
 const staleBlob = writeLoose(gitDir, "blob", "stale v1");
 const tree1 = makeTree(gitDir, [{ name: "base.js", hash: baseBlob }, { name: "stale.js", hash: staleBlob }]);
 const c1 = makeCommit(gitDir, { tree: tree1, atMs: NOW - 10 * DAY });
 
-// c2（窗口内）：改 base.js，新增 added.js
+// c2（視窗內）：改 base.js，新增 added.js
 const baseBlob2 = writeLoose(gitDir, "blob", "base v2");
 const addedBlob = writeLoose(gitDir, "blob", "added v1");
 const tree2 = makeTree(gitDir, [
@@ -127,7 +127,7 @@ const c2 = makeCommit(gitDir, { tree: tree2, parents: [c1], atMs: NOW - 2 * 3600
 writeFileSync(join(gitDir, "HEAD"), "ref: refs/heads/main\n");
 writeFileSync(join(gitDir, "refs", "heads", "main"), c2 + "\n");
 
-// 工作树：tracked 文件新改（modified）+ untracked 新文件（added）+ 老文件不动
+// 工作樹：tracked 檔案新改（modified）+ untracked 新檔案（added）+ 老檔案不動
 touch(repo, "base.js", NOW - 10 * DAY);
 touch(repo, "stale.js", NOW - 10 * DAY);
 touch(repo, "added.js", NOW - 10 * DAY);
@@ -135,19 +135,19 @@ touch(repo, "dirty.js", NOW - 30_000);
 touch(repo, "tracked-edit.js", NOW - 10 * DAY);
 
 const gitRes = detectSessionChanges({ projectPath: repo, sinceMs: NOW - DAY, now: NOW });
-assert.ok(gitRes.files.includes("base.js"), "窗口内 commit 修改的文件进结果");
-assert.ok(gitRes.files.includes("added.js"), "窗口内 commit 新增的文件进结果");
-assert.ok(!gitRes.files.includes("stale.js"), "窗口外 commit 的文件不进结果");
-assert.ok(gitRes.files.includes("dirty.js"), "工作树新改文件进结果");
+assert.ok(gitRes.files.includes("base.js"), "視窗內 commit 修改的檔案進結果");
+assert.ok(gitRes.files.includes("added.js"), "視窗內 commit 新增的檔案進結果");
+assert.ok(!gitRes.files.includes("stale.js"), "視窗外 commit 的檔案不進結果");
+assert.ok(gitRes.files.includes("dirty.js"), "工作樹新改檔案進結果");
 assert.equal(gitRes.source, "git+worktree");
-assert.ok(gitRes.commits.length >= 1 && gitRes.commits.length <= 2, "只收窗口内 commit");
+assert.ok(gitRes.commits.length >= 1 && gitRes.commits.length <= 2, "只收視窗內 commit");
 
 const typeOf = (p) => (gitRes.changes.find((c) => c.path === p) || {}).type;
 assert.equal(typeOf("base.js"), "modified");
 assert.equal(typeOf("added.js"), "added");
-assert.equal(typeOf("dirty.js"), "added", "HEAD tree 里没有的新文件算 added");
+assert.equal(typeOf("dirty.js"), "added", "HEAD tree 裡沒有的新檔案算 added");
 
-// ── 5) maxFiles 截断 ──
+// ── 5) maxFiles 截斷 ──
 const capped = detectSessionChanges({ projectPath: repo, sinceMs: NOW - 30 * DAY, now: NOW, maxFiles: 2 });
 assert.equal(capped.files.length, 2);
 assert.ok(capped.truncated === true);

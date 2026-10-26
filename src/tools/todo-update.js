@@ -1,5 +1,5 @@
-// project_todo_update Tool - 更新一条待办（status / title / description / priority）
-// 按 todo id（前缀）或 title 精确匹配。
+// project_todo_update Tool - 更新一條待辦（status / title / description / priority）
+// 按 todo id（字首）或 title 精確匹配。
 
 import { defineTool } from "@deepseek-ai/dsh-tools";
 import { brainPath, readJsonl, writeText, appendJsonl, serializeJsonl } from "../host/store/brain-files.js";
@@ -28,28 +28,28 @@ export function buildTodoUpdateTool({ fs, sandboxPolicy }) {
   return defineTool({
     name: "project_todo_update",
     description:
-      "dsh-project-brain: 更新一条待办（按 id 或 title 匹配）。" +
+      "dsh-project-brain: 更新一條待辦（按 id 或 title 匹配）。" +
       "可改 status（pending/in_progress/blocked/done/cancelled）、title、description、priority（low/medium/high/urgent）。" +
-      "完成后写 timeline 事件并触发 preview 刷新。",
+      "完成後寫 timeline 事件並觸發 preview 重新整理。",
     parameters: {
-      id: { type: "string", description: "todo id 或其前缀（与 title 二选一）" },
-      title: { type: "string", description: "todo 标题精确匹配（与 id 二选一）" },
-      status: { type: "string", description: "新状态：" + TODO_STATUSES.join(" | ") },
-      newTitle: { type: "string", description: "新标题（可选）" },
-      description: { type: "string", description: "新描述（可选）" },
-      priority: { type: "string", description: "新优先级：" + TODO_PRIORITIES.join(" | ") },
-      path: { type: "string", description: "项目根路径（默认从 session cwd 推断）" },
+      id: { type: "string", description: "todo id 或其字首（與 title 二選一）" },
+      title: { type: "string", description: "todo 標題精確匹配（與 id 二選一）" },
+      status: { type: "string", description: "新狀態：" + TODO_STATUSES.join(" | ") },
+      newTitle: { type: "string", description: "新標題（可選）" },
+      description: { type: "string", description: "新描述（可選）" },
+      priority: { type: "string", description: "新優先順序：" + TODO_PRIORITIES.join(" | ") },
+      path: { type: "string", description: "專案根路徑（預設從 session cwd 推斷）" },
     },
     output: { schema: baseOutputSchema, render: (_args, value) => renderTodoUpdate(value) },
     async execute(args, exec) {
       try {
         const projectPath = resolveProjectPath(args, exec, sandboxPolicy);
         const ref = (args && (args.id || args.title)) || "";
-        if (!ref) return { ok: false, data: { error: { code: "E_NO_REF", message: "id 或 title 必填一项" } } };
+        if (!ref) return { ok: false, data: { error: { code: "E_NO_REF", message: "id 或 title 必填一項" } } };
         const todoPath = brainPath(projectPath, "todo.jsonl");
         const todos = await readJsonl(fs, todoPath);
         const target = findTodo(todos, ref);
-        if (!target) return { ok: false, data: { error: { code: "E_NOT_FOUND", message: "未找到匹配的活跃待办：" + ref } } };
+        if (!target) return { ok: false, data: { error: { code: "E_NOT_FOUND", message: "未找到匹配的活躍待辦：" + ref } } };
 
         const now = Date.now();
         let changed = [];
@@ -57,12 +57,12 @@ export function buildTodoUpdateTool({ fs, sandboxPolicy }) {
           if (t.id !== target.id) continue;
           if (args.status != null) {
             const ns = normalizeStatus(args.status);
-            if (!ns) return { ok: false, data: { error: { code: "E_INVALID_STATUS", message: "status 必须是 " + TODO_STATUSES.join("/") } } };
+            if (!ns) return { ok: false, data: { error: { code: "E_INVALID_STATUS", message: "status 必須是 " + TODO_STATUSES.join("/") } } };
             if (t.status !== ns) { t.status = ns; changed.push("status=" + ns); }
           }
           if (args.priority != null) {
             const np = normalizePriority(args.priority);
-            if (!np) return { ok: false, data: { error: { code: "E_INVALID_PRIORITY", message: "priority 必须是 " + TODO_PRIORITIES.join("/") } } };
+            if (!np) return { ok: false, data: { error: { code: "E_INVALID_PRIORITY", message: "priority 必須是 " + TODO_PRIORITIES.join("/") } } };
             if (t.priority !== np) { t.priority = np; changed.push("priority=" + np); }
           }
           if (args.newTitle != null && String(args.newTitle).trim()) {
@@ -80,7 +80,7 @@ export function buildTodoUpdateTool({ fs, sandboxPolicy }) {
 
         await appendJsonl(fs, brainPath(projectPath, "timeline.jsonl"), {
           id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-          title: "更新待办[" + target.id + "]：" + target.title + (changed.length ? "（" + changed.join(",") + "）" : ""),
+          title: "更新待辦[" + target.id + "]：" + target.title + (changed.length ? "（" + changed.join(",") + "）" : ""),
           eventType: "todo_update",
           occurredAt: now,
         });

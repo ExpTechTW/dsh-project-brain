@@ -1,5 +1,5 @@
 // dsh-project-brain Host 入口
-// 导出 name / inject / apply 三个 named export（cordis 4 标准）
+// 匯出 name / inject / apply 三個 named export（cordis 4 標準）
 
 import { buildProjectInitTool, buildProjectRescanTool } from "./tools.js";
 import { buildMemoryAddTool, buildMemoryListTool, buildMemoryArchiveTool, buildMemorySupersedeTool } from "./tools/memory.js";
@@ -17,11 +17,11 @@ import { buildCleanupBackupsTool } from "./tools/cleanup-backups.js";
 import { buildRollbackBackupTool } from "./tools/rollback-backup.js";
 import { invalidateAggregatorCache } from "./host/sidebar/aggregator.js";
 import { registerConnectionRpc, registerSidebarRpc } from "./host/rpc/sidebar.js";
-// v0.3.0: Context Injector（自动注入 Top-K 记忆到 system prompt，实现跨 Session 续接）
+// v0.3.0: Context Injector（自動注入 Top-K 記憶到 system prompt，實現跨 Session 續接）
 import { setupInjector } from "./host/injector.js";
-// P0.5: Session 摘要（session/flush 空闲去抖；session/disposed 立刻摘要）
+// P0.5: Session 摘要（session/flush 空閒去抖；session/disposed 立刻摘要）
 import { setupSummarizer } from "./host/summarizer.js";
-// v0.4.x: 实时交互记忆（监听 agent/inbox/claimed → 检测长期意图信号自动落盘）
+// v0.4.x: 即時互動記憶（監聽 agent/inbox/claimed → 檢測長期意圖訊號自動落盤）
 import { setupRealtimeMemory } from "./host/realtime-memory.js";
 import { Config, createMemoryConfigRuntime } from "./host/memory/config.js";
 import { createLlmRuntime } from "./host/architecture/analyzer.js";
@@ -30,8 +30,8 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
-// 插件版本（写入 bundle manifest + 跨版本兼容锚点）
-// 优先读 ctx.config.version（cordis loader 注入），兜底读 package.json
+// 外掛版本（寫入 bundle manifest + 跨版本相容錨點）
+// 優先讀 ctx.config.version（cordis loader 注入），兜底讀 package.json
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 function readPluginVersion() {
@@ -52,11 +52,11 @@ export const name = "dsh-project-brain";
 // here gives this plugin fiber lawful access to ctx.llm/ctx.get("llm").
 export const inject = ["tools", "fs", "sandboxPolicy", "connection", "sessions", "llm"];
 
-// Arrow（不能是 function declaration，否则 cordis 4 会当 class 构造）
+// Arrow（不能是 function declaration，否則 cordis 4 會當 class 構造）
 export const apply = (ctx, config) => {
-  // 顶层 try-catch：让 apply 永不抛错（避免整 fiber 崩）
-  // dshmarket hotMount 创建的子 fiber 不注入 host builtin（harness/timer/webServer），
-  // 任何 ctx.<service> 访问都可能抛 "cannot get property ... without inject"
+  // 頂層 try-catch：讓 apply 永不拋錯（避免整 fiber 崩）
+  // dshmarket hotMount 建立的子 fiber 不注入 host builtin（harness/timer/webServer），
+  // 任何 ctx.<service> 訪問都可能拋 "cannot get property ... without inject"
   try {
     return applyImpl(ctx, config);
   } catch (e) {
@@ -67,7 +67,7 @@ export const apply = (ctx, config) => {
 };
 
 function applyImpl(ctx, config) {
-  // 每个 service 访问都包 try-catch（cordis 在 inject 缺失时直接抛错）
+  // 每個 service 訪問都包 try-catch（cordis 在 inject 缺失時直接拋錯）
   function safeGet(name) {
     try { return ctx[name]; } catch (e) { return undefined; }
   }
@@ -99,11 +99,11 @@ function applyImpl(ctx, config) {
     return;
   }
 
-  // 1) 注册工具（P0.4.x + P0.5 + P0.7 + v0.4.1：16 个工具，含 v0.7.x memory_archive/supersede）
-  //   init/rescan（项目扫描）/ continue（续接）/ status（状态快照）
-  //   memory_add / memory_list / memory_archive / memory_supersede（记忆 CRUD 全套）
-  //   todo_add / todo_list / todo_done / todo_update（待办 CRUD）
-  //   ask（自然语言查询）/ dream（轻量整合）/ diff（v0.4.1 LLM 架构 diff）
+  // 1) 註冊工具（P0.4.x + P0.5 + P0.7 + v0.4.1：16 個工具，含 v0.7.x memory_archive/supersede）
+  //   init/rescan（專案掃描）/ continue（續接）/ status（狀態快照）
+  //   memory_add / memory_list / memory_archive / memory_supersede（記憶 CRUD 全套）
+  //   todo_add / todo_list / todo_done / todo_update（待辦 CRUD）
+  //   ask（自然語言查詢）/ dream（輕量整合）/ diff（v0.4.1 LLM 架構 diff）
   const toolBuilders = [
     buildProjectInitTool,
     buildProjectRescanTool,
@@ -147,8 +147,8 @@ function applyImpl(ctx, config) {
     }
   }
 
-  // 2) 注册 sidebar RPC（getPreview / initProject / continueSession）
-  // harness 是 host builtin；用 ctx.get 探测（避免模块作用域 typeof 假性）
+  // 2) 註冊 sidebar RPC（getPreview / initProject / continueSession）
+  // harness 是 host builtin；用 ctx.get 探測（避免模組作用域 typeof 假性）
   let harness;
   try { harness = ctx.get ? ctx.get("harness") : ctx.harness; } catch (e) { harness = undefined; }
   if (ctx.logger && typeof ctx.logger.info === "function") {
@@ -195,7 +195,7 @@ function applyImpl(ctx, config) {
     if (ctx.logger) try { ctx.logger.warn("[dsh-project-brain] connection RPC registration failed:", String((e && e.message) || e)); } catch {}
   }
 
-  // 3) preview.changed -> 清 aggregator 缓存
+  // 3) preview.changed -> 清 aggregator 快取
   try {
     if (ctx.on) {
       ctx.on("project_brain/preview.changed", (payload) => {
@@ -208,8 +208,8 @@ function applyImpl(ctx, config) {
     if (ctx.logger) try { ctx.logger.warn("[dsh-project-brain] event subscription failed:", String((e && e.message) || e)); } catch {}
   }
 
-  // 3.5) Context Injector。systemPrompt 不是主插件启动的硬依赖：用 Cordis
-  //   动态 inject 等待服务出现，避免直接 ctx.get("systemPrompt") 因未声明依赖而失败。
+  // 3.5) Context Injector。systemPrompt 不是主外掛啟動的硬依賴：用 Cordis
+  //   動態 inject 等待服務出現，避免直接 ctx.get("systemPrompt") 因未宣告依賴而失敗。
   try {
     if (typeof ctx.inject === "function") {
       ctx.inject(["systemPrompt"], (promptCtx) => setupInjector(promptCtx, fs, sandboxPolicy));
@@ -220,7 +220,7 @@ function applyImpl(ctx, config) {
     if (ctx.logger) try { ctx.logger.warn("[dsh-project-brain] setupInjector failed:", String((e && e.message) || e)); } catch {}
   }
 
-  // 4) Session 摘要：session/flush 安静一段时间后抽取；session/disposed 立刻抽取
+  // 4) Session 摘要：session/flush 安靜一段時間後抽取；session/disposed 立刻抽取
   try {
     setupSummarizer(ctx, fs, sandboxPolicy, {
       getMemoryConfig: memoryRuntime.get,
@@ -230,8 +230,8 @@ function applyImpl(ctx, config) {
     if (ctx.logger) try { ctx.logger.warn("[dsh-project-brain] setupSummarizer failed:", String((e && e.message) || e)); } catch {}
   }
 
-  // 4.5) 实时交互记忆：监听 agent/inbox/claimed → 检测长期意图信号 → 自动落盘
-  //   与 4) 的空闲摘要形成双通道：实时信号 + 会话沉淀兜底
+  // 4.5) 即時互動記憶：監聽 agent/inbox/claimed → 檢測長期意圖訊號 → 自動落盤
+  //   與 4) 的空閒摘要形成雙通道：即時訊號 + 會話沉澱兜底
   try {
     setupRealtimeMemory(ctx, fs, sandboxPolicy, {
       getMemoryConfig: memoryRuntime.get,
@@ -241,7 +241,7 @@ function applyImpl(ctx, config) {
     if (ctx.logger) try { ctx.logger.warn("[dsh-project-brain] setupRealtimeMemory failed:", String((e && e.message) || e)); } catch {}
   }
 
-  // 5) 启动成功 log
+  // 5) 啟動成功 log
   if (ctx.logger && typeof ctx.logger.info === "function") {
     try { ctx.logger.info("[dsh-project-brain] host loaded (runtime RPC, tools registered: " + registered + ")"); } catch {}
   }

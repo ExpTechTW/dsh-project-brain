@@ -1,13 +1,13 @@
 import { previewStackLayers, RUNTIME_STACK_FIELDS, DEVOPS_STACK_FIELDS } from "./stack-taxonomy.js";
 
-// dsh-project-brain Client 入口（v0.5.1：Connection RPC 实时数据 + 离线快照降级）
-// DSH 浏览器侧模块加载格式：window.__ModuleLoader__.load({id, factory})
+// dsh-project-brain Client 入口（v0.5.1：Connection RPC 即時資料 + 離線快照降級）
+// DSH 瀏覽器側模組載入格式：window.__ModuleLoader__.load({id, factory})
 //
-// 主数据通道：Client 用 connection.rpc 按 live sessionId 请求 Host，Host 从 Session
-// header 解析可信 cwd 并读取对应 .project-brain。build-time embed 只作首屏/离线降级。
+// 主資料通道：Client 用 connection.rpc 按 live sessionId 請求 Host，Host 從 Session
+// header 解析可信 cwd 並讀取對應 .project-brain。build-time embed 只作首屏/離線降級。
 //
-// 区块组件不变（Header/Phase/Todo/CodeGraph/Activity/Memories/Stats/Actions/Dashboard），
-// 因为它们是纯函数，数据来源 embed 即可。
+// 區塊元件不變（Header/Phase/Todo/CodeGraph/Activity/Memories/Stats/Actions/Dashboard），
+// 因為它們是純函式，資料來源 embed 即可。
 
 window.__ModuleLoader__.load({
   id: "dsh-project-brain",
@@ -18,156 +18,156 @@ window.__ModuleLoader__.load({
     // ─── i18n 字典 ───
     const dicts = {
       "zh-CN": {
-        "tab.label": "项目",
-        "header.section": "项目",
-        "header.untitled": "未命名项目",
+        "tab.label": "專案",
+        "header.section": "專案",
+        "header.untitled": "未命名專案",
         "header.lastUpdate": "上次更新",
-        "phase.title": "当前阶段",
-        "phase.empty": "暂无进行中任务",
-        "todo.title": "待办",
-        "todo.empty": "暂无待办",
-        "activity.title": "最近活动",
-        "activity.empty": "暂无活动",
-        "memories.title": "项目记忆",
-        "stats.title": "概览",
-        "stats.pending": "待办",
+        "phase.title": "當前階段",
+        "phase.empty": "暫無進行中任務",
+        "todo.title": "待辦",
+        "todo.empty": "暫無待辦",
+        "activity.title": "最近活動",
+        "activity.empty": "暫無活動",
+        "memories.title": "專案記憶",
+        "stats.title": "概覽",
+        "stats.pending": "待辦",
         "stats.done": "已完成",
-        "stats.decisions": "决策",
-        "codegraph.title": "代码结构",
-        "codegraph.files": "文件",
-        "codegraph.edges": "依赖边",
-        "codegraph.langs": "语言",
-        "codegraph.noLang": "暂无语言数据",
-        "arch.title": "项目架构图",
-        "arch.modules": "模块",
-        "arch.edges": "依赖",
+        "stats.decisions": "決策",
+        "codegraph.title": "程式碼結構",
+        "codegraph.files": "檔案",
+        "codegraph.edges": "依賴邊",
+        "codegraph.langs": "語言",
+        "codegraph.noLang": "暫無語言資料",
+        "arch.title": "專案架構圖",
+        "arch.modules": "模組",
+        "arch.edges": "依賴",
         "arch.local": "本地分析",
-        "arch.hybrid": "DSH LLM 增强",
-        "arch.select": "点一层看同层模块，点模块看职责",
-        "arch.flows": "运行路径",
-        "arch.flowEmpty": "还没有可展示的运行路径",
-        "arch.peersHint": "同层模块是并列关系，没有固定先后顺序",
-        "arch.inspectLayer": "层详情",
-        "arch.inspectModule": "模块详情",
-        "arch.related": "协作",
-        "arch.runtime": "运行路径",
-        "arch.empty": "还没有可展示的分层",
-        "arch.purpose": "项目定位",
-        "arch.risks": "架构提示",
-        "arch.style": "架构风格",
-        "arch.layers": "架构分层",
-        "arch.components": "核心组件",
-        "arch.keyFiles": "关键文件导览",
-        "arch.start": "快速熟悉路径",
-        "arch.highlights": "设计要点",
-        "arch.trigger": "触发",
-        "arch.outcome": "结果",
-        "arch.llmFallback": "DSH LLM 未完成，当前展示本地推断",
-        "arch.actionRetry": "重新扫描",
-        "arch.actionChat": "先发一条消息",
-        "arch.actionSettings": "检查 DSH 模型路由",
-        "arch.retrying": "重新扫描中…",
+        "arch.hybrid": "DSH LLM 增強",
+        "arch.select": "點一層看同層模組，點模組看職責",
+        "arch.flows": "執行路徑",
+        "arch.flowEmpty": "還沒有可展示的執行路徑",
+        "arch.peersHint": "同層模組是並列關係，沒有固定先後順序",
+        "arch.inspectLayer": "層詳情",
+        "arch.inspectModule": "模組詳情",
+        "arch.related": "協作",
+        "arch.runtime": "執行路徑",
+        "arch.empty": "還沒有可展示的分層",
+        "arch.purpose": "專案定位",
+        "arch.risks": "架構提示",
+        "arch.style": "架構風格",
+        "arch.layers": "架構分層",
+        "arch.components": "核心元件",
+        "arch.keyFiles": "關鍵檔案導覽",
+        "arch.start": "快速熟悉路徑",
+        "arch.highlights": "設計要點",
+        "arch.trigger": "觸發",
+        "arch.outcome": "結果",
+        "arch.llmFallback": "DSH LLM 未完成，當前展示本地推斷",
+        "arch.actionRetry": "重新掃描",
+        "arch.actionChat": "先發一條訊息",
+        "arch.actionSettings": "檢查 DSH 模型路由",
+        "arch.retrying": "重新掃描中…",
         "arch.retryDone": "已重新生成",
-        "arch.retryFailed": "重新扫描失败",
-        "actions.continue": "继续上次开发",
-        "actions.openDashboard": "打开 Dashboard",
+        "arch.retryFailed": "重新掃描失敗",
+        "actions.continue": "繼續上次開發",
+        "actions.openDashboard": "開啟 Dashboard",
         "actions.closeDashboard": "收起 Dashboard",
-        "actions.copied": "已复制，粘贴到输入框发送",
-        "actions.copyFail": "复制失败，请手动输入",
-        "todostrip.title": "活跃待办",
-        "todostrip.viewAll": "查看全部",
+        "actions.copied": "已複製，貼上到輸入框傳送",
+        "actions.copyFail": "複製失敗，請手動輸入",
+        "todostrip.title": "活躍待辦",
+        "todostrip.viewAll": "檢視全部",
         "todostrip.close": "收起",
-        "todostrip.empty": "🎉 暂无活跃待办",
-        "onboarding.title": "项目大脑未启动",
-        "onboarding.body": "启动后会扫描项目、生成架构，并在之后的对话里自动带上记忆和待办。快速上手，越用越懂，长期把项目做下去。",
-        "onboarding.cta": "启动项目大脑",
-        "onboarding.f1.title": "读懂项目",
-        "onboarding.f1.desc": "识别技术栈与入口，生成分层架构",
-        "onboarding.f2.title": "跨会话记住",
-        "onboarding.f2.desc": "新对话自动带上项目上下文，不用重复介绍",
-        "onboarding.f3.title": "接着往下做",
-        "onboarding.f3.desc": "待办和记忆留在项目里，回来就能续上",
-        "onboarding.more": "记忆沉淀、Git 历史可在启动后使用",
-        "onboarding.copyPrompt": "请扫描本项目：调用 project_init 工具生成项目大脑",
-        "onboarding.copied": "已复制启动指令，粘贴发送即可",
-        "loading": "加载中…",
+        "todostrip.empty": "🎉 暫無活躍待辦",
+        "onboarding.title": "專案大腦未啟動",
+        "onboarding.body": "啟動後會掃描專案、生成架構，並在之後的對話裡自動帶上記憶和待辦。快速上手，越用越懂，長期把專案做下去。",
+        "onboarding.cta": "啟動專案大腦",
+        "onboarding.f1.title": "讀懂專案",
+        "onboarding.f1.desc": "識別技術棧與入口，生成分層架構",
+        "onboarding.f2.title": "跨會話記住",
+        "onboarding.f2.desc": "新對話自動帶上專案上下文，不用重複介紹",
+        "onboarding.f3.title": "接著往下做",
+        "onboarding.f3.desc": "待辦和記憶留在專案裡，回來就能續上",
+        "onboarding.more": "記憶沉澱、Git 歷史可在啟動後使用",
+        "onboarding.copyPrompt": "請掃描本專案：呼叫 project_init 工具生成專案大腦",
+        "onboarding.copied": "已複製啟動指令，貼上傳送即可",
+        "loading": "載入中…",
         "snapshot.label": "快照",
-        "snapshot.autoSync": "离线快照；连接恢复后自动切换实时数据",
-        "runtime.label": "实时",
-        "runtime.synced": "数据来自当前 Session workspace",
-        "time.justNow": "刚刚",
-        "time.minutesAgo": "{n} 分钟前",
-        "time.hoursAgo": "{n} 小时前",
+        "snapshot.autoSync": "離線快照；連線恢復後自動切換即時資料",
+        "runtime.label": "即時",
+        "runtime.synced": "資料來自當前 Session workspace",
+        "time.justNow": "剛剛",
+        "time.minutesAgo": "{n} 分鐘前",
+        "time.hoursAgo": "{n} 小時前",
         "time.daysAgo": "{n} 天前",
-        "prio.urgent": "紧急",
+        "prio.urgent": "緊急",
         "prio.high": "高",
         "prio.medium": "中",
         "prio.low": "低",
-        "st.pending": "待办",
-        "st.in_progress": "进行中",
+        "st.pending": "待辦",
+        "st.in_progress": "進行中",
         "st.blocked": "阻塞",
         "st.done": "已完成",
         "st.cancelled": "已取消",
-        "dash.title": "Dashboard · 项目全景",
-        "dash.tech": "技术栈",
+        "dash.title": "Dashboard · 專案全景",
+        "dash.tech": "技術棧",
         "dash.devops": "交付",
-        "dash.entry": "开发入口",
-        "dash.todo": "待办（全部）",
-        "dash.timeline": "时间线",
-        "dash.memory": "项目记忆",
-        "dash.memory.core": "当前 Core（每轮注入）",
+        "dash.entry": "開發入口",
+        "dash.todo": "待辦（全部）",
+        "dash.timeline": "時間線",
+        "dash.memory": "專案記憶",
+        "dash.memory.core": "當前 Core（每輪注入）",
         "dash.memory.dormant": "休眠（不注入，可用 project_ask）",
-        "dash.memory.dormantShow": "展开休眠记忆",
-        "dash.memory.dormantHide": "收起休眠记忆",
-        "dash.memory.archived": "已归档（不注入、不检索，可恢复或永久删除）",
-        "dash.memory.archivedShow": "展开已归档",
-        "dash.memory.archivedHide": "收起已归档",
-        "dash.tab.overview": "概览",
-        "dash.tab.architecture": "架构",
-        "dash.tab.work": "任务动态",
-        "dash.tab.knowledge": "项目记忆",
-        "dash.tab.git": "Git 历史",
-        "dash.tab.settings": "设置",
-        "settings.probe.embedding": "测试向量连通",
-        "settings.probe.llm": "测试会话 LLM",
-        "settings.probe.embeddingHint": "用当前表单值请求一次 embeddings，不写 cache。未保存的修改也会用于本次测试。",
-        "settings.probe.llmHint": "探测当前 DSH 会话的模型路由，会话摘要和架构增强用的是同一条 LLM。",
-        "settings.probe.running": "测试中…",
-        "dash.snapshot": "数据快照 · {time}",
+        "dash.memory.dormantShow": "展開休眠記憶",
+        "dash.memory.dormantHide": "收起休眠記憶",
+        "dash.memory.archived": "已歸檔（不注入、不檢索，可恢復或永久刪除）",
+        "dash.memory.archivedShow": "展開已歸檔",
+        "dash.memory.archivedHide": "收起已歸檔",
+        "dash.tab.overview": "概覽",
+        "dash.tab.architecture": "架構",
+        "dash.tab.work": "任務動態",
+        "dash.tab.knowledge": "專案記憶",
+        "dash.tab.git": "Git 歷史",
+        "dash.tab.settings": "設定",
+        "settings.probe.embedding": "測試向量連通",
+        "settings.probe.llm": "測試會話 LLM",
+        "settings.probe.embeddingHint": "用當前表單值請求一次 embeddings，不寫 cache。未儲存的修改也會用於本次測試。",
+        "settings.probe.llmHint": "探測當前 DSH 會話的模型路由，會話摘要和架構增強用的是同一條 LLM。",
+        "settings.probe.running": "測試中…",
+        "dash.snapshot": "資料快照 · {time}",
         "dash.none": "（空）",
-        "briefing.what": "这是什么",
-        "briefing.recent": "最近做什么",
-        "briefing.stale": "架构可能过期，关键文件按扫描入口降级。",
-        "briefing.empty": "（暂无）",
-        "briefing.recent.empty": "还没有会话摘要",
-        "briefing.recent.outdated": "可能已过时",
-        "graph.title": "开发主干",
-        "graph.empty": "还没有可展示的会话节点",
-        "graph.collapsed": "已折叠 {n} 段无实质产出的记录",
-        "graph.expandAll": "展开全部",
-        "graph.collapse": "按重要节点显示",
+        "briefing.what": "這是什麼",
+        "briefing.recent": "最近做什麼",
+        "briefing.stale": "架構可能過期，關鍵檔案按掃描入口降級。",
+        "briefing.empty": "（暫無）",
+        "briefing.recent.empty": "還沒有會話摘要",
+        "briefing.recent.outdated": "可能已過時",
+        "graph.title": "開發主幹",
+        "graph.empty": "還沒有可展示的會話節點",
+        "graph.collapsed": "已摺疊 {n} 段無實質產出的記錄",
+        "graph.expandAll": "展開全部",
+        "graph.collapse": "按重要節點顯示",
         "graph.edge.todo": "TODO",
         "graph.edge.supersede": "替代",
-        "graph.edge.architecture": "架构",
-        "graph.filesMore": "+{n} 个文件",
-        "suggest.title": "💡 你今天可能想推进",
-        "suggest.llmTag": "AI 推荐",
-        "suggest.localTag": "本地推荐",
-        "suggest.fallbackTag": "AI 暂不可用",
-        "suggest.loading": "分析今天的续接建议…",
+        "graph.edge.architecture": "架構",
+        "graph.filesMore": "+{n} 個檔案",
+        "suggest.title": "💡 你今天可能想推進",
+        "suggest.llmTag": "AI 推薦",
+        "suggest.localTag": "本地推薦",
+        "suggest.fallbackTag": "AI 暫不可用",
+        "suggest.loading": "分析今天的續接建議…",
         "suggest.confidence": "置信度 {pct}%",
         "suggest.refresh": "重新生成",
         "suggest.dismiss": "收起",
-        "suggest.empty": "暂无活跃任务和近期记忆，可用 project_todo_add 规划下一步",
-        "suggest.reasonLabel": "依据",
-        "mem.type.decision": "决策",
+        "suggest.empty": "暫無活躍任務和近期記憶，可用 project_todo_add 規劃下一步",
+        "suggest.reasonLabel": "依據",
+        "mem.type.decision": "決策",
         "mem.type.bug": "Bug",
-        "mem.type.lesson": "教训",
+        "mem.type.lesson": "教訓",
         "mem.type.requirement": "需求",
-        "mem.type.architecture": "架构",
-        "mem.type.change": "变更",
-        "mem.type.context": "备注",
-        "mem.type.issue": "问题",
+        "mem.type.architecture": "架構",
+        "mem.type.change": "變更",
+        "mem.type.context": "備註",
+        "mem.type.issue": "問題",
         "mem.type.preference": "偏好",
       },
       "en-US": {
@@ -355,9 +355,9 @@ window.__ModuleLoader__.load({
       } catch (e) { return ""; }
     }
 
-    // v1.1.x-fix: 语言使用率归一化（按文件数降序 + 百分比 + 长尾聚合）
-    // 输入 { lang: count } 或 null/undefined；输出 { top: [{lang,count,percent}], tail: {count,percent,languages}|null, total, distinctCount }
-    // topN 默认 8（典型项目 ≤8 种都能完整展示；更多则把后位合并为"其它"chip）
+    // v1.1.x-fix: 語言使用率歸一化（按檔案數降序 + 百分比 + 長尾聚合）
+    // 輸入 { lang: count } 或 null/undefined；輸出 { top: [{lang,count,percent}], tail: {count,percent,languages}|null, total, distinctCount }
+    // topN 預設 8（典型專案 ≤8 種都能完整展示；更多則把後位合併為"其它"chip）
     function formatLanguagesUsage(languages, opts) {
       const obj = languages && typeof languages === "object" ? languages : {};
       const entries = Object.entries(obj)
@@ -416,8 +416,8 @@ window.__ModuleLoader__.load({
       if (!el) return;
       const open = el.style.display === "none";
       el.style.display = open ? "block" : "none";
-      // v0.4.12: 按钮文案统一为"查看 Dashboard · 项目全景"，点击后不再切换文案
-      // 改用按钮右侧小图标（▾ 已展开 / ▸ 已折叠）作为状态指示
+      // v0.4.12: 按鈕文案統一為"檢視 Dashboard · 專案全景"，點選後不再切換文案
+      // 改用按鈕右側小圖示（▾ 已展開 / ▸ 已摺疊）作為狀態指示
       const indicator = btn && btn.querySelector("[data-dashboard-indicator]");
       if (indicator) indicator.textContent = open ? "▾" : "▸";
       if (open && el.scrollIntoView) {
@@ -455,7 +455,7 @@ window.__ModuleLoader__.load({
       display: "inline-block",
     };
 
-    // ─── build-time embed 数据 ───
+    // ─── build-time embed 資料 ───
     const __PROJECT_DATA__ = /*#__PURE__*/ JSON.parse(__PROJECT_DATA_JSON__);
     const __CODEGRAPH_EMBED__ = __CODEGRAPH_JSON__ && __CODEGRAPH_JSON__ !== "null"
       ? JSON.parse(__CODEGRAPH_JSON__) : null;
@@ -466,9 +466,9 @@ window.__ModuleLoader__.load({
       ? location.search.indexOf("dsh_brain_demo=onboarding") >= 0 : false;
 
     // ─── build-time fallback：解析 embed 多 workspace 索引 ───
-    // Connection RPC 请求完成前使用的离线快照降级。
-    // v1.1.x-fix: embedded 阶段不再预设 hint（hint 是运行时降级信号，embedded 不知道 host 是否能成功）。
-    //   首屏一律走 loading，等 host RPC 真正答复后再决定渲染 dashboard / Onboarding / 兜底 banner。
+    // Connection RPC 請求完成前使用的離線快照降級。
+    // v1.1.x-fix: embedded 階段不再預設 hint（hint 是執行時降級訊號，embedded 不知道 host 是否能成功）。
+    //   首屏一律走 loading，等 host RPC 真正答覆後再決定渲染 dashboard / Onboarding / 兜底 banner。
     function resolvePreview(props) {
       const sid = (props && props.sessionId) || null;
       const wsMap = __ALL_WORKSPACES__ || {};
@@ -509,7 +509,7 @@ window.__ModuleLoader__.load({
       return { data: merged, workspaceId: wsId, workspacePath: wsPath, sessionId: sid, hint: "", source: "snapshot" };
     }
 
-    // 项目 type → emoji
+    // 專案 type → emoji
     const projectIcon = (type) => {
       const t = (type || "").toLowerCase();
       if (t.includes("frontend") || t.includes("web") || t.includes("ui")) return "🎨";
@@ -520,13 +520,13 @@ window.__ModuleLoader__.load({
       return "📦";
     };
 
-    // ─── 区块组件（纯函数） ───
+    // ─── 區塊元件（純函式） ───
     function pathSep(p) {
       return p && String(p).indexOf("\\") >= 0 ? "\\" : "/";
     }
     function readRpcResult(resp) {
       if (!resp || resp.ok !== true) {
-        throw new Error((resp && resp.error && resp.error.message) || "请求失败");
+        throw new Error((resp && resp.error && resp.error.message) || "請求失敗");
       }
       const value = resp.value && typeof resp.value === "object" ? resp.value : {};
       const result = value.result && typeof value.result === "object" ? value.result : null;
@@ -581,15 +581,15 @@ window.__ModuleLoader__.load({
         try {
           const resp = await callRpc("export.openFolder", { folderPath });
           if (!resp || !resp.ok) {
-            throw new Error((resp && resp.error && resp.error.message) || "无法打开文件夹");
+            throw new Error((resp && resp.error && resp.error.message) || "無法開啟資料夾");
           }
-          showToast("info", "已尝试打开文件夹：" + folderPath, 3000);
+          showToast("info", "已嘗試開啟資料夾：" + folderPath, 3000);
         } catch (e) {
-          // 降级：复制路径，让用户自己 Win+R 粘贴
+          // 降級：複製路徑，讓使用者自己 Win+R 貼上
           if (typeof navigator !== "undefined" && navigator.clipboard) {
             navigator.clipboard.writeText(folderPath).catch(() => {});
           }
-          showToast("error", "打开文件夹失败，路径已复制到剪贴板：" + folderPath, 6000);
+          showToast("error", "開啟資料夾失敗，路徑已複製到剪貼簿：" + folderPath, 6000);
         }
       }
       function sizeFormat(bytes) {
@@ -637,11 +637,11 @@ window.__ModuleLoader__.load({
 
           let toastText;
           if (fileName) {
-            toastText = "已导出 " + fileName + "（" + sizeFormat(result.sizeBytes) + "）"
-              + (copyPath ? "\n路径：" + copyPath : "\n（路径未返回，请在 dist-backups/ 目录查找）");
+            toastText = "已匯出 " + fileName + "（" + sizeFormat(result.sizeBytes) + "）"
+              + (copyPath ? "\n路徑：" + copyPath : "\n（路徑未返回，請在 dist-backups/ 目錄查詢）");
           } else {
-            toastText = "导出成功（未拿到文件名，请在 dist-backups/ 目录查找）"
-              + (openFolderPath ? "\n目录：" + openFolderPath : "");
+            toastText = "匯出成功（未拿到檔名，請在 dist-backups/ 目錄查詢）"
+              + (openFolderPath ? "\n目錄：" + openFolderPath : "");
           }
           showToast("success", toastText, 8000);
           setToastActions({
@@ -649,7 +649,7 @@ window.__ModuleLoader__.load({
             openFolderPath: openFolderPath,
           });
         } catch (e) {
-          showToast("error", "导出失败：" + String((e && e.message) || e));
+          showToast("error", "匯出失敗：" + String((e && e.message) || e));
         } finally {
           setBusy(false);
         }
@@ -665,8 +665,8 @@ window.__ModuleLoader__.load({
         try {
           const resp = await callRpc("import.pickBundle", {});
           if (!resp || !resp.ok) {
-            const msg = (resp && resp.error && resp.error.message) || "系统文件选择器不可用";
-            setImportPick((prev) => Object.assign({}, prev || { path: "" }, { error: msg + "。请粘贴 zip 的完整路径。" }));
+            const msg = (resp && resp.error && resp.error.message) || "系統檔案選擇器不可用";
+            setImportPick((prev) => Object.assign({}, prev || { path: "" }, { error: msg + "。請貼上 zip 的完整路徑。" }));
             return;
           }
           const value = (resp && resp.value) || {};
@@ -676,7 +676,7 @@ window.__ModuleLoader__.load({
           }
         } catch (e) {
           setImportPick((prev) => Object.assign({}, prev || { path: "" }, {
-            error: "无法打开文件选择器：" + String((e && e.message) || e) + "。请粘贴 zip 的完整路径。",
+            error: "無法開啟檔案選擇器：" + String((e && e.message) || e) + "。請貼上 zip 的完整路徑。",
           }));
         }
       }
@@ -685,7 +685,7 @@ window.__ModuleLoader__.load({
         if (busy || !importPick) return;
         const bundlePath = String(importPick.path || "").trim();
         if (!bundlePath) {
-          setImportPick(Object.assign({}, importPick, { error: "请填写 bundle zip 的完整路径" }));
+          setImportPick(Object.assign({}, importPick, { error: "請填寫 bundle zip 的完整路徑" }));
           return;
         }
         setBusy(true);
@@ -695,7 +695,7 @@ window.__ModuleLoader__.load({
           setImportPick(null);
           setPreviewState({ kind: "import", data: result });
         } catch (e) {
-          setImportPick(Object.assign({}, importPick, { error: "预览失败：" + String((e && e.message) || e) }));
+          setImportPick(Object.assign({}, importPick, { error: "預覽失敗：" + String((e && e.message) || e) }));
         } finally {
           setBusy(false);
         }
@@ -707,11 +707,11 @@ window.__ModuleLoader__.load({
         const confirmToken = d.confirmToken;
         const bundlePath = d.bundlePath;
         if (!confirmToken) {
-          showToast("error", "缺少 confirmToken，请重新预览");
+          showToast("error", "缺少 confirmToken，請重新預覽");
           return;
         }
         if (!bundlePath) {
-          showToast("error", "缺少 bundle 路径，请重新预览");
+          showToast("error", "缺少 bundle 路徑，請重新預覽");
           return;
         }
         setBusy(true);
@@ -721,11 +721,11 @@ window.__ModuleLoader__.load({
           setPreviewState(null);
           notifyPreviewChanged();
           const extra = result.rescanError
-            ? " 脑已写入，但自动重扫失败，可手动点「重新扫描」。"
-            : (result.backupPath ? " 旧脑已备份。" : "");
-          showToast("success", "已恢复。" + extra);
+            ? " 腦已寫入，但自動重掃失敗，可手動點「重新掃描」。"
+            : (result.backupPath ? " 舊腦已備份。" : "");
+          showToast("success", "已恢復。" + extra);
         } catch (e) {
-          showToast("error", "导入失败：" + String((e && e.message) || e));
+          showToast("error", "匯入失敗：" + String((e && e.message) || e));
         } finally {
           setBusy(false);
         }
@@ -739,12 +739,12 @@ window.__ModuleLoader__.load({
           const value = readRpcResult(resp);
           const backups = (value && value.backups) || [];
           if (backups.length === 0) {
-            showToast("info", "当前项目没有本地备份");
+            showToast("info", "當前專案沒有本地備份");
           } else {
             setBackupList(backups);
           }
         } catch (e) {
-          showToast("error", "获取备份列表失败：" + String((e && e.message) || e));
+          showToast("error", "獲取備份列表失敗：" + String((e && e.message) || e));
         } finally {
           setBusy(false);
         }
@@ -759,7 +759,7 @@ window.__ModuleLoader__.load({
           setBackupList(null);
           setPreviewState({ kind: "rollback", data: result, backup });
         } catch (e) {
-          showToast("error", "预览失败：" + String((e && e.message) || e));
+          showToast("error", "預覽失敗：" + String((e && e.message) || e));
         } finally {
           setBusy(false);
         }
@@ -772,7 +772,7 @@ window.__ModuleLoader__.load({
         const backupTimestamp = d.backupTimestamp || d.sourceBackupTs
           || (d.sourceBackup && d.sourceBackup.ts);
         if (!confirmToken || !backupTimestamp) {
-          showToast("error", "缺少 confirmToken，请重新选择");
+          showToast("error", "缺少 confirmToken，請重新選擇");
           return;
         }
         setBusy(true);
@@ -781,15 +781,15 @@ window.__ModuleLoader__.load({
           readRpcResult(resp);
           setPreviewState(null);
           notifyPreviewChanged();
-          showToast("success", "已回滚到 " + backupTimestamp);
+          showToast("success", "已回滾到 " + backupTimestamp);
         } catch (e) {
-          showToast("error", "回滚失败：" + String((e && e.message) || e));
+          showToast("error", "回滾失敗：" + String((e && e.message) || e));
         } finally {
           setBusy(false);
         }
       }
 
-      // ─── 按钮样式（与 chip 同行不换行，靠右） ───
+      // ─── 按鈕樣式（與 chip 同行不換行，靠右） ───
       const headerBtnBase = {
         display: "inline-flex",
         alignItems: "center",
@@ -829,9 +829,9 @@ window.__ModuleLoader__.load({
         style: { display: "flex", gap: "6px", flexShrink: 0, marginLeft: "auto" },
         "data-brain-action-bar": "1",
       },
-        renderButton("💾", "备份", handleExport, "export", { title: "导出当前脑到 zip 文件" }),
-        renderButton("📥", "恢复", handleImportPick, "import", { title: "从 zip 文件恢复脑（覆盖当前）" }),
-        renderButton("↩️", "回滚", handleRollbackOpen, "rollback", { title: "从本地历史备份回滚" }),
+        renderButton("💾", "備份", handleExport, "export", { title: "匯出當前腦到 zip 檔案" }),
+        renderButton("📥", "恢復", handleImportPick, "import", { title: "從 zip 檔案恢復腦（覆蓋當前）" }),
+        renderButton("↩️", "回滾", handleRollbackOpen, "rollback", { title: "從本地歷史備份回滾" }),
       );
 
       return React.createElement(
@@ -857,7 +857,7 @@ window.__ModuleLoader__.load({
               React.createElement("span", null, `${t("header.lastUpdate")} · ${formatRelativeTime(p.lastUpdateAt, Date.now(), data._localeCode)}`),
             )
           : null,
-        // ─── Dialogs（同一组件内挂载，状态由 useState 管理） ───
+        // ─── Dialogs（同一組件內掛載，狀態由 useState 管理） ───
         previewState ? renderPreviewDialog(previewState, { onCancel: () => setPreviewState(null), onConfirm: previewState.kind === "import" ? handleImportConfirm : handleRollbackConfirm, busy }) : null,
         importPick ? renderImportPathDialog(importPick, {
           onCancel: () => setImportPick(null),
@@ -900,14 +900,14 @@ window.__ModuleLoader__.load({
         style: overlayStyle, onClick: (e) => { if (e.target === e.currentTarget) onCancel(); },
       },
         React.createElement("div", { style: cardStyle, "data-brain-dialog": "import-path" },
-          React.createElement("h2", { style: { margin: "0 0 8px", fontSize: "16px", fontWeight: "600" } }, "从 bundle 恢复"),
+          React.createElement("h2", { style: { margin: "0 0 8px", fontSize: "16px", fontWeight: "600" } }, "從 bundle 恢復"),
           React.createElement("p", { style: { margin: "0 0 12px", fontSize: "12px", lineHeight: "1.5", color: "var(--dsw-alias-label-secondary)" } },
-            "选择或粘贴导出的 zip 完整路径。恢复会覆盖当前脑，下一步会先给你预览再确认。"),
+            "選擇或貼上匯出的 zip 完整路徑。恢復會覆蓋當前腦，下一步會先給你預覽再確認。"),
           React.createElement("div", { style: { display: "flex", gap: "8px" } },
             React.createElement("input", {
               type: "text",
               value: state.path || "",
-              placeholder: "粘贴导出的 zip 完整路径",
+              placeholder: "貼上匯出的 zip 完整路徑",
               disabled: busy,
               onChange: (e) => onChange(e.target.value),
               onKeyDown: (e) => { if (e.key === "Enter") onPreview(); },
@@ -930,7 +930,7 @@ window.__ModuleLoader__.load({
                 borderColor: "var(--dsw-alias-border-l1)",
                 flexShrink: 0,
               }),
-            }, "浏览…"),
+            }, "瀏覽…"),
           ),
           state.error ? React.createElement("div", {
             style: { marginTop: "10px", fontSize: "12px", color: "var(--dsw-alias-state-error-primary)", lineHeight: "1.45" },
@@ -943,13 +943,13 @@ window.__ModuleLoader__.load({
             React.createElement("button", {
               type: "button", onClick: onPreview, disabled: busy,
               style: Object.assign({}, btnBase, { background: "var(--dsw-alias-brand-primary)", color: "var(--dsw-alias-bg-base)" }),
-            }, busy ? "预览中…" : "预览影响"),
+            }, busy ? "預覽中…" : "預覽影響"),
           ),
         ),
       );
     }
 
-    // ─── 预览弹框（覆盖并恢复） ───
+    // ─── 預覽彈框（覆蓋並恢復） ───
     function renderPreviewDialog(state, { onCancel, onConfirm, busy }) {
       const { kind, data } = state;
       const overlayStyle = {
@@ -1000,7 +1000,7 @@ window.__ModuleLoader__.load({
         key: "confirm", type: "button", onClick: onConfirm,
         disabled: busy || !(data && data.confirmToken),
         style: Object.assign({}, btnBase, { background: "var(--dsw-alias-state-warn-primary)", color: "var(--dsw-alias-bg-base)" }),
-      }, busy ? "处理中…" : "覆盖并恢复");
+      }, busy ? "處理中…" : "覆蓋並恢復");
       const footerStyle = { display: "flex", gap: "8px", justifyContent: "flex-end", marginTop: "20px" };
 
       let title, fields, warning;
@@ -1037,42 +1037,42 @@ window.__ModuleLoader__.load({
           data.manifest && data.manifest.sourceProject && data.manifest.sourceProject.rootPath,
           data.bundlePath,
         );
-        title = "确认从 bundle 恢复脑";
+        title = "確認從 bundle 恢復腦";
         fields = [
-          fieldRow("bundle 来源", sourceRoot || "（未知）"),
-          fieldRow("当前脑", currentExists
-            ? currentMem + " 记忆 / " + currentTodos + " 待办 / " + currentTimeline + " timeline"
-            : "（无）"),
-          fieldRow("即将恢复", incomingMem + " 记忆 / " + incomingTodos + " 待办 / " + incomingTimeline + " timeline"),
-          fieldRow("旧脑将备份到", backupTo || "（无需，无脑）"),
-          fieldRow("rootPath 改写", (rootFrom || "（空）") + " → " + (rootTo || "（空）")),
+          fieldRow("bundle 來源", sourceRoot || "（未知）"),
+          fieldRow("當前腦", currentExists
+            ? currentMem + " 記憶 / " + currentTodos + " 待辦 / " + currentTimeline + " timeline"
+            : "（無）"),
+          fieldRow("即將恢復", incomingMem + " 記憶 / " + incomingTodos + " 待辦 / " + incomingTimeline + " timeline"),
+          fieldRow("舊腦將備份到", backupTo || "（無需，無腦）"),
+          fieldRow("rootPath 改寫", (rootFrom || "（空）") + " → " + (rootTo || "（空）")),
         ];
         warning = textOf(data.warning) || (currentExists
-          ? "⚠️ 这会覆盖当前脑。旧脑会自动备份到上方的路径，可继续回滚。"
-          : "这是该项目首次导入，无旧脑可备份。");
+          ? "⚠️ 這會覆蓋當前腦。舊腦會自動備份到上方的路徑，可繼續回滾。"
+          : "這是該專案首次匯入，無舊腦可備份。");
       } else if (kind === "rollback") {
         const sb = data.sourceBackup || {};
         const cb = data.currentBrain || {};
         const currentExists = !!(cb.exists || data.currentBrainExists);
-        const sourceName = textOf(sb.backupName, data.sourceBackupName, "（未知备份）");
+        const sourceName = textOf(sb.backupName, data.sourceBackupName, "（未知備份）");
         const sourceTs = textOf(sb.ts, data.sourceBackupTs, data.backupTimestamp);
-        title = "确认回滚到备份";
+        title = "確認回滾到備份";
         fields = [
-          fieldRow("目标备份", sourceName + (sourceTs ? "（" + sourceTs + "）" : "")),
-          fieldRow("备份内容",
-            countOf(sb.memCount, data.sourceMemCount) + " 记忆 / "
-            + countOf(sb.todoCount, data.sourceTodoCount) + " 待办 / "
+          fieldRow("目標備份", sourceName + (sourceTs ? "（" + sourceTs + "）" : "")),
+          fieldRow("備份內容",
+            countOf(sb.memCount, data.sourceMemCount) + " 記憶 / "
+            + countOf(sb.todoCount, data.sourceTodoCount) + " 待辦 / "
             + countOf(sb.timelineCount, data.sourceTimelineCount) + " timeline"),
-          fieldRow("当前脑", currentExists
-            ? countOf(cb.memCount, data.currentMemories) + " 记忆 / "
-              + countOf(cb.todoCount, data.currentTodos) + " 待办 / "
+          fieldRow("當前腦", currentExists
+            ? countOf(cb.memCount, data.currentMemories) + " 記憶 / "
+              + countOf(cb.todoCount, data.currentTodos) + " 待辦 / "
               + countOf(cb.timelineCount, data.currentTimeline) + " timeline"
-            : "（无）"),
-          fieldRow("当前脑先备份到", textOf(data.willBackupCurrentTo) || "（无需）"),
+            : "（無）"),
+          fieldRow("當前腦先備份到", textOf(data.willBackupCurrentTo) || "（無需）"),
         ];
         warning = textOf(data.warning) || (currentExists
-          ? "⚠️ 当前脑会自动备份到上方的路径，可继续回滚。"
-          : "当前脑不存在，回滚后会成为当前脑。");
+          ? "⚠️ 當前腦會自動備份到上方的路徑，可繼續回滾。"
+          : "當前腦不存在，回滾後會成為當前腦。");
       }
 
       return React.createElement("div", { style: overlayStyle, onClick: (e) => { if (e.target === e.currentTarget) onCancel(); } },
@@ -1087,7 +1087,7 @@ window.__ModuleLoader__.load({
       );
     }
 
-    // ─── 备份列表弹框 ───
+    // ─── 備份列表彈框 ───
     function renderBackupListDialog(backups, { onCancel, onPick, busy }) {
       const overlayStyle = {
         position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
@@ -1120,8 +1120,8 @@ window.__ModuleLoader__.load({
         style: overlayStyle, onClick: (e) => { if (e.target === e.currentTarget) onCancel(); },
       },
         React.createElement("div", { style: cardStyle, "data-brain-dialog": "backup-list" },
-          React.createElement("h2", { style: { margin: "0 0 4px", fontSize: "16px", fontWeight: "600" } }, "选择要回滚到的备份"),
-          React.createElement("div", { style: { margin: "0 0 12px", fontSize: "11px", color: "var(--dsw-alias-label-secondary)" } }, "共 " + backups.length + " 个备份（按时间倒序）"),
+          React.createElement("h2", { style: { margin: "0 0 4px", fontSize: "16px", fontWeight: "600" } }, "選擇要回滾到的備份"),
+          React.createElement("div", { style: { margin: "0 0 12px", fontSize: "11px", color: "var(--dsw-alias-label-secondary)" } }, "共 " + backups.length + " 個備份（按時間倒序）"),
           backups.map((b, i) => {
             const sizeKB = Math.max(1, Math.round((b.sizeBytes || 0) / 1024));
             const subtitle = (b.projectExists ? "" : "（不完整）") + ` · ${sizeKB} KB · ${b.memCount} mem / ${b.todoCount} todo`;
@@ -1159,7 +1159,7 @@ window.__ModuleLoader__.load({
           navigator.clipboard.writeText(toast.copyPath).then(
             () => {
               const el = document.querySelector("[data-brain-toast-copy-hint]");
-              if (el) el.textContent = "✓ 已复制路径";
+              if (el) el.textContent = "✓ 已複製路徑";
             },
             () => onDismiss(),
           );
@@ -1171,9 +1171,9 @@ window.__ModuleLoader__.load({
         "data-brain-toast-copy-hint": "1",
         style: { fontSize: "10px", opacity: 0.85, marginTop: "4px", fontWeight: "400" },
       },
-        toast.copyPath ? "点击复制路径" : (toast.openFolderPath ? "已尝试在文件管理器中打开" : ""),
+        toast.copyPath ? "點選複製路徑" : (toast.openFolderPath ? "已嘗試在檔案管理器中開啟" : ""),
       );
-      // 「在文件夹中显示」按钮（如果有 openFolderPath）
+      // 「在資料夾中顯示」按鈕（如果有 openFolderPath）
       const openFolderBtn = toast.openFolderPath ? React.createElement("button", {
         type: "button",
         onClick: (e) => { e.stopPropagation(); onOpenFolder(toast.openFolderPath); },
@@ -1190,7 +1190,7 @@ window.__ModuleLoader__.load({
           cursor: "pointer",
           fontFamily: "inherit",
         },
-      }, "📂 在文件夹中显示") : null;
+      }, "📂 在資料夾中顯示") : null;
       return React.createElement("div", {
         style: {
           position: "fixed", right: "20px", bottom: "20px",
@@ -1213,7 +1213,7 @@ window.__ModuleLoader__.load({
       );
     }
 
-    // 项目状态总览（新增 v0.4.8）：3 大数字 + 一行解读
+    // 專案狀態總覽（新增 v0.4.8）：3 大數字 + 一行解讀
     function StatusBannerBlock({ data, t, compact }) {
       const s = data.stats || {};
       const todos = (data.todos || []).filter((x) => x && x.status !== "done" && x.status !== "cancelled");
@@ -1225,11 +1225,11 @@ window.__ModuleLoader__.load({
           React.createElement("div", { style: { fontSize: "20px", fontWeight: "700", lineHeight: "1.1", color: color || "var(--dsw-alias-label-primary)", fontVariantNumeric: "tabular-nums" } }, value),
           React.createElement("div", { style: { fontSize: "10px", color: "var(--dsw-alias-label-secondary)", marginTop: "4px", letterSpacing: "0.3px" } }, label),
         );
-      // 一行解读
+      // 一行解讀
       const tips = [];
-      if (todos.length > 5) tips.push(`${todos.length} 个待办较密集`);
-      if (memories.length > 30) tips.push("记忆较多，可整理");
-      const insight = lastAct ? `最近 ${formatRelativeTime(lastAct.occurredAt, Date.now(), data._localeCode)}` : "暂无活动";
+      if (todos.length > 5) tips.push(`${todos.length} 個待辦較密集`);
+      if (memories.length > 30) tips.push("記憶較多，可整理");
+      const insight = lastAct ? `最近 ${formatRelativeTime(lastAct.occurredAt, Date.now(), data._localeCode)}` : "暫無活動";
       return React.createElement(
         "section",
         { style: Object.assign({}, sectionStyle, { padding: "12px 14px", margin: compact ? 0 : sectionStyle.margin }), "data-block": "status-banner" },
@@ -1329,13 +1329,13 @@ window.__ModuleLoader__.load({
       }
       const eventIcon = (title) => {
         const t0 = (title || "").toLowerCase();
-        if (t0.includes("init") || t0.includes("扫描") || t0.includes("scan")) return "🚀";
-        if (t0.includes("memory") || t0.includes("记忆")) return "🧠";
-        if (t0.includes("todo") || t0.includes("待办")) return "📋";
+        if (t0.includes("init") || t0.includes("掃描") || t0.includes("scan")) return "🚀";
+        if (t0.includes("memory") || t0.includes("記憶")) return "🧠";
+        if (t0.includes("todo") || t0.includes("待辦")) return "📋";
         if (t0.includes("dream") || t0.includes("整理")) return "✨";
         if (t0.includes("rescan")) return "🔄";
         if (t0.includes("session") || t0.includes("摘要")) return "📝";
-        if (t0.includes("diff") || t0.includes("架构")) return "🌳";
+        if (t0.includes("diff") || t0.includes("架構")) return "🌳";
         return "•";
       };
       const timelineItem = (it, isLast) => {
@@ -1369,8 +1369,8 @@ window.__ModuleLoader__.load({
         const stars = Math.max(0, Math.min(5, Math.round((imp || 0) * 5)));
         return "★".repeat(stars) + "☆".repeat(5 - stars);
       };
-      // 用 React state 管理展开状态（修复 v0.4.9 toggle bug：原版用模块级 const + DOM 直接操作，
-      //   React 重渲染时 inline style 被 React state 计算值覆盖，导致"展开后无法收起"）
+      // 用 React state 管理展開狀態（修復 v0.4.9 toggle bug：原版用模組級 const + DOM 直接操作，
+      //   React 重渲染時 inline style 被 React state 計算值覆蓋，導致"展開後無法收起"）
       const [expanded, setExpanded] = React.useState(new Set());
       const toggle = (m, e) => {
         if (e) e.stopPropagation();
@@ -1419,7 +1419,7 @@ window.__ModuleLoader__.load({
             React.createElement("div", { style: { flex: "1 1 auto" } }),
             React.createElement("button", {
               "data-mem-copy": "1",
-              title: "复制到 LLM 帮你整理",
+              title: "複製到 LLM 幫你整理",
               style: { background: "transparent", border: "none", cursor: "pointer", fontSize: "11px", color: "var(--dsw-alias-label-secondary)", padding: "0 4px", borderRadius: "4px" },
               onClick: (e) => copyMem(m, e),
             }, "📋"),
@@ -1427,7 +1427,7 @@ window.__ModuleLoader__.load({
               "data-mem-indicator": "1",
               style: { fontSize: "12px", color: "var(--dsw-alias-label-secondary)", cursor: "pointer", padding: "0 4px", userSelect: "none" },
               onClick: (e) => toggle(m, e),
-              title: "展开/收起",
+              title: "展開/收起",
             }, isOpen ? "▾" : "▸"),
           ),
           React.createElement("div", { style: { fontSize: "13px", fontWeight: "600", color: "var(--dsw-alias-label-primary)", lineHeight: "1.4", marginBottom: "4px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", textOverflow: "ellipsis" } }, m.title),
@@ -1446,7 +1446,7 @@ window.__ModuleLoader__.load({
       return React.createElement("section", { style: sectionStyle, "data-block": "memories" },
         React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" } },
           React.createElement("h3", { style: Object.assign({}, sectionTitleStyle, { margin: 0 }) }, "🧠 " + t("memories.title") + " · " + memories.length),
-          React.createElement("span", { style: { fontSize: "10px", color: "var(--dsw-alias-label-secondary)" } }, "📋 点击 📋 复制给 LLM"),
+          React.createElement("span", { style: { fontSize: "10px", color: "var(--dsw-alias-label-secondary)" } }, "📋 點選 📋 複製給 LLM"),
         ),
         React.createElement("div", null, memories.slice(0, 8).map(memCard)),
         memories.length > 8 ? React.createElement("div", { style: { textAlign: "center", fontSize: "11px", color: "var(--dsw-alias-label-secondary)", marginTop: "6px" } }, "+" + (memories.length - 8) + " 更多 → Dashboard") : null,
@@ -1493,7 +1493,7 @@ window.__ModuleLoader__.load({
         const pctLabel = langUsage.total > 0 ? Math.round(item.percent) + "%" : "";
         langItems.push(React.createElement("span", {
           key: "lang-" + item.lang,
-          title: item.lang + " · " + item.count + " 个文件",
+          title: item.lang + " · " + item.count + " 個檔案",
           style: { display: "inline-flex", alignItems: "center", gap: "4px", padding: "2px 8px", background: "var(--dsw-alias-bg-layer-2)", borderRadius: "10px", fontSize: "11px", fontWeight: "500", marginRight: "4px", marginBottom: "4px", border: "1px solid var(--dsw-alias-border-l1)" },
         },
           React.createElement("span", { style: { width: "8px", height: "8px", borderRadius: "50%", background: "var(--dsw-alias-brand-primary)" } }),
@@ -1504,10 +1504,10 @@ window.__ModuleLoader__.load({
       if (langUsage.tail) {
         langItems.push(React.createElement("span", {
           key: "lang-tail",
-          title: langUsage.tail.languages + " 种语言共 " + langUsage.tail.count + " 个文件",
+          title: langUsage.tail.languages + " 種語言共 " + langUsage.tail.count + " 個檔案",
           style: { display: "inline-flex", alignItems: "center", gap: "4px", padding: "2px 8px", background: "var(--dsw-alias-bg-layer-2)", borderRadius: "10px", fontSize: "11px", fontWeight: "500", marginRight: "4px", marginBottom: "4px", border: "1px solid var(--dsw-alias-border-l1)", color: "var(--dsw-alias-label-secondary)" },
         },
-          React.createElement("span", null, "其它 " + langUsage.tail.languages + " 种"),
+          React.createElement("span", null, "其它 " + langUsage.tail.languages + " 種"),
           React.createElement("span", null, " · " + Math.round(langUsage.tail.percent) + "%"),
         ));
       }
@@ -1628,11 +1628,11 @@ window.__ModuleLoader__.load({
         const steps = (flow && flow.steps) || [];
         if (steps.length < 2) return false;
         const name = String(flow.name || "");
-        if (/本地推断|local inference/i.test(name)) return false;
+        if (/本地推斷|local inference/i.test(name)) return false;
         const ids = steps.map(stepComponentId);
         if (ids.length === components.length && ids.every((id, index) => id === components[index].id)) return false;
         const actions = steps.map((step) => (typeof step === "object" && step && step.action) || "");
-        const generic = actions.length > 0 && actions.every((action) => action === "接收请求" || action === "完成处理" || action === "处理并传递");
+        const generic = actions.length > 0 && actions.every((action) => action === "接收請求" || action === "完成處理" || action === "處理並傳遞");
         return !generic;
       }
 
@@ -1885,26 +1885,26 @@ window.__ModuleLoader__.load({
         gap: "8px",
         transition: "transform 0.1s ease, opacity 0.1s ease, background 0.15s ease",
       });
-      // v0.4.12: 按钮文案统一为"查看 Dashboard · 项目全景"（v0.4.11 之前是"打开/收起 Dashboard" 切换）
-      // Dashboard 默认展开，按钮在折叠状态显示，展开后 dashboard 占满，按钮可折叠回
-      // 右侧小图标（▾/▸）作为状态指示，文案不变
+      // v0.4.12: 按鈕文案統一為"檢視 Dashboard · 專案全景"（v0.4.11 之前是"開啟/收起 Dashboard" 切換）
+      // Dashboard 預設展開，按鈕在摺疊狀態顯示，展開後 dashboard 佔滿，按鈕可摺疊回
+      // 右側小圖示（▾/▸）作為狀態指示，文案不變
       return React.createElement("section", { style: Object.assign({}, sectionStyle, { padding: "10px 14px" }), "data-block": "actions" },
         React.createElement("div", { style: { display: "flex", gap: "8px" } },
           React.createElement("button", {
             "data-action": "toggle-dashboard",
             style: buttonStyle(),
             onClick: (e) => toggleDashboard(e, t),
-            title: localeCode === "en-US" ? "View full project dashboard" : "查看项目完整数据快照",
+            title: localeCode === "en-US" ? "View full project dashboard" : "檢視專案完整資料快照",
           },
             React.createElement("span", { style: { fontSize: "16px" } }, "📊"),
             React.createElement("span", { style: { flex: "1 1 auto", textAlign: "left" } },
               React.createElement("div", { style: { fontSize: "13px", fontWeight: "600", lineHeight: "1.2" } },
-                React.createElement("span", null, localeCode === "en-US" ? "View Dashboard" : "查看 Dashboard"),
+                React.createElement("span", null, localeCode === "en-US" ? "View Dashboard" : "檢視 Dashboard"),
                 React.createElement("span", { style: { color: "var(--dsw-alias-label-secondary)", fontWeight: "400", margin: "0 4px" } }, "·"),
-                React.createElement("span", { style: { color: "var(--dsw-alias-label-secondary)", fontWeight: "400" } }, localeCode === "en-US" ? "Project Overview" : "项目全景"),
+                React.createElement("span", { style: { color: "var(--dsw-alias-label-secondary)", fontWeight: "400" } }, localeCode === "en-US" ? "Project Overview" : "專案全景"),
               ),
               React.createElement("div", { style: { fontSize: "10px", color: "var(--dsw-alias-label-secondary)", marginTop: "1px" } },
-                localeCode === "en-US" ? "Tech stack · todos · memories · timeline" : "技术栈 · 待办 · 记忆 · 时间线",
+                localeCode === "en-US" ? "Tech stack · todos · memories · timeline" : "技術棧 · 待辦 · 記憶 · 時間線",
               ),
             ),
             React.createElement("span", { "data-dashboard-indicator": "1", style: { fontSize: "12px", color: "var(--dsw-alias-label-secondary)" } }, "▾"),
@@ -1913,20 +1913,20 @@ window.__ModuleLoader__.load({
       );
     }
 
-    // ─── Onboarding 启动状态机 ───
-    // v0.5.0: 把"复制命令让人贴"换成"点按钮直接后台扫描"。
-    //   流程：点击 → host.call('project_brain/initProject') → 期间显示转圈 + 阶段文案
-    //         → 成功：父组件刷新 preview 后自动切到 dashboard
-    //         → 失败：把错误显示在按钮上方，用户可重试
+    // ─── Onboarding 啟動狀態機 ───
+    // v0.5.0: 把"複製命令讓人貼"換成"點按鈕直接後臺掃描"。
+    //   流程：點選 → host.call('project_brain/initProject') → 期間顯示轉圈 + 階段文案
+    //         → 成功：父元件重新整理 preview 後自動切到 dashboard
+    //         → 失敗：把錯誤顯示在按鈕上方，使用者可重試
     //
-    // 父组件（SidebarPreviewRoot）传 path / onComplete；
-    //   path：当前 workspace 路径（来自 build-time embed 的 sessionToWorkspaceId 反查）
-    //   onComplete：完成后调一下让父组件重新解析数据
+    // 父元件（SidebarPreviewRoot）傳 path / onComplete；
+    //   path：當前 workspace 路徑（來自 build-time embed 的 sessionToWorkspaceId 反查）
+    //   onComplete：完成後調一下讓父元件重新解析資料
     const ONBOARDING_PHASES = [
-      { key: "scanning", icon: "🔍", label: "扫描项目结构…" },
-      { key: "graph", icon: "🏛️", label: "构建架构关系…" },
-      { key: "analyzing", icon: "🧠", label: "DSH LLM 语义分析…" },
-      { key: "done", icon: "✅", label: "架构与项目脑已生成" },
+      { key: "scanning", icon: "🔍", label: "掃描專案結構…" },
+      { key: "graph", icon: "🏛️", label: "構建架構關係…" },
+      { key: "analyzing", icon: "🧠", label: "DSH LLM 語義分析…" },
+      { key: "done", icon: "✅", label: "架構與專案腦已生成" },
     ];
 
     const ONBOARDING_FEATURES = [
@@ -1936,15 +1936,15 @@ window.__ModuleLoader__.load({
     ];
 
     function OnboardingBlock({ t, path, sessionId, onComplete, connection }) {
-      // 三态机：idle / loading / error
+      // 三態機：idle / loading / error
       const [phase, setPhase] = React.useState("idle");   // "idle" | "loading" | "error"
-      const [phaseStep, setPhaseStep] = React.useState(0); // 0..3，对应 ONBOARDING_PHASES 下标
+      const [phaseStep, setPhaseStep] = React.useState(0); // 0..3，對應 ONBOARDING_PHASES 下標
       const [errMsg, setErrMsg] = React.useState("");
       const [result, setResult] = React.useState(null);
 
       const rpc = connection && connection.rpc;
 
-      // 启动按钮基础样式
+      // 啟動按鈕基礎樣式
       const ctaBase = {
         display: "flex",
         alignItems: "center",
@@ -1984,11 +1984,11 @@ window.__ModuleLoader__.load({
           ),
         );
 
-      // 阶段推进（仅前端 UX 节奏，让用户感知"在干活"；RPC 自身是单次调用）
+      // 階段推進（僅前端 UX 節奏，讓使用者感知"在幹活"；RPC 自身是單次呼叫）
       function advancePhase(stepIdx) {
         setPhaseStep(stepIdx);
       }
-      // 注：stepStyle 函数保留兼容（内部不再使用），外部若引用不破坏构建。
+      // 注：stepStyle 函式保留相容（內部不再使用），外部若引用不破壞構建。
 
       async function startScan() {
         if (phase === "loading") return;
@@ -1996,20 +1996,20 @@ window.__ModuleLoader__.load({
         setResult(null);
         setPhase("loading");
         advancePhase(0);
-        // v0.5.1 修复：当 path 为空（build-time sessionToWorkspaceId miss）时，
-        //   用 sessionId 走 host 兜底——host 端 getCwdBySession 会用 ctx.sessions.get
-        //   反查真实 cwd，避免每个新建 workspace 都要重启 DSH 才能用
+        // v0.5.1 修復：當 path 為空（build-time sessionToWorkspaceId miss）時，
+        //   用 sessionId 走 host 兜底——host 端 getCwdBySession 會用 ctx.sessions.get
+        //   反查真實 cwd，避免每個新建 workspace 都要重啟 DSH 才能用
         if (!sessionId) {
           setPhase("error");
-          setErrMsg("未找到当前 Session，请先在 DSH 中打开该项目");
+          setErrMsg("未找到當前 Session，請先在 DSH 中開啟該專案");
           return;
         }
         if (!rpc || typeof rpc.call !== "function") {
           setPhase("error");
-          setErrMsg("DSH Connection RPC 不可用，请确认插件依赖已正确安装");
+          setErrMsg("DSH Connection RPC 不可用，請確認外掛依賴已正確安裝");
           return;
         }
-        // 阶段推进定时器（UX 节奏，~600ms 一步；RPC 通常 1-3s 完成）
+        // 階段推進定時器（UX 節奏，~600ms 一步；RPC 通常 1-3s 完成）
         const timers = [];
         timers.push(setTimeout(() => advancePhase(1), 700));
         timers.push(setTimeout(() => advancePhase(2), 1500));
@@ -2027,7 +2027,7 @@ window.__ModuleLoader__.load({
           return;
         }
         timers.forEach((id) => clearTimeout(id));
-        // Connection RPC 统一形态：{ok:true,value:{projectPath,scan,preview}}
+        // Connection RPC 統一形態：{ok:true,value:{projectPath,scan,preview}}
         // 或 {ok:false,error:{code,message,details}}。
         const okFlag = resp && resp.ok;
         const dataObj = (resp && resp.value) || {};
@@ -2039,7 +2039,7 @@ window.__ModuleLoader__.load({
           }
         } else {
           const errStr = (resp && resp.error && resp.error.message)
-            || "未知错误";
+            || "未知錯誤";
           setPhase("error");
           setErrMsg(errStr);
         }
@@ -2051,13 +2051,13 @@ window.__ModuleLoader__.load({
         setResult(null);
       }
 
-      // CTA 渲染：分三态
+      // CTA 渲染：分三態
       let ctaNode;
       if (phase === "loading") {
         ctaNode = React.createElement(
           "div",
           { style: { marginTop: "16px" }, "data-block": "onboarding-loading" },
-          // 转圈圈：CSS conic-gradient 实现（不依赖 framer-motion / 第三方）
+          // 轉圈圈：CSS conic-gradient 實現（不依賴 framer-motion / 第三方）
           React.createElement(
             "div",
             {
@@ -2078,7 +2078,7 @@ window.__ModuleLoader__.load({
             }),
             React.createElement("span", null, ONBOARDING_PHASES[phaseStep] ? ONBOARDING_PHASES[phaseStep].label : "分析中…"),
           ),
-          // 进度指示（4 步）
+          // 進度指示（4 步）
           React.createElement(
             "div",
             {
@@ -2127,8 +2127,8 @@ window.__ModuleLoader__.load({
                 border: "1px solid rgba(220,38,38,0.25)",
               },
             },
-            React.createElement("div", { style: { fontWeight: "600", marginBottom: "4px" } }, "❌ 启动失败"),
-            React.createElement("div", null, errMsg || "未知错误"),
+            React.createElement("div", { style: { fontWeight: "600", marginBottom: "4px" } }, "❌ 啟動失敗"),
+            React.createElement("div", null, errMsg || "未知錯誤"),
           ),
           React.createElement(
             "button",
@@ -2138,7 +2138,7 @@ window.__ModuleLoader__.load({
               "data-action": "retry",
             },
             React.createElement("span", { style: { fontSize: "16px" } }, "🔁"),
-            React.createElement("span", null, "重试"),
+            React.createElement("span", null, "重試"),
           ),
           React.createElement(
             "button",
@@ -2154,9 +2154,9 @@ window.__ModuleLoader__.load({
                 width: "100%",
                 fontFamily: "inherit",
               },
-              onClick: () => copyPrompt(t("onboarding.copyPrompt"), null, "已复制", "复制失败"),
+              onClick: () => copyPrompt(t("onboarding.copyPrompt"), null, "已複製", "複製失敗"),
             },
-            "📋 复制启动指令（兜底）",
+            "📋 複製啟動指令（兜底）",
           ),
         );
       } else {
@@ -2204,10 +2204,10 @@ window.__ModuleLoader__.load({
           )),
           React.createElement("div", { style: { fontSize: "11px", color: "var(--dsw-alias-label-secondary)", marginTop: "6px", paddingTop: "8px", borderTop: "1px dashed var(--dsw-alias-border-l1)" } }, t("onboarding.more")),
         ),
-        // path 提示（让用户知道会扫哪个目录）
+        // path 提示（讓使用者知道會掃哪個目錄）
         // v0.5.1：即使 build-time map miss，只要 sessionId 存在，host 端 initProject RPC
-        //   会用 getCwdBySession 兜底解析 cwd，所以这里不应该再显示"未检测到 workspace 路径"
-        //   警告；改为显示"等待从 sessionId 解析"提示，让用户知道会自动兜底。
+        //   會用 getCwdBySession 兜底解析 cwd，所以這裡不應該再顯示"未檢測到 workspace 路徑"
+        //   警告；改為顯示"等待從 sessionId 解析"提示，讓使用者知道會自動兜底。
         path
           ? React.createElement(
               "div",
@@ -2241,7 +2241,7 @@ window.__ModuleLoader__.load({
                 "data-workspace-session-id": String(sessionId).slice(0, 12) + "…",
               },
               React.createElement("span", null, "🔌"),
-              React.createElement("span", null, "build 未纳入此 session，点击启动将由 host 自动解析路径"),
+              React.createElement("span", null, "build 未納入此 session，點選啟動將由 host 自動解析路徑"),
             )
           : React.createElement(
               "div",
@@ -2256,26 +2256,26 @@ window.__ModuleLoader__.load({
                 },
               },
               React.createElement("span", null, "⚠️"),
-              React.createElement("span", null, "未检测到 workspace 路径"),
+              React.createElement("span", null, "未檢測到 workspace 路徑"),
             ),
         ctaNode,
-        // 注入转圈动画 keyframes（一次性）
+        // 注入轉圈動畫 keyframes（一次性）
         React.createElement("style", null, "@keyframes dsh-brain-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }"),
       );
     }
 
-    // ─── 智能续接建议卡（v0.4.15 project_suggest_next） ───
-    // v0.4.16：模块级缓存（跨组件 unmount/mount）+ 5 分钟 TTL + preview.changed 失效。
-    //   - 切 tab / DashboardSection 重 mount 都不重拉（之前用 useRef 失败，因为 React 重 mount 会清空 ref）
-    //   - 用户点 ↻ 重新生成 / preview 变化 / 跨过 5 分钟 才重拉
+    // ─── 智慧續接建議卡（v0.4.15 project_suggest_next） ───
+    // v0.4.16：模組級快取（跨元件 unmount/mount）+ 5 分鐘 TTL + preview.changed 失效。
+    //   - 切 tab / DashboardSection 重 mount 都不重拉（之前用 useRef 失敗，因為 React 重 mount 會清空 ref）
+    //   - 使用者點 ↻ 重新生成 / preview 變化 / 跨過 5 分鐘 才重拉
     const SUGGESTION_TTL_MS = 5 * 60 * 1000;
     const suggestionCache = new Map(); // sessionId -> { fetchedAt, status, data, error, dismissed }
 
     function SuggestionCard({ t, localeCode, sessionId, connection, projectInitialized, embeddedSuggestion, workspacePath }) {
-      // v0.4.18：cache key 只用 workspacePath（项目级共享）；workspacePath 还没解析到时显示 loading。
+      // v0.4.18：cache key 只用 workspacePath（專案級共享）；workspacePath 還沒解析到時顯示 loading。
       const cacheKey = workspacePath ? String(workspacePath) : null;
       const cached = cacheKey ? suggestionCache.get(cacheKey) : null;
-      // workspacePath 未就绪 → 强制走 loading，避免用 sessionId 落到跨 session 串数据
+      // workspacePath 未就緒 → 強制走 loading，避免用 sessionId 落到跨 session 串資料
       const initialState = cached
         ? { status: cached.status, data: cached.data, error: cached.error }
         : (workspacePath
@@ -2287,7 +2287,7 @@ window.__ModuleLoader__.load({
       const fetchSuggestion = React.useCallback(async (force) => {
         const rpc = connection && connection.rpc;
         if (!sessionId || !rpc || typeof rpc.call !== "function") return;
-        // 模块级 TTL：未强制刷新 + 已缓存 + 在 TTL 内 → 直接复用
+        // 模組級 TTL：未強制重新整理 + 已快取 + 在 TTL 內 → 直接複用
         const cur = suggestionCache.get(cacheKey);
         if (!force && cur && cur.status === "ready" && cur.data && (Date.now() - (cur.fetchedAt || 0)) < SUGGESTION_TTL_MS) {
           setState({ status: cur.status, data: cur.data, error: cur.error });
@@ -2295,8 +2295,8 @@ window.__ModuleLoader__.load({
         }
         setState({ status: "loading", data: (cur && cur.data) || state.data || null, error: null });
         try {
-          // v0.4.18：传 sessionId + workspacePath 让 host 端用工作区路径（不依赖 sessionId 解析），
-          // 保证同一项目下不同 session 拿到的内容完全一致。
+          // v0.4.18：傳 sessionId + workspacePath 讓 host 端用工作區路徑（不依賴 sessionId 解析），
+          // 保證同一專案下不同 session 拿到的內容完全一致。
           const payload = { sessionId };
           if (cacheKey) payload.workspacePath = cacheKey;
           const res = await rpc.call("/project-brain", "suggest", payload);
@@ -2321,11 +2321,11 @@ window.__ModuleLoader__.load({
             setState({ status: "ready", data: res.value.suggestion, error: null });
             return;
           }
-          let errMsg = "智能续接失败";
+          let errMsg = "智慧續接失敗";
           if (res.error && res.error.message) errMsg = res.error.message + " (" + (res.error.code || "?") + ")";
-          else if (!res.value) errMsg = "RPC value 为空";
-          else if (!res.value.suggestion) errMsg = "value.suggestion 为空";
-          else errMsg = "未知状态：" + JSON.stringify(res).slice(0, 200);
+          else if (!res.value) errMsg = "RPC value 為空";
+          else if (!res.value.suggestion) errMsg = "value.suggestion 為空";
+          else errMsg = "未知狀態：" + JSON.stringify(res).slice(0, 200);
           setState({ status: "error", data: null, error: errMsg });
         } catch (error) {
           setState({ status: "error", data: null, error: "throw: " + String((error && error.message) || error) });
@@ -2340,7 +2340,7 @@ window.__ModuleLoader__.load({
         if (dismissed) return;
         const rpc = connection && connection.rpc;
         if (!rpc || !sessionId) return;
-        // workspacePath 未就绪 → 等；不要用 sessionId 当 cache key（避免跨 session 串数据）
+        // workspacePath 未就緒 → 等；不要用 sessionId 當 cache key（避免跨 session 串資料）
         if (!cacheKey) {
           setState({ status: "loading", data: null, error: null });
           return;
@@ -2358,7 +2358,7 @@ window.__ModuleLoader__.load({
         const handler = (event) => {
           const ev = event && event.detail;
           const changedPath = ev && typeof ev.projectPath === "string" ? ev.projectPath : null;
-          if (changedPath && cacheKey && changedPath !== cacheKey) return; // 不同项目，不影响
+          if (changedPath && cacheKey && changedPath !== cacheKey) return; // 不同專案，不影響
           const c = suggestionCache.get(cacheKey);
           if (c) {
             c.fetchedAt = 0;
@@ -2370,7 +2370,7 @@ window.__ModuleLoader__.load({
       }, [cacheKey]);
 
       if (!projectInitialized) {
-        // v0.4.15：项目未初始化时显示轻提示卡片（不阻塞 Onboarding 流程）
+        // v0.4.15：專案未初始化時顯示輕提示卡片（不阻塞 Onboarding 流程）
         return React.createElement(
           "div",
           {
@@ -2389,7 +2389,7 @@ window.__ModuleLoader__.load({
           React.createElement("span", null, "💡 "),
           React.createElement("span", null, localeCode === "en-US"
             ? "Init project brain to see today's continuation."
-            : "初始化项目脑后查看今天可能推进的内容。"),
+            : "初始化專案腦後檢視今天可能推進的內容。"),
         );
       }
       if (dismissed) {
@@ -2418,7 +2418,7 @@ window.__ModuleLoader__.load({
               },
               "data-action": "suggest-show",
             },
-            "💡 " + (localeCode === "en-US" ? "Show suggestion" : "查看续接建议"),
+            "💡 " + (localeCode === "en-US" ? "Show suggestion" : "檢視續接建議"),
           ),
         );
       }
@@ -2517,16 +2517,16 @@ window.__ModuleLoader__.load({
       );
     }
 
-    // ─── v0.4.x: GitTab — 可视化 git 提交历史（仅项目是 git 仓库时挂载） ───
-    // 设计：左侧 ASCII graph（| / \ 节点），右侧 commit 信息；点击展开 body + parents。
-    // 数据来源：RPC `git` endpoint（已探测 gitInfo.available 控制挂载）。
+    // ─── v0.4.x: GitTab — 視覺化 git 提交歷史（僅專案是 git 倉庫時掛載） ───
+    // 設計：左側 ASCII graph（| / \ 節點），右側 commit 資訊；點選展開 body + parents。
+    // 資料來源：RPC `git` endpoint（已探測 gitInfo.available 控制掛載）。
     function GitTab({ gitInfo, t, onRefresh, autoRefresh, onToggleAutoRefresh }) {
       if (!gitInfo) {
-        return React.createElement("div", { style: { padding: "20px", textAlign: "center", fontSize: "12px", color: "var(--dsw-alias-label-secondary)" }, "data-block": "git-loading" }, "⏳ 加载 git 历史...");
+        return React.createElement("div", { style: { padding: "20px", textAlign: "center", fontSize: "12px", color: "var(--dsw-alias-label-secondary)" }, "data-block": "git-loading" }, "⏳ 載入 git 歷史...");
       }
       if (gitInfo.available !== true) {
         return React.createElement("div", { style: { padding: "20px", textAlign: "center", fontSize: "12px", color: "var(--dsw-alias-label-secondary)" }, "data-block": "git-empty" },
-          "📂 当前项目不是 git 仓库",
+          "📂 當前專案不是 git 倉庫",
           gitInfo.error ? React.createElement("div", { style: { marginTop: "6px", fontSize: "10px", opacity: 0.7 } }, gitInfo.error) : null,
         );
       }
@@ -2534,17 +2534,17 @@ window.__ModuleLoader__.load({
       const commits = gitInfo.commits || [];
       const branches = gitInfo.branches || [];
       const currentBranch = gitInfo.currentBranch;
-      const [expanded, setExpanded] = React.useState(null);  // 当前展开的 commit hash
+      const [expanded, setExpanded] = React.useState(null);  // 當前展開的 commit hash
 
-      // ── 时间格式化 ──
+      // ── 時間格式化 ──
       const relTime = (ts) => {
         if (!ts) return "";
         const diff = Date.now() / 1000 - ts;
         if (diff < 60) return Math.round(diff) + "秒前";
-        if (diff < 3600) return Math.round(diff / 60) + "分钟前";
-        if (diff < 86400) return Math.round(diff / 3600) + "小时前";
+        if (diff < 3600) return Math.round(diff / 60) + "分鐘前";
+        if (diff < 86400) return Math.round(diff / 3600) + "小時前";
         if (diff < 30 * 86400) return Math.round(diff / 86400) + "天前";
-        if (diff < 365 * 86400) return Math.round(diff / 2592000) + "个月前";
+        if (diff < 365 * 86400) return Math.round(diff / 2592000) + "個月前";
         return Math.round(diff / 31536000) + "年前";
       };
       const fmtDate = (ts) => {
@@ -2553,23 +2553,23 @@ window.__ModuleLoader__.load({
         return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
       };
 
-      // ── 按 commit hash 索引 branch refs（多分支时挂到对应 commit 行） ──
+      // ── 按 commit hash 索引 branch refs（多分支時掛到對應 commit 行） ──
       const refsByHash = new Map();
       for (const b of branches) {
         if (!refsByHash.has(b.commit)) refsByHash.set(b.commit, []);
         refsByHash.get(b.commit).push({ kind: "branch", name: b.name, isCurrent: b.name === currentBranch });
       }
 
-      // ── 分支配色（按 branch name hash 到固定颜色，让用户视觉区分分支） ──
-      // 注意：这是 GitHub 风格的浅色装饰调色板，独立于 DSH 主题 token 体系。
-      // smoke-theme-tokens.mjs 检测到 `const palette = [ ... ]` 字面量会自动豁免其中的 hex。
+      // ── 分支配色（按 branch name hash 到固定顏色，讓使用者視覺區分分支） ──
+      // 注意：這是 GitHub 風格的淺色裝飾調色盤，獨立於 DSH 主題 token 體系。
+      // smoke-theme-tokens.mjs 檢測到 `const palette = [ ... ]` 字面量會自動豁免其中的 hex。
       const palette = [
-        { fg: "#1f6feb", bg: "#ddf4ff" },  // 蓝
-        { fg: "#1a7f37", bg: "#dafbe1" },  // 绿
+        { fg: "#1f6feb", bg: "#ddf4ff" },  // 藍
+        { fg: "#1a7f37", bg: "#dafbe1" },  // 綠
         { fg: "#8250df", bg: "#fbefff" },  // 紫
-        { fg: "#cf222e", bg: "#ffebe9" },  // 红
-        { fg: "#9a6700", bg: "#fff8c5" },  // 黄
-        { fg: "#0a3069", bg: "#dbeafe" },  // 深蓝
+        { fg: "#cf222e", bg: "#ffebe9" },  // 紅
+        { fg: "#9a6700", bg: "#fff8c5" },  // 黃
+        { fg: "#0a3069", bg: "#dbeafe" },  // 深藍
       ];
       const colorByBranch = new Map();
       let colorIdx = 0;
@@ -2580,7 +2580,7 @@ window.__ModuleLoader__.load({
         }
       }
 
-      // ── Styles（VSCode / Cursor 风格：紧凑、留白、hover 高亮） ──
+      // ── Styles（VSCode / Cursor 風格：緊湊、留白、hover 高亮） ──
       const cardStyle = {
         background: "var(--dsw-alias-bg-layer-2)",
         border: "1px solid var(--dsw-alias-border-l1)",
@@ -2696,7 +2696,7 @@ window.__ModuleLoader__.load({
         whiteSpace: "nowrap",
       });
 
-      // 展开后的详情块样式
+      // 展開後的詳情塊樣式
       const expandedPanelStyle = {
         gridColumn: "2 / -1",
         marginTop: "8px",
@@ -2747,7 +2747,7 @@ window.__ModuleLoader__.load({
           "data-commit": c.hash,
           "data-expanded": isExpanded ? "1" : "0",
           onClick: (ev) => {
-            // 阻止展开内部链接/按钮冒泡
+            // 阻止展開內部連結/按鈕冒泡
             const tag = ev && ev.target && ev.target.tagName;
             if (tag === "A" || tag === "BUTTON") return;
             setExpanded(isExpanded ? null : c.hash);
@@ -2760,14 +2760,14 @@ window.__ModuleLoader__.load({
           ),
           // info column
           React.createElement("div", { style: { minWidth: 0 } },
-            React.createElement("div", { style: subjectStyle, title: c.subject }, c.subject || "(无标题)"),
+            React.createElement("div", { style: subjectStyle, title: c.subject }, c.subject || "(無標題)"),
             React.createElement("div", { style: metaStyle },
               React.createElement("span", { style: hashChipStyle }, c.shortHash),
               React.createElement("span", { style: { fontWeight: "500" } }, c.author || "?"),
               React.createElement("span", null, "·"),
               React.createElement("span", { title: c.isoTime || "" }, relTime(c.timestamp)),
               c.isMerge ? React.createElement("span", { style: { color: "var(--dsw-alias-state-warn-primary)", fontSize: "10px" } }, "⎇ merge") : null,
-              // v0.4.x: 变更文件摘要（来自 history.js 的 tree diff；pack 不可读时为 0）
+              // v0.4.x: 變更檔案摘要（來自 history.js 的 tree diff；pack 不可讀時為 0）
               typeof c.filesChangedTotal === "number" && c.filesChangedTotal > 0
                 ? (() => {
                     const fileStatText =
@@ -2782,9 +2782,9 @@ window.__ModuleLoader__.load({
                   })()
                 : null,
             ),
-            // 展开后的详情
+            // 展開後的詳情
             isExpanded ? React.createElement("div", { style: expandedPanelStyle },
-              c.body ? React.createElement("div", { style: bodyTextStyle }, c.body) : React.createElement("div", { style: Object.assign({}, bodyTextStyle, { opacity: 0.6, fontStyle: "italic" }) }, "（无详细描述）"),
+              c.body ? React.createElement("div", { style: bodyTextStyle }, c.body) : React.createElement("div", { style: Object.assign({}, bodyTextStyle, { opacity: 0.6, fontStyle: "italic" }) }, "（無詳細描述）"),
               React.createElement("div", { style: detailRowStyle },
                 React.createElement("div", { style: detailLabelStyle }, "Hash"),
                 React.createElement("div", { style: monospaceStyle }, c.hash),
@@ -2805,7 +2805,7 @@ window.__ModuleLoader__.load({
                 React.createElement("div", { style: detailLabelStyle }, "Merged"),
                 React.createElement("div", { style: monospaceStyle, color: "var(--dsw-alias-state-warn-primary)" }, c.extraParents.join(", ")),
               ) : null,
-              // v0.4.x: Changed Files 列表（tree diff 失败时不显示）
+              // v0.4.x: Changed Files 列表（tree diff 失敗時不顯示）
               Array.isArray(c.filesChanged) && c.filesChanged.length > 0 ? React.createElement("div", { style: Object.assign({}, detailRowStyle, { alignItems: "flex-start" }) },
                 React.createElement("div", { style: detailLabelStyle }, "Files"),
                 React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: "4px" } },
@@ -2839,7 +2839,7 @@ window.__ModuleLoader__.load({
 
       const otherBranches = branches.filter((b) => b.name !== currentBranch);
 
-      // v0.4.x: Working Tree 区块（HEAD tree vs 工作树对比，列出 untracked / deleted）
+      // v0.4.x: Working Tree 區塊（HEAD tree vs 工作樹對比，列出 untracked / deleted）
       const wt = gitInfo && gitInfo.workTree;
       const [wtExpanded, setwtExpanded] = React.useState(false);
       const renderWorkTreeSection = (workTree) => {
@@ -2897,7 +2897,7 @@ window.__ModuleLoader__.load({
           return React.createElement("div", { style: { marginBottom: "8px" } },
             React.createElement("div", { style: { display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" } },
               React.createElement("span", { style: statusBadgeStyle(kind) }, label),
-              React.createElement("span", { style: { fontSize: "11px", color: "var(--dsw-alias-label-secondary)" } }, total + " 文件" + (truncated ? "（已截断）" : "")),
+              React.createElement("span", { style: { fontSize: "11px", color: "var(--dsw-alias-label-secondary)" } }, total + " 檔案" + (truncated ? "（已截斷）" : "")),
             ),
             visible.length > 0 ? React.createElement("div", { style: { paddingLeft: "8px" } },
               visible.map((f) =>
@@ -2907,10 +2907,10 @@ window.__ModuleLoader__.load({
                 ),
               ),
               !wtExpanded && sample.length > 8
-                ? React.createElement("div", { style: { fontSize: "10px", color: "var(--dsw-alias-label-secondary)", paddingLeft: "16px" } }, "+ " + (sample.length - 8) + " 更多（点击展开查看全部）")
+                ? React.createElement("div", { style: { fontSize: "10px", color: "var(--dsw-alias-label-secondary)", paddingLeft: "16px" } }, "+ " + (sample.length - 8) + " 更多（點選展開檢視全部）")
                 : null,
               wtExpanded && truncated
-                ? React.createElement("div", { style: { fontSize: "10px", color: "var(--dsw-alias-label-secondary)", paddingLeft: "16px" } }, "（后端已截断，全部 " + total + " 个）")
+                ? React.createElement("div", { style: { fontSize: "10px", color: "var(--dsw-alias-label-secondary)", paddingLeft: "16px" } }, "（後端已截斷，全部 " + total + " 個）")
                 : null,
             ) : null,
           );
@@ -2925,7 +2925,7 @@ window.__ModuleLoader__.load({
             workTree.reference === "fallback"
               ? React.createElement("span", {
                   style: { fontSize: "10px", padding: "1px 7px", borderRadius: "9px", background: "var(--dsw-alias-state-warn-bg, var(--dsw-alias-bg-layer-1))", border: "1px solid var(--dsw-alias-state-warn-primary)", color: "var(--dsw-alias-state-warn-primary)", fontWeight: "600" },
-                  title: "HEAD tree 不可读（pack 解析限制），已沿 first-parent 链回退到 " + (workTree.referenceCommitShort || "?") + " 作为参考，结果可能略有过期",
+                  title: "HEAD tree 不可讀（pack 解析限制），已沿 first-parent 鏈回退到 " + (workTree.referenceCommitShort || "?") + " 作為參考，結果可能略有過期",
                 }, "vs " + (workTree.referenceCommitShort || "fallback"))
               : null,
             React.createElement("span", { style: { marginLeft: "auto", fontSize: "11px", color: "var(--dsw-alias-label-secondary)" } }, wtExpanded ? "▴" : "▾"),
@@ -2942,18 +2942,18 @@ window.__ModuleLoader__.load({
         React.createElement("div", { style: cardStyle },
           React.createElement("span", { style: branchChipStyle(true) }, "⎇ " + (currentBranch || "detached HEAD")),
           React.createElement("span", { style: { fontSize: "12px", color: "var(--dsw-alias-label-secondary)" } },
-            commits.length + " 个提交" + (gitInfo.truncated ? "（已截断）" : ""),
+            commits.length + " 個提交" + (gitInfo.truncated ? "（已截斷）" : ""),
           ),
           otherBranches.length > 0 ? React.createElement("span", { style: { fontSize: "11px", color: "var(--dsw-alias-label-secondary)" } },
-            "· " + otherBranches.length + " 个其他分支",
+            "· " + otherBranches.length + " 個其他分支",
           ) : null,
           gitInfo.head ? React.createElement("span", { style: { marginLeft: "auto", fontFamily: "ui-monospace, monospace", fontSize: "10px", color: "var(--dsw-alias-label-secondary)" } }, "HEAD " + gitInfo.head.substring(0, 7)) : null,
-          // v0.4.x: 自动刷新开关 + 手动刷新按钮
+          // v0.4.x: 自動重新整理開關 + 手動重新整理按鈕
           typeof onRefresh === "function" ? React.createElement("span", { style: { display: "inline-flex", alignItems: "center", gap: "4px", marginLeft: "8px" } },
             typeof onToggleAutoRefresh === "function" ? React.createElement("button", {
               key: "auto",
               type: "button",
-              title: autoRefresh ? "自动刷新已开启（30s 间隔），点击关闭" : "自动刷新已关闭，点击开启",
+              title: autoRefresh ? "自動重新整理已開啟（30s 間隔），點選關閉" : "自動重新整理已關閉，點選開啟",
               onClick: () => onToggleAutoRefresh(!autoRefresh),
               "data-git-auto": autoRefresh ? "1" : "0",
               style: {
@@ -2969,11 +2969,11 @@ window.__ModuleLoader__.load({
                 alignItems: "center",
                 gap: "4px",
               },
-            }, React.createElement("span", { style: { width: "6px", height: "6px", borderRadius: "50%", background: autoRefresh ? "var(--dsw-alias-state-success-primary)" : "var(--dsw-alias-label-secondary)" } }), autoRefresh ? "自动 30s" : "自动关") : null,
+            }, React.createElement("span", { style: { width: "6px", height: "6px", borderRadius: "50%", background: autoRefresh ? "var(--dsw-alias-state-success-primary)" : "var(--dsw-alias-label-secondary)" } }), autoRefresh ? "自動 30s" : "自動關") : null,
             React.createElement("button", {
               key: "refresh",
               type: "button",
-              title: "刷新 Git 数据",
+              title: "重新整理 Git 資料",
               onClick: onRefresh,
               "data-git-refresh": "1",
               style: {
@@ -2992,78 +2992,78 @@ window.__ModuleLoader__.load({
         ),
         // commits 列表
         commits.length === 0
-          ? React.createElement("div", { style: { padding: "20px", textAlign: "center", fontSize: "12px", color: "var(--dsw-alias-label-secondary)" } }, "（无提交历史）")
+          ? React.createElement("div", { style: { padding: "20px", textAlign: "center", fontSize: "12px", color: "var(--dsw-alias-label-secondary)" } }, "（無提交歷史）")
           : React.createElement("div", { style: listStyle },
               commits.map((c, idx) => renderRow(c, idx)),
             ),
-        // v0.4.x: Working Tree 区块 — HEAD tree vs 工作树对比，不依赖 git binary
+        // v0.4.x: Working Tree 區塊 — HEAD tree vs 工作樹對比，不依賴 git binary
         renderWorkTreeSection(gitInfo.workTree),
       );
     }
 
     // ─── dsh-project-brain Settings Tab (v0.7.x) ────────────────────────────
-    // 把插件设置暴露在 Dashboard 的「设置」tab（字段与 config.js 手写对齐，不是全量 schema），
-    // 不依赖 DSH 桌面设置面板是否渲染第三方插件 settings。
-    //   - 字段元数据与 config.js 的 Config schema 保持一致（手写）
-    //   - 读：rpc.call("/project-brain", "settings", { action: "get" })
-    //   - 写：rpc.call("/project-brain", "settings", { sessionId, action: "update", patch })
+    // 把外掛設定暴露在 Dashboard 的「設定」tab（欄位與 config.js 手寫對齊，不是全量 schema），
+    // 不依賴 DSH 桌面設定面板是否渲染第三方外掛 settings。
+    //   - 欄位後設資料與 config.js 的 Config schema 保持一致（手寫）
+    //   - 讀：rpc.call("/project-brain", "settings", { action: "get" })
+    //   - 寫：rpc.call("/project-brain", "settings", { sessionId, action: "update", patch })
     const BRAIN_SETTINGS_META = [
-      { group: "retrieval", icon: "🔎", title: { "zh-CN": "检索与向量", "en-US": "Retrieval & vectors" },
+      { group: "retrieval", icon: "🔎", title: { "zh-CN": "檢索與向量", "en-US": "Retrieval & vectors" },
         fields: [
-          { key: "retrievalMode", label: { "zh-CN": "检索模式", "en-US": "Retrieval mode" }, type: "enum",
-            options: [{ v: "keyword", l: { "zh-CN": "关键词 (BM25)", "en-US": "Keyword (BM25)" } }, { v: "hybrid", l: { "zh-CN": "混合 (关键词 + 向量)", "en-US": "Hybrid (keyword + vector)" } }],
+          { key: "retrievalMode", label: { "zh-CN": "檢索模式", "en-US": "Retrieval mode" }, type: "enum",
+            options: [{ v: "keyword", l: { "zh-CN": "關鍵詞 (BM25)", "en-US": "Keyword (BM25)" } }, { v: "hybrid", l: { "zh-CN": "混合 (關鍵詞 + 向量)", "en-US": "Hybrid (keyword + vector)" } }],
             hint: { "zh-CN": "hybrid 需要先配置下方 Embedding", "en-US": "hybrid requires Embedding configured below" } },
-          { key: "vectorEnabled", label: { "zh-CN": "启用向量检索", "en-US": "Vector retrieval" }, type: "boolean",
-            hint: { "zh-CN": "关闭时即使配了 embedding 也只用关键词", "en-US": "When off, retrieval is keyword-only even if embedding is configured" } },
+          { key: "vectorEnabled", label: { "zh-CN": "啟用向量檢索", "en-US": "Vector retrieval" }, type: "boolean",
+            hint: { "zh-CN": "關閉時即使配了 embedding 也只用關鍵詞", "en-US": "When off, retrieval is keyword-only even if embedding is configured" } },
           { key: "embeddingBaseURL", label: { "zh-CN": "Embedding 地址", "en-US": "Embedding base URL" }, type: "string",
             placeholder: "https://api.openai.com/v1",
-            hint: { "zh-CN": "OpenAI 兼容 /v1/embeddings 端点；留空 = 禁用向量", "en-US": "OpenAI-compatible /v1/embeddings endpoint; empty = no vectors" } },
+            hint: { "zh-CN": "OpenAI 相容 /v1/embeddings 端點；留空 = 停用向量", "en-US": "OpenAI-compatible /v1/embeddings endpoint; empty = no vectors" } },
           { key: "embeddingModel", label: { "zh-CN": "Embedding 模型", "en-US": "Embedding model" }, type: "string",
             placeholder: "text-embedding-3-small" },
           { key: "embeddingApiKeyEnv", label: { "zh-CN": "API Key", "en-US": "API Key" }, type: "password",
             placeholder: "sk-… 或 PROJECT_BRAIN_EMBEDDING_API_KEY",
-            hint: { "zh-CN": "优先直接填写 API Key。如果填的是 PROJECT_BRAIN_EMBEDDING_API_KEY 这类全大写名字，则不会把它当作密钥，而是读取本机同名环境变量的值；请先在系统或用户环境变量里配好该项，并完全退出再打开 DSH Desktop。", "en-US": "Paste the API key to use it directly. An ALL_CAPS name like PROJECT_BRAIN_EMBEDDING_API_KEY is not the secret: the plugin reads the local environment variable of the same name. Set that env var on this machine, then fully quit and reopen DSH Desktop." } },
-          { key: "embeddingDimensions", label: { "zh-CN": "向量维度", "en-US": "Vector dimensions" }, type: "number",
-            hint: { "zh-CN": "0 = 由服务自动推断", "en-US": "0 = auto from service" } },
+            hint: { "zh-CN": "優先直接填寫 API Key。如果填的是 PROJECT_BRAIN_EMBEDDING_API_KEY 這類全大寫名字，則不會把它當作金鑰，而是讀取本機同名環境變數的值；請先在系統或使用者環境變數裡配好該項，並完全退出再開啟 DSH Desktop。", "en-US": "Paste the API key to use it directly. An ALL_CAPS name like PROJECT_BRAIN_EMBEDDING_API_KEY is not the secret: the plugin reads the local environment variable of the same name. Set that env var on this machine, then fully quit and reopen DSH Desktop." } },
+          { key: "embeddingDimensions", label: { "zh-CN": "向量維度", "en-US": "Vector dimensions" }, type: "number",
+            hint: { "zh-CN": "0 = 由服務自動推斷", "en-US": "0 = auto from service" } },
           { key: "embeddingBatchSize", label: { "zh-CN": "Embedding 批大小", "en-US": "Embedding batch size" }, type: "number", min: 1, max: 128 },
-          { key: "embeddingMaxIndexPerRun", label: { "zh-CN": "单次最大索引条目", "en-US": "Max items per indexing run" }, type: "number", min: 1, max: 500 },
-          { key: "embeddingTimeoutMs", label: { "zh-CN": "Embedding 超时 (ms)", "en-US": "Embedding timeout (ms)" }, type: "number", min: 1000, max: 120000, step: 1000 },
+          { key: "embeddingMaxIndexPerRun", label: { "zh-CN": "單次最大索引條目", "en-US": "Max items per indexing run" }, type: "number", min: 1, max: 500 },
+          { key: "embeddingTimeoutMs", label: { "zh-CN": "Embedding 超時 (ms)", "en-US": "Embedding timeout (ms)" }, type: "number", min: 1000, max: 120000, step: 1000 },
         ],
       },
-      { group: "weights", icon: "⚖️", title: { "zh-CN": "检索权重", "en-US": "Retrieval weights" },
-        hint: { "zh-CN": "只作用于 project_ask 的记忆排序（不管列表和会话注入）。哪项更大哪项更优先，五项相对大小即可，不必凑成 1。保存后下次提问生效。", "en-US": "Applies only to project_ask memory ranking, not list or session inject. Higher = more influence; need not sum to 1. Takes effect on the next ask after save." },
+      { group: "weights", icon: "⚖️", title: { "zh-CN": "檢索權重", "en-US": "Retrieval weights" },
+        hint: { "zh-CN": "只作用於 project_ask 的記憶排序（不管列表和會話注入）。哪項更大哪項更優先，五項相對大小即可，不必湊成 1。儲存後下次提問生效。", "en-US": "Applies only to project_ask memory ranking, not list or session inject. Higher = more influence; need not sum to 1. Takes effect on the next ask after save." },
         fields: [
-          { key: "keywordWeight", label: { "zh-CN": "关键词权重", "en-US": "Keyword" }, type: "number", min: 0, max: 1, step: 0.05,
-            hint: { "zh-CN": "字面匹配（BM25）。问题里有专有名词、文件名、术语时调高。", "en-US": "Lexical BM25. Raise when the question contains names, files, or exact terms." } },
-          { key: "vectorWeight", label: { "zh-CN": "向量权重", "en-US": "Vector" }, type: "number", min: 0, max: 1, step: 0.05,
-            hint: { "zh-CN": "语义相近。同义改写、词对不上时靠这项。未建向量或未开 hybrid 时此项为 0。", "en-US": "Semantic similarity. Helps paraphrases. Stays 0 until vectors are indexed in hybrid mode." } },
-          { key: "importanceWeight", label: { "zh-CN": "重要性权重", "en-US": "Importance" }, type: "number", min: 0, max: 1, step: 0.05,
-            hint: { "zh-CN": "记忆自带的重要性。默认最大，让标过重要的决策排前面。", "en-US": "Memory importance. Highest by default so marked decisions rank first." } },
-          { key: "confidenceWeight", label: { "zh-CN": "可信度权重", "en-US": "Confidence" }, type: "number", min: 0, max: 1, step: 0.05,
-            hint: { "zh-CN": "抽取可信度。一般保持较低，避免模型自评挤掉事实。", "en-US": "Extraction confidence. Keep low so model self-scores do not dominate." } },
-          { key: "recencyWeight", label: { "zh-CN": "时新性权重", "en-US": "Recency" }, type: "number", min: 0, max: 1, step: 0.05,
-            hint: { "zh-CN": "越新越高：约 7 天内满分，约 180 天降到 0。", "en-US": "Newer ranks higher: full score within ~7 days, near 0 by ~180 days." } },
+          { key: "keywordWeight", label: { "zh-CN": "關鍵詞權重", "en-US": "Keyword" }, type: "number", min: 0, max: 1, step: 0.05,
+            hint: { "zh-CN": "字面匹配（BM25）。問題裡有專有名詞、檔名、術語時調高。", "en-US": "Lexical BM25. Raise when the question contains names, files, or exact terms." } },
+          { key: "vectorWeight", label: { "zh-CN": "向量權重", "en-US": "Vector" }, type: "number", min: 0, max: 1, step: 0.05,
+            hint: { "zh-CN": "語義相近。同義改寫、詞對不上時靠這項。未建向量或未開 hybrid 時此項為 0。", "en-US": "Semantic similarity. Helps paraphrases. Stays 0 until vectors are indexed in hybrid mode." } },
+          { key: "importanceWeight", label: { "zh-CN": "重要性權重", "en-US": "Importance" }, type: "number", min: 0, max: 1, step: 0.05,
+            hint: { "zh-CN": "記憶自帶的重要性。預設最大，讓標過重要的決策排前面。", "en-US": "Memory importance. Highest by default so marked decisions rank first." } },
+          { key: "confidenceWeight", label: { "zh-CN": "可信度權重", "en-US": "Confidence" }, type: "number", min: 0, max: 1, step: 0.05,
+            hint: { "zh-CN": "抽取可信度。一般保持較低，避免模型自評擠掉事實。", "en-US": "Extraction confidence. Keep low so model self-scores do not dominate." } },
+          { key: "recencyWeight", label: { "zh-CN": "時新性權重", "en-US": "Recency" }, type: "number", min: 0, max: 1, step: 0.05,
+            hint: { "zh-CN": "越新越高：約 7 天內滿分，約 180 天降到 0。", "en-US": "Newer ranks higher: full score within ~7 days, near 0 by ~180 days." } },
         ],
       },
-      { group: "summary", icon: "📝", title: { "zh-CN": "会话摘要 (LLM)", "en-US": "Session summary (LLM)" },
+      { group: "summary", icon: "📝", title: { "zh-CN": "會話摘要 (LLM)", "en-US": "Session summary (LLM)" },
         fields: [
-          { key: "sessionSemanticMemoryEnabled", label: { "zh-CN": "启用会话摘要", "en-US": "Enable session summary" }, type: "boolean",
-            hint: { "zh-CN": "会话安静一段时间后自动调 LLM 抽取语义记忆并做证据校验。不需要关闭会话。", "en-US": "After the session goes quiet, extract semantic memories with a grounding check. Closing the session is not required." } },
-          { key: "sessionIdleSummaryMs", label: { "zh-CN": "空闲多久再摘要 (ms)", "en-US": "Idle before summary (ms)" }, type: "number", min: 30000, max: 3600000, step: 1000,
-            hint: { "zh-CN": "每次会话有动静都重新计时。安静满这段时间才摘要，默认 5 分钟。会话被销毁时仍会立刻摘要。", "en-US": "Each flush resets the timer. A summary runs after this much quiet time (default 5 minutes). Session dispose still summarizes immediately." } },
-          { key: "sessionSemanticMaxChars", label: { "zh-CN": "Transcript 截断 (chars)", "en-US": "Transcript truncate (chars)" }, type: "number", min: 2000, max: 40000, step: 1000 },
+          { key: "sessionSemanticMemoryEnabled", label: { "zh-CN": "啟用會話摘要", "en-US": "Enable session summary" }, type: "boolean",
+            hint: { "zh-CN": "會話安靜一段時間後自動調 LLM 抽取語義記憶並做證據校驗。不需要關閉會話。", "en-US": "After the session goes quiet, extract semantic memories with a grounding check. Closing the session is not required." } },
+          { key: "sessionIdleSummaryMs", label: { "zh-CN": "空閒多久再摘要 (ms)", "en-US": "Idle before summary (ms)" }, type: "number", min: 30000, max: 3600000, step: 1000,
+            hint: { "zh-CN": "每次會話有動靜都重新計時。安靜滿這段時間才摘要，預設 5 分鐘。會話被銷燬時仍會立刻摘要。", "en-US": "Each flush resets the timer. A summary runs after this much quiet time (default 5 minutes). Session dispose still summarizes immediately." } },
+          { key: "sessionSemanticMaxChars", label: { "zh-CN": "Transcript 截斷 (chars)", "en-US": "Transcript truncate (chars)" }, type: "number", min: 2000, max: 40000, step: 1000 },
           { key: "sessionSemanticMaxItems", label: { "zh-CN": "每次最多抽取", "en-US": "Max items per extraction" }, type: "number", min: 1, max: 8 },
-          { key: "sessionSemanticTimeoutMs", label: { "zh-CN": "LLM 超时 (ms)", "en-US": "LLM timeout (ms)" }, type: "number", min: 5000, max: 120000, step: 1000 },
+          { key: "sessionSemanticTimeoutMs", label: { "zh-CN": "LLM 超時 (ms)", "en-US": "LLM timeout (ms)" }, type: "number", min: 5000, max: 120000, step: 1000 },
         ],
       },
-      { group: "arch", icon: "🏗️", title: { "zh-CN": "架构分析", "en-US": "Architecture analysis" },
+      { group: "arch", icon: "🏗️", title: { "zh-CN": "架構分析", "en-US": "Architecture analysis" },
         fields: [
-          { key: "architectureEnabled", label: { "zh-CN": "启用架构分析", "en-US": "Enable" }, type: "boolean" },
-          { key: "architectureLlmEnabled", label: { "zh-CN": "LLM 增强", "en-US": "LLM enrichment" }, type: "boolean" },
-          { key: "architectureLlmIncludeSource", label: { "zh-CN": "向 LLM 注入源码片段", "en-US": "Inject source snippets into LLM" }, type: "boolean" },
-          { key: "architectureMaxFiles", label: { "zh-CN": "最大扫描文件数", "en-US": "Max files scanned" }, type: "number", min: 20, max: 1000 },
-          { key: "architectureMaxNodes", label: { "zh-CN": "最大架构节点", "en-US": "Max architecture nodes" }, type: "number", min: 6, max: 60 },
-          { key: "architectureLlmTimeoutMs", label: { "zh-CN": "LLM 超时 (ms)", "en-US": "LLM timeout (ms)" }, type: "number", min: 5000, max: 120000, step: 1000 },
+          { key: "architectureEnabled", label: { "zh-CN": "啟用架構分析", "en-US": "Enable" }, type: "boolean" },
+          { key: "architectureLlmEnabled", label: { "zh-CN": "LLM 增強", "en-US": "LLM enrichment" }, type: "boolean" },
+          { key: "architectureLlmIncludeSource", label: { "zh-CN": "向 LLM 注入原始碼片段", "en-US": "Inject source snippets into LLM" }, type: "boolean" },
+          { key: "architectureMaxFiles", label: { "zh-CN": "最大掃描檔案數", "en-US": "Max files scanned" }, type: "number", min: 20, max: 1000 },
+          { key: "architectureMaxNodes", label: { "zh-CN": "最大架構節點", "en-US": "Max architecture nodes" }, type: "number", min: 6, max: 60 },
+          { key: "architectureLlmTimeoutMs", label: { "zh-CN": "LLM 超時 (ms)", "en-US": "LLM timeout (ms)" }, type: "number", min: 5000, max: 120000, step: 1000 },
         ],
       },
     ];
@@ -3105,7 +3105,7 @@ window.__ModuleLoader__.load({
             setState({ loaded: true, writable: !!res.value.writable, config: res.value.config || {}, dirty: {}, saving: false, error: null, info: null });
           } else {
             const code = (res && res.error && res.error.code) || "E_RPC";
-            const msg = (res && res.error && res.error.message) || "无法读取插件设置";
+            const msg = (res && res.error && res.error.message) || "無法讀取外掛設定";
             setState((s) => Object.assign({}, s, { loaded: true, error: msg + (code !== "E_RPC" ? " [" + code + "]" : "") }));
           }
         } catch (e) {
@@ -3136,10 +3136,10 @@ window.__ModuleLoader__.load({
         try {
           const res = await rpc.call("/project-brain", "settings", { sessionId, action: "update", patch });
           if (res && res.ok && res.value) {
-            setState({ loaded: true, writable: !!res.value.writable, config: res.value.config || {}, dirty: {}, saving: false, error: null, info: "✓ 已保存" });
+            setState({ loaded: true, writable: !!res.value.writable, config: res.value.config || {}, dirty: {}, saving: false, error: null, info: "✓ 已儲存" });
           } else {
             const code = (res && res.error && res.error.code) || "E_RPC";
-            const msg = (res && res.error && res.error.message) || "保存失败";
+            const msg = (res && res.error && res.error.message) || "儲存失敗";
             setState((s) => Object.assign({}, s, { saving: false, error: msg + (code !== "E_RPC" ? " [" + code + "]" : "") }));
           }
         } catch (e) {
@@ -3148,7 +3148,7 @@ window.__ModuleLoader__.load({
       }
 
       function discard() {
-        setState((s) => Object.assign({}, s, { dirty: {}, error: null, info: "已丢弃本地修改（点击「重新读取」会刷新服务器值）" }));
+        setState((s) => Object.assign({}, s, { dirty: {}, error: null, info: "已丟棄本地修改（點選「重新讀取」會重新整理伺服器值）" }));
       }
 
       async function runProbe(target) {
@@ -3273,9 +3273,9 @@ window.__ModuleLoader__.load({
                 type: "button",
                 "data-action": "toggle-secret",
                 "aria-label": revealed
-                  ? (locale === "en-US" ? "Hide API key" : "隐藏密钥")
-                  : (locale === "en-US" ? "Show API key" : "显示密钥"),
-                title: revealed ? (locale === "en-US" ? "Hide" : "隐藏") : (locale === "en-US" ? "Show" : "显示"),
+                  ? (locale === "en-US" ? "Hide API key" : "隱藏金鑰")
+                  : (locale === "en-US" ? "Show API key" : "顯示金鑰"),
+                title: revealed ? (locale === "en-US" ? "Hide" : "隱藏") : (locale === "en-US" ? "Show" : "顯示"),
                 onClick: () => setRevealSecrets((s) => Object.assign({}, s, { [field.key]: !s[field.key] })),
                 style: {
                   position: "absolute", right: "6px", top: "50%", transform: "translateY(-50%)",
@@ -3299,7 +3299,7 @@ window.__ModuleLoader__.load({
           );
         }
 
-        // number / string 共享一个 input
+        // number / string 共享一個 input
         const isNumber = field.type === "number";
         const inputProps = {
           id: inputId, disabled: !state.writable || state.saving,
@@ -3334,7 +3334,7 @@ window.__ModuleLoader__.load({
       }
 
       if (!state.loaded) {
-        return React.createElement("div", { style: { padding: "20px", textAlign: "center", fontSize: "12px", color: "var(--dsw-alias-label-secondary)" } }, "加载设置中…");
+        return React.createElement("div", { style: { padding: "20px", textAlign: "center", fontSize: "12px", color: "var(--dsw-alias-label-secondary)" } }, "載入設定中…");
       }
 
       const dirtyCount = Object.keys(state.dirty).length;
@@ -3349,9 +3349,9 @@ window.__ModuleLoader__.load({
         } },
           React.createElement("span", null, state.writable ? "✅" : "⚠️"),
           React.createElement("span", { style: { flex: "1 1 auto", lineHeight: "1.45" } }, state.writable
-            ? (locale === "en-US" ? "Settings are writable. After editing, scroll to the bottom of this page and click Save — unsaved changes do not take effect." : "配置可写。改完后请滚到本页最底部点「保存」；未点保存不会生效。")
-            : (locale === "en-US" ? "Settings read-only in this runtime (DSH settings service unavailable). Configure via DSH settings panel or env vars." : "当前运行时配置为只读（DSH settings 服务不可用）。请通过 DSH 设置面板或环境变量配置。")),
-          React.createElement("span", { style: { marginLeft: "auto", cursor: "pointer", opacity: 0.85 } , onClick: loadSettings, title: locale === "en-US" ? "Reload" : "重新读取"},
+            ? (locale === "en-US" ? "Settings are writable. After editing, scroll to the bottom of this page and click Save — unsaved changes do not take effect." : "配置可寫。改完後請滾到本頁最底部點「儲存」；未點儲存不會生效。")
+            : (locale === "en-US" ? "Settings read-only in this runtime (DSH settings service unavailable). Configure via DSH settings panel or env vars." : "當前執行時配置為只讀（DSH settings 服務不可用）。請通過 DSH 設定面板或環境變數配置。")),
+          React.createElement("span", { style: { marginLeft: "auto", cursor: "pointer", opacity: 0.85 } , onClick: loadSettings, title: locale === "en-US" ? "Reload" : "重新讀取"},
             "⟳"),
         ),
         BRAIN_SETTINGS_META.map((group) =>
@@ -3380,7 +3380,7 @@ window.__ModuleLoader__.load({
           state.error ? React.createElement("span", { style: { color: "var(--dsw-alias-state-error-primary)", fontSize: "11px", flex: "1 1 auto" } }, "❌ " + state.error) : null,
           !state.error && state.info ? React.createElement("span", { style: { color: "var(--dsw-alias-state-success-primary)", fontSize: "11px", flex: "1 1 auto" } }, state.info) : null,
           !state.error && !state.info ? React.createElement("span", { style: { color: "var(--dsw-alias-label-secondary)", fontSize: "11px", flex: "1 1 auto" } },
-            dirtyCount > 0 ? (dirtyCount + (locale === "en-US" ? " unsaved field(s)" : " 项未保存")) : (locale === "en-US" ? "No changes" : "无修改")) : null,
+            dirtyCount > 0 ? (dirtyCount + (locale === "en-US" ? " unsaved field(s)" : " 項未儲存")) : (locale === "en-US" ? "No changes" : "無修改")) : null,
           React.createElement("button", {
             type: "button", onClick: discard,
             disabled: dirtyCount === 0 || state.saving,
@@ -3390,7 +3390,7 @@ window.__ModuleLoader__.load({
               color: "var(--dsw-alias-label-primary)", cursor: dirtyCount === 0 ? "not-allowed" : "pointer",
               fontSize: "11px", opacity: dirtyCount === 0 ? 0.5 : 1, fontFamily: "inherit",
             },
-          }, locale === "en-US" ? "Discard" : "放弃修改"),
+          }, locale === "en-US" ? "Discard" : "放棄修改"),
           React.createElement("button", {
             type: "button", onClick: save,
             disabled: dirtyCount === 0 || state.saving || !state.writable,
@@ -3403,7 +3403,7 @@ window.__ModuleLoader__.load({
               cursor: (dirtyCount === 0 || !state.writable || state.saving) ? "not-allowed" : "pointer",
               fontSize: "12px", fontWeight: "600", fontFamily: "inherit",
             },
-          }, state.saving ? "保存中…" : (locale === "en-US" ? "Save" : "保存")),
+          }, state.saving ? "儲存中…" : (locale === "en-US" ? "Save" : "儲存")),
         ),
       );
     }
@@ -3546,11 +3546,11 @@ window.__ModuleLoader__.load({
       const retrieval = data.retrieval || {};
       const [quickActionState, setQuickActionState] = React.useState({});
       const [activeTab, setActiveTab] = React.useState("overview");
-      // v1.1.x-fix：项目记忆卡片点击 → 弹框展示完整内容（避免 inline 展开撑爆页面）
+      // v1.1.x-fix：專案記憶卡片點選 → 彈框展示完整內容（避免 inline 展開撐爆頁面）
       const [memoryModal, setMemoryModal] = React.useState(null);
       const [dormantOpen, setDormantOpen] = React.useState(false);
       const [archivedOpen, setArchivedOpen] = React.useState(false);
-      // 人工维护记忆：draft 非空 = 编辑态；confirmDelete = 永久删除的二次确认
+      // 人工維護記憶：draft 非空 = 編輯態；confirmDelete = 永久刪除的二次確認
       const [memoryDraft, setMemoryDraft] = React.useState(null);
       const [memoryBusy, setMemoryBusy] = React.useState(false);
       const [memoryError, setMemoryError] = React.useState(null);
@@ -3564,7 +3564,7 @@ window.__ModuleLoader__.load({
       const openMemoryModal = React.useCallback((m) => { resetMemoryEditing(); setMemoryModal(m); }, [resetMemoryEditing]);
       const closeMemoryModal = React.useCallback(() => { resetMemoryEditing(); setMemoryModal(null); }, [resetMemoryEditing]);
       const rpc = connection && connection.rpc;
-      // 记忆的增删改共用一条调用路径：失败留在弹框里显示，成功就用 host 回传的 preview 刷新页面。
+      // 記憶的增刪改共用一條呼叫路徑：失敗留在彈框裡顯示，成功就用 host 回傳的 preview 重新整理頁面。
       const callMemoryRpc = React.useCallback(async (endpoint, extra) => {
         if (!rpc || typeof rpc.call !== "function") {
           setMemoryError("DSH Connection RPC 不可用");
@@ -3573,14 +3573,14 @@ window.__ModuleLoader__.load({
         setMemoryBusy(true);
         setMemoryError(null);
         try {
-          // host 端万一不返回（比如写入路径里出现死锁），没有超时的话按钮会一直转圈，
-          // 用户既看不到结果也不知道该不该重试。
+          // host 端萬一不返回（比如寫入路徑裡出現死鎖），沒有超時的話按鈕會一直轉圈，
+          // 使用者既看不到結果也不知道該不該重試。
           const res = await Promise.race([
             rpc.call("/project-brain", endpoint, Object.assign({ sessionId: sessionId || undefined }, extra || {})),
-            new Promise((_, reject) => setTimeout(() => reject(new Error("操作超时，请刷新后确认是否已生效")), 15000)),
+            new Promise((_, reject) => setTimeout(() => reject(new Error("操作超時，請重新整理後確認是否已生效")), 15000)),
           ]);
           if (!res || !res.ok || !res.value) {
-            setMemoryError((res && res.error && res.error.message) || "操作失败");
+            setMemoryError((res && res.error && res.error.message) || "操作失敗");
             return null;
           }
           if (res.value.preview && typeof onPreviewUpdate === "function") {
@@ -3630,7 +3630,7 @@ window.__ModuleLoader__.load({
         if (!memoryModal) return;
         const value = await callMemoryRpc("memory.status", { id: memoryModal.id, status });
         if (!value) return;
-        // 归档后这条已从当前列表移走，留着弹框会让人以为没生效。
+        // 歸檔後這條已從當前列表移走，留著彈框會讓人以為沒生效。
         if (status === "archived") closeMemoryModal();
         else setMemoryModal(value.memory || null);
       }, [memoryModal, callMemoryRpc, closeMemoryModal]);
@@ -3642,7 +3642,7 @@ window.__ModuleLoader__.load({
         closeMemoryModal();
       }, [memoryModal, callMemoryRpc, closeMemoryModal]);
 
-      // 架构兜底条专用重试：独立 promise-based（避开 quickActionState 的 stale 闭包）
+      // 架構兜底條專用重試：獨立 promise-based（避開 quickActionState 的 stale 閉包）
       const runArchRescan = React.useCallback(async () => {
         if (!sessionId || !rpc || typeof rpc.call !== "function") throw new Error(t("arch.retryFailed"));
         const res = await rpc.call("/project-brain", "action", { sessionId, action: "rescan" });
@@ -3651,11 +3651,11 @@ window.__ModuleLoader__.load({
           try { onPreviewUpdate(res.value); } catch (e) {}
         }
         const stats = res.value && res.value.result && res.value.result.data && res.value.result.data.stats;
-        return { message: stats ? t("arch.retryDone") + " · " + (stats.files || 0) + " 文件" : t("arch.retryDone") };
+        return { message: stats ? t("arch.retryDone") + " · " + (stats.files || 0) + " 檔案" : t("arch.retryDone") };
       }, [sessionId, rpc, onPreviewUpdate, t]);
-      // v0.4.x: Git Tab 数据（null=探测中，{available:false}=非 git 仓库不显示 tab，{available:true,...}=有 git）
+      // v0.4.x: Git Tab 資料（null=探測中，{available:false}=非 git 倉庫不顯示 tab，{available:true,...}=有 git）
       const [gitInfo, setGitInfo] = React.useState(null);
-      // v0.4.x: Git Tab 自动刷新开关（默认开；localStorage 记忆；切到 git tab 时启动 30 秒轮询）
+      // v0.4.x: Git Tab 自動重新整理開關（預設開；localStorage 記憶；切到 git tab 時啟動 30 秒輪詢）
       const [gitAutoRefresh, setGitAutoRefresh] = React.useState(() => {
         try { return localStorage.getItem("dsh-brain-git-auto-refresh") !== "0"; } catch (e) { return true; }
       });
@@ -3684,7 +3684,7 @@ window.__ModuleLoader__.load({
         })();
         return () => { cancelled = true; };
       }, [rpc, sessionId, data._workspacePath]);
-      // v0.4.x: Git Tab 自动轮询（仅 git tab 激活 + 开关开时启动；30 秒间隔）
+      // v0.4.x: Git Tab 自動輪詢（僅 git tab 啟用 + 開關開時啟動；30 秒間隔）
       React.useEffect(() => {
         if (activeTab !== "git" || !gitAutoRefresh) return undefined;
         const t = setInterval(refreshGit, 30000);
@@ -3696,19 +3696,19 @@ window.__ModuleLoader__.load({
         const detail = result && result.data ? result.data : {};
         if (action === "rescan") {
           const stats = detail.stats || {};
-          return "扫描完成 · " + (stats.files || 0) + " 个文件";
+          return "掃描完成 · " + (stats.files || 0) + " 個檔案";
         }
         if (action === "todos") {
-          return "活跃 " + (detail.active || 0) + " 项 · 已完成 " + (detail.done || 0) + " 项";
+          return "活躍 " + (detail.active || 0) + " 項 · 已完成 " + (detail.done || 0) + " 項";
         }
         if (action === "overview") {
-          return detail.suggestedNextStep ? "下一步：" + detail.suggestedNextStep : "项目全景已刷新";
+          return detail.suggestedNextStep ? "下一步：" + detail.suggestedNextStep : "專案全景已重新整理";
         }
         if (action === "dreamCommit") {
           const committed = detail.committed || {};
-          return "整理完成 · " + (committed.beforeCount || 0) + " → " + (committed.afterCount || 0) + " 条记忆";
+          return "整理完成 · " + (committed.beforeCount || 0) + " → " + (committed.afterCount || 0) + " 條記憶";
         }
-        return "执行完成";
+        return "執行完成";
       }
 
       async function runQuickAction(qa) {
@@ -3716,11 +3716,11 @@ window.__ModuleLoader__.load({
         const action = qa.action === "dream" && previous.status === "confirm" ? "dreamCommit" : qa.action;
         if (Object.values(quickActionState).some((state) => state && state.status === "loading")) return;
         setQuickActionState((states) => Object.assign({}, states, {
-          [qa.id]: { status: "loading", message: action === "dreamCommit" ? "正在提交整理…" : "正在执行…" },
+          [qa.id]: { status: "loading", message: action === "dreamCommit" ? "正在提交整理…" : "正在執行…" },
         }));
         if (!sessionId || !rpc || typeof rpc.call !== "function") {
           setQuickActionState((states) => Object.assign({}, states, {
-            [qa.id]: { status: "error", message: !sessionId ? "未找到当前 Session" : "DSH Runtime RPC 不可用" },
+            [qa.id]: { status: "error", message: !sessionId ? "未找到當前 Session" : "DSH Runtime RPC 不可用" },
           }));
           return;
         }
@@ -3738,7 +3738,7 @@ window.__ModuleLoader__.load({
           setQuickActionState((states) => Object.assign({}, states, {
             [qa.id]: {
               status: "error",
-              message: (response && response.error && response.error.message) || "操作执行失败",
+              message: (response && response.error && response.error.message) || "操作執行失敗",
             },
           }));
           return;
@@ -3751,12 +3751,12 @@ window.__ModuleLoader__.load({
           const candidates = (summary.mergeCandidates || 0) + (summary.archiveCandidates || 0);
           if (candidates > 0) {
             setQuickActionState((states) => Object.assign({}, states, {
-              [qa.id]: { status: "confirm", message: "发现 " + candidates + " 项候选，点击确认整理" },
+              [qa.id]: { status: "confirm", message: "發現 " + candidates + " 項候選，點選確認整理" },
             }));
             return;
           }
           setQuickActionState((states) => Object.assign({}, states, {
-            [qa.id]: { status: "success", message: "检查完成 · 无需整理" },
+            [qa.id]: { status: "success", message: "檢查完成 · 無需整理" },
           }));
           return;
         }
@@ -3768,7 +3768,7 @@ window.__ModuleLoader__.load({
           [qa.id]: { status: "success", message: resultMessage(action, value) },
         }));
       }
-      // 技术栈三层：运行时主视野 → 交付（CI/IaC/观测）→ 工程工具；结构作小角标
+      // 技術棧三層：執行時主視野 → 交付（CI/IaC/觀測）→ 工程工具；結構作小角標
       const STACK_ICON = {
         "framework-frontend": "🎨",
         "framework-backend": "⚙️",
@@ -3861,7 +3861,7 @@ window.__ModuleLoader__.load({
       const structureChips = (stackLayers.structure || []).map((s) =>
         React.createElement("span", {
           key: "struct-" + s,
-          title: "代码结构",
+          title: "程式碼結構",
           style: {
             display: "inline-flex",
             alignItems: "center",
@@ -3899,7 +3899,7 @@ window.__ModuleLoader__.load({
         }, "+", String(item)),
       );
       const techChips = stackChips;
-      // 工程工具（构建/Lint/测试/类型/包管理）—— 折叠到小字一行
+      // 工程工具（構建/Lint/測試/型別/包管理）—— 摺疊到小字一行
       const toolingChips = (p.tooling || []).map((tool) =>
         React.createElement("span", { key: "tool-" + tool, style: { display: "inline-flex", alignItems: "center", gap: "4px", padding: "2px 7px", background: "transparent", borderRadius: "8px", fontSize: "10px", fontWeight: "500", marginRight: "3px", marginBottom: "4px", color: "var(--dsw-alias-label-secondary)", border: "1px solid var(--dsw-alias-border-l1)" } },
           React.createElement("span", null, "🛠"),
@@ -3912,7 +3912,7 @@ window.__ModuleLoader__.load({
         const pctLabel = langUsage.total > 0 ? Math.round(item.percent) + "%" : "";
         langChips.push(React.createElement("span", {
           key: "lang-" + item.lang,
-          title: item.lang + " · " + item.count + " 个文件",
+          title: item.lang + " · " + item.count + " 個檔案",
           style: { display: "inline-flex", alignItems: "center", gap: "4px", padding: "3px 10px", background: "var(--dsw-alias-bg-layer-2)", borderRadius: "10px", fontSize: "11px", fontWeight: "500", marginRight: "4px", marginBottom: "4px", border: "1px solid var(--dsw-alias-border-l1)" },
         },
           React.createElement("span", { style: { width: "8px", height: "8px", borderRadius: "50%", background: "var(--dsw-alias-state-warn-primary)" } }),
@@ -3923,10 +3923,10 @@ window.__ModuleLoader__.load({
       if (langUsage.tail) {
         langChips.push(React.createElement("span", {
           key: "lang-tail",
-          title: langUsage.tail.languages + " 种语言共 " + langUsage.tail.count + " 个文件",
+          title: langUsage.tail.languages + " 種語言共 " + langUsage.tail.count + " 個檔案",
           style: { display: "inline-flex", alignItems: "center", gap: "4px", padding: "3px 10px", background: "var(--dsw-alias-bg-layer-2)", borderRadius: "10px", fontSize: "11px", fontWeight: "500", marginRight: "4px", marginBottom: "4px", border: "1px solid var(--dsw-alias-border-l1)", color: "var(--dsw-alias-label-secondary)" },
         },
-          React.createElement("span", null, "其它 " + langUsage.tail.languages + " 种"),
+          React.createElement("span", null, "其它 " + langUsage.tail.languages + " 種"),
           React.createElement("span", null, " · " + Math.round(langUsage.tail.percent) + "%"),
         ));
       }
@@ -3938,7 +3938,7 @@ window.__ModuleLoader__.load({
       );
       const typeLabel = (type) => t("mem.type." + type) !== "mem.type." + type ? t("mem.type." + type) : type;
       const typeChipStyle = { flex: "0 0 auto", fontSize: "10px", padding: "1px 7px", borderRadius: "8px", background: "var(--dsw-alias-bg-layer-2)", color: "var(--dsw-alias-label-primary)", fontWeight: "600", border: "1px solid var(--dsw-alias-border-l1)" };
-      // 记忆编辑表单：与 host 端 MEMORY_TYPES 保持一致
+      // 記憶編輯表單：與 host 端 MEMORY_TYPES 保持一致
       const MEMORY_TYPE_OPTIONS = ["decision", "requirement", "architecture", "bug", "lesson", "preference", "context", "issue", "change"];
       const memoryInputStyle = {
         width: "100%",
@@ -3986,7 +3986,7 @@ window.__ModuleLoader__.load({
         { id: "work", icon: "✓", label: t("dash.tab.work") },
         { id: "knowledge", icon: "◇", label: t("dash.tab.knowledge") },
       ];
-      // Git 仓库才显示 Git Tab；设置始终在这一排最后
+      // Git 倉庫才顯示 Git Tab；設定始終在這一排最後
       if (gitInfo && gitInfo.available === true) {
         tabDefs.push({ id: "git", icon: "⎇", label: t("dash.tab.git") });
       }
@@ -4007,8 +4007,8 @@ window.__ModuleLoader__.load({
               React.createElement("span", { style: { minWidth: 0, lineHeight: 1.45 } }, e.title),
             )))
           : emptyNode;
-      // v1.1.x-fix：记忆卡片支持点击展开/收起，hover 高亮，expanded 态左边框 brand-primary 标记
-      //   旧版标题用 ellipsis 截断看不到全名，内容用 line-clamp + slice 截断看不到完整——用户痛点
+      // v1.1.x-fix：記憶卡片支援點選展開/收起，hover 高亮，expanded 態左邊框 brand-primary 標記
+      //   舊版標題用 ellipsis 截斷看不到全名，內容用 line-clamp + slice 截斷看不到完整——使用者痛點
       const formatMemTime = (ts) => {
         if (!ts) return "";
         try {
@@ -4021,17 +4021,17 @@ window.__ModuleLoader__.load({
         const stars = Math.max(0, Math.min(5, Math.round((imp || 0) * 5)));
         return "★".repeat(stars) + "☆".repeat(5 - stars);
       };
-      // v1.2.x：记忆详情弹框 markdown 渲染（轻量纯函数，零依赖）
-      //   支持：# ## ### #### 标题、**粗体**、*斜体*、`行内代码`、[text](url) 链接、
-      //         - 无序列表、1. 有序列表、> 引用、--- 分割线、```fenced``` 代码块、段落
-      //   设计要点：
-      //   1) 全部输出走 React.createElement，不用 dangerouslySetInnerHTML → 天然 XSS 免疫
-      //   2) inline 解析用单一正则按 token 切分，避免手写状态机出错
-      //   3) block 解析按行扫描，相同前缀连续行合并成同一 block（list/quote）
-      //   4) 不引第三方库：DSH 客户端 esbuild bundle 产物 < 5KB，CSS 复用现有主题变量
-      //   5) v1.2.x-patch 美化：黄金比例 type scale、克制留白、自定义 list marker、暗色 code block
+      // v1.2.x：記憶詳情彈框 markdown 渲染（輕量純函式，零依賴）
+      //   支援：# ## ### #### 標題、**粗體**、*斜體*、`行內程式碼`、[text](url) 連結、
+      //         - 無序列表、1. 有序列表、> 引用、--- 分割線、```fenced``` 程式碼塊、段落
+      //   設計要點：
+      //   1) 全部輸出走 React.createElement，不用 dangerouslySetInnerHTML → 天然 XSS 免疫
+      //   2) inline 解析用單一正則按 token 切分，避免手寫狀態機出錯
+      //   3) block 解析按行掃描，相同字首連續行合併成同一 block（list/quote）
+      //   4) 不引第三方庫：DSH 客戶端 esbuild bundle 產物 < 5KB，CSS 複用現有主題變數
+      //   5) v1.2.x-patch 美化：黃金比例 type scale、剋制留白、自定義 list marker、暗色 code block
       const mdEscape = (s) => String(s == null ? "" : s);
-      // ── 共享样式 ──
+      // ── 共享樣式 ──
       const mdBaseFont = "13.5px";
       const mdInlineStyle = {
         fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
@@ -4053,7 +4053,7 @@ window.__ModuleLoader__.load({
       const mdStrongStyle = { fontWeight: "700", color: "var(--dsw-alias-label-primary)" };
       const mdEmStyle = { fontStyle: "italic", color: "var(--dsw-alias-label-primary)" };
       const mdRenderInline = (text, React, keyPrefix) => {
-        // 单一正则：**|*|`|[text](url) 四类 inline 标签；其他原样作为 text token
+        // 單一正則：**|*|`|[text](url) 四類 inline 標籤；其他原樣作為 text token
         const re = /(\*\*([^*\n][^*]*?)\*\*)|(\*([^*\n][^*]*?)\*)|(`([^`\n]+)`)|(\[([^\]\n]+)\]\(([^)\s]+)\))/g;
         const nodes = [];
         let lastIndex = 0;
@@ -4108,8 +4108,8 @@ window.__ModuleLoader__.load({
           }, block.text));
         }
         if (block.kind === "heading") {
-          // 黄金比例 type scale: h1=20 / h2=17 / h3=15 / h4=13.5（正文）
-          // h1/h2 加下边线 brand-primary 渐隐做章节感；h3/h4 纯字号 + 字重
+          // 黃金比例 type scale: h1=20 / h2=17 / h3=15 / h4=13.5（正文）
+          // h1/h2 加下邊線 brand-primary 漸隱做章節感；h3/h4 純字號 + 字重
           const isMajor = block.level <= 2;
           const sizeMap = { 1: "20px", 2: "17px", 3: "15px", 4: "14px" };
           const marginMap = {
@@ -4134,7 +4134,7 @@ window.__ModuleLoader__.load({
           }, mdRenderInline(block.text, React, k + "-h"));
         }
         if (block.kind === "hr") {
-          // 渐隐分割线：用 linear-gradient 让两端融于背景（inline style 支持）
+          // 漸隱分割線：用 linear-gradient 讓兩端融於背景（inline style 支援）
           return React.createElement("div", {
             key: k,
             role: "separator",
@@ -4149,7 +4149,7 @@ window.__ModuleLoader__.load({
         if (block.kind === "ul" || block.kind === "ol") {
           const isOrdered = block.kind === "ol";
           const Tag = isOrdered ? "ol" : "ul";
-          // 自定义 marker：flex 布局，左列固定宽度放 marker，右列放内容
+          // 自定義 marker：flex 佈局，左列固定寬度放 marker，右列放內容
           const listStyle = {
             listStyle: "none",
             padding: "0",
@@ -4234,7 +4234,7 @@ window.__ModuleLoader__.load({
             style: { marginBottom: idx === block.lines.length - 1 ? 0 : "4px" },
           }, mdRenderInline(ln, React, k + "-q-" + idx))));
         }
-        // paragraph（默认）
+        // paragraph（預設）
         return React.createElement("div", {
           key: k,
           style: {
@@ -4248,13 +4248,13 @@ window.__ModuleLoader__.load({
         }, mdRenderInline(block.text, React, k + "-p"));
       };
       const mdParse = (src) => {
-        // 块级解析：按行扫描，识别 fenced code / heading / hr / list / quote / paragraph
+        // 塊級解析：按行掃描，識別 fenced code / heading / hr / list / quote / paragraph
         const lines = String(src || "").replace(/\r\n?/g, "\n").split("\n");
         const blocks = [];
         let i = 0;
         while (i < lines.length) {
           const line = lines[i];
-          // fenced code: ``` 或 ~~~ 开头
+          // fenced code: ``` 或 ~~~ 開頭
           const fence = line.match(/^(\s*)(`{3,}|~{3,})(.*)$/);
           if (fence) {
             const fenceCh = fence[2][0];
@@ -4273,9 +4273,9 @@ window.__ModuleLoader__.load({
             blocks.push({ kind: "code", text: codeLines.join("\n") });
             continue;
           }
-          // 空行：跳过（段落分隔）
+          // 空行：跳過（段落分隔）
           if (line.trim() === "") { i++; continue; }
-          // hr: --- *** ___ 3+ 连续
+          // hr: --- *** ___ 3+ 連續
           if (/^(\s*)(-{3,}|\*{3,}|_{3,})\s*$/.test(line)) {
             blocks.push({ kind: "hr" });
             i++;
@@ -4288,7 +4288,7 @@ window.__ModuleLoader__.load({
             i++;
             continue;
           }
-          // blockquote: > 开头连续行
+          // blockquote: > 開頭連續行
           if (/^\s*>\s?/.test(line)) {
             const qlines = [];
             while (i < lines.length && /^\s*>\s?/.test(lines[i])) {
@@ -4298,7 +4298,7 @@ window.__ModuleLoader__.load({
             blocks.push({ kind: "quote", lines: qlines });
             continue;
           }
-          // unordered list: - * + 开头连续行
+          // unordered list: - * + 開頭連續行
           if (/^\s*[-*+]\s+/.test(line)) {
             const items = [];
             while (i < lines.length && /^\s*[-*+]\s+/.test(lines[i])) {
@@ -4308,7 +4308,7 @@ window.__ModuleLoader__.load({
             blocks.push({ kind: "ul", items: items });
             continue;
           }
-          // ordered list: 数字. 开头连续行
+          // ordered list: 數字. 開頭連續行
           const ol = line.match(/^\s*(\d+)\.\s+(.*)$/);
           if (ol) {
             const items = [];
@@ -4322,7 +4322,7 @@ window.__ModuleLoader__.load({
             blocks.push({ kind: "ol", items: items, start: start });
             continue;
           }
-          // paragraph: 收集到下一个空行 / block 起始为止
+          // paragraph: 收集到下一個空行 / block 起始為止
           const paraLines = [line];
           i++;
           while (i < lines.length) {
@@ -4355,7 +4355,7 @@ window.__ModuleLoader__.load({
           "data-mem-id": m.id,
           "data-mem-status": m.status || "active",
           onClick: () => openMemoryModal(m),
-          title: "点击查看完整内容",
+          title: "點選檢視完整內容",
           style: {
             padding: "12px 14px",
             background: "var(--dsw-alias-bg-layer-1)",
@@ -4382,7 +4382,7 @@ window.__ModuleLoader__.load({
         },
           React.createElement("div", { style: { display: "flex", gap: "8px", alignItems: "flex-start", flexWrap: "wrap" } },
             React.createElement("span", { style: Object.assign({}, typeChipStyle, { marginTop: "1px" }) }, typeLabel(m.type)),
-            m.pinned === true ? React.createElement("span", { title: "已置顶：Core 满员时不会被挤掉", style: { fontSize: "10px", padding: "1px 7px", borderRadius: "8px", background: "var(--dsw-alias-brand-primary)", color: "var(--dsw-alias-bg-base)", fontWeight: "600" } }, "置顶") : null,
+            m.pinned === true ? React.createElement("span", { title: "已置頂：Core 滿員時不會被擠掉", style: { fontSize: "10px", padding: "1px 7px", borderRadius: "8px", background: "var(--dsw-alias-brand-primary)", color: "var(--dsw-alias-bg-base)", fontWeight: "600" } }, "置頂") : null,
             m.status && m.status !== "active" ? React.createElement("span", { style: { fontSize: "10px", padding: "1px 7px", borderRadius: "8px", background: "var(--dsw-alias-bg-layer-2)", color: "var(--dsw-alias-label-secondary)", fontWeight: "600" } }, m.status) : null,
             React.createElement("span", { style: { fontSize: "13px", fontWeight: "600", flex: "1 1 200px", minWidth: 0, wordBreak: "break-word", lineHeight: 1.4, color: "var(--dsw-alias-label-primary)" } }, m.title),
           ),
@@ -4393,14 +4393,14 @@ window.__ModuleLoader__.load({
               m.createdAt ? React.createElement("span", { style: { fontVariantNumeric: "tabular-nums" } }, formatMemTime(m.createdAt)) : null,
               Array.isArray(m.tags) && m.tags.length > 0 ? React.createElement("span", { style: { maxWidth: "160px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }, title: m.tags.map((tag) => "#" + tag).join(" ") }, m.tags.slice(0, 3).map((tag) => "#" + tag).join(" ")) : null,
             ),
-            contentStr ? React.createElement("span", { style: { fontSize: "10px", padding: "2px 9px", borderRadius: "10px", background: "var(--dsw-alias-bg-layer-2)", color: "var(--dsw-alias-label-primary)", fontWeight: "600", border: "1px solid var(--dsw-alias-border-l1)", flex: "0 0 auto" } }, "▸ 查看详情") : null,
+            contentStr ? React.createElement("span", { style: { fontSize: "10px", padding: "2px 9px", borderRadius: "10px", background: "var(--dsw-alias-bg-layer-2)", color: "var(--dsw-alias-label-primary)", fontWeight: "600", border: "1px solid var(--dsw-alias-border-l1)", flex: "0 0 auto" } }, "▸ 檢視詳情") : null,
           ),
         );
       };
       const coreMemList = memoriesAll.filter((m) => m && m.status !== "dormant");
       const dormantMemList = memoriesAll.filter((m) => m && m.status === "dormant");
       const memoryGrid = (items) => React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "8px" } }, items.slice(0, 20).map(renderMemoryCard));
-      // 归档区：默认收起。点进卡片就能「恢复」或「永久删除」，误清理有地方找回来。
+      // 歸檔區：預設收起。點進卡片就能「恢復」或「永久刪除」，誤清理有地方找回來。
       const archivedSection = memoriesArchived.length > 0
         ? React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: "8px" } },
             React.createElement("button", {
@@ -4459,7 +4459,7 @@ window.__ModuleLoader__.load({
             ? React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: "12px" } }, emptyNode, archivedSection)
             : emptyNode);
 
-      // v1.1.x-fix：项目记忆详情弹框（避免 inline 展开撑爆网格）
+      // v1.1.x-fix：專案記憶詳情彈框（避免 inline 展開撐爆網格）
       const memoryModalNode = memoryModal ? React.createElement(
         "div",
         {
@@ -4496,16 +4496,16 @@ window.__ModuleLoader__.load({
             },
             onClick: (e) => e.stopPropagation(),
           },
-          // 头部：type chip + title + close
+          // 頭部：type chip + title + close
           React.createElement("div", { style: { padding: "14px 18px", borderBottom: "1px solid var(--dsw-alias-border-l1)", display: "flex", alignItems: "flex-start", gap: "10px", background: "linear-gradient(90deg, var(--dsw-alias-bg-layer-1), var(--dsw-alias-bg-layer-2))" } },
             React.createElement("span", { style: typeChipStyle }, typeLabel(memoryModal.type)),
-            memoryModal.pinned === true ? React.createElement("span", { title: "已置顶", style: { flex: "0 0 auto", fontSize: "10px", padding: "1px 7px", borderRadius: "8px", background: "var(--dsw-alias-brand-primary)", color: "var(--dsw-alias-bg-base)", fontWeight: "600" } }, "置顶") : null,
-            React.createElement("span", { style: { fontSize: "15px", fontWeight: "600", flex: "1 1 auto", minWidth: 0, wordBreak: "break-word", lineHeight: 1.45 } }, memoryModal.title || "(无标题)"),
+            memoryModal.pinned === true ? React.createElement("span", { title: "已置頂", style: { flex: "0 0 auto", fontSize: "10px", padding: "1px 7px", borderRadius: "8px", background: "var(--dsw-alias-brand-primary)", color: "var(--dsw-alias-bg-base)", fontWeight: "600" } }, "置頂") : null,
+            React.createElement("span", { style: { fontSize: "15px", fontWeight: "600", flex: "1 1 auto", minWidth: 0, wordBreak: "break-word", lineHeight: 1.45 } }, memoryModal.title || "(無標題)"),
             React.createElement("button", {
               type: "button",
               "data-action": "memory-modal-close",
               onClick: closeMemoryModal,
-              title: "关闭",
+              title: "關閉",
               style: {
                 background: "transparent",
                 border: "1px solid var(--dsw-alias-border-l1)",
@@ -4521,13 +4521,13 @@ window.__ModuleLoader__.load({
               },
             }, "×"),
           ),
-          // 主体：只读时渲染 markdown，编辑态换成表单（v1.2.x 起正文走 markdown：标题/列表/代码块/链接等）
+          // 主體：只讀時渲染 markdown，編輯態換成表單（v1.2.x 起正文走 markdown：標題/列表/程式碼塊/連結等）
           React.createElement("div", {
             "data-block": "memory-modal-body",
             style: { padding: "20px 24px 24px", overflowY: "auto", flex: "1 1 auto", color: "var(--dsw-alias-label-primary)" },
           }, memoryDraft
             ? React.createElement("div", { "data-block": "memory-edit-form", style: { display: "flex", flexDirection: "column", gap: "14px" } },
-                memoryField("标题", React.createElement("input", {
+                memoryField("標題", React.createElement("input", {
                   type: "text",
                   "data-field": "memory-title",
                   value: memoryDraft.title,
@@ -4535,7 +4535,7 @@ window.__ModuleLoader__.load({
                   onChange: (e) => updateDraft({ title: e.target.value }),
                   style: memoryInputStyle,
                 })),
-                memoryField("正文（至少 12 个字符）", React.createElement("textarea", {
+                memoryField("正文（至少 12 個字元）", React.createElement("textarea", {
                   "data-field": "memory-content",
                   value: memoryDraft.content,
                   rows: 10,
@@ -4544,7 +4544,7 @@ window.__ModuleLoader__.load({
                   style: Object.assign({}, memoryInputStyle, { resize: "vertical", lineHeight: 1.6, fontFamily: "inherit" }),
                 })),
                 React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "12px" } },
-                  memoryField("类型", React.createElement("select", {
+                  memoryField("型別", React.createElement("select", {
                     "data-field": "memory-type",
                     value: memoryDraft.type,
                     onChange: (e) => updateDraft({ type: e.target.value }),
@@ -4558,16 +4558,16 @@ window.__ModuleLoader__.load({
                     onChange: (e) => updateDraft({ importance: Number(e.target.value) }),
                     style: { width: "100%", accentColor: "var(--dsw-alias-brand-primary)" },
                   })),
-                  memoryField("状态", React.createElement("select", {
+                  memoryField("狀態", React.createElement("select", {
                     "data-field": "memory-status",
                     value: memoryDraft.status,
                     onChange: (e) => updateDraft({ status: e.target.value }),
                     style: memoryInputStyle,
                   },
-                    React.createElement("option", { value: "active" }, "Core（每轮注入）"),
+                    React.createElement("option", { value: "active" }, "Core（每輪注入）"),
                     React.createElement("option", { value: "dormant" }, "休眠（不注入）"),
                   )),
-                  memoryField("置顶", React.createElement("label", {
+                  memoryField("置頂", React.createElement("label", {
                     style: { display: "flex", alignItems: "center", gap: "7px", fontSize: "12px", padding: "8px 0", cursor: "pointer", color: "var(--dsw-alias-label-secondary)" },
                   },
                     React.createElement("input", {
@@ -4577,10 +4577,10 @@ window.__ModuleLoader__.load({
                       onChange: (e) => updateDraft({ pinned: e.target.checked }),
                       style: { accentColor: "var(--dsw-alias-brand-primary)", margin: 0 },
                     }),
-                    React.createElement("span", null, "Core 满员时不被挤掉"),
+                    React.createElement("span", null, "Core 滿員時不被擠掉"),
                   )),
                 ),
-                memoryField("标签（逗号分隔）", React.createElement("input", {
+                memoryField("標籤（逗號分隔）", React.createElement("input", {
                   type: "text",
                   "data-field": "memory-tags",
                   value: memoryDraft.tags,
@@ -4590,12 +4590,12 @@ window.__ModuleLoader__.load({
               )
             : (memoryModal.content
                 ? renderMarkdown(String(memoryModal.content), React)
-                : React.createElement("div", { style: { fontSize: "13.5px", color: "var(--dsw-alias-label-secondary)" } }, "（无内容）"))),
+                : React.createElement("div", { style: { fontSize: "13.5px", color: "var(--dsw-alias-label-secondary)" } }, "（無內容）"))),
           memoryError ? React.createElement("div", {
             "data-block": "memory-modal-error",
             style: { padding: "8px 18px", fontSize: "11.5px", color: "var(--dsw-alias-state-error-primary)", background: "var(--dsw-alias-bg-layer-2)", borderTop: "1px solid var(--dsw-alias-border-l1)" },
           }, "⚠ " + memoryError) : null,
-          // 底部：importance + 时间 + tags + 复制
+          // 底部：importance + 時間 + tags + 複製
           React.createElement("div", { style: { padding: "10px 18px", borderTop: "1px solid var(--dsw-alias-border-l1)", display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap", fontSize: "11px", color: "var(--dsw-alias-label-secondary)", background: "var(--dsw-alias-bg-layer-2)" } },
             memoryModal.importance ? React.createElement("span", { title: "importance " + memoryModal.importance, style: { color: "var(--dsw-alias-brand-primary)", letterSpacing: "1px", fontWeight: "600" } }, importanceStars(memoryModal.importance)) : null,
             memoryModal.createdAt ? React.createElement("span", { style: { fontVariantNumeric: "tabular-nums" } }, formatMemTime(memoryModal.createdAt)) : null,
@@ -4616,11 +4616,11 @@ window.__ModuleLoader__.load({
                     disabled: memoryBusy,
                     onClick: saveMemoryEdit,
                     style: memoryButtonStyle("primary"),
-                  }, memoryBusy ? "保存中…" : "✓ 保存"),
+                  }, memoryBusy ? "儲存中…" : "✓ 儲存"),
                 )
               : (confirmDelete
                   ? React.createElement(React.Fragment, null,
-                      React.createElement("span", { style: { color: "var(--dsw-alias-state-error-primary)", fontWeight: "600" } }, "永久删除后无法恢复，确定？"),
+                      React.createElement("span", { style: { color: "var(--dsw-alias-state-error-primary)", fontWeight: "600" } }, "永久刪除後無法恢復，確定？"),
                       React.createElement("button", {
                         type: "button",
                         "data-action": "memory-delete-cancel",
@@ -4634,26 +4634,26 @@ window.__ModuleLoader__.load({
                         disabled: memoryBusy,
                         onClick: deleteMemory,
                         style: memoryButtonStyle("danger"),
-                      }, memoryBusy ? "删除中…" : "确认永久删除"),
+                      }, memoryBusy ? "刪除中…" : "確認永久刪除"),
                     )
                   : React.createElement(React.Fragment, null,
                       React.createElement("button", {
                         type: "button",
                         "data-action": "memory-modal-copy",
                         onClick: (e) => {
-                          // 复制原始 markdown 字符串：title 一行 + 空行 + 原文（content 本身就是带 markdown 格式的原文，未做任何转换）
+                          // 複製原始 markdown 字串：title 一行 + 空行 + 原文（content 本身就是帶 markdown 格式的原文，未做任何轉換）
                           const text = (memoryModal.title || "") + "\n\n" + (memoryModal.content || "");
-                          copyPrompt(text, e, "✓ 已复制", "复制失败");
+                          copyPrompt(text, e, "✓ 已複製", "複製失敗");
                         },
                         style: memoryButtonStyle(),
-                      }, "📋 复制全文"),
+                      }, "📋 複製全文"),
                       React.createElement("button", {
                         type: "button",
                         "data-action": "memory-edit-start",
                         disabled: memoryBusy,
                         onClick: () => startMemoryEdit(memoryModal),
                         style: memoryButtonStyle(),
-                      }, "✏️ 编辑"),
+                      }, "✏️ 編輯"),
                       isArchivedMemory(memoryModal)
                         ? React.createElement("button", {
                             type: "button",
@@ -4661,23 +4661,23 @@ window.__ModuleLoader__.load({
                             disabled: memoryBusy,
                             onClick: () => setMemoryStatus("active"),
                             style: memoryButtonStyle(),
-                          }, "↩ 恢复")
+                          }, "↩ 恢復")
                         : React.createElement("button", {
                             type: "button",
                             "data-action": "memory-archive",
                             disabled: memoryBusy,
                             onClick: () => setMemoryStatus("archived"),
-                            title: "从 Core 和检索中移除，之后可在「已归档」里恢复",
+                            title: "從 Core 和檢索中移除，之後可在「已歸檔」裡恢復",
                             style: memoryButtonStyle(),
-                          }, "🗂 归档"),
+                          }, "🗂 歸檔"),
                       React.createElement("button", {
                         type: "button",
                         "data-action": "memory-delete",
                         disabled: memoryBusy,
                         onClick: () => setConfirmDelete(true),
-                        title: "物理删除，不可恢复",
+                        title: "物理刪除，不可恢復",
                         style: memoryButtonStyle(),
-                      }, "🗑 删除"),
+                      }, "🗑 刪除"),
                     )),
           ),
         ),
@@ -4687,26 +4687,26 @@ window.__ModuleLoader__.load({
           React.createElement("span", { style: { fontSize: "18px" } }, "🎯"),
           React.createElement("span", { style: { flex: "1 1 auto" } }, t("dash.title")),
           React.createElement("span", {
-            title: retrieval.vectorConfigured ? (retrieval.embeddingModel || "hybrid") : "无需配置，数据保留在项目内",
+            title: retrieval.vectorConfigured ? (retrieval.embeddingModel || "hybrid") : "無需配置，資料保留在專案內",
             style: { fontSize: "10px", padding: "2px 7px", borderRadius: "8px", background: "var(--dsw-alias-bg-layer-2)", color: "var(--dsw-alias-label-secondary)", border: "1px solid var(--dsw-alias-border-l1)" },
-          }, retrieval.configuredMode === "hybrid" ? "向量已配置" : "本地检索"),
-          React.createElement("span", { style: { fontSize: "10px", color: "var(--dsw-alias-label-secondary)" } }, "点击卡片后台执行"),
+          }, retrieval.configuredMode === "hybrid" ? "向量已配置" : "本地檢索"),
+          React.createElement("span", { style: { fontSize: "10px", color: "var(--dsw-alias-label-secondary)" } }, "點選卡片後臺執行"),
         ),
-        // v0.4.15 智能续接：Session 开始时主动给出"今天可能想推进什么"
+        // v0.4.15 智慧續接：Session 開始時主動給出"今天可能想推進什麼"
         React.createElement(SuggestionCard, {
           t, localeCode, sessionId, connection,
           projectInitialized: Boolean(data.initialized && data.project),
           embeddedSuggestion: data.suggestion || null,
           workspacePath: data._workspacePath || null,
         }),
-        // v0.4.11: Quick Actions 2x2 网格（替代"继续上次开发"鸡肋按钮）
+        // v0.4.11: Quick Actions 2x2 網格（替代"繼續上次開發"雞肋按鈕）
         (() => {
           const isEn = localeCode === "en-US";
           const quickActions = [
-            { id: "qa-rescan", action: "rescan", icon: "🔄", title: isEn ? "Rescan" : "重新扫描", desc: isEn ? "Incrementally refresh project structure" : "增量更新项目结构" },
-            { id: "qa-todo", action: "todos", icon: "📋", title: isEn ? "Review todos" : "整理待办", desc: isEn ? "View active tasks" : "查看活跃任务" },
-            { id: "qa-memory", action: "dream", icon: "🧠", title: isEn ? "Organize memories" : "整理记忆", desc: isEn ? "Deduplicate and archive stale items" : "去重 + 归档过期" },
-            { id: "qa-summary", action: "overview", icon: "🎯", title: isEn ? "Project overview" : "项目全景", desc: isEn ? "Summarize current status" : "总览当前状态" },
+            { id: "qa-rescan", action: "rescan", icon: "🔄", title: isEn ? "Rescan" : "重新掃描", desc: isEn ? "Incrementally refresh project structure" : "增量更新專案結構" },
+            { id: "qa-todo", action: "todos", icon: "📋", title: isEn ? "Review todos" : "整理待辦", desc: isEn ? "View active tasks" : "檢視活躍任務" },
+            { id: "qa-memory", action: "dream", icon: "🧠", title: isEn ? "Organize memories" : "整理記憶", desc: isEn ? "Deduplicate and archive stale items" : "去重 + 歸檔過期" },
+            { id: "qa-summary", action: "overview", icon: "🎯", title: isEn ? "Project overview" : "專案全景", desc: isEn ? "Summarize current status" : "總覽當前狀態" },
           ];
           return React.createElement("div", { style: { padding: "12px 12px 4px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: "8px" } },
             quickActions.map((qa) => {
@@ -4717,7 +4717,7 @@ window.__ModuleLoader__.load({
                 ? React.createElement("span", { "data-spinner": "1", style: { width: "15px", height: "15px", borderRadius: "50%", border: "2px solid var(--dsw-alias-border-l2)", borderTopColor: "var(--dsw-alias-brand-primary)", animation: "dsh-brain-spin 0.9s linear infinite", display: "inline-block" } })
                 : state.status === "success" ? "✅"
                 : state.status === "error" ? "❌"
-                : state.status === "confirm" ? "确认"
+                : state.status === "confirm" ? "確認"
                 : "▶";
               return React.createElement("button", {
                 key: qa.id,
@@ -4755,7 +4755,7 @@ window.__ModuleLoader__.load({
         })(),
         React.createElement("div", { style: { padding: "0 12px 8px", fontSize: "10px", color: "var(--dsw-alias-label-secondary)", display: "flex", alignItems: "center", gap: "4px" } },
           React.createElement("span", null, "💡"),
-          React.createElement("span", null, "操作将在当前工作区后台执行；整理记忆会先预览再确认"),
+          React.createElement("span", null, "操作將在當前工作區後臺執行；整理記憶會先預覽再確認"),
         ),
         React.createElement("style", null, "@keyframes dsh-brain-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }"),
         React.createElement("nav", { style: { display: "flex", gap: "4px", padding: "8px 12px 0", borderTop: "1px solid var(--dsw-alias-border-l1)", overflowX: "auto" }, "aria-label": "Project dashboard sections" },
@@ -4807,12 +4807,12 @@ window.__ModuleLoader__.load({
           React.createElement("span", null, "🕒"),
           React.createElement("span", null, t("dash.snapshot", { time: formatDate(data.generatedAt || Date.now()) })),
         ),
-        // v1.1.x-fix：项目记忆详情弹框（fixed 定位，挂在 dashboard 末尾不影响布局）
+        // v1.1.x-fix：專案記憶詳情彈框（fixed 定位，掛在 dashboard 末尾不影響佈局）
         memoryModalNode,
       );
     }
 
-    // ─── 快照指示（v0.3.4）：build-time embed 数据通道标识 ───
+    // ─── 快照指示（v0.3.4）：build-time embed 資料通道標識 ───
     function SnapshotBadge({ data, t, source }) {
       const ts = data && data.generatedAt;
       const age = ts ? Math.round((Date.now() - ts) / 1000) : null;
@@ -4833,9 +4833,9 @@ window.__ModuleLoader__.load({
       }, (source === "runtime" ? "● " + t("runtime.label") : "📦 " + t("snapshot.label")) + (ageText ? " · " + ageText : ""));
     }
 
-    // ─── 取 DSH 当前 locale（client builtin locale.getLocale()），fallback zh-CN ───
-    //   v0.3.12: 不再硬编码 zh-CN，实时跟随 DSH 语言设置
-    //   从 props._dshLocale（apply 注入）取；fallback zh-CN
+    // ─── 取 DSH 當前 locale（client builtin locale.getLocale()），fallback zh-CN ───
+    //   v0.3.12: 不再硬編碼 zh-CN，即時跟隨 DSH 語言設定
+    //   從 props._dshLocale（apply 注入）取；fallback zh-CN
     function resolveLocaleCode(props) {
       try {
         const l = props && props._dshLocale;
@@ -4843,7 +4843,7 @@ window.__ModuleLoader__.load({
           const code = l.getLocale();
           if (code && typeof code === "string" && dicts[code]) return code;
           if (code && typeof code === "string") {
-            // DSH 可能返回 "zh-CN" / "en-US" / "zh" / "en" 等，匹配前缀
+            // DSH 可能返回 "zh-CN" / "en-US" / "zh" / "en" 等，匹配字首
             const lower = code.toLowerCase();
             for (const k of Object.keys(dicts)) {
               if (k.toLowerCase() === lower || k.toLowerCase().indexOf(lower + "-") === 0 || lower.indexOf(k.toLowerCase()) === 0) return k;
@@ -4860,27 +4860,27 @@ window.__ModuleLoader__.load({
         : resolvePreview(props);
       const sid = (props && props.sessionId) || null;
       const [runtime, setRuntime] = React.useState(null);
-      // v1.1.x-fix：3 状态机 + 显式 runtimeError
-      //   - runtimeResolved=false                                       → host RPC 进行中（loading 占位）
+      // v1.1.x-fix：3 狀態機 + 顯式 runtimeError
+      //   - runtimeResolved=false                                       → host RPC 進行中（loading 佔位）
       //   - runtimeResolved=true && runtime != null                     → host RPC 成功（render dashboard / Onboarding）
-      //   - runtimeResolved=true && runtime == null && runtimeError!=null → host RPC 失败（render 显式降级 banner）
-      //   - runtimeResolved=true && runtime == null && runtimeError==null → 离线模式（offlineMode 入口直返）
-      // 移除原 4 秒 setTimeout 强制 finish——避免 host 慢时落到 embedded hint 闪现。
+      //   - runtimeResolved=true && runtime == null && runtimeError!=null → host RPC 失敗（render 顯式降級 banner）
+      //   - runtimeResolved=true && runtime == null && runtimeError==null → 離線模式（offlineMode 入口直返）
+      // 移除原 4 秒 setTimeout 強制 finish——避免 host 慢時落到 embedded hint 閃現。
       const [runtimeResolved, setRuntimeResolved] = React.useState(DEMO_ONBOARDING || !sid || !__DSH_CONNECTION__ || !__DSH_CONNECTION__.rpc);
       const [runtimeError, setRuntimeError] = React.useState(null);
 
-      // 把 Connection RPC 抛出的"原始 error"压缩成人话（避免 banner 里出现整页 schemastery JSON）
+      // 把 Connection RPC 丟擲的"原始 error"壓縮成人話（避免 banner 裡出現整頁 schemastery JSON）
       function compressRpcError(err) {
         const raw = err && err.message ? err.message : (typeof err === "string" ? err : String(err || ""));
-        // schemastery 的 invalid_union / invalid_value 错误 → 直接提示 result schema 不匹配
+        // schemastery 的 invalid_union / invalid_value 錯誤 → 直接提示 result schema 不匹配
         if (/invalid_union|invalid_value|No matching discriminator/.test(raw)) {
-          return "[DSH schema] host 返回的 result 不符合 Connection RPC schema（通常是 DSH 升级/降级引入的协议不兼容，或插件返回了 schema 未声明的字段）";
+          return "[DSH schema] host 返回的 result 不符合 Connection RPC schema（通常是 DSH 升級/降級引入的協議不相容，或外掛返回了 schema 未宣告的欄位）";
         }
-        // Network/connection 类错误
+        // Network/connection 類錯誤
         if (/Failed to fetch|NetworkError|ECONNREFUSED|ENOTFOUND|timeout/i.test(raw)) {
-          return "[DSH IPC] host 通道不可达（" + raw.slice(0, 80) + "）";
+          return "[DSH IPC] host 通道不可達（" + raw.slice(0, 80) + "）";
         }
-        // 其他：截断到 200 字符
+        // 其他：截斷到 200 字元
         return raw.length > 200 ? raw.slice(0, 200) + "…" : raw;
       }
 
@@ -4911,14 +4911,14 @@ window.__ModuleLoader__.load({
                 });
                 setRuntimeError(null);
               } else {
-                // host RPC 返回失败结构（workspace-not-found / bad-request 等）——
-                // 显式记录错误，让 UI 渲染降级 banner 而不是落到 embedded。
+                // host RPC 返回失敗結構（workspace-not-found / bad-request 等）——
+                // 顯式記錄錯誤，讓 UI 渲染降級 banner 而不是落到 embedded。
                 const err = (result && result.error) || {};
                 const originalCode = (err.details && err.details.originalCode) || null;
                 setRuntimeError({
                   code: err.code || "RPC_EMPTY",
                   originalCode: originalCode,
-                  message: err.message || "host RPC 返回异常",
+                  message: err.message || "host RPC 返回異常",
                   sessionId: sid,
                   at: Date.now(),
                 });
@@ -4939,9 +4939,9 @@ window.__ModuleLoader__.load({
             });
         };
         refresh();
-        // v1.1.x-fix：setInterval 5000→2000ms，缩短切 session 时的"host 慢"等待窗口。
-        //   DSH 异步注册 session workspace 时首次 preview 可能返回 workspace-not-found，
-        //   5s 太长导致 banner 显示几秒才消失；2s 通常足够 DSH 完成注册。
+        // v1.1.x-fix：setInterval 5000→2000ms，縮短切 session 時的"host 慢"等待視窗。
+        //   DSH 非同步註冊 session workspace 時首次 preview 可能返回 workspace-not-found，
+        //   5s 太長導致 banner 顯示幾秒才消失；2s 通常足夠 DSH 完成註冊。
         const timer = setInterval(refresh, 2000);
         return () => {
           active = false;
@@ -4952,7 +4952,7 @@ window.__ModuleLoader__.load({
       return [runtime || embedded, setRuntime, runtimeResolved, runtimeError];
     }
 
-    // ─── 根组件：Connection RPC 为主，build-time embed 为首屏/离线降级 ───
+    // ─── 根元件：Connection RPC 為主，build-time embed 為首屏/離線降級 ───
     function SidebarPreviewRoot(props) {
       const localeCode = resolveLocaleCode(props);
       const t = makeT(localeCode);
@@ -4998,15 +4998,15 @@ window.__ModuleLoader__.load({
         ),
       );
 
-      // v1.1.x-fix：3 状态机渲染
-      //   1) host RPC 进行中（!runtimeResolved）→ loading 占位，**不显示 Onboarding / hint**，
-      //      避免 build miss 时 embedded 阶段的 hint 闪现误导用户。
-      //   2) host RPC 失败（runtimeError）→ 显式降级 banner（含原因 + 操作建议，按用户
-      //      preference "任何兜底/降级必须附原因+操作建议"）。
-      //   3) host RPC 成功 / 离线模式（runtime）→ 走正常判定：已初始化 → Dashboard，
-      //      未初始化 → Onboarding（path 来自 r.workspacePath）。
+      // v1.1.x-fix：3 狀態機渲染
+      //   1) host RPC 進行中（!runtimeResolved）→ loading 佔位，**不顯示 Onboarding / hint**，
+      //      避免 build miss 時 embedded 階段的 hint 閃現誤導使用者。
+      //   2) host RPC 失敗（runtimeError）→ 顯式降級 banner（含原因 + 操作建議，按使用者
+      //      preference "任何兜底/降級必須附原因+操作建議"）。
+      //   3) host RPC 成功 / 離線模式（runtime）→ 走正常判定：已初始化 → Dashboard，
+      //      未初始化 → Onboarding（path 來自 r.workspacePath）。
       if (!dataWithLocale.initialized) {
-        // 1) host RPC 进行中
+        // 1) host RPC 進行中
         if (!runtimeResolved) {
           return React.createElement("div", containerProps,
             React.createElement("style", null, "@keyframes dsh-brain-loading-spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}.dsh-brain-loading-dot{display:inline-block;width:8px;height:8px;border-radius:50%;border:1.5px solid var(--dsw-alias-brand-primary);border-top-color:transparent;animation:dsh-brain-loading-spin 0.9s linear infinite;vertical-align:middle;margin-right:8px}"),
@@ -5017,7 +5017,7 @@ window.__ModuleLoader__.load({
             },
               React.createElement("div", { style: { display: "flex", alignItems: "center" } },
                 React.createElement("span", { className: "dsh-brain-loading-dot" }),
-                React.createElement("span", null, localeCode === "en-US" ? "Resolving workspace from Session…" : "正在从 Session 解析 workspace…"),
+                React.createElement("span", null, localeCode === "en-US" ? "Resolving workspace from Session…" : "正在從 Session 解析 workspace…"),
               ),
               React.createElement("div", { style: { fontSize: "10px", opacity: 0.7 } },
                 (r.sessionId ? String(r.sessionId).slice(0, 12) + "…" : "—"),
@@ -5026,50 +5026,50 @@ window.__ModuleLoader__.load({
           );
         }
 
-        // 2) host RPC 失败 → 显式降级 banner
+        // 2) host RPC 失敗 → 顯式降級 banner
         if (runtimeError) {
           const errCode = runtimeError.code || "RPC_EMPTY";
           const originalCode = runtimeError.originalCode || null;
-          // v1.1.x-fix：host 端会把不在 DSH schema 白名单的 code 降级到 "internal"，原 code 进 details.originalCode。
-          //   客户端 banner 判定时优先用 originalCode（更精确），再用 errCode。这样切项目时的"workspace-not-found"
-          //   不会因为降级显示成"host 连接失败"+"检查网络/重启"。
+          // v1.1.x-fix：host 端會把不在 DSH schema 白名單的 code 降級到 "internal"，原 code 進 details.originalCode。
+          //   客戶端 banner 判定時優先用 originalCode（更精確），再用 errCode。這樣切專案時的"workspace-not-found"
+          //   不會因為降級顯示成"host 連線失敗"+"檢查網路/重啟"。
           const effectiveCode = originalCode || errCode;
           const isWorkspaceMiss = effectiveCode === "workspace-not-found";
           const isSchema = (errCode === "RPC_THROW" || errCode === "internal") && /\[DSH schema\]/.test(runtimeError.message || "");
           const isNetwork = (errCode === "RPC_THROW" || errCode === "internal") && /\[DSH IPC\]/.test(runtimeError.message || "");
           const bannerTitle = isWorkspaceMiss
-            ? (localeCode === "en-US" ? "Workspace path not found for this Session" : "无法从当前 Session 解析 workspace 路径")
+            ? (localeCode === "en-US" ? "Workspace path not found for this Session" : "無法從當前 Session 解析 workspace 路徑")
             : isSchema
-              ? (localeCode === "en-US" ? "DSH host returned a malformed result" : "DSH host 返回的 result 协议不匹配")
+              ? (localeCode === "en-US" ? "DSH host returned a malformed result" : "DSH host 返回的 result 協議不匹配")
               : isNetwork
-                ? (localeCode === "en-US" ? "Cannot reach DSH host" : "无法连接 DSH host")
-                : (localeCode === "en-US" ? "Host RPC failed" : "host 连接失败");
+                ? (localeCode === "en-US" ? "Cannot reach DSH host" : "無法連線 DSH host")
+                : (localeCode === "en-US" ? "Host RPC failed" : "host 連線失敗");
           const bannerReason = isWorkspaceMiss
             ? (localeCode === "en-US"
                 ? "DSH Host could not resolve cwd for this sessionId. Usually means DSH has not yet registered the session workspace (cold start) or the session has no cwd header."
-                : "DSH Host 暂时无法解析当前 sessionId 对应的 cwd（通常 DSH 还没把 session workspace 注册进来，或 session header 缺 cwd 字段）。")
+                : "DSH Host 暫時無法解析當前 sessionId 對應的 cwd（通常 DSH 還沒把 session workspace 註冊進來，或 session header 缺 cwd 欄位）。")
             : isSchema
               ? (localeCode === "en-US"
                   ? "The result of /project-brain preview did not match Connection RPC schema. This usually means the plugin and DSH Desktop versions are out of sync — try restarting DSH."
-                  : "/project-brain preview 返回的 result 不符合 Connection RPC schema，通常是插件与 DSH 桌面版本不一致导致——重启 DSH 试试。")
+                  : "/project-brain preview 返回的 result 不符合 Connection RPC schema，通常是外掛與 DSH 桌面版本不一致導致——重啟 DSH 試試。")
               : (localeCode === "en-US"
                   ? `RPC "${errCode}"${originalCode ? " (was " + originalCode + ")" : ""} — ${runtimeError.message || "(no message)"}`
-                  : `RPC "${errCode}"${originalCode ? "（原 code=" + originalCode + "）" : ""} — ${runtimeError.message || "未知错误"}`);
+                  : `RPC "${errCode}"${originalCode ? "（原 code=" + originalCode + "）" : ""} — ${runtimeError.message || "未知錯誤"}`);
           const bannerAction = isWorkspaceMiss
             ? (localeCode === "en-US"
                 ? "Action: wait a moment and switch again, or open any file in the project root so DSH registers the workspace, then return."
-                : "建议：等 1~2 秒再切一次，或在项目根目录随便打开一个文件让 DSH 注册 workspace 后再回来。")
+                : "建議：等 1~2 秒再切一次，或在專案根目錄隨便開啟一個檔案讓 DSH 註冊 workspace 後再回來。")
             : isSchema
               ? (localeCode === "en-US"
                   ? "Action: fully quit DSH Desktop (right-click tray → Quit) and restart. Reopen the project — the bundle will be reloaded."
-                  : "建议：完全退出 DSH 桌面（托盘右键 → Quit）后重新启动，再打开该项目即可重新加载 bundle。")
+                  : "建議：完全退出 DSH 桌面（托盤右鍵 → Quit）後重新啟動，再開啟該專案即可重新載入 bundle。")
             : (localeCode === "en-US"
                 ? "Action: check DSH Desktop network/plugin health, or restart DSH. The retry interval is 5s."
-                : "建议：检查 DSH 桌面网络/插件状态，或重启 DSH。客户端每 5 秒会自动重试。");
-          const bannerSeverity = isWorkspaceMiss ? "轻" : (isSchema || isNetwork) ? "中" : "中";
+                : "建議：檢查 DSH 桌面網路/外掛狀態，或重啟 DSH。客戶端每 5 秒會自動重試。");
+          const bannerSeverity = isWorkspaceMiss ? "輕" : (isSchema || isNetwork) ? "中" : "中";
           const severityLabel = localeCode === "en-US"
             ? (isWorkspaceMiss ? "Severity: low" : "Severity: medium")
-            : `严重程度：${bannerSeverity}`;
+            : `嚴重程度：${bannerSeverity}`;
           const banner = React.createElement(
             "div",
             {
@@ -5109,7 +5109,7 @@ window.__ModuleLoader__.load({
           );
         }
 
-        // 3) host RPC 成功且确认未初始化 → Onboarding（path 来自 r.workspacePath）
+        // 3) host RPC 成功且確認未初始化 → Onboarding（path 來自 r.workspacePath）
         return React.createElement("div", containerProps,
           headerWithBadge,
           React.createElement(OnboardingBlock, {
@@ -5154,22 +5154,22 @@ window.__ModuleLoader__.load({
     }
 
     // ─── P0.7: TodoStrip (conversation.input.dock) ───
-    // 位置：composer 上方全宽行；折叠态显示活跃 TODO Top-3，点击"查看全部"展开全量；空状态隐藏整行
-    // 数据源：复用 SidebarPreviewRoot 同源 build-time embed (resolvePreview props -> data.todos)
-    // 交互：纯 DOM toggle（避免 useState 触发 DSH static client 兼容性 bug，已知历史教训）
+    // 位置：composer 上方全寬行；摺疊態顯示活躍 TODO Top-3，點選"檢視全部"展開全量；空狀態隱藏整行
+    // 資料來源：複用 SidebarPreviewRoot 同源 build-time embed (resolvePreview props -> data.todos)
+    // 互動：純 DOM toggle（避免 useState 觸發 DSH static client 相容性 bug，已知歷史教訓）
 
     function TodoStrip(props) {
       const localeCode = resolveLocaleCode(props);
       const t = makeT(localeCode);
       const [r, , runtimeResolved] = useResolvedPreview(props);
       const data = r.data;
-      // v1.1.x-fix：host 拉数据期间（!runtimeResolved）不渲染 strip，避免切项目时
-      //   "embedded.data.initialized=true（之前项目的）→ 现在 sid 的 embedded=false"
-      //   引起的闪烁。host 回数据后再根据 data.initialized 决定显示与否。
+      // v1.1.x-fix：host 拉資料期間（!runtimeResolved）不渲染 strip，避免切專案時
+      //   "embedded.data.initialized=true（之前專案的）→ 現在 sid 的 embedded=false"
+      //   引起的閃爍。host 回資料後再根據 data.initialized 決定顯示與否。
       if (!runtimeResolved) return null;
-      if (!data || !data.initialized) return null;  // 未初始化项目不显示
+      if (!data || !data.initialized) return null;  // 未初始化專案不顯示
       const active = (data.todos || []).filter((x) => x && x.status !== "done" && x.status !== "cancelled");
-      if (active.length === 0) return null;        // 无活跃 TODO 不显示（避免噪音）
+      if (active.length === 0) return null;        // 無活躍 TODO 不顯示（避免噪音）
 
       const wsid = r.workspaceId || "default";
       const stripId = "dsh-brain-todo-strip-" + wsid;
@@ -5254,7 +5254,7 @@ window.__ModuleLoader__.load({
         color: prioColor[priority] ? "var(--dsw-alias-bg-base)" : "var(--dsw-alias-label-secondary)",
       });
 
-      // 切换展开/折叠（纯 DOM，避免 useState 触发 DSH static client 兼容性 bug）
+      // 切換展開/摺疊（純 DOM，避免 useState 觸發 DSH static client 相容性 bug）
       const onToggle = (ev) => {
         try {
           if (ev && ev.stopPropagation) ev.stopPropagation();
@@ -5274,7 +5274,7 @@ window.__ModuleLoader__.load({
         } catch (e) {}
       };
 
-      // 关闭整个 strip：隐藏 + 写 localStorage + 显示恢复 chip
+      // 關閉整個 strip：隱藏 + 寫 localStorage + 顯示恢復 chip
       const onClose = (ev) => {
         try {
           if (ev && ev.stopPropagation) ev.stopPropagation();
@@ -5286,7 +5286,7 @@ window.__ModuleLoader__.load({
         } catch (e) {}
       };
 
-      // 从关闭态恢复
+      // 從關閉態恢復
       const onRestore = (ev) => {
         try {
           if (ev && ev.stopPropagation) ev.stopPropagation();
@@ -5310,7 +5310,7 @@ window.__ModuleLoader__.load({
         ),
       );
 
-      // 主 strip（默认折叠，列表隐藏）— header 始终可见，点击切换展开
+      // 主 strip（預設摺疊，列表隱藏）— header 始終可見，點選切換展開
       const strip = React.createElement("div", {
         id: stripId,
         "data-block": "todo-strip",
@@ -5339,7 +5339,7 @@ window.__ModuleLoader__.load({
         }, items),
       );
 
-      // 恢复 chip（关闭后显示，极小占用，不钉住）
+      // 恢復 chip（關閉後顯示，極小佔用，不釘住）
       const restoreChip = React.createElement("button", {
         key: "restore", id: restoreId, type: "button",
         "data-block": "todo-strip-restore",
@@ -5393,15 +5393,15 @@ window.__ModuleLoader__.load({
             name: "conversation.view",
             id: "project-brain",
             order: 35,
-            label: () => "项目",
+            label: () => "專案",
           },
           (props) => React.createElement(SidebarPreviewRoot, Object.assign({}, props, { _dshLocale: dshLocale })),
         ),
       );
 
-      // P0.7: 注册 conversation.input.dock（composer 上方 TodoStrip）
-      //   id: project-brain-todo-strip, order: 10（DSH 默认 dock 顺序）
-      //   Slot 类型 list（多个 dock 共存），scope: session
+      // P0.7: 註冊 conversation.input.dock（composer 上方 TodoStrip）
+      //   id: project-brain-todo-strip, order: 10（DSH 預設 dock 順序）
+      //   Slot 型別 list（多個 dock 共存），scope: session
       try {
         slots.inject("conversation.input.dock", () =>
           slots.register(

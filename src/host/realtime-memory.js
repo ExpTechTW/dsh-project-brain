@@ -1,10 +1,10 @@
-// realtime-memory.js - 实时交互记忆
+// realtime-memory.js - 即時互動記憶
 //
-// 分工：正则只负责「要不要记」，LLM 负责「记什么」。
-//   用户说「把这个记住」时，真正的知识几乎总在上几轮里（而且常常是 assistant 说的），
-//   正则捕获组拿到的只是触发语后面的残句。所以命中强信号后必须带最近若干轮上下文
-//   去做一次指代消解，产出能脱离本次对话独立阅读的正文。
-// 弱信号只检测、不在 ingest 写入。无法消解指代时宁可不写，交给会话结束的 session-extractor 兜底。
+// 分工：正則只負責「要不要記」，LLM 負責「記什麼」。
+//   使用者說「把這個記住」時，真正的知識幾乎總在上幾輪裡（而且常常是 assistant 說的），
+//   正則捕獲組拿到的只是觸發語後面的殘句。所以命中強訊號後必須帶最近若干輪上下文
+//   去做一次指代消解，產出能脫離本次對話獨立閱讀的正文。
+// 弱訊號只檢測、不在 ingest 寫入。無法消解指代時寧可不寫，交給會話結束的 session-extractor 兜底。
 
 import { admitMemory, hasUnresolvedReference, isMockLlmPayload, titleJaccard } from "./memory/admit.js";
 import { sessionMessageLines } from "./memory/session-extractor.js";
@@ -13,21 +13,21 @@ import { isRetrievableMemory, makeId, normalizeMemoryType } from "./store/brain-
 import { appendJsonl, brainPath, readBrain } from "./store/brain-files.js";
 
 const STRONG_SIGNAL_PATTERNS = [
-  /(?:记住|记一下|备忘|别忘了|长期记住)\s*[:：]?\s*([^。\n]{4,200})/,
-  /以后\s*([^。\n]{2,80})\s*(?:要|请|一定)?\s*(?:做|处理|记得|注意)/,
+  /(?:記住|記一下|備忘|別忘了|長期記住)\s*[:：]?\s*([^。\n]{4,200})/,
+  /以後\s*([^。\n]{2,80})\s*(?:要|請|一定)?\s*(?:做|處理|記得|注意)/,
   /(?:remember|note that|don't forget|never forget|long-term remember)\s*[:：]?\s*([^.\n]{4,200})/i,
   /\b(always|never)\s+([a-z][^.\n]{4,150})/i,
 ];
 
 const WEAK_SIGNAL_PATTERNS = [
-  /(?:以后都|以后请|以后记得|下次记得|下次注意|约定|规则是|从今往后|今后)\s*[:：,，]?\s*([^。\n]{4,150})/,
-  /(?:记住这个|注意这个|留意一下|请注意)\s*[:：,，]?\s*([^。\n]{4,150})/,
+  /(?:以後都|以後請|以後記得|下次記得|下次注意|約定|規則是|從今往後|今後)\s*[:：,，]?\s*([^。\n]{4,150})/,
+  /(?:記住這個|注意這個|留意一下|請注意)\s*[:：,，]?\s*([^。\n]{4,150})/,
   /\b(going forward|from now on|henceforth|note this|bear in mind|keep in mind)\b\s*[:：,，]?\s*([^.]{4,150})/i,
   /\b(let'?s (?:always|never))\b\s+([^.]{4,150})/i,
 ];
 
 const NEGATIVE_CONTEXTS = [
-  /\b(?:eslint|prettier|type:|noqa|tsconfig|build\s*error|报错|编译|运行)\b/i,
+  /\b(?:eslint|prettier|type:|noqa|tsconfig|build\s*error|報錯|編譯|執行)\b/i,
   /\b(?:commit|push|pr|merge|git|分支)\b/i,
 ];
 
@@ -37,7 +37,7 @@ export function cleanRememberContent(text) {
 
 export function rememberTitle(content) {
   const t = cleanRememberContent(content);
-  if (!t) return "用户记住的长期约束";
+  if (!t) return "使用者記住的長期約束";
   return t.length > 40 ? t.slice(0, 40) + "…" : t;
 }
 
@@ -88,21 +88,21 @@ function sessionCwd(session) {
 
 const projectState = new Map();
 const MAX_PER_SESSION = 5;
-// 同一个 30 分钟窗口内最多做这么多次提炼（含失败的）。
+// 同一個 30 分鐘視窗內最多做這麼多次提煉（含失敗的）。
 const MAX_REFINE_CALLS = 12;
 const SEEN_CACHE_LIMIT = 50;
 
-// 指代消解用的上下文窗口：必须包含 assistant 消息，用户说的「这个角度」十有八九是助手刚写的东西。
+// 指代消解用的上下文視窗：必須包含 assistant 訊息，使用者說的「這個角度」十有八九是助手剛寫的東西。
 //
-// 头尾都要取。只留最近 N 条的话，「这个对话的第一句」「最开始说的」这类往回指的
-// 表达永远落在窗口外，模型只能诚实地回答解不开——而那看起来就像插件没记住。
+// 頭尾都要取。只留最近 N 條的話，「這個對話的第一句」「最開始說的」這類往回指的
+// 表達永遠落在視窗外，模型只能誠實地回答解不開——而那看起來就像外掛沒記住。
 const CONTEXT_HEAD_MESSAGES = 4;
 const CONTEXT_TAIL_MESSAGES = 10;
 const CONTEXT_MAX_CHARS = 7000;
 const CONTEXT_PER_MESSAGE_CHARS = 1200;
-const CONTEXT_GAP_MARK = "（……中间省略若干轮……）";
+const CONTEXT_GAP_MARK = "（……中間省略若干輪……）";
 const REFINE_TIMEOUT_MS = 20000;
-// 同一条偏好被反复重申时走 supersede，否则 Core 里会堆一排同义条目。
+// 同一條偏好被反覆重申時走 supersede，否則 Core 裡會堆一排同義條目。
 const SUPERSEDE_JACCARD = 0.72;
 const REFINE_TYPES = new Set(["preference", "decision", "requirement", "architecture", "bug", "lesson"]);
 
@@ -120,7 +120,7 @@ export function contextWindow(session) {
         .concat(lines.slice(-CONTEXT_TAIL_MESSAGES));
     }
 
-    // 还是超预算就整体再压一档，而不是丢消息——丢掉哪一条都可能正是用户指的那条。
+    // 還是超預算就整體再壓一檔，而不是丟訊息——丟掉哪一條都可能正是使用者指的那條。
     let text = selected.join("\n\n");
     if (text.length > CONTEXT_MAX_CHARS) {
       const budget = Math.max(200, Math.floor(CONTEXT_MAX_CHARS / selected.length) - 8);
@@ -136,37 +136,37 @@ export function contextWindow(session) {
 
 function refinePrompt(triggerText, transcript) {
   return [
-    "用户在对话里明确要求「记住」某件事。把它整理成一条能脱离本次对话独立阅读的长期记忆。",
+    "使用者在對話裡明確要求「記住」某件事。把它整理成一條能脫離本次對話獨立閱讀的長期記憶。",
     "",
-    "用户原话（触发语）：",
+    "使用者原話（觸發語）：",
     triggerText,
     "",
-    "对话上下文（按时间先后排列；若出现省略标记，说明中间轮次未提供，但首尾都在）：",
-    transcript || "（无上下文）",
+    "對話上下文（按時間先後排列；若出現省略標記，說明中間輪次未提供，但首尾都在）：",
+    transcript || "（無上下文）",
     "",
     "要求：",
-    "1. 消解全部指代。正文里不允许出现「这个 / 那个 / 上面说的 / 这样 / this / that」，一律替换成上下文里它真正指的东西（目标、口径、技术选型、文件名等）。",
-    "2. 正文写 what + why：用户要求的是什么、适用范围和原因，2–4 句，自包含。",
-    "3. 用户说「这个对话的第一句」「最开始说的」时，指的就是上面上下文里最早那条 USER 消息；说「刚才说的」则指最后几条。按这个理解去取内容。",
-    "4. 只有上下文里确实没有可对应的内容时，resolved 才返回 false。不要因为不确定就放弃，也不要编造。",
-    "5. title 写成站立事实句，不要写成「记住 XXX」「用户要求 XXX」。",
-    "6. type：对协作方式、输出结构、长期口径的要求用 preference；技术选型用 decision；其余按语义选。",
+    "1. 消解全部指代。正文裡不允許出現「這個 / 那個 / 上面說的 / 這樣 / this / that」，一律替換成上下文裡它真正指的東西（目標、口徑、技術選型、檔名等）。",
+    "2. 正文寫 what + why：使用者要求的是什麼、適用範圍和原因，2–4 句，自包含。",
+    "3. 使用者說「這個對話的第一句」「最開始說的」時，指的就是上面上下文裡最早那條 USER 訊息；說「剛才說的」則指最後幾條。按這個理解去取內容。",
+    "4. 只有上下文裡確實沒有可對應的內容時，resolved 才返回 false。不要因為不確定就放棄，也不要編造。",
+    "5. title 寫成站立事實句，不要寫成「記住 XXX」「使用者要求 XXX」。",
+    "6. type：對協作方式、輸出結構、長期口徑的要求用 preference；技術選型用 decision；其餘按語義選。",
     "",
-    "输出格式（严格遵守）：第一个字符必须是 {，最后一个字符必须是 }。",
-    "不要写任何解释、前言、结语，不要用 Markdown 代码块包裹。",
-    JSON.stringify({ resolved: true, type: "preference", title: "站立事实句", content: "自包含的 what + why", importance: 0.8 }),
+    "輸出格式（嚴格遵守）：第一個字元必須是 {，最後一個字元必須是 }。",
+    "不要寫任何解釋、前言、結語，不要用 Markdown 程式碼塊包裹。",
+    JSON.stringify({ resolved: true, type: "preference", title: "站立事實句", content: "自包含的 what + why", importance: 0.8 }),
   ].join("\n");
 }
 
-// 模型偶尔会在 JSON 前后带上解释文字或直接用自然语言作答。与其丢掉这次提炼，
-// 不如把它自己的输出丢回去让它重排一遍——只要一次就够，再失败就认了。
+// 模型偶爾會在 JSON 前後帶上解釋文字或直接用自然語言作答。與其丟掉這次提煉，
+// 不如把它自己的輸出丟回去讓它重排一遍——只要一次就夠，再失敗就認了。
 function repairPrompt(rawText) {
   return [
-    "下面这段输出本应是严格 JSON，但无法解析。请原样提取其中的信息，重新输出为合法 JSON。",
-    "第一个字符必须是 {，最后一个字符必须是 }，不要任何解释或代码块标记。",
-    "字段：" + JSON.stringify({ resolved: true, type: "preference", title: "", content: "", importance: 0.8 }),
+    "下面這段輸出本應是嚴格 JSON，但無法解析。請原樣提取其中的資訊，重新輸出為合法 JSON。",
+    "第一個字元必須是 {，最後一個字元必須是 }，不要任何解釋或程式碼塊標記。",
+    "欄位：" + JSON.stringify({ resolved: true, type: "preference", title: "", content: "", importance: 0.8 }),
     "",
-    "原始输出：",
+    "原始輸出：",
     String(rawText || "").slice(0, 2000),
   ].join("\n");
 }
@@ -194,7 +194,7 @@ async function refineSignal({ llm, route, sessionId, signal, transcript, timeout
   try {
     parsed = parseArchitectureJson(text);
   } catch (e) {
-    // 第一次没给出合法 JSON，把它的原始输出丢回去重排一次再放弃。
+    // 第一次沒給出合法 JSON，把它的原始輸出丟回去重排一次再放棄。
     log("info", "realtime-memory: refine output unparseable, retrying once");
     try {
       parsed = parseArchitectureJson(await ask(repairPrompt(text)));
@@ -203,11 +203,11 @@ async function refineSignal({ llm, route, sessionId, signal, transcript, timeout
     }
   }
   if (!parsed || parsed.resolved !== true) {
-    // 模型说它解不开。把窗口规模记下来——多数情况是窗口里确实没有用户指的那段。
+    // 模型說它解不開。把視窗規模記下來——多數情況是窗口裡確實沒有使用者指的那段。
     return {
       status: "unresolved",
       candidate: null,
-      sample: "模型判定无法消解；上下文窗口 " + String(transcript || "").length + " 字符",
+      sample: "模型判定無法消解；上下文視窗 " + String(transcript || "").length + " 字元",
     };
   }
 
@@ -217,7 +217,7 @@ async function refineSignal({ llm, route, sessionId, signal, transcript, timeout
   if (!REFINE_TYPES.has(type) || !title || content.length < 12) {
     return { status: "refine_invalid", candidate: null };
   }
-  // 模型自称 resolved 但正文还带着指代词 —— 以正文为准。
+  // 模型自稱 resolved 但正文還帶著指代詞 —— 以正文為準。
   if (hasUnresolvedReference(title, content, { maxSelfContainedChars: 0 })) {
     return { status: "unresolved", candidate: null };
   }
@@ -235,7 +235,7 @@ async function refineSignal({ llm, route, sessionId, signal, transcript, timeout
   };
 }
 
-// LLM 不可用时的保守兜底：只有用户原话本身就自包含才落盘，绝不靠补一句套话凑长度。
+// LLM 不可用時的保守兜底：只有使用者原話本身就自包含才落盤，絕不靠補一句套話湊長度。
 export function fallbackCandidate(signal) {
   const cleaned = cleanRememberContent(signal && signal.content);
   if (cleaned.length < 12) return null;
@@ -250,24 +250,24 @@ export function fallbackCandidate(signal) {
   };
 }
 
-// 失败原因要说准：把「模型返回格式不对」写成「缺少模型」，会让人跑去查配置。
-// refineStatus 比笼统的 reason 更接近真相，优先用它。
+// 失敗原因要說準：把「模型返回格式不對」寫成「缺少模型」，會讓人跑去查配置。
+// refineStatus 比籠統的 reason 更接近真相，優先用它。
 const REJECT_REASON_TEXT = {
-  unresolved_reference: "没能从上下文里认出「这个 / 那个」指的是什么",
-  needs_context: "缺少可用的上下文，无法整理成自包含的记忆",
+  unresolved_reference: "沒能從上下文裡認出「這個 / 那個」指的是什麼",
+  needs_context: "缺少可用的上下文，無法整理成自包含的記憶",
 };
 
 const REFINE_STATUS_TEXT = {
-  llm_unavailable: "当前 Session 还没有可复用的模型路由，先完成一次正常对话再试",
-  refine_failed: "整理记忆时模型调用失败（超时或中断）",
-  refine_unparseable: "模型两次都没按要求返回 JSON",
-  refine_invalid: "模型返回的内容不完整，缺少标题或正文",
+  llm_unavailable: "當前 Session 還沒有可複用的模型路由，先完成一次正常對話再試",
+  refine_failed: "整理記憶時模型呼叫失敗（超時或中斷）",
+  refine_unparseable: "模型兩次都沒按要求返回 JSON",
+  refine_invalid: "模型返回的內容不完整，缺少標題或正文",
 };
 
-const REJECT_NEXT_STEP = "可以补一句更具体的说法，或等本次会话结束后自动归纳。";
+const REJECT_NEXT_STEP = "可以補一句更具體的說法，或等本次會話結束後自動歸納。";
 
-// 用户明确说了「记住」却没记成，是最容易让人误以为已经记下的场景。
-// 留一条 timeline，在侧边栏「任务动态」里看得到；Agent 通道的常规拒绝不记，避免刷屏。
+// 使用者明確說了「記住」卻沒記成，是最容易讓人誤以為已經記下的場景。
+// 留一條 timeline，在側邊欄「任務動態」裡看得到；Agent 通道的常規拒絕不記，避免刷屏。
 async function noteRejection({ fs, projectPath, sessionId, signal, reason, refineStatus, sample }) {
   const now = Date.now();
   const trigger = String(signal.fullText || signal.content || "").slice(0, 120);
@@ -275,23 +275,23 @@ async function noteRejection({ fs, projectPath, sessionId, signal, reason, refin
   try {
     await appendJsonl(fs, brainPath(projectPath, "timeline.jsonl"), {
       id: makeId("evt", now),
-      title: "未记住：" + trigger,
+      title: "未記住：" + trigger,
       eventType: "memory_rejected",
       occurredAt: now,
       sessionId: sessionId || null,
       detail: why + "。" + REJECT_NEXT_STEP,
       rejectReason: reason,
       refineStatus: refineStatus || null,
-      // 模型到底返回了什么，排查时比任何描述都有用。
+      // 模型到底返回了什麼，排查時比任何描述都有用。
       ...(sample ? { sample } : {}),
     });
-  } catch (e) { /* 记录失败不影响主流程 */ }
+  } catch (e) { /* 記錄失敗不影響主流程 */ }
 }
 
 export const WEAK_SOURCE_KIND = "user_intent_weak";
 const REALTIME_SOURCE_KINDS = new Set(["user_explicit", WEAK_SOURCE_KIND]);
 
-// 同类型、同样来自实时通道、标题高度重合 → 视为对旧口径的重申，走 supersede。
+// 同類型、同樣來自即時通道、標題高度重合 → 視為對舊口徑的重申，走 supersede。
 export function findSupersedable(memories, candidate) {
   let best = null;
   let bestScore = 0;
@@ -343,8 +343,8 @@ export async function handleOne({ fs, projectPath, sessionId, signal, session, l
     log("info", "realtime-memory: rate limit reached for " + projectPath + ", skip");
     return { skipped: "rate_limit" };
   }
-  // 落盘额度只在写成功时消耗，挡不住「反复触发但都提炼失败」。模型调用另算一份额度，
-  // 否则一段全是「以后都…」的对话会把模型打爆。
+  // 落盤額度只在寫成功時消耗，擋不住「反覆觸發但都提煉失敗」。模型呼叫另算一份額度，
+  // 否則一段全是「以後都…」的對話會把模型打爆。
   if (st.refineCalls >= MAX_REFINE_CALLS) {
     log("info", "realtime-memory: refine budget exhausted for " + projectPath + ", skip");
     return { skipped: "refine_budget" };
@@ -364,13 +364,13 @@ export async function handleOne({ fs, projectPath, sessionId, signal, session, l
 
   let candidate = refined.candidate;
   if (!candidate) {
-    // 弱信号（「以后都…」「约定…」）用户并没有明确要求记住，模型解不开就安静跳过：
-    // 既不退回原话，也不写「未记住」——那会把没人要求的事报成失败。
+    // 弱訊號（「以後都…」「約定…」）使用者並沒有明確要求記住，模型解不開就安靜跳過：
+    // 既不退回原話，也不寫「未記住」——那會把沒人要求的事報成失敗。
     if (weak) {
       log("info", "realtime-memory: weak signal not resolvable (" + refined.status + "), skip");
       return { skipped: "weak_unresolved", refineStatus: refined.status };
     }
-    // 模型明确说解不开指代时不要退回原话——那条原话就是解不开的那条。
+    // 模型明確說解不開指代時不要退回原話——那條原話就是解不開的那條。
     const reason = refined.status === "unresolved" ? "unresolved_reference" : null;
     if (reason) {
       log("info", "realtime-memory: reference unresolved, deferring to session summary");
@@ -391,7 +391,7 @@ export async function handleOne({ fs, projectPath, sessionId, signal, session, l
     }
   }
   if (weak) {
-    // 弱信号是从语气里推断出来的，不是用户点名要记的，可信度和重要性都要压一档。
+    // 弱訊號是從語氣裡推斷出來的，不是使用者點名要記的，可信度和重要性都要壓一檔。
     candidate = Object.assign({}, candidate, {
       confidence: Math.min(candidate.confidence, 0.7),
       importance: Math.min(candidate.importance, 0.7),
@@ -418,8 +418,8 @@ export async function handleOne({ fs, projectPath, sessionId, signal, session, l
         ...(prior ? { supersedes: prior.id } : {}),
       },
     },
-    // 强信号是用户点名要记的，准入没得商量；弱信号是从语气里推断的，走常规通道，
-    // 但内容已经由上面那次提炼产出，不再重复问一遍模型。
+    // 強訊號是使用者點名要記的，准入沒得商量；弱訊號是從語氣裡推斷的，走常規通道，
+    // 但內容已經由上面那次提煉產出，不再重複問一遍模型。
     channel: weak ? "automatic" : "user_explicit",
     ...(weak ? { llmConfirm: { admit: true, type: candidate.type } } : {}),
     now: Date.now(),
@@ -489,7 +489,7 @@ export function setupRealtimeMemory(ctx, fs, sandboxPolicy, runtime = {}) {
         route: resolveSessionRoute(session),
       })
         .then(async (result) => {
-          // 落盘和「记了一条未记住」都会改变侧边栏内容，两种都要通知。
+          // 落盤和「記了一條未記住」都會改變側邊欄內容，兩種都要通知。
           if (result && (result.appended || result.noted) && ctx && typeof ctx.emit === "function") {
             try { ctx.emit("project_brain/preview.changed", { projectPath }); } catch (e) {}
           }

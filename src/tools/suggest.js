@@ -1,14 +1,14 @@
-// project_suggest_next Tool - v0.4.15 智能续接
+// project_suggest_next Tool - v0.4.15 智慧續接
 //
-// Session 开始时（或主动调用）给用户一句"今天可能想推进什么"：
-//   1) 默认走纯规则：基于 in_progress TODO / 高优先级 pending / 阻塞 / 近期记忆
-//   2) 若 DSH Session 已有可用 model route，组装 RAG prompt 让 LLM 推断
-//   3) LLM 失败 / 不可用 → 自动降级到本地规则
+// Session 開始時（或主動呼叫）給使用者一句"今天可能想推進什麼"：
+//   1) 預設走純規則：基於 in_progress TODO / 高優先順序 pending / 阻塞 / 近期記憶
+//   2) 若 DSH Session 已有可用 model route，組裝 RAG prompt 讓 LLM 推斷
+//   3) LLM 失敗 / 不可用 → 自動降級到本地規則
 //
-// 设计要点：
-//   - 不调架构 LLM（architecture.llm）也不调 session_extractor，独立用 llm service 即可
-//   - 完整 try/catch + swallow：不能让 Session 启动卡住
-//   - 返回结构稳定（source: "llm" / "local" / "error"），UI 据此展示
+// 設計要點：
+//   - 不調架構 LLM（architecture.llm）也不調 session_extractor，獨立用 llm service 即可
+//   - 完整 try/catch + swallow：不能讓 Session 啟動卡住
+//   - 返回結構穩定（source: "llm" / "local" / "error"），UI 據此展示
 
 import { defineTool } from "@deepseek-ai/dsh-tools";
 import { readBrain } from "../host/store/brain-files.js";
@@ -52,7 +52,7 @@ async function tryLlmSuggestion({ llm, route, sessionId, brain, temperature }) {
       system: "You are the dsh-project-brain 'smart continue' advisor. Output strict JSON only. Never invent TODOs, memories or files that were not provided as evidence.",
       maxTokens: 400,
       purpose: "project-suggest-next",
-      // v0.4.17：deterministic 输出，让同一项目下不同 session 拿到的建议尽量一致
+      // v0.4.17：deterministic 輸出，讓同一專案下不同 session 拿到的建議儘量一致
       temperature: typeof temperature === "number" ? temperature : 0,
     });
   } catch (error) {
@@ -61,7 +61,7 @@ async function tryLlmSuggestion({ llm, route, sessionId, brain, temperature }) {
   const parsed = parseSuggestJson(text);
   if (!parsed) return { ok: false, error: "INVALID_JSON", message: "LLM 返回非 JSON" };
   const normalized = normalizeSuggestion(parsed);
-  if (!normalized) return { ok: false, error: "INVALID_SCHEMA", message: "LLM JSON 缺少必要字段" };
+  if (!normalized) return { ok: false, error: "INVALID_SCHEMA", message: "LLM JSON 缺少必要欄位" };
   return { ok: true, data: { suggestion: normalized, evidence: summarizeEvidence(evidence), source: "llm" } };
 }
 
@@ -82,14 +82,14 @@ export function buildSuggestTool({ fs, sandboxPolicy, getLlm }) {
   return defineTool({
     name: "project_suggest_next",
     description:
-      "dsh-project-brain: 智能续接。Session 开始时给用户一句「今天可能想推进什么」+ 依据，" +
-      "结合活跃 TODO / 近期记忆 / 最近活动 / 架构概览综合推断。" +
-      "默认走本地规则（in_progress > 最高优先级 pending > 阻塞 > 记忆），" +
-        "若 DSH 当前 Session 有可用 LLM route，会自动调模型升级建议质量；失败时降级到本地。" +
-        "适用于「今天继续什么 / 接下来做什么」等场景。",
+      "dsh-project-brain: 智慧續接。Session 開始時給使用者一句「今天可能想推進什麼」+ 依據，" +
+      "結合活躍 TODO / 近期記憶 / 最近活動 / 架構概覽綜合推斷。" +
+      "預設走本地規則（in_progress > 最高優先順序 pending > 阻塞 > 記憶），" +
+        "若 DSH 當前 Session 有可用 LLM route，會自動調模型升級建議質量；失敗時降級到本地。" +
+        "適用於「今天繼續什麼 / 接下來做什麼」等場景。",
     parameters: {
-      path: { type: "string", description: "项目根路径（可选；默认从当前 DSH Session 的 workspace 自动解析）" },
-      useLLM: { type: "boolean", description: "是否尝试调 LLM（默认 true；设 false 强制走本地规则）" },
+      path: { type: "string", description: "專案根路徑（可選；預設從當前 DSH Session 的 workspace 自動解析）" },
+      useLLM: { type: "boolean", description: "是否嘗試調 LLM（預設 true；設 false 強制走本地規則）" },
     },
     output: { schema: baseOutputSchema, render: (_args, value) => renderSuggest(value) },
     async execute(args, exec) {
@@ -97,14 +97,14 @@ export function buildSuggestTool({ fs, sandboxPolicy, getLlm }) {
       try {
         const projectPath = resolveProjectPath(args, exec, sandboxPolicy);
         if (projectPath === ".") {
-          return { ok: false, data: { error: { code: "E_NO_PATH", message: "无法从当前 Session 解析 workspace 路径" } } };
+          return { ok: false, data: { error: { code: "E_NO_PATH", message: "無法從當前 Session 解析 workspace 路徑" } } };
         }
         await ensureHousekeepOnRead(fs, projectPath);
         const brain = await readBrain(fs, projectPath);
         if (!brain.project || brain.project.__error) {
-          return { ok: false, data: { error: { code: "E_NOT_INITIALIZED", message: "项目还未初始化 .project-brain/project.json，请先调用 project_init" } } };
+          return { ok: false, data: { error: { code: "E_NOT_INITIALIZED", message: "專案還未初始化 .project-brain/project.json，請先呼叫 project_init" } } };
         }
-        // 也读 architecture（LLM prompt 用）
+        // 也讀 architecture（LLM prompt 用）
         try {
           const archPath = projectPath.replace(/[\\/]+$/, "") + "/.project-brain/architecture.json";
           const text = await (async () => { try { return await fs.readText(await fs.resolve(archPath)); } catch { return null; } })();
@@ -118,12 +118,12 @@ export function buildSuggestTool({ fs, sandboxPolicy, getLlm }) {
 
         let result;
         if (useLLM && llm && route && route.provider && route.model) {
-          // v0.4.17：传 temperature=0 让同一项目下不同 session 拿到的建议尽量一致
+          // v0.4.17：傳 temperature=0 讓同一專案下不同 session 拿到的建議儘量一致
           result = await tryLlmSuggestion({ llm, route, sessionId, brain, temperature: 0 });
           if (result.ok) {
             return { ok: true, data: result.data };
           }
-          // LLM 失败：fallback 到本地
+          // LLM 失敗：fallback 到本地
           const fallback = buildLocalSuggestion(brain, Date.now());
           return {
             ok: true,
@@ -155,7 +155,7 @@ function renderSuggest(value) {
     const d = value.data || {};
     const s = d.suggestion || {};
     const lines = [{ type: "text", text: `dsh-project-brain: suggest (${d.source || "?"})` }];
-    lines.push({ type: "text", text: `  ${s.title || "(无标题)"}` });
+    lines.push({ type: "text", text: `  ${s.title || "(無標題)"}` });
     if (s.reason) lines.push({ type: "text", text: `  reason: ${s.reason}` });
     if (s.confidence != null) lines.push({ type: "text", text: `  confidence: ${(s.confidence * 100).toFixed(0)}%` });
     if (s.suggestedTodoId) lines.push({ type: "text", text: `  todo: ${s.suggestedTodoId}` });

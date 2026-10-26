@@ -6,8 +6,8 @@ const session = {
   deriveMessages() {
     return [
       { role: "system", content: [{ type: "text", text: "hidden system instruction" }] },
-      { role: "user", content: [{ type: "text", text: "决定使用 PostgreSQL 保存业务数据。api_key=super-secret-value，修改 src/db.ts。" }] },
-      { role: "assistant", content: [{ type: "text", text: "已完成；原因是需要事务能力。" }, { type: "tool-result", text: "hidden tool output" }] },
+      { role: "user", content: [{ type: "text", text: "決定使用 PostgreSQL 儲存業務資料。api_key=super-secret-value，修改 src/db.ts。" }] },
+      { role: "assistant", content: [{ type: "text", text: "已完成；原因是需要事務能力。" }, { type: "tool-result", text: "hidden tool output" }] },
     ];
   },
 };
@@ -20,9 +20,9 @@ assert.doesNotMatch(transcript, /super-secret-value|hidden system|hidden tool/);
 let request = null;
 const response = JSON.stringify({ memories: [{
   type: "decision",
-  title: "业务数据库采用 PostgreSQL",
-  content: "项目使用 PostgreSQL 保存业务数据，因为核心流程需要事务能力。",
-  evidence: "决定使用 PostgreSQL 保存业务数据",
+  title: "業務資料庫採用 PostgreSQL",
+  content: "專案使用 PostgreSQL 儲存業務資料，因為核心流程需要事務能力。",
+  evidence: "決定使用 PostgreSQL 儲存業務資料",
   durable: true,
   importance: 0.86,
   confidence: 0.94,
@@ -30,9 +30,9 @@ const response = JSON.stringify({ memories: [{
   tags: ["database", "architecture"],
 }, {
   type: "requirement",
-  title: "核心流程要求事务一致性",
-  content: "业务核心流程必须保证事务一致性，数据库方案需要满足这一约束。",
-  evidence: "原因是需要事务能力",
+  title: "核心流程要求事務一致性",
+  content: "業務核心流程必須保證事務一致性，資料庫方案需要滿足這一約束。",
+  evidence: "原因是需要事務能力",
   durable: true,
   importance: 0.8,
   confidence: 0.88,

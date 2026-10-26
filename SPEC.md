@@ -1,139 +1,139 @@
-# dsh-project-brain 开发规格说明（SPEC）
+# dsh-project-brain 開發規格說明（SPEC）
 
-**版本：** **v1.3.1**（latest）— 历史章节保留早期实验记录
-**状态：** Active
-**对应文档：** `REQUIREMENTS.md`（PRD） / `DESIGN.md`（设计方案）
-**性质：** 代码、测试、提交流程与排错流程均必须与本文档对齐；若与 PRD/DESIGN 冲突，以本文档为准并回写 PRD/DESIGN。
+**版本：** **v1.3.1**（latest）— 歷史章節保留早期實驗記錄
+**狀態：** Active
+**對應文件：** `REQUIREMENTS.md`（PRD） / `DESIGN.md`（設計方案）
+**性質：** 程式碼、測試、提交流程與排錯流程均必須與本文件對齊；若與 PRD/DESIGN 衝突，以本文件為準並回寫 PRD/DESIGN。
 
-> **v1.3.1 增量说明**（2026-09-15）：导入导出 / 本地备份恢复。
-> - 4 个新 Tool：`project_export` / `project_import` / `project_rollback_backup` / `project_cleanup_backups`
-> - 7 个新 RPC（`project_brain/export.run` 等）
-> - Dashboard 顶部三按钮 + PreviewDialog + BackupListDialog + Toast
-> - 详见 `docs/superpowers/specs/2026-09-15-brain-import-export.md`（独立 SPEC，因本文件主体章节保持稳定）
-> - 端到端 20/20 smoke + 46/46 host-acceptance 通过
+> **v1.3.1 增量說明**（2026-09-15）：匯入匯出 / 本地備份恢復。
+> - 4 個新 Tool：`project_export` / `project_import` / `project_rollback_backup` / `project_cleanup_backups`
+> - 7 個新 RPC（`project_brain/export.run` 等）
+> - Dashboard 頂部三按鈕 + PreviewDialog + BackupListDialog + Toast
+> - 詳見 `docs/superpowers/specs/2026-09-15-brain-import-export.md`（獨立 SPEC，因本檔案主體章節保持穩定）
+> - 端到端 20/20 smoke + 46/46 host-acceptance 通過
 
-> **版本说明（v0.3 → v0.4 MINOR bump）**：本次 MINOR bump 开启 v0.4.x，累积 v0.2.1~v0.2.9 + v0.3.0~v0.4.8 共 39 行变更（数据通道重大回退 / 工具面补全 / summarizer + injector / auto-rebuild / path-resolver / sandbox 修复 / TODO strip / dream commit+full / locale-aware / 跨 Session 端到端 / 跨 workspace 隔离实测 / dark/light 主题 token 取证 / auto-rebuild 跨 fiber 修复 / inject timer 根因补漏 / 冷启动诊断 + DSH 原生事件主动唤醒 / spawn 子进程 watcher 终极 fallback / 工具层同步 rebuild 工程止血 / 端到端验证完成 + 接受手动 build fallback / 清理过时 todo + 完善 Project Memory 5 类混合填充 / P0.8 收尾大结局 / appendJsonl 性能优化 O(N) → O(1) / DSH Desktop 发布准备 INSTALL.md + CHANGELOG.md + STORE_LISTING.md / dream 真实架构 diff LLM 接入 + project_diff 工具（v0.4.1 mock fallback 实测 DSH Desktop shell 静默）/ **真实 git + 真实 LLM 绕过 DSH Desktop sandbox（v0.4.2，node 内置模块 + node:fetch）** / **summarizer 真实 git + detector 真实 git 格式修复（v0.4.4：inflateSync + 目录 mode + fixture deflateSync，198/198 PASS）** / **detector 移除 pack 整体拒绝（v0.4.5：commit/tree 在 loose 即可 diff，不读 blob，199/199 PASS）** / **detector pack 真实支持（v0.4.6：parseIdxV2 + readPackEntryByOffset + packed-refs + OFS_DELTA/REF_DELTA，201/201 PASS）** / **llm.js 加 Anthropic 兼容协议（v0.4.7：detectProtocol 自动路由 + fetchAnthropic /v1/messages，210/210 PASS）** / **本地 AST 分析扩展到 6 种语言（v0.4.8：Go/Java/Rust/C/C++ 新增；每语言独立 import/export/function/API/DB schema 抽取器；config.json languages 白名单；smoke-multi-lang 56/56 PASS）**）。v0.4.x：v0.4.0 + v0.4.1 + v0.4.2 + v0.4.3 + v0.4.4 + v0.4.5 + v0.4.6 + v0.4.7 + v0.4.8。真实路径 vs mock fallback 决策记录在 .project-brain/memory.jsonl mem-mtccn6uf。大章节结构与 SPEC §1~§19 保持不变；待 v1.0 MVP 时考虑 MAJOR bump。
+> **版本說明（v0.3 → v0.4 MINOR bump）**：本次 MINOR bump 開啟 v0.4.x，累積 v0.2.1~v0.2.9 + v0.3.0~v0.4.8 共 39 行變更（資料通道重大回退 / 工具面補全 / summarizer + injector / auto-rebuild / path-resolver / sandbox 修復 / TODO strip / dream commit+full / locale-aware / 跨 Session 端到端 / 跨 workspace 隔離實測 / dark/light 主題 token 取證 / auto-rebuild 跨 fiber 修復 / inject timer 根因補漏 / 冷啟動診斷 + DSH 原生事件主動喚醒 / spawn 子程序 watcher 終極 fallback / 工具層同步 rebuild 工程止血 / 端到端驗證完成 + 接受手動 build fallback / 清理過時 todo + 完善 Project Memory 5 類混合填充 / P0.8 收尾大結局 / appendJsonl 效能最佳化 O(N) → O(1) / DSH Desktop 釋出準備 INSTALL.md + CHANGELOG.md + STORE_LISTING.md / dream 真實架構 diff LLM 接入 + project_diff 工具（v0.4.1 mock fallback 實測 DSH Desktop shell 靜默）/ **真實 git + 真實 LLM 繞過 DSH Desktop sandbox（v0.4.2，node 內建模組 + node:fetch）** / **summarizer 真實 git + detector 真實 git 格式修復（v0.4.4：inflateSync + 目錄 mode + fixture deflateSync，198/198 PASS）** / **detector 移除 pack 整體拒絕（v0.4.5：commit/tree 在 loose 即可 diff，不讀 blob，199/199 PASS）** / **detector pack 真實支援（v0.4.6：parseIdxV2 + readPackEntryByOffset + packed-refs + OFS_DELTA/REF_DELTA，201/201 PASS）** / **llm.js 加 Anthropic 相容協議（v0.4.7：detectProtocol 自動路由 + fetchAnthropic /v1/messages，210/210 PASS）** / **本地 AST 分析擴充套件到 6 種語言（v0.4.8：Go/Java/Rust/C/C++ 新增；每語言獨立 import/export/function/API/DB schema 抽取器；config.json languages 白名單；smoke-multi-lang 56/56 PASS）**）。v0.4.x：v0.4.0 + v0.4.1 + v0.4.2 + v0.4.3 + v0.4.4 + v0.4.5 + v0.4.6 + v0.4.7 + v0.4.8。真實路徑 vs mock fallback 決策記錄在 .project-brain/memory.jsonl mem-mtccn6uf。大章節結構與 SPEC §1~§19 保持不變；待 v1.0 MVP 時考慮 MAJOR bump。
 
-> **v0.6.0 当前架构覆盖说明：** Client 以 `connection.rpc` 为主通道；Host 每次从 live Session header 解析可信 workspace；build-time embed 仅作无本机数据的离线降级。Context Injector 使用 workspace/session 隔离缓存；Session summarizer 仅处理已初始化项目并去重。早期章节中“只能 build-time embed”“写数据后手动 build”“全局 injector cache”等描述均为历史记录，已被本说明取代。
+> **v0.6.0 當前架構覆蓋說明：** Client 以 `connection.rpc` 為主通道；Host 每次從 live Session header 解析可信 workspace；build-time embed 僅作無本機資料的離線降級。Context Injector 使用 workspace/session 隔離快取；Session summarizer 僅處理已初始化專案並去重。早期章節中“只能 build-time embed”“寫資料後手動 build”“全域性 injector cache”等描述均為歷史記錄，已被本說明取代。
 
 ---
 
-# 0. 阅读指引
+# 0. 閱讀指引
 
-| 章节 | 内容 | 何时读 |
+| 章節 | 內容 | 何時讀 |
 | --- | --- | --- |
-| §1~3 | 项目身份、架构、代码库布局 | 建立工程认知 |
-| §4~9 | 数据模型、Host/Client、Tool/RPC/Sidebar 硬契约 | 编码时随时参考 |
-| §10~12 | 配置、开发阶段、测试策略 | 排期与验收 |
-| §13~16 | 调试、编码规约、DoD、未决问题 | 日常开发与收尾 |
-| §17~20 | 数据迁移、安全、失败模式、变更日志 | 长期运维 |
+| §1~3 | 專案身份、架構、程式碼庫佈局 | 建立工程認知 |
+| §4~9 | 資料模型、Host/Client、Tool/RPC/Sidebar 硬契約 | 編碼時隨時參考 |
+| §10~12 | 配置、開發階段、測試策略 | 排期與驗收 |
+| §13~16 | 除錯、編碼規約、DoD、未決問題 | 日常開發與收尾 |
+| §17~20 | 資料遷移、安全、失敗模式、變更日誌 | 長期運維 |
 
-**强制约定**：
+**強制約定**：
 
-1. 本文档所有 **TypeScript 类型签名仅为契约示意**，运行时由 `.js` / `.ts` 编译产物实现；动态插件禁止 `import`/`require`/JSX/装饰器。
-2. **所有 DSH 服务名、Slot ID、Tool 注册 API 必须通过 `cordis_inspect_*` 实时确认**，不能凭推测写死。
-3. 数据落在被分析项目自己的 `.project-brain/`（**项目绑定**，不是 Session 绑定）。
-4. 命名约定：**SidebarPreview** = 功能名；**SidebarTab** = UI 元素；**`preview.changed`** = 事件名；**`sidebar.getPreview`** = RPC 名。整份文档及配套 PRD/DESIGN 统一使用此术语。
+1. 本文件所有 **TypeScript 型別簽名僅為契約示意**，執行時由 `.js` / `.ts` 編譯產物實現；動態外掛禁止 `import`/`require`/JSX/裝飾器。
+2. **所有 DSH 服務名、Slot ID、Tool 註冊 API 必須通過 `cordis_inspect_*` 即時確認**，不能憑推測寫死。
+3. 資料落在被分析專案自己的 `.project-brain/`（**專案繫結**，不是 Session 繫結）。
+4. 命名約定：**SidebarPreview** = 功能名；**SidebarTab** = UI 元素；**`preview.changed`** = 事件名；**`sidebar.getPreview`** = RPC 名。整份文件及配套 PRD/DESIGN 統一使用此術語。
 
 ---
 
-# 1. 项目身份与目标
+# 1. 專案身份與目標
 
-| 字段 | 值 |
+| 欄位 | 值 |
 | --- | --- |
 | 包名 | `dsh-project-brain` |
 | 展示名（中/英） | dsh-project-brain / Project Brain |
-| 目标用户 | 使用 DSH 进行长期软件开发的个人开发者与开发团队 |
-| 项目定位 | DSH 的持久化项目大脑：理解代码架构、记住项目历史、跨 Session 保持上下文，并随着项目持续成长 |
-| 核心场景 | 快速理解陌生项目；跨 Session 续接开发；自动沉淀架构/决策/Bug/TODO |
-| MVP 周期 | 单人 **38~48 工作日**（含 30% 调试 buffer，不含可选 Go/Java 拓展） |
+| 目標使用者 | 使用 DSH 進行長期軟體開發的個人開發者與開發團隊 |
+| 專案定位 | DSH 的持久化專案大腦：理解程式碼架構、記住專案歷史、跨 Session 保持上下文，並隨著專案持續成長 |
+| 核心場景 | 快速理解陌生專案；跨 Session 續接開發；自動沉澱架構/決策/Bug/TODO |
+| MVP 週期 | 單人 **38~48 工作日**（含 30% 除錯 buffer，不含可選 Go/Java 拓展） |
 
-**五大设计原则（不可妥协）**：
-1. 只记长期有价值的内容（评分 + Dream 整合）。
-2. 记录 What 与 Why（每条 Decision / Architecture / Lesson 必带 reason 字段）。
-3. 项目知识属于 Project，不属于 Session（数据落在 `.project-brain/`，跨机器迁移）。
-4. 持续演进（增量扫描 + Dream 周期）。
-5. 知识可追溯（每条 Memory 必带 source_type + source_id）。
+**五大設計原則（不可妥協）**：
+1. 只記長期有價值的內容（評分 + Dream 整合）。
+2. 記錄 What 與 Why（每條 Decision / Architecture / Lesson 必帶 reason 欄位）。
+3. 專案知識屬於 Project，不屬於 Session（資料落在 `.project-brain/`，跨機器遷移）。
+4. 持續演進（增量掃描 + Dream 週期）。
+5. 知識可追溯（每條 Memory 必帶 source_type + source_id）。
 
 ---
 
-# 2. 架构总览
+# 2. 架構總覽
 
-## 2.1 三层架构
+## 2.1 三層架構
 
 ```
-Client（DSH 浏览器进程）
-├── SidebarTab + SidebarPreview  ← 常驻入口（紧邻"记忆库"右侧）
-├── Dashboard 主视图               ← 按需展开
-└── 全部数据通过 host.call(...) 拉取
+Client（DSH 瀏覽器程序）
+├── SidebarTab + SidebarPreview  ← 常駐入口（緊鄰"記憶庫"右側）
+├── Dashboard 主檢視               ← 按需展開
+└── 全部資料通過 host.call(...) 拉取
                 ↕ JSON RPC（Package-private）
-Host（DSH Node.js 进程）
-├── Tool 实现（/project *）
+Host（DSH Node.js 程序）
+├── Tool 實現（/project *）
 ├── SidebarPreview RPC + Pub/Sub
-├── Session 事件监听 + 摘要生成
+├── Session 事件監聽 + 摘要生成
 ├── Context Injector
-└── 调度 Scanner / Analyzer / Memory / Dream
+└── 排程 Scanner / Analyzer / Memory / Dream
                 ↕
-本地引擎层（无状态模块）
+本地引擎層（無狀態模組）
 ├── Scanner / Analyzer / Dream Engine
 ├── Memory Engine
 └── Storage（SQLite + JSON）
                 ↕
-持久化 .project-brain/（与目标项目绑定）
+持久化 .project-brain/（與目標專案繫結）
 ├── project.json / architecture.json / config.json
-├── codegraph.db / memory.db / timeline.db（实际同库或分库均可）
+├── codegraph.db / memory.db / timeline.db（實際同庫或分庫均可）
 ├── sessions/ / snapshots/ / dream.log
 ```
 
-## 2.2 DSH 集成形态
+## 2.2 DSH 整合形態
 
-dsh-project-brain 是一个**静态 + HMR 友好的 Cordis 插件**，通过以下 5 类集成点与 DSH 交互：
+dsh-project-brain 是一個**靜態 + HMR 友好的 Cordis 外掛**，通過以下 5 類整合點與 DSH 互動：
 
-| 集成点 | 提供方 | 接收方 / 注册目标 |
+| 整合點 | 提供方 | 接收方 / 註冊目標 |
 | --- | --- | --- |
-| Tool（供 LLM 调用） | Host | `@deepseek-ai/dsh-tools` |
-| RPC（供 Client 调用） | Host | `harness.handle('project_brain/...', handler)` |
-| Event（订阅） | Host | `ctx.on('session:started' \| 'session:ended', ...)` |
-| Event（发布） | Host | `ctx.emit('project_brain/preview.changed', ...)` |
-| Slot（UI 挂载） | Client | DSH SidebarTab Slot + Dashboard Slot |
+| Tool（供 LLM 呼叫） | Host | `@deepseek-ai/dsh-tools` |
+| RPC（供 Client 呼叫） | Host | `harness.handle('project_brain/...', handler)` |
+| Event（訂閱） | Host | `ctx.on('session:started' \| 'session:ended', ...)` |
+| Event（釋出） | Host | `ctx.emit('project_brain/preview.changed', ...)` |
+| Slot（UI 掛載） | Client | DSH SidebarTab Slot + Dashboard Slot |
 
-## 2.3 关键依赖
+## 2.3 關鍵依賴
 
-| 依赖 | 用途 | 版本约束 |
+| 依賴 | 用途 | 版本約束 |
 | --- | --- | --- |
-| `@deepseek-ai/cordis` | 插件运行时 | ^4.0.1 |
-| `@deepseek-ai/dsh-llm` | LLM 调用 | 0.1.1-rc.2+ |
+| `@deepseek-ai/cordis` | 外掛執行時 | ^4.0.1 |
+| `@deepseek-ai/dsh-llm` | LLM 呼叫 | 0.1.1-rc.2+ |
 | `@deepseek-ai/dsh-storage-domain` | 持久化域 | 0.1.1-rc.2+ |
-| `@deepseek-ai/dsh-tools` | Tool 注册 | 0.1.1-rc.2+ |
+| `@deepseek-ai/dsh-tools` | Tool 註冊 | 0.1.1-rc.2+ |
 | `@deepseek-ai/dsh-session` | Session 事件 | 0.1.1-rc.2+ |
 | `better-sqlite3` | SQLite | ^11 |
-| `tree-sitter` + JS/TS/Python/Go/Java/Rust/C grammar | AST 解析（v0.4.8 6 语言） | ^0.21+（6 个 npm 包） |
-| `esbuild` | 开发期 watch 构建 | ^0.24 |
-| `chokidar` | 文件监听（HMR 友好） | ^4 |
-| `@deepseek-ai/schemastery` | Schema 校验 | ^3.18 |
+| `tree-sitter` + JS/TS/Python/Go/Java/Rust/C grammar | AST 解析（v0.4.8 6 語言） | ^0.21+（6 個 npm 包） |
+| `esbuild` | 開發期 watch 構建 | ^0.24 |
+| `chokidar` | 檔案監聽（HMR 友好） | ^4 |
+| `@deepseek-ai/schemastery` | Schema 校驗 | ^3.18 |
 
-> ⚠️ **P0.1 第一件事**：跑 `cordis_inspect_list` 拉一份当前 DSH 真实暴露的 Service / Event / Tool 名单，对照本表修正"硬依赖 vs 软依赖 vs 不存在"。
+> ⚠️ **P0.1 第一件事**：跑 `cordis_inspect_list` 拉一份當前 DSH 真實暴露的 Service / Event / Tool 名單，對照本表修正"硬依賴 vs 軟依賴 vs 不存在"。
 
 ---
 
-# 3. 代码库布局
+# 3. 程式碼庫佈局
 
 ```
 dsh-project-brain/
-├── package.json               # 包元信息 + scripts
-├── tsconfig.json              # 类型检查（仅类型，不参与运行时）
-├── cordis.yml                 # Loader 入口配置（host/client 挂载点）
-├── README.md                  # 用户文档
+├── package.json               # 包元資訊 + scripts
+├── tsconfig.json              # 型別檢查（僅型別，不參與執行時）
+├── cordis.yml                 # Loader 入口配置（host/client 掛載點）
+├── README.md                  # 使用者文件
 ├── REQUIREMENTS.md            # PRD
-├── DESIGN.md                  # 设计方案
-├── SPEC.md                    # 本文档
-├── TODO.md                    # 任务清单（P0.1 创建并持续更新）
+├── DESIGN.md                  # 設計方案
+├── SPEC.md                    # 本文件
+├── TODO.md                    # 任務清單（P0.1 建立並持續更新）
 ├── src/
-│   ├── shared/                # Host/Client 共用常量与类型
-│   │   ├── types.ts           # 跨边界接口（用 JSDoc 表达）
-│   │   ├── constants.ts       # 常量（路径、限制、错误码）
-│   │   └── terms.ts           # 术语表（功能 / UI / 事件 / RPC 名）
-│   ├── host/                  # Host 插件
+│   ├── shared/                # Host/Client 共用常量與型別
+│   │   ├── types.ts           # 跨邊界介面（用 JSDoc 表達）
+│   │   ├── constants.ts       # 常量（路徑、限制、錯誤碼）
+│   │   └── terms.ts           # 術語表（功能 / UI / 事件 / RPC 名）
+│   ├── host/                  # Host 外掛
 │   │   ├── index.js           # Host Plugin.apply(ctx)
 │   │   ├── scanner/
 │   │   │   ├── index.js
@@ -147,7 +147,7 @@ dsh-project-brain/
 │   │   │   ├── callgraph.js
 │   │   │   ├── apis.js
 │   │   │   ├── tables.js
-│   │   │   └── grammars/      # 5 个 tree-sitter grammar 入口（require）
+│   │   │   └── grammars/      # 5 個 tree-sitter grammar 入口（require）
 │   │   ├── memory/
 │   │   │   ├── store.js
 │   │   │   ├── types.js
@@ -156,11 +156,11 @@ dsh-project-brain/
 │   │   ├── dream/
 │   │   │   └── consolidator.js
 │   │   ├── injector.js        # 跨 Session 上下文注入
-│   │   ├── summarizer.js      # Session 结束摘要
+│   │   ├── summarizer.js      # Session 結束摘要
 │   │   ├── sidebar/
-│   │   │   ├── aggregator.js  # SidebarPreview 数据聚合
+│   │   │   ├── aggregator.js  # SidebarPreview 資料聚合
 │   │   │   └── pubsub.js      # Pub/Sub 推送
-│   │   ├── tools/             # Tool 实现
+│   │   ├── tools/             # Tool 實現
 │   │   │   ├── init.js
 │   │   │   ├── continue.js
 │   │   │   ├── ask.js
@@ -171,27 +171,27 @@ dsh-project-brain/
 │   │   ├── rpc/               # Client → Host RPC handlers
 │   │   │   ├── sidebar.js
 │   │   │   ├── dashboard.js
-│   │   │   └── register.js    # harness.handle 集中注册入口
+│   │   │   └── register.js    # harness.handle 集中註冊入口
 │   │   └── storage/
 │   │       ├── sqlite.js
 │   │       ├── migrations.js
-│   │       └── fingerprint.js # FS 指纹 + 增量检测
-│   └── client/                # Client 插件
+│   │       └── fingerprint.js # FS 指紋 + 增量檢測
+│   └── client/                # Client 外掛
 │       ├── index.js           # Client Plugin.apply(ctx)
 │       ├── i18n/
 │       │   ├── zh-CN.js
 │       │   └── en-US.js
 │       ├── sidebar/
-│       │   ├── tab.js         # SidebarTab 注册
-│       │   ├── preview.js     # SidebarPreview 折叠态面板
-│       │   ├── onboarding.js  # 空状态引导
-│       │   ├── blocks/        # 5 个区块组件
+│       │   ├── tab.js         # SidebarTab 註冊
+│       │   ├── preview.js     # SidebarPreview 摺疊態面板
+│       │   ├── onboarding.js  # 空狀態引導
+│       │   ├── blocks/        # 5 個區塊元件
 │       │   │   ├── header.js
 │       │   │   ├── phase.js
 │       │   │   ├── activity.js
 │       │   │   ├── stats.js
 │       │   │   └── actions.js
-│       │   └── rpc.js          # host.call 封装
+│       │   └── rpc.js          # host.call 封裝
 │       └── dashboard/
 │           ├── view.js
 │           ├── panels/
@@ -203,12 +203,12 @@ dsh-project-brain/
 │           │   └── tasks.js
 │           └── router.js
 └── tests/
-    ├── fixtures/              # 测试仓库（详见 §12.4）
+    ├── fixtures/              # 測試倉庫（詳見 §12.4）
     │   ├── ts-sample/          # P0.0 必做
     │   ├── js-sample/          # P0.3a 必做
     │   ├── py-sample/          # P0.3a 必做
-    │   ├── go-sample/          # 可选 P0.3b
-    │   └── java-sample/        # 可选 P0.3b
+    │   ├── go-sample/          # 可選 P0.3b
+    │   └── java-sample/        # 可選 P0.3b
     ├── host/
     │   ├── scanner.test.js
     │   ├── analyzer.test.js
@@ -219,44 +219,44 @@ dsh-project-brain/
         └── sidebar-preview.test.js
 ```
 
-**目录命名约束**：
-- Host/Client 严格分离，不允许跨层 import。
-- 共用类型/常量只放 `src/shared/`。
-- 模块内部 `index.js` 作为对外统一出口。
-- 文件名 `kebab-case.js`；React 组件 `PascalCase.js`。
+**目錄命名約束**：
+- Host/Client 嚴格分離，不允許跨層 import。
+- 共用型別/常量只放 `src/shared/`。
+- 模組內部 `index.js` 作為對外統一齣口。
+- 檔名 `kebab-case.js`；React 元件 `PascalCase.js`。
 
 ---
 
-# 4. 数据模型规范
+# 4. 資料模型規範
 
-## 4.1 目录位置
+## 4.1 目錄位置
 
-* 数据落在被分析项目自身的 `.project-brain/` 目录下（**项目绑定**）。
-* 首次访问某项目时若 `.project-brain/` 不存在则自动创建。
+* 資料落在被分析專案自身的 `.project-brain/` 目錄下（**專案繫結**）。
+* 首次訪問某專案時若 `.project-brain/` 不存在則自動建立。
 
 ```
 .project-brain/
 ├── project.json
 ├── architecture.json
 ├── config.json
-├── codegraph.db       # 也可与 memory.db 合库；MVP 单库即可
-├── memory.db          # MVP：与 codegraph.db 合并为 single.db
+├── codegraph.db       # 也可與 memory.db 合庫；MVP 單庫即可
+├── memory.db          # MVP：與 codegraph.db 合併為 single.db
 ├── timeline.db        # MVP：同上
 ├── sessions/<session-id>.md
 ├── snapshots/<snapshot-id>.json
 └── dream.log
 ```
 
-**MVP 决策**：所有表放单一 SQLite 文件 `memory.db`（最简），V2 可拆。Schema 设计按物理表名约定，仍以业务域为前缀。
+**MVP 決策**：所有表放單一 SQLite 檔案 `memory.db`（最簡），V2 可拆。Schema 設計按物理表名約定，仍以業務域為字首。
 
-## 4.2 SQLite Schema（必须严格遵守）
+## 4.2 SQLite Schema（必須嚴格遵守）
 
-**启动时强制执行的 PRAGMA**（写在 `sqlite.js` 初始化函数内）：
+**啟動時強制執行的 PRAGMA**（寫在 `sqlite.js` 初始化函式內）：
 ```sql
-PRAGMA journal_mode = WAL;       -- 并发读写
-PRAGMA busy_timeout = 5000;      -- 锁等待 5s
+PRAGMA journal_mode = WAL;       -- 併發讀寫
+PRAGMA busy_timeout = 5000;      -- 鎖等待 5s
 PRAGMA foreign_keys = ON;
-PRAGMA synchronous = NORMAL;     -- WAL 模式下 NORMAL 已足够安全
+PRAGMA synchronous = NORMAL;     -- WAL 模式下 NORMAL 已足夠安全
 ```
 
 ```sql
@@ -280,7 +280,7 @@ CREATE TABLE memory (
   project_id TEXT NOT NULL,
   type TEXT NOT NULL,                 -- architecture|decision|requirement|change|bug|lesson|todo|issue|context
   title TEXT NOT NULL,
-  content JSON NOT NULL,              -- 类型专属字段
+  content JSON NOT NULL,              -- 型別專屬欄位
   importance REAL DEFAULT 0.5,        -- 0~1
   confidence REAL DEFAULT 0.5,        -- 0~1
   status TEXT DEFAULT 'new',          -- new|active|reinforced|outdated|archived
@@ -333,7 +333,7 @@ CREATE TABLE code_entity (
   end_line INTEGER,
   language TEXT,
   metadata JSON,
-  hash TEXT,                          -- 单文件级 content hash，用于增量更新
+  hash TEXT,                          -- 單檔案級 content hash，用於增量更新
   created_at INTEGER NOT NULL,
   updated_at INTEGER NOT NULL,
   FOREIGN KEY (project_id) REFERENCES project(id)
@@ -402,14 +402,14 @@ CREATE TABLE codegraph_snapshot (
 CREATE INDEX idx_codegraph_snapshot_project ON codegraph_snapshot(project_id, version DESC);
 ```
 
-**约束**：
-- 所有表必须有 `project_id`。
-- 所有时间戳统一 `INTEGER`（epoch ms）。
-- 不使用 `ON DELETE` 级联；项目删除时手动清理。
-- 所有 JSON 字段必须可被 `JSON.parse` 解析；写入时 `JSON.stringify` + null 检查。
-- 删除项目流程：先 `DELETE FROM` 所有表 + 删除 `.project-brain/` 目录。
+**約束**：
+- 所有表必須有 `project_id`。
+- 所有時間戳統一 `INTEGER`（epoch ms）。
+- 不使用 `ON DELETE` 級聯；專案刪除時手動清理。
+- 所有 JSON 欄位必須可被 `JSON.parse` 解析；寫入時 `JSON.stringify` + null 檢查。
+- 刪除專案流程：先 `DELETE FROM` 所有表 + 刪除 `.project-brain/` 目錄。
 
-## 4.3 JSON 结构规范
+## 4.3 JSON 結構規範
 
 ### 4.3.1 project.json
 
@@ -452,25 +452,25 @@ CREATE INDEX idx_codegraph_snapshot_project ON codegraph_snapshot(project_id, ve
   "source": "hybrid",
   "project": { "name": "my-saas", "techStack": {}, "entrypoints": [] },
   "overview": {
-    "purpose": "让 DSH 跨对话持续理解和维护当前项目",
-    "audience": "长期维护软件项目的开发者",
-    "category": "DSH 开发者工具插件",
-    "architectureStyle": "Host/Client 双端的分层插件架构",
-    "value": "把项目理解、记忆和待办沉淀在 workspace"
+    "purpose": "讓 DSH 跨對話持續理解和維護當前專案",
+    "audience": "長期維護軟體專案的開發者",
+    "category": "DSH 開發者工具外掛",
+    "architectureStyle": "Host/Client 雙端的分層外掛架構",
+    "value": "把專案理解、記憶和待辦沉澱在 workspace"
   },
-  "summary": "系统由界面、运行时桥接、项目分析、记忆检索和本地存储等职责组件协作完成。",
+  "summary": "系統由介面、執行時橋接、專案分析、記憶檢索和本地儲存等職責元件協作完成。",
   "layers": [
-    { "id": "layer-experience", "name": "体验层", "responsibility": "展示项目认知与交互入口", "order": 0 },
-    { "id": "layer-application", "name": "应用层", "responsibility": "编排扫描、记忆和待办能力", "order": 1 }
+    { "id": "layer-experience", "name": "體驗層", "responsibility": "展示專案認知與互動入口", "order": 0 },
+    { "id": "layer-application", "name": "應用層", "responsibility": "編排掃描、記憶和待辦能力", "order": 1 }
   ],
   "components": [
     {
       "id": "component-project-analysis",
-      "name": "项目分析引擎",
+      "name": "專案分析引擎",
       "layerId": "layer-application",
       "type": "service",
-      "responsibility": "收集工作区证据并生成项目认知",
-      "details": "本地事实作为基线，当前 DSH 模型生成语义架构",
+      "responsibility": "收集工作區證據並生成專案認知",
+      "details": "本地事實作為基線，當前 DSH 模型生成語義架構",
       "technologies": ["JavaScript"],
       "importantFiles": ["src/host/architecture/analyzer.js"],
       "evidencePaths": ["src/scanner.js", "src/host/architecture/analyzer.js"],
@@ -478,16 +478,16 @@ CREATE INDEX idx_codegraph_snapshot_project ON codegraph_snapshot(project_id, ve
     }
   ],
   "relationships": [
-    { "id": "relation-1", "from": "component-runtime-bridge", "to": "component-project-analysis", "label": "触发", "type": "request", "description": "当前 Session 发起初始化或重扫", "confidence": 0.9 }
+    { "id": "relation-1", "from": "component-runtime-bridge", "to": "component-project-analysis", "label": "觸發", "type": "request", "description": "當前 Session 發起初始化或重掃", "confidence": 0.9 }
   ],
   "runtimeFlows": [
-    { "id": "flow-1", "name": "项目初始化", "trigger": "用户点击启动", "outcome": "生成项目认知报告", "steps": [{ "componentId": "component-runtime-bridge", "action": "解析 workspace" }, { "componentId": "component-project-analysis", "action": "分析证据" }] }
+    { "id": "flow-1", "name": "專案初始化", "trigger": "使用者點選啟動", "outcome": "生成專案認知報告", "steps": [{ "componentId": "component-runtime-bridge", "action": "解析 workspace" }, { "componentId": "component-project-analysis", "action": "分析證據" }] }
   ],
   "keyFiles": [
-    { "path": "src/index.js", "role": "Host 入口", "whyImportant": "可了解插件注册和生命周期", "category": "entry" }
+    { "path": "src/index.js", "role": "Host 入口", "whyImportant": "可瞭解外掛註冊和生命週期", "category": "entry" }
   ],
-  "gettingStarted": ["先读 README", "再读 Host 入口和架构分析器"],
-  "designHighlights": ["项目数据按 workspace 隔离"],
+  "gettingStarted": ["先讀 README", "再讀 Host 入口和架構分析器"],
+  "designHighlights": ["專案資料按 workspace 隔離"],
   "risks": [],
   "evidence": { "readmeUsed": true, "manifestFiles": ["package.json"], "sourceFilesAnalyzed": 40, "sourceSnippetsShared": true },
   "stats": { "files": 48, "analyzedFiles": 40, "layers": 5, "components": 8, "edges": 12, "keyFiles": 10 },
@@ -495,14 +495,14 @@ CREATE INDEX idx_codegraph_snapshot_project ON codegraph_snapshot(project_id, ve
 }
 ```
 
-约束：
+約束：
 
-- 本地分析是硬基线；LLM 不可用时 `source="local"`，初始化仍成功。
-- LLM 可以重新抽象概念层与职责组件，但目录名不得直接充当组件名；文件路径只能作为证据。
-- 默认请求包含 README、manifest、符号/import 和有限关键源码摘要，不包含绝对路径；可关闭源码摘要。
-- 所有 `importantFiles/evidencePaths/keyFiles` 必须命中本地真实相对路径，所有关系和流程必须引用已校验组件。
-- `fingerprint` 包含关键源码内容哈希、manifest、README 和技术栈；未变化时复用已有 LLM 结果。
-- Dashboard 使用受控 React 组件渲染该 JSON，不执行数据中的脚本或 markup。
+- 本地分析是硬基線；LLM 不可用時 `source="local"`，初始化仍成功。
+- LLM 可以重新抽象概念層與職責元件，但目錄名不得直接充當元件名；檔案路徑只能作為證據。
+- 預設請求包含 README、manifest、符號/import 和有限關鍵原始碼摘要，不包含絕對路徑；可關閉原始碼摘要。
+- 所有 `importantFiles/evidencePaths/keyFiles` 必須命中本地真實相對路徑，所有關係和流程必須引用已校驗元件。
+- `fingerprint` 包含關鍵原始碼內容雜湊、manifest、README 和技術棧；未變化時複用已有 LLM 結果。
+- Dashboard 使用受控 React 元件渲染該 JSON，不執行資料中的指令碼或 markup。
 
 ### 4.3.3 config.json
 
@@ -540,18 +540,18 @@ CREATE INDEX idx_codegraph_snapshot_project ON codegraph_snapshot(project_id, ve
 }
 ```
 
-## 4.4 Memory 类型 Schema（每类必填字段）
+## 4.4 Memory 型別 Schema（每類必填欄位）
 
-> **运行时由 `src/host/memory/types.js` 内的 schemastery 校验，缺字段写入失败并返回 `E_MEMORY_SCHEMA`。**
+> **執行時由 `src/host/memory/types.js` 內的 schemastery 校驗，缺欄位寫入失敗並返回 `E_MEMORY_SCHEMA`。**
 
 ```js
-// 仅作契约示意，运行时按 JSDoc + schemastery 实现
+// 僅作契約示意，執行時按 JSDoc + schemastery 實現
 const DecisionContent = {
   decision: 'string',           // 必填
   reason: 'string',             // 必填
-  alternatives: 'string[]?',    // 可选
-  rejected: 'string[]?',        // 可选
-  rejectedReason: 'string?',    // 可选
+  alternatives: 'string[]?',    // 可選
+  rejected: 'string[]?',        // 可選
+  rejectedReason: 'string?',    // 可選
   relatedFiles: 'string[]'      // 必填
 }
 const ArchitectureContent = {
@@ -567,73 +567,73 @@ const RequirementContent = { original: 'string', current: 'string?', evolution: 
 const BugContent = { symptom: 'string', rootCause: 'string?', fixedAt: 'number?', relatedFiles: 'string[]' }
 const IssueContent = { description: 'string', severity: 'low|medium|high', relatedFiles: 'string[]?' }
 const ContextContent = { note: 'string', tags: 'string[]?' }
-const TodoContent = { todoId: 'string' }   // 与 todos 表关联
+const TodoContent = { todoId: 'string' }   // 與 todos 表關聯
 ```
 
-## 4.5 错误码
+## 4.5 錯誤碼
 
-| 错误码 | 含义 | 处理 |
+| 錯誤碼 | 含義 | 處理 |
 | --- | --- | --- |
-| `E_NOT_INITIALIZED` | 项目未 init | 提示用户先运行 `/project init` |
-| `E_SCAN_TIMEOUT` | 扫描超过 2 分钟 | 后台续跑 + 返回部分结果 |
-| `E_SCAN_FAILED` | 扫描过程出错 | 返回错误位置 + 继续可能的部分 |
-| `E_MEMORY_SCHEMA` | Memory 字段缺失 | 详细列出缺失字段 |
-| `E_NOT_FOUND` | 实体不存在 | 404 语义 |
-| `E_PERMISSION` | 文件读写权限 | 提示用户检查权限 |
-| `E_LLM_FAILED` | LLM 调用失败 | 重试 1 次 + 降级到规则抽取 |
-| `E_INTERNAL` | 未分类内部错误 | 记录 stack，向上抛 |
+| `E_NOT_INITIALIZED` | 專案未 init | 提示使用者先執行 `/project init` |
+| `E_SCAN_TIMEOUT` | 掃描超過 2 分鐘 | 後臺續跑 + 返回部分結果 |
+| `E_SCAN_FAILED` | 掃描過程出錯 | 返回錯誤位置 + 繼續可能的部分 |
+| `E_MEMORY_SCHEMA` | Memory 欄位缺失 | 詳細列出缺失欄位 |
+| `E_NOT_FOUND` | 實體不存在 | 404 語義 |
+| `E_PERMISSION` | 檔案讀寫許可權 | 提示使用者檢查許可權 |
+| `E_LLM_FAILED` | LLM 呼叫失敗 | 重試 1 次 + 降級到規則抽取 |
+| `E_INTERNAL` | 未分類內部錯誤 | 記錄 stack，向上拋 |
 
 ---
 
-# 5. Host 插件规范
+# 5. Host 外掛規範
 
-## 5.1 入口与生命周期
+## 5.1 入口與生命週期
 
-> 本节 TypeScript 类型仅为契约示意，运行时由 `.js` 实现。
+> 本節 TypeScript 型別僅為契約示意，執行時由 `.js` 實現。
 
 ```js
-// src/host/index.js —— 契约示意
+// src/host/index.js —— 契約示意
 export default function hostPlugin() {
   return {
     name: 'dsh-project-brain:host',
-    inject: [/* 见 §5.6 注入清单 */],
+    inject: [/* 見 §5.6 注入清單 */],
     apply: async (ctx) => {
       // 1. 初始化 storage（SQLite PRAGMA + migrations）
-      // 2. 读取 config.json
-      // 3. 探测 cwd 项目
-      // 4. 注册 Tool（/project *）
-      // 5. 注册 RPC（project_brain/*）
-      // 6. 监听 session:started / session:ended
-      // 7. 注册 Service（projectBrain）
-      // 8. 注册 Pub/Sub
+      // 2. 讀取 config.json
+      // 3. 探測 cwd 專案
+      // 4. 註冊 Tool（/project *）
+      // 5. 註冊 RPC（project_brain/*）
+      // 6. 監聽 session:started / session:ended
+      // 7. 註冊 Service（projectBrain）
+      // 8. 註冊 Pub/Sub
     },
   }
 }
 ```
 
-| 阶段 | 行为 |
+| 階段 | 行為 |
 | --- | --- |
-| 启动 | 迁移 schema → 读 config → 探测 cwd 项目 |
-| 运行 | 监听事件；提供 RPC；Tools 可被 LLM 调用；SidebarPreview aggregator 就绪 |
-| 关闭 | 关闭 SQLite 连接；flush Pub/Sub；保存 snapshot（如有 dirty） |
+| 啟動 | 遷移 schema → 讀 config → 探測 cwd 專案 |
+| 執行 | 監聽事件；提供 RPC；Tools 可被 LLM 呼叫；SidebarPreview aggregator 就緒 |
+| 關閉 | 關閉 SQLite 連線；flush Pub/Sub；儲存 snapshot（如有 dirty） |
 
 ## 5.2 Service：`projectBrain`
 
-供其它 Host 插件调用（不直接面向 Client）。**MVP 暴露以下方法**，所有方法必须返回 `{ ok, data | code, message }` 包装：
+供其它 Host 外掛呼叫（不直接面向 Client）。**MVP 暴露以下方法**，所有方法必須返回 `{ ok, data | code, message }` 包裝：
 
-| 方法 | 用途 | 时延上限 |
+| 方法 | 用途 | 時延上限 |
 | --- | --- | --- |
-| `analyze(path)` | 触发扫描 | 不限（带 dryRun） |
-| `recordMemory(input)` | 写入单条 Memory | 100ms |
+| `analyze(path)` | 觸發掃描 | 不限（帶 dryRun） |
+| `recordMemory(input)` | 寫入單條 Memory | 100ms |
 | `queryMemory(filter)` | 查 Memory | 100ms |
 | `listTodos(filter?)` | 查 TODO | 100ms |
-| `upsertTodo(input)` | 写 TODO | 100ms |
-| `getSidebarPreview(projectId)` | 聚合 SidebarPreview 数据 | 200ms（5 表 join） |
-| `triggerDream(mode)` | 触发 Dream | 不限 |
+| `upsertTodo(input)` | 寫 TODO | 100ms |
+| `getSidebarPreview(projectId)` | 聚合 SidebarPreview 資料 | 200ms（5 表 join） |
+| `triggerDream(mode)` | 觸發 Dream | 不限 |
 
-`analyze` / `triggerDream` 异步执行，立即返回 `{ ok, data: { taskId } }`；通过 `preview.changed` 通知完成。
+`analyze` / `triggerDream` 非同步執行，立即返回 `{ ok, data: { taskId } }`；通過 `preview.changed` 通知完成。
 
-## 5.3 Tool 注册规范
+## 5.3 Tool 註冊規範
 
 ```js
 ctx.tool({
@@ -644,33 +644,33 @@ ctx.tool({
 })
 ```
 
-**强制要求**：
-- 每个 Tool 必须支持 `dryRun`。
-- 返回值必须 JSON 可序列化。
-- 错误返回 `{ ok: false, code: 'E_xxx', message }`。
+**強制要求**：
+- 每個 Tool 必須支援 `dryRun`。
+- 返回值必須 JSON 可序列化。
+- 錯誤返回 `{ ok: false, code: 'E_xxx', message }`。
 - 成功返回 `{ ok: true, data }`。
-- Tool 内部禁止直接写 SQLite；统一走 Service（保持事务边界）。
+- Tool 內部禁止直接寫 SQLite；統一走 Service（保持事務邊界）。
 
-## 5.4 事件订阅 / 发布
+## 5.4 事件訂閱 / 釋出
 
-### 订阅
+### 訂閱
 ```js
-ctx.on('session:started', async (session) => { /* 写 session_started_at */ })
-ctx.on('session:ended',   async (session) => { /* 触发 summarizer */ })
+ctx.on('session:started', async (session) => { /* 寫 session_started_at */ })
+ctx.on('session:ended',   async (session) => { /* 觸發 summarizer */ })
 ```
 
-### 发布（命名空间 `project_brain/*`）
+### 釋出（名稱空間 `project_brain/*`）
 
-| 事件 | payload | 触发时机 |
+| 事件 | payload | 觸發時機 |
 | --- | --- | --- |
-| `project_brain/preview.changed` | `{ projectId }` | 任意 Memory/TODO/project 变更 |
-| `project_brain/scanner.started` | `{ projectId, mode }` | scanner 启动 |
-| `project_brain/scanner.progress` | `{ projectId, percent }` | 扫描过程 |
-| `project_brain/scanner.completed` | `{ projectId, ms, partial }` | 扫描完成 |
-| `project_brain/dream.started` | `{ projectId, mode }` | Dream 启动 |
+| `project_brain/preview.changed` | `{ projectId }` | 任意 Memory/TODO/project 變更 |
+| `project_brain/scanner.started` | `{ projectId, mode }` | scanner 啟動 |
+| `project_brain/scanner.progress` | `{ projectId, percent }` | 掃描過程 |
+| `project_brain/scanner.completed` | `{ projectId, ms, partial }` | 掃描完成 |
+| `project_brain/dream.started` | `{ projectId, mode }` | Dream 啟動 |
 | `project_brain/dream.completed` | `{ projectId, summary }` | Dream 完成 |
 
-## 5.5 Pub/Sub 设计
+## 5.5 Pub/Sub 設計
 
 ```js
 class PreviewPubSub {
@@ -680,66 +680,66 @@ class PreviewPubSub {
 }
 ```
 
-- 单 process 单例（Service）。
-- Debounce 100ms，避免高频写触发高频推送。
-- Client 通过 `sidebar.subscribe` RPC 订阅。
+- 單 process 單例（Service）。
+- Debounce 100ms，避免高頻寫觸發高頻推送。
+- Client 通過 `sidebar.subscribe` RPC 訂閱。
 
-## 5.6 注入清单（必须用 `cordis_inspect_*` 校正）
+## 5.6 注入清單（必須用 `cordis_inspect_*` 校正）
 
-| 依赖 | 来源（推测） | 用途 |
+| 依賴 | 來源（推測） | 用途 |
 | --- | --- | --- |
-| `llm` | `@deepseek-ai/dsh-llm` | LLM 调用 |
-| `tools` | `@deepseek-ai/dsh-tools` | Tool 注册 |
+| `llm` | `@deepseek-ai/dsh-llm` | LLM 呼叫 |
+| `tools` | `@deepseek-ai/dsh-tools` | Tool 註冊 |
 | `session` | `@deepseek-ai/dsh-session` | Session 事件 |
-| `timer` | `@deepseek-ai/cordis-plugin-timer` | 周期任务（Dream） |
-| `loader` | `@deepseek-ai/cordis-plugin-loader` | 加载元数据 |
-| `storage` 或 `storageDomain` | `@deepseek-ai/dsh-storage*` | 持久化（**P0.1 验证是哪个**） |
+| `timer` | `@deepseek-ai/cordis-plugin-timer` | 週期任務（Dream） |
+| `loader` | `@deepseek-ai/cordis-plugin-loader` | 載入後設資料 |
+| `storage` 或 `storageDomain` | `@deepseek-ai/dsh-storage*` | 持久化（**P0.1 驗證是哪個**） |
 
-可选依赖用 `ctx.get('name')` 而非 inject，避免启动顺序死锁。
+可選依賴用 `ctx.get('name')` 而非 inject，避免啟動順序死鎖。
 
 ---
 
-# 6. Client 插件规范
+# 6. Client 外掛規範
 
 ## 6.1 入口
 
 ```js
-// src/client/index.js —— 契约示意
+// src/client/index.js —— 契約示意
 export default function clientPlugin() {
   return {
     name: 'dsh-project-brain:client',
     platform: 'web',
     apply: async (ctx) => {
-      // 1. 注册 SidebarTab（Slot ID 来自 §11.2 Inspect 结果）
-      // 2. 注册 Dashboard View
+      // 1. 註冊 SidebarTab（Slot ID 來自 §11.2 Inspect 結果）
+      // 2. 註冊 Dashboard View
       // 3. 初始化 i18n
-      // 4. 绑定 Pub/Sub 监听（host.call('project_brain/sidebar.subscribe', ...)）
+      // 4. 繫結 Pub/Sub 監聽（host.call('project_brain/sidebar.subscribe', ...)）
     }
   }
 }
 ```
 
-## 6.2 强制约束
+## 6.2 強制約束
 
-1. **必须用 `React.createElement(...)`，不写 JSX**。
-2. **禁止在 Client 直接访问 SQLite / FS**；统一 `host.call(...)`。
-3. **禁止序列化整个 Service 对象**到 React state；只保存所需字段。
-4. 国际化文案必须经过 `i18n.t(key)`。
-5. 主题色 / 间距必须读取 DSH Theme token（推测前缀 `--dsh-*`，**P0.1 Inspect 验证**）；不允许硬编码颜色。
-6. 组件卸载必须清理所有订阅 / 定时器（通过 `ctx.effect()`）。
-7. **禁止客户端直连 SQLite / FS**（重要，再强调一次）。
+1. **必須用 `React.createElement(...)`，不寫 JSX**。
+2. **禁止在 Client 直接訪問 SQLite / FS**；統一 `host.call(...)`。
+3. **禁止序列化整個 Service 物件**到 React state；只儲存所需欄位。
+4. 國際化文案必須經過 `i18n.t(key)`。
+5. 主題色 / 間距必須讀取 DSH Theme token（推測字首 `--dsh-*`，**P0.1 Inspect 驗證**）；不允許硬編碼顏色。
+6. 元件解除安裝必須清理所有訂閱 / 定時器（通過 `ctx.effect()`）。
+7. **禁止客戶端直連 SQLite / FS**（重要，再強調一次）。
 
-## 6.3 Slot 注册
+## 6.3 Slot 註冊
 
-| 用途 | **实际 Slot 名** | kind | 备注 |
+| 用途 | **實際 Slot 名** | kind | 備註 |
 | --- | --- | --- | --- |
-| **SidebarPreview View Tab** | **`conversation.view`** | list | `id: 'project-brain'`、`order: 35`（紧随 `dsh-mneme-memory` order=30） |
-| Tool 调用卡片 | `tool.call.toolview` | keyed | 可选：自定义 `/project_*` 工具展示卡 |
-| 顶部 toast | `shell.overlay` | list | 可选：通知 + 错误提示 |
+| **SidebarPreview View Tab** | **`conversation.view`** | list | `id: 'project-brain'`、`order: 35`（緊隨 `dsh-mneme-memory` order=30） |
+| Tool 呼叫卡片 | `tool.call.toolview` | keyed | 可選：自定義 `/project_*` 工具展示卡 |
+| 頂部 toast | `shell.overlay` | list | 可選：通知 + 錯誤提示 |
 
-> **关键修正**（来自 P0.1 #2 Inspect）：用户截图中的"记忆库"是 `conversation.view` 的 `dsh-mneme-memory`（order=30，由 `@deepseek-ai/dsh-mneme` 插件注册），不是侧边栏 tab。我们的入口注册到 **`conversation.view`** 的 order=35，紧邻"记忆库"。
+> **關鍵修正**（來自 P0.1 #2 Inspect）：使用者截圖中的"記憶庫"是 `conversation.view` 的 `dsh-mneme-memory`（order=30，由 `@deepseek-ai/dsh-mneme` 外掛註冊），不是側邊欄 tab。我們的入口註冊到 **`conversation.view`** 的 order=35，緊鄰"記憶庫"。
 
-注册示例（基于 Inspect 真实结果）：
+註冊示例（基於 Inspect 真實結果）：
 ```js
 const slots = ctx.get('slots')
 slots.inject('conversation.view', () => slots.register(
@@ -753,7 +753,7 @@ slots.inject('conversation.view', () => slots.register(
 ))
 ```
 
-**`conversation.view` 当前 occupants（避免抢 id）**：
+**`conversation.view` 當前 occupants（避免搶 id）**：
 
 | id | order | registrant |
 | --- | --- | --- |
@@ -761,158 +761,158 @@ slots.inject('conversation.view', () => slots.register(
 | `trajectory` | 10 | z5 |
 | `context` | 20 | dsh-context |
 | `dsh-mneme-memory` | 30 | dsh-mneme |
-| **`project-brain`** | **35** | **dsh-project-brain（我们）** |
+| **`project-brain`** | **35** | **dsh-project-brain（我們）** |
 
-## 6.4 国际化
+## 6.4 國際化
 
-`src/client/i18n/zh-CN.js` 与 `src/client/i18n/en-US.js` 必须保持 key 一致。完整 key 表见 §6.5。
+`src/client/i18n/zh-CN.js` 與 `src/client/i18n/en-US.js` 必須保持 key 一致。完整 key 表見 §6.5。
 
-## 6.5 i18n Key 清单
+## 6.5 i18n Key 清單
 
 | Key | zh-CN | en-US |
 | --- | --- | --- |
-| `sidebar.tab.label` | 项目 | Project |
+| `sidebar.tab.label` | 專案 | Project |
 | `sidebar.preview.header.lastUpdate` | 上次更新 | Last update |
-| `sidebar.preview.header.untitled` | 未命名项目 | Untitled project |
-| `sidebar.preview.phase.title` | 当前阶段 | Current phase |
-| `sidebar.preview.phase.empty` | 暂无进行中任务 | No tasks in progress |
-| `sidebar.preview.activity.title` | 最近活动 | Recent activity |
-| `sidebar.preview.activity.empty` | 暂无活动 | No recent activity |
-| `sidebar.preview.activity.viewMore` | 查看更多 | View more |
-| `sidebar.preview.stats.pending` | 待办 | Pending |
+| `sidebar.preview.header.untitled` | 未命名專案 | Untitled project |
+| `sidebar.preview.phase.title` | 當前階段 | Current phase |
+| `sidebar.preview.phase.empty` | 暫無進行中任務 | No tasks in progress |
+| `sidebar.preview.activity.title` | 最近活動 | Recent activity |
+| `sidebar.preview.activity.empty` | 暫無活動 | No recent activity |
+| `sidebar.preview.activity.viewMore` | 檢視更多 | View more |
+| `sidebar.preview.stats.pending` | 待辦 | Pending |
 | `sidebar.preview.stats.done` | 已完成 | Done |
-| `sidebar.preview.stats.decisions` | 决策 | Decisions |
-| `sidebar.preview.actions.continue` | 继续上次开发 | Continue last session |
-| `sidebar.preview.actions.openDashboard` | 打开完整 Dashboard | Open full Dashboard |
-| `sidebar.preview.onboarding.title` | 项目大脑未启动 | Project Brain not started |
-| `sidebar.preview.onboarding.body` | 启动后将自动生成… | After startup, it will… |
-| `sidebar.preview.onboarding.cta` | 启动项目大脑 /project init | Start Project Brain /project init |
-| `sidebar.preview.error.loadFailed` | 项目数据加载失败 | Failed to load project data |
-| `sidebar.preview.error.retry` | 重试 | Retry |
+| `sidebar.preview.stats.decisions` | 決策 | Decisions |
+| `sidebar.preview.actions.continue` | 繼續上次開發 | Continue last session |
+| `sidebar.preview.actions.openDashboard` | 開啟完整 Dashboard | Open full Dashboard |
+| `sidebar.preview.onboarding.title` | 專案大腦未啟動 | Project Brain not started |
+| `sidebar.preview.onboarding.body` | 啟動後將自動生成… | After startup, it will… |
+| `sidebar.preview.onboarding.cta` | 啟動專案大腦 /project init | Start Project Brain /project init |
+| `sidebar.preview.error.loadFailed` | 專案資料載入失敗 | Failed to load project data |
+| `sidebar.preview.error.retry` | 重試 | Retry |
 
 ---
 
-# 7. Tool 契约规范
+# 7. Tool 契約規範
 
-## 7.1 通用约定
+## 7.1 通用約定
 
 所有 Tool 都遵循：
 ```js
-// 请求
-{ args: { /* 工具参数 */ }, dryRun?: boolean }
+// 請求
+{ args: { /* 工具引數 */ }, dryRun?: boolean }
 
 // 成功
 { ok: true, data: T }
 
-// 失败
+// 失敗
 { ok: false, code: 'E_xxx', message: string, details?: any }
 ```
 
-## 7.2 工具清单
+## 7.2 工具清單
 
 ### `project_init`
 
-| 字段 | 内容 |
+| 欄位 | 內容 |
 | --- | --- |
-| 用途 | 初始化项目 Brain |
-| 参数 | `{ path?: string }`（默认 cwd） |
+| 用途 | 初始化專案 Brain |
+| 引數 | `{ path?: string }`（預設 cwd） |
 | dryRun | 是 |
 | 返回 | `{ projectId, name, scanDurationMs, stats: { files, loc, entities, relations }, partial: boolean }` |
-| 错误 | `E_SCAN_TIMEOUT` / `E_PERMISSION` / `E_SCAN_FAILED` |
+| 錯誤 | `E_SCAN_TIMEOUT` / `E_PERMISSION` / `E_SCAN_FAILED` |
 
-实现要点：
-- 先扫描 FS（2 分钟硬上限）。
-- 写 project 表 / project.json。
+實現要點：
+- 先掃描 FS（2 分鐘硬上限）。
+- 寫 project 表 / project.json。
 - 生成 architecture.json。
 - emit `preview.changed`。
 
 ### `project_continue`
 
-| 字段 | 内容 |
+| 欄位 | 內容 |
 | --- | --- |
-| 用途 | 恢复上次开发状态 |
-| 参数 | `{}` |
+| 用途 | 恢復上次開發狀態 |
+| 引數 | `{}` |
 | dryRun | 是 |
 | 返回 | `{ project, lastDevelopment, currentPhase, completed, pending, decisions, knownIssues, suggestedNext, relatedFiles }` |
-| 错误 | `E_NOT_INITIALIZED` |
+| 錯誤 | `E_NOT_INITIALIZED` |
 
 ### `project_status`
 
-| 字段 | 内容 |
+| 欄位 | 內容 |
 | --- | --- |
-| 用途 | 当前项目状态快照 |
-| 参数 | `{ projectId?: string }` |
+| 用途 | 當前專案狀態快照 |
+| 引數 | `{ projectId?: string }` |
 | 返回 | `{ project, memoryCounts, todoCounts, lastActivity, uptime }` |
 
 ### `project_ask`
 
-| 字段 | 内容 |
+| 欄位 | 內容 |
 | --- | --- |
-| 用途 | 自然语言查询 Project Brain |
-| 参数 | `{ question: string, topK?: number }`（默认 topK=5） |
-| dryRun | 否（成本较高） |
+| 用途 | 自然語言查詢 Project Brain |
+| 引數 | `{ question: string, topK?: number }`（預設 topK=5） |
+| dryRun | 否（成本較高） |
 | 返回 | `{ answer: string, sources: MemoryRef[], confidence: number }` |
-| 错误 | `E_NOT_INITIALIZED`, `E_LLM_FAILED` |
+| 錯誤 | `E_NOT_INITIALIZED`, `E_LLM_FAILED` |
 
-**confidence 计算**：`avg(sources.map(s => s.memory.confidence * s.similarity))`。
+**confidence 計算**：`avg(sources.map(s => s.memory.confidence * s.similarity))`。
 
 ### `project_memory_list`
 
-| 字段 | 内容 |
+| 欄位 | 內容 |
 | --- | --- |
 | 用途 | 列出 Memory |
-| 参数 | `{ type?, keyword?, importanceMin?, status?, limit=20, offset=0 }` |
+| 引數 | `{ type?, keyword?, importanceMin?, status?, limit=20, offset=0 }` |
 | 返回 | `{ items: MemoryRecord[], total: number }` |
 
 ### `project_memory_add`
 
-| 字段 | 内容 |
+| 欄位 | 內容 |
 | --- | --- |
-| 用途 | 添加 Memory |
-| 参数 | `{ type, title, content, relatedFiles? }` |
+| 用途 | 新增 Memory |
+| 引數 | `{ type, title, content, relatedFiles? }` |
 | dryRun | 是 |
 | 返回 | `{ memory: MemoryRecord, deduped?: boolean, relatedTo?: string[] }` |
-| 错误 | `E_MEMORY_SCHEMA` |
+| 錯誤 | `E_MEMORY_SCHEMA` |
 
-实现要点：
-- 按 §4.4 schema 校验 content 必填字段。
-- importance 默认 0.6 + bonus（relatedFiles 非空 +0.15；source=llm +0.05）。
-- 与现有 Memory 做相似度去重：>=0.92 触发合并；>=0.75 加 relatedMemoryIds。
-- 写入后 emit `preview.changed`。
+實現要點：
+- 按 §4.4 schema 校驗 content 必填欄位。
+- importance 預設 0.6 + bonus（relatedFiles 非空 +0.15；source=llm +0.05）。
+- 與現有 Memory 做相似度去重：>=0.92 觸發合併；>=0.75 加 relatedMemoryIds。
+- 寫入後 emit `preview.changed`。
 
 ### `project_todo_list`
 
-| 字段 | 内容 |
+| 欄位 | 內容 |
 | --- | --- |
-| 参数 | `{ status?, priority? }` |
+| 引數 | `{ status?, priority? }` |
 | 返回 | `{ items: TodoRecord[] }` |
 
 ### `project_todo_add`
 
-| 字段 | 内容 |
+| 欄位 | 內容 |
 | --- | --- |
-| 参数 | `{ title, description?, priority?, relatedFiles?, relatedFeature? }` |
+| 引數 | `{ title, description?, priority?, relatedFiles?, relatedFeature? }` |
 | dryRun | 是 |
 | 返回 | `{ todo: TodoRecord }` |
 
 ### `project_todo_update`
 
-| 字段 | 内容 |
+| 欄位 | 內容 |
 | --- | --- |
-| 参数 | `{ id, status?, title?, description?, priority? }` |
+| 引數 | `{ id, status?, title?, description?, priority? }` |
 | 返回 | `{ todo: TodoRecord }` |
 
 ### `project_dream`
 
-| 字段 | 内容 |
+| 欄位 | 內容 |
 | --- | --- |
-| 参数 | `{ mode: 'light' \| 'full' }` |
-| dryRun | 是（返回计划但不执行） |
+| 引數 | `{ mode: 'light' \| 'full' }` |
+| dryRun | 是（返回計劃但不執行） |
 | 返回 | `{ started, plannedActions, estimatedMs }` |
 
-## 7.3 Tool 错误码映射
+## 7.3 Tool 錯誤碼對映
 
-| Tool | 可能错误码 |
+| Tool | 可能錯誤碼 |
 | --- | --- |
 | project_init | E_SCAN_TIMEOUT, E_SCAN_FAILED, E_PERMISSION |
 | project_continue | E_NOT_INITIALIZED |
@@ -924,79 +924,79 @@ slots.inject('conversation.view', () => slots.register(
 
 ---
 
-# 8. RPC 契约规范
+# 8. RPC 契約規範
 
-## 8.1 命名空间
+## 8.1 名稱空間
 
 所有 RPC 方法名：`project_brain/<area>.<action>`
 
-注册（Host）：
+註冊（Host）：
 ```js
 harness.handle('project_brain/sidebar.getPreview', async (ctx, args) => { ... })
 ```
 
-调用（Client）：
+呼叫（Client）：
 ```js
 const preview = await host.call('project_brain/sidebar.getPreview', { projectId })
 ```
 
-## 8.2 通用约定
+## 8.2 通用約定
 
-- 入参必须 JSON 可序列化。
-- 返回必须 JSON 可序列化。
-- 单 RPC 在 200ms 内必须返回（聚合类 `sidebar.getPreview` 可放宽到 200ms）。
-- 错误统一 `{ ok: false, code, message }`。
+- 入參必須 JSON 可序列化。
+- 返回必須 JSON 可序列化。
+- 單 RPC 在 200ms 內必須返回（聚合類 `sidebar.getPreview` 可放寬到 200ms）。
+- 錯誤統一 `{ ok: false, code, message }`。
 
-## 8.3 RPC 方法清单
+## 8.3 RPC 方法清單
 
-| 方法 | 用途 | 主要入参 | 主要返回 |
+| 方法 | 用途 | 主要入參 | 主要返回 |
 | --- | --- | --- | --- |
-| `project_brain/sidebar.getPreview` | SidebarPreview 数据聚合 | `{ projectId }` | `SidebarPreview`（§9.3） |
-| `project_brain/sidebar.subscribe` | 订阅 preview 变更推送 | `{ projectId }` | `{ subscribed: true, channelId }` |
+| `project_brain/sidebar.getPreview` | SidebarPreview 資料聚合 | `{ projectId }` | `SidebarPreview`（§9.3） |
+| `project_brain/sidebar.subscribe` | 訂閱 preview 變更推送 | `{ projectId }` | `{ subscribed: true, channelId }` |
 | `project_brain/dashboard.getOverview` | Dashboard Overview 面板 | `{ projectId }` | `OverviewData` |
 | `project_brain/dashboard.getArchitecture` | Architecture 面板 | `{ projectId }` | `ArchitectureData` |
 | `project_brain/dashboard.getCodeGraph` | Code Map | `{ projectId, rootId? }` | `{ nodes, edges }` |
 | `project_brain/dashboard.getMemoryList` | Memory 面板 | `{ projectId, type?, keyword?, limit, offset }` | `{ items, total }` |
 | `project_brain/dashboard.getTimeline` | Timeline | `{ projectId, from?, to? }` | `{ items }` |
 | `project_brain/dashboard.getTasks` | Tasks | `{ projectId }` | `{ items, stats }` |
-| `project_brain/dashboard.getCallChain` | 调用链 | `{ projectId, startEntityId, maxDepth? }` | `{ paths }` |
+| `project_brain/dashboard.getCallChain` | 呼叫鏈 | `{ projectId, startEntityId, maxDepth? }` | `{ paths }` |
 | `project_brain/memory.add` | 新增 Memory（不走 Tool） | `{ type, title, content, relatedFiles? }` | `{ memory }` |
-| `project_brain/memory.get` | 获取 Memory 详情 | `{ id }` | `{ memory, relatedMemories }` |
+| `project_brain/memory.get` | 獲取 Memory 詳情 | `{ id }` | `{ memory, relatedMemories }` |
 
-> `memory.add` 与 Tool `project_memory_add` 共用 Service `recordMemory`；Tool 用于 LLM 调用，RPC 用于 Client 手动写入。
+> `memory.add` 與 Tool `project_memory_add` 共用 Service `recordMemory`；Tool 用於 LLM 呼叫，RPC 用於 Client 手動寫入。
 
-## 8.4 错误码统一
+## 8.4 錯誤碼統一
 
-参见 §4.5。
+參見 §4.5。
 
 ---
 
-# 9. SidebarPreview 规范（重点章节）
+# 9. SidebarPreview 規範（重點章節）
 
-## 9.1 目标
+## 9.1 目標
 
-> 用户打开 DSH 第一秒，无需任何输入即可感知"我现在在哪个项目、开发到哪里、下一步该做什么"。
+> 使用者開啟 DSH 第一秒，無需任何輸入即可感知"我現在在哪個專案、開發到哪裡、下一步該做什麼"。
 
-## 9.2 术语与位置
+## 9.2 術語與位置
 
-| 维度 | 规格 |
+| 維度 | 規格 |
 | --- | --- |
-| 功能名 | **SidebarPreview**（"Sidebar" 是历史命名沿用，指 conversation 视图栏） |
-| UI 元素 | **SidebarTab**（conversation.view 的 entry：图标+文字） |
-| 实际 Slot | **`conversation.view`**（list, scope: session） |
-| 注册参数 | `id: 'project-brain'`、`order: 35`（紧随 `dsh-mneme-memory` order=30） |
-| 物理位置 | 紧邻"记忆库"右侧（用户已确认） |
-| Tab 标签 | zh: "项目" / en: "Project"（由 i18n `sidebar.tab.label` 控制） |
-| 图标 | brain 类，单色，16×16 |
-| 角标 | status ∈ {pending, in_progress} 的 TODO 计数（>99 显示 `99+`） |
-| 激活交互 | 点击切换 view；激活后渲染折叠态 SidebarPreview；面板内任意处点击跳转 Dashboard 对应面板 |
+| 功能名 | **SidebarPreview**（"Sidebar" 是歷史命名沿用，指 conversation 檢視欄） |
+| UI 元素 | **SidebarTab**（conversation.view 的 entry：圖示+文字） |
+| 實際 Slot | **`conversation.view`**（list, scope: session） |
+| 註冊引數 | `id: 'project-brain'`、`order: 35`（緊隨 `dsh-mneme-memory` order=30） |
+| 物理位置 | 緊鄰"記憶庫"右側（使用者已確認） |
+| Tab 標籤 | zh: "專案" / en: "Project"（由 i18n `sidebar.tab.label` 控制） |
+| 圖示 | brain 類，單色，16×16 |
+| 角標 | status ∈ {pending, in_progress} 的 TODO 計數（>99 顯示 `99+`） |
+| 啟用互動 | 點選切換 view；啟用後渲染摺疊態 SidebarPreview；面板內任意處點選跳轉 Dashboard 對應面板 |
 
 **事件名**：`project_brain/preview.changed`
 **RPC 名**：`project_brain/sidebar.getPreview` / `project_brain/sidebar.subscribe`
 
-> **P0.1 Inspect 校正**：用户截图中的"记忆库"实际是 `conversation.view` 的 `dsh-mneme-memory`（由 `@deepseek-ai/dsh-mneme` 注册），order=30。我们的入口紧随其后注册为 order=35。
+> **P0.1 Inspect 校正**：使用者截圖中的"記憶庫"實際是 `conversation.view` 的 `dsh-mneme-memory`（由 `@deepseek-ai/dsh-mneme` 註冊），order=30。我們的入口緊隨其後註冊為 order=35。
 
-## 9.3 数据契约：SidebarPreview
+## 9.3 資料契約：SidebarPreview
 
 ```js
 const SidebarPreview = {
@@ -1005,26 +1005,26 @@ const SidebarPreview = {
   phase: { title, progress: { done, total } },
   recentActivity: [{ id, title, occurredAt, eventType }],
   stats: { pendingTodos, completedTodos, decisions },
-  empty: false                   // 同 initialized=false 的冗余表达
+  empty: false                   // 同 initialized=false 的冗餘表達
 }
 ```
 
-**Onboarding 是状态分支，不是区块**。`initialized=true` 时渲染 5 个区块，false 时整个面板替换为引导卡片。
+**Onboarding 是狀態分支，不是區塊**。`initialized=true` 時渲染 5 個區塊，false 時整個面板替換為引導卡片。
 
-## 9.4 区块设计（5 个）
+## 9.4 區塊設計（5 個）
 
-| # | 区块名 | 内容 | 跳转目标 |
+| # | 區塊名 | 內容 | 跳轉目標 |
 | --- | --- | --- | --- |
-| 1 | Header | 项目名 / 类型 chip / 上次更新 | Dashboard / Overview |
-| 2 | Phase | 当前阶段名 + 进度条 | Dashboard / Tasks |
-| 3 | Activity | 最近 N 条 Timeline（N 来自 `sidebar.recentActivityLimit`，默认 3） | Dashboard / Timeline |
-| 4 | Stats | 待办 / 已完成 / 决策 计数 | Dashboard / Memory 或 Tasks |
-| 5 | Actions | `[继续上次开发]` `[打开 Dashboard]` | 触发 Tool / 路由 |
+| 1 | Header | 專案名 / 型別 chip / 上次更新 | Dashboard / Overview |
+| 2 | Phase | 當前階段名 + 進度條 | Dashboard / Tasks |
+| 3 | Activity | 最近 N 條 Timeline（N 來自 `sidebar.recentActivityLimit`，預設 3） | Dashboard / Timeline |
+| 4 | Stats | 待辦 / 已完成 / 決策 計數 | Dashboard / Memory 或 Tasks |
+| 5 | Actions | `[繼續上次開發]` `[開啟 Dashboard]` | 觸發 Tool / 路由 |
 
-## 9.5 区块交互契约
+## 9.5 區塊互動契約
 
 ```js
-// 区块组件接收的 props
+// 區塊元件接收的 props
 {
   data: BlockData,
   onJump: (target: 'overview' | 'tasks' | 'timeline' | 'memory') => void,
@@ -1032,96 +1032,96 @@ const SidebarPreview = {
 }
 ```
 
-- 区块空白点击 → `onJump(target)`。
-- Activity 单项点击 → `onJump('timeline')` + Dashboard 高亮（由 Dashboard 状态管理）。
-- Actions 按钮 → `onAction`。
+- 區塊空白點選 → `onJump(target)`。
+- Activity 單項點選 → `onJump('timeline')` + Dashboard 高亮（由 Dashboard 狀態管理）。
+- Actions 按鈕 → `onAction`。
 
-## 9.6 视觉规范
+## 9.6 視覺規範
 
-| 项 | 值 |
+| 項 | 值 |
 | --- | --- |
-| 折叠态面板高度 | ≤ 视口 60% |
+| 摺疊態面板高度 | ≤ 視口 60% |
 | Header 背景 | `--dsw-alias-bg-layer-1` |
-| 进度条完成段 | `--dsw-alias-state-success-primary` |
-| 进度条未完成段 | `--dsw-alias-bg-layer-2` |
-| Activity 项上限 | 由 `config.json` 的 `sidebar.recentActivityLimit` 控制（默认 3） |
-| Actions 主按钮 | DSH primary 样式 |
+| 進度條完成段 | `--dsw-alias-state-success-primary` |
+| 進度條未完成段 | `--dsw-alias-bg-layer-2` |
+| Activity 項上限 | 由 `config.json` 的 `sidebar.recentActivityLimit` 控制（預設 3） |
+| Actions 主按鈕 | DSH primary 樣式 |
 | 文字色 | `--dsw-alias-label-primary` / `--dsw-alias-label-secondary` |
-| 边框 | `--dsw-alias-border-l1` |
+| 邊框 | `--dsw-alias-border-l1` |
 
-> 主题 token 前缀校正：DSH 真实主题 token 前缀为 **`--dsw-*`**（不是 `--dsh-*`）。完整 token 表见 `TODO.md` Inspect 区。
+> 主題 token 字首校正：DSH 真實主題 token 字首為 **`--dsw-*`**（不是 `--dsh-*`）。完整 token 表見 `TODO.md` Inspect 區。
 
-## 9.7 数据更新策略
+## 9.7 資料更新策略
 
-| 触发 | 行为 |
+| 觸發 | 行為 |
 | --- | --- |
 | SidebarPreview 首次渲染 | 拉一次完整 preview |
 | `project_brain/preview.changed` 事件 | 重新拉取 |
-| 同一面板 30s 内重复打开 | 复用缓存 |
-| `/project continue` 触发后 | 强制刷新 phase / progress |
-| `/project init` 完成 | 强制刷新全部 |
+| 同一面板 30s 內重複開啟 | 複用快取 |
+| `/project continue` 觸發後 | 強制重新整理 phase / progress |
+| `/project init` 完成 | 強制重新整理全部 |
 
-Host 侧在以下时机 emit `preview.changed`：
-- Memory 写入 / 更新 / 归档
-- TODO 写入 / 更新 / 完成
-- Project 元数据变更
+Host 側在以下時機 emit `preview.changed`：
+- Memory 寫入 / 更新 / 歸檔
+- TODO 寫入 / 更新 / 完成
+- Project 後設資料變更
 - Timeline 新增
 - Session 摘要完成
 
-## 9.8 Onboarding（空状态）
+## 9.8 Onboarding（空狀態）
 
-`initialized=false` 时整个面板替换为引导卡片：
+`initialized=false` 時整個面板替換為引導卡片：
 
 ```
 ┌─────────────────────────────────────┐
-│ 🧠 项目大脑未启动                      │
+│ 🧠 專案大腦未啟動                      │
 ├─────────────────────────────────────┤
-│ 这个项目还没有 Project Brain。         │
-│ 启动后将自动生成：                     │
-│   · 项目结构 / 技术栈 / 架构图          │
-│   · 持续记录开发历史与决策               │
-│   · 跨 Session 自动恢复上下文           │
+│ 這個專案還沒有 Project Brain。         │
+│ 啟動後將自動生成：                     │
+│   · 專案結構 / 技術棧 / 架構圖          │
+│   · 持續記錄開發歷史與決策               │
+│   · 跨 Session 自動恢復上下文           │
 ├─────────────────────────────────────┤
-│   [启动项目大脑 /project init]          │
+│   [啟動專案大腦 /project init]          │
 └─────────────────────────────────────┘
 ```
 
-主按钮 → 调用 `project_init` Tool。完成后 `initialized=true`，自动切换到正常态。
+主按鈕 → 呼叫 `project_init` Tool。完成後 `initialized=true`，自動切換到正常態。
 
-## 9.9 错误处理
+## 9.9 錯誤處理
 
-| 情况 | 表现 |
+| 情況 | 表現 |
 | --- | --- |
-| RPC 失败 | "项目数据加载失败 [重试]" 卡片 |
-| preview 数据不完整 | 显示已加载部分 + "部分数据可能过期" |
-| TODO 计数异常 | 显示 `—` 占位，不显示错误数字 |
+| RPC 失敗 | "專案資料載入失敗 [重試]" 卡片 |
+| preview 資料不完整 | 顯示已載入部分 + "部分資料可能過期" |
+| TODO 計數異常 | 顯示 `—` 佔位，不顯示錯誤數字 |
 
-## 9.10 SidebarPreview P0 验收清单（带测量方法）
+## 9.10 SidebarPreview P0 驗收清單（帶測量方法）
 
-| # | 验收项 | 目标 | 测量方法 |
+| # | 驗收項 | 目標 | 測量方法 |
 | --- | --- | --- | --- |
-| 1 | Slot ID 已通过 `cordis_inspect_query` 确认 | 必填 | `TODO.md` 记录 |
-| 2 | SidebarTab 注册成功，紧邻"记忆库"右侧 | 必填 | 视觉验证截图 |
-| 3 | 角标数字与 todo 表实时同步 | 必填 | 创建/完成 TODO 后角标变化 < 100ms |
-| 4 | 5 区块渲染完整 | 必填 | 已 init 项目截图 |
-| 5 | Onboarding 卡片 | 必填 | 未 init 项目截图 |
-| 6 | "继续上次开发" 触发 Tool 正常 | 必填 | 日志确认 |
-| 7 | 区块点击跳转 Dashboard | 必填 | 5 区块各点 1 次 |
-| 8 | i18n（zh/en）覆盖 | 必填 | 切语言后文案变 |
-| 9 | 主题 token 全部使用 DSH 变量 | 必填 | grep `--dsh-` 引用，无硬编码颜色 |
-| 10 | 折叠态首次渲染 | < 50ms（不含 RPC） | `PerformanceObserver` 实测 |
-| 11 | RPC `sidebar.getPreview` 响应 | < 100ms（p95） | logger 打 timestamp + 100 次采样 |
-| 12 | `preview.changed` debounce + 推送 | < 100ms | 单测 |
+| 1 | Slot ID 已通過 `cordis_inspect_query` 確認 | 必填 | `TODO.md` 記錄 |
+| 2 | SidebarTab 註冊成功，緊鄰"記憶庫"右側 | 必填 | 視覺驗證截圖 |
+| 3 | 角標數字與 todo 表即時同步 | 必填 | 建立/完成 TODO 後角標變化 < 100ms |
+| 4 | 5 區塊渲染完整 | 必填 | 已 init 專案截圖 |
+| 5 | Onboarding 卡片 | 必填 | 未 init 專案截圖 |
+| 6 | "繼續上次開發" 觸發 Tool 正常 | 必填 | 日誌確認 |
+| 7 | 區塊點選跳轉 Dashboard | 必填 | 5 區塊各點 1 次 |
+| 8 | i18n（zh/en）覆蓋 | 必填 | 切語言後文案變 |
+| 9 | 主題 token 全部使用 DSH 變數 | 必填 | grep `--dsh-` 引用，無硬編碼顏色 |
+| 10 | 摺疊態首次渲染 | < 50ms（不含 RPC） | `PerformanceObserver` 實測 |
+| 11 | RPC `sidebar.getPreview` 響應 | < 100ms（p95） | logger 打 timestamp + 100 次取樣 |
+| 12 | `preview.changed` debounce + 推送 | < 100ms | 單測 |
 
 ---
 
-# 10. 配置规范
+# 10. 配置規範
 
-## 10.1 配置文件
+## 10.1 配置檔案
 
-`<project>/.project-brain/config.json`（首次 init 时生成全默认值）。
+`<project>/.project-brain/config.json`（首次 init 時生成全預設值）。
 
-## 10.2 Schema（schemastery 校验）
+## 10.2 Schema（schemastery 校驗）
 
 ```js
 const ConfigSchema = {
@@ -1134,81 +1134,81 @@ const ConfigSchema = {
 }
 ```
 
-## 10.3 加载规则
+## 10.3 載入規則
 
-- 启动读 config.json，缺字段填默认。
-- 写入：仅改字段，其他保留。
-- 校验失败 → 记录 warning，使用全默认。
-- 不允许运行时改 `version`。
+- 啟動讀 config.json，缺欄位填預設。
+- 寫入：僅改欄位，其他保留。
+- 校驗失敗 → 記錄 warning，使用全預設。
+- 不允許執行時改 `version`。
 
-## 10.4 环境变量覆盖
+## 10.4 環境變數覆蓋
 
-| 环境变量 | 覆盖字段 | 用途 |
+| 環境變數 | 覆蓋欄位 | 用途 |
 | --- | --- | --- |
-| `DSH_BRAIN_SCAN_TIMEOUT_MS` | `scan.timeoutMs` | CI 场景 |
-| `DSH_BRAIN_LLM_MODEL` | `llm.modelPreference` | 临时切换模型 |
-| `DSH_BRAIN_DISABLE_SIDEBAR` | `sidebar.enabled` | 关闭 Sidebar（debug） |
+| `DSH_BRAIN_SCAN_TIMEOUT_MS` | `scan.timeoutMs` | CI 場景 |
+| `DSH_BRAIN_LLM_MODEL` | `llm.modelPreference` | 臨時切換模型 |
+| `DSH_BRAIN_DISABLE_SIDEBAR` | `sidebar.enabled` | 關閉 Sidebar（debug） |
 
 ---
 
-# 11. 开发阶段与任务清单
+# 11. 開發階段與任務清單
 
-## 11.1 阶段总览（含 buffer）
+## 11.1 階段總覽（含 buffer）
 
-| 阶段 | 时长 | 入口依赖 | 出口交付 | 备注 |
+| 階段 | 時長 | 入口依賴 | 出口交付 | 備註 |
 | --- | --- | --- | --- | --- |
-| **P0.0 测试 fixture（最小集）** | 0.5~1d | 无 | `tests/fixtures/ts-sample` 可编译运行 | 必须先于 P0.2 |
-| **P0.1 项目骨架** | 1~2d | P0.0 | 工程脚手架 + Inspect 清单 | 必须跑通 hello world |
-| **P0.2 Tech Stack + Overview + SidebarPreview** | 3~4d | P0.1 | Tech 识别 + Overview + SidebarPreview | **本阶段交付 Sidebar 全功能** |
-| **P0.3a Code Graph（TS/JS/Python）** | 5~7d | P0.2 | 三语言 Code Graph | MVP 必交付 |
-| **P0.3b Code Graph（Go/Java，可选）** | 3~5d | P0.3a | 五语言 Code Graph | **可选；时间紧可砍** |
-| **P0.4 Memory CRUD** | 3~4d | P0.3a | Memory 体系 + Tool | — |
-| **P0.5 Session 摘要** | 4~5d | P0.4 | 自动 Memory | LLM 抽取可能需 +2d buffer |
-| **P0.6 Cross-Session + Continue** | 3~4d | P0.5 | 跨 Session 续接 | — |
+| **P0.0 測試 fixture（最小集）** | 0.5~1d | 無 | `tests/fixtures/ts-sample` 可編譯執行 | 必須先於 P0.2 |
+| **P0.1 專案骨架** | 1~2d | P0.0 | 工程腳手架 + Inspect 清單 | 必須跑通 hello world |
+| **P0.2 Tech Stack + Overview + SidebarPreview** | 3~4d | P0.1 | Tech 識別 + Overview + SidebarPreview | **本階段交付 Sidebar 全功能** |
+| **P0.3a Code Graph（TS/JS/Python）** | 5~7d | P0.2 | 三語言 Code Graph | MVP 必交付 |
+| **P0.3b Code Graph（Go/Java，可選）** | 3~5d | P0.3a | 五語言 Code Graph | **可選；時間緊可砍** |
+| **P0.4 Memory CRUD** | 3~4d | P0.3a | Memory 體系 + Tool | — |
+| **P0.5 Session 摘要** | 4~5d | P0.4 | 自動 Memory | LLM 抽取可能需 +2d buffer |
+| **P0.6 Cross-Session + Continue** | 3~4d | P0.5 | 跨 Session 續接 | — |
 | **P0.7 TODO 管理** | 2~3d | P0.6 | Tasks 面板 + SidebarPreview Phase 同步 | — |
 | **P0.8 Architecture + 收尾** | 3~4d | P0.7 | 可演示 | — |
 
-**合计核心**：约 28~38 工作日（不含 P0.3b）。
-**含 30% 调试 buffer**：**38~48 工作日**。
+**合計核心**：約 28~38 工作日（不含 P0.3b）。
+**含 30% 除錯 buffer**：**38~48 工作日**。
 **含 P0.3b**：46~58 工作日。
 
-## 11.2 P0.0 Fixture 任务
+## 11.2 P0.0 Fixture 任務
 
-- [ ] 创建 `tests/fixtures/ts-sample/`（Express + TypeScript，5 文件，2 API，1 DB 模型）
-- [ ] 该 sample 必须可 `npm install && npm run build && npm start` 跑通
-- [ ] 至少一个跨文件调用链贯穿（API → Service → Repository → Model）
-- [ ] 在 `TODO.md` 记录 sample 的入口路径与调用链说明
+- [ ] 建立 `tests/fixtures/ts-sample/`（Express + TypeScript，5 檔案，2 API，1 DB 模型）
+- [ ] 該 sample 必須可 `npm install && npm run build && npm start` 跑通
+- [ ] 至少一個跨檔案呼叫鏈貫穿（API → Service → Repository → Model）
+- [ ] 在 `TODO.md` 記錄 sample 的入口路徑與呼叫鏈說明
 
-## 11.3 P0.1 详细任务清单
+## 11.3 P0.1 詳細任務清單
 
-- [ ] 用 `cordis_inspect_list` 拉一份 DSH 真实服务清单，填入 §5.6 表格
-- [ ] 用 `cordis_inspect_query` 查 `Slots.listSubTree` 确认 SidebarTab Slot ID 与 Dashboard Slot ID（写入 `TODO.md`）
-- [ ] 创建 `package.json`（§3 + §2.3）
-- [ ] 创建 `tsconfig.json`（strict, target esnext, module esnext）
-- [ ] 创建 `cordis.yml`（loader 入口）
-- [ ] 创建 `src/shared/{types,constants,terms}.js`
-- [ ] 创建 `src/host/index.js`（最小 hello world：`ctx.logger.info('dsh-project-brain host loaded')`）
-- [ ] 创建 `src/client/index.js`（最小 hello world）
-- [ ] 把插件挂到 active profile（pnpm install + 加 bundles）
-- [ ] 重启 DSH，日志看到 "dsh-project-brain host loaded"
+- [ ] 用 `cordis_inspect_list` 拉一份 DSH 真實服務清單，填入 §5.6 表格
+- [ ] 用 `cordis_inspect_query` 查 `Slots.listSubTree` 確認 SidebarTab Slot ID 與 Dashboard Slot ID（寫入 `TODO.md`）
+- [ ] 建立 `package.json`（§3 + §2.3）
+- [ ] 建立 `tsconfig.json`（strict, target esnext, module esnext）
+- [ ] 建立 `cordis.yml`（loader 入口）
+- [ ] 建立 `src/shared/{types,constants,terms}.js`
+- [ ] 建立 `src/host/index.js`（最小 hello world：`ctx.logger.info('dsh-project-brain host loaded')`）
+- [ ] 建立 `src/client/index.js`（最小 hello world）
+- [ ] 把外掛掛到 active profile（pnpm install + 加 bundles）
+- [ ] 重啟 DSH，日誌看到 "dsh-project-brain host loaded"
 
-**退出标准**：DSH 启动日志可见 hello world；改 `host/index.js` 后 HMR 重启可见；`TODO.md` 记录两份 Inspect 数据。
+**退出標準**：DSH 啟動日誌可見 hello world；改 `host/index.js` 後 HMR 重啟可見；`TODO.md` 記錄兩份 Inspect 資料。
 
-## 11.4 P0.2 详细任务清单
+## 11.4 P0.2 詳細任務清單
 
 ### Scanner
-- [ ] `storage/sqlite.js`：better-sqlite3 封装 + PRAGMA 强制
-- [ ] `storage/migrations.js`：schema v1 迁移脚本
-- [ ] `storage/fingerprint.js`：FS 指纹（path + mtime + size hash）
-- [ ] `scanner/filesystem.js`：并发遍历、`.gitignore`、大文件阈值
-- [ ] `scanner/ignore.js`：默认 ignore 列表
-- [ ] `scanner/techstack.js`：5 语言 manifest 识别
-- [ ] `scanner/entrypoints.js`：识别 main / app / server / cmd
+- [ ] `storage/sqlite.js`：better-sqlite3 封裝 + PRAGMA 強制
+- [ ] `storage/migrations.js`：schema v1 遷移指令碼
+- [ ] `storage/fingerprint.js`：FS 指紋（path + mtime + size hash）
+- [ ] `scanner/filesystem.js`：併發遍歷、`.gitignore`、大檔案閾值
+- [ ] `scanner/ignore.js`：預設 ignore 列表
+- [ ] `scanner/techstack.js`：5 語言 manifest 識別
+- [ ] `scanner/entrypoints.js`：識別 main / app / server / cmd
 
 ### Tech Stack + Overview
-- [ ] Tool `project_init` 实现（dryRun 支持）
-- [ ] 写 `project.json` / `architecture.json`
-- [ ] Timeline 写入 init 事件
+- [ ] Tool `project_init` 實現（dryRun 支援）
+- [ ] 寫 `project.json` / `architecture.json`
+- [ ] Timeline 寫入 init 事件
 - [ ] RPC `dashboard.getOverview`
 - [ ] Dashboard Overview 面板
 
@@ -1216,219 +1216,219 @@ const ConfigSchema = {
 - [ ] `sidebar/aggregator.js`：5 表聚合 → SidebarPreview
 - [ ] `sidebar/pubsub.js`：debounce 100ms + emit `preview.changed`
 - [ ] `rpc/sidebar.js`：`getPreview` / `subscribe`
-- [ ] `client/sidebar/tab.js`：SidebarTab 注册
-- [ ] `client/sidebar/preview.js`：5 区块渲染
-- [ ] `client/sidebar/onboarding.js`：空状态引导
+- [ ] `client/sidebar/tab.js`：SidebarTab 註冊
+- [ ] `client/sidebar/preview.js`：5 區塊渲染
+- [ ] `client/sidebar/onboarding.js`：空狀態引導
 - [ ] `client/sidebar/blocks/{header,phase,activity,stats,actions}.js`
-- [ ] Tab 角标（>99 → `99+`）
-- [ ] i18n 覆盖（zh-CN / en-US，按 §6.5 key 表）
-- [ ] 主题 token 全部使用 DSH 变量
-- [ ] 区块跳转 Dashboard 锚点联调
+- [ ] Tab 角標（>99 → `99+`）
+- [ ] i18n 覆蓋（zh-CN / en-US，按 §6.5 key 表）
+- [ ] 主題 token 全部使用 DSH 變數
+- [ ] 區塊跳轉 Dashboard 錨點聯調
 
-## 11.5 P0.3a~P0.8 任务清单（概要）
+## 11.5 P0.3a~P0.8 任務清單（概要）
 
 **P0.3a Code Graph（TS/JS/Python）**：
-- tree-sitter 3 个 grammar 接入
-- AST 解析器（按文件类型分发）
-- 调用图（BFS + 环检测 + 深度限制 6）
+- tree-sitter 3 個 grammar 接入
+- AST 解析器（按檔案型別分發）
+- 呼叫圖（BFS + 環檢測 + 深度限制 6）
 - API endpoint 提取（Express / Fastify / FastAPI）
-- 数据库表识别（Prisma / TypeORM / SQLAlchemy）
-- 增量扫描（fingerprint 驱动）
+- 資料庫表識別（Prisma / TypeORM / SQLAlchemy）
+- 增量掃描（fingerprint 驅動）
 - Code Map 面板
 
 **P0.3b Code Graph（Go/Java/Rust/C/C++，v0.4.8 已交付）**：
-- Gin（Go）/ Spring（Java）/ FastAPI（Python）API endpoint 适配
+- Gin（Go）/ Spring（Java）/ FastAPI（Python）API endpoint 適配
 - GORM（Go）/ JPA（Java）/ SQLAlchemy（Python）/ Diesel（Rust）DB schema 抽取
-- Go 大写开头视为导出；Java class/interface/record/enum 视为导出；Rust `pub` 修饰符；C `#include` + function_definition
-- config.json `languages` 白名单（默认全开 JS/TS/Python/Go/Java/Rust/C/C++ 6 语言）
+- Go 大寫開頭視為匯出；Java class/interface/record/enum 視為匯出；Rust `pub` 修飾符；C `#include` + function_definition
+- config.json `languages` 白名單（預設全開 JS/TS/Python/Go/Java/Rust/C/C++ 6 語言）
 
 **P0.4 Memory**：
-- 9 类型校验 + 评分 + 相似度去重
+- 9 型別校驗 + 評分 + 相似度去重
 - Tools `project_memory_list/add` + RPC `memory.add/get`
 - Memory 面板
 
 **P0.5 Session 摘要**：
-- 监听 `session:ended`
+- 監聽 `session:ended`
 - 收集聊天摘要 + Git Diff
-- LLM 抽取（强制 JSON Schema）
-- 自动合并 / 强化
+- LLM 抽取（強制 JSON Schema）
+- 自動合併 / 強化
 - emit `preview.changed`
 
 **P0.6 Cross-Session**：
-- Context Injector（Top-K 选择算法：`importance*0.5 + recency*0.3 + moduleMatch*0.2`）
+- Context Injector（Top-K 選擇演算法：`importance*0.5 + recency*0.3 + moduleMatch*0.2`）
 - Tool `project_continue`
-- SidebarPreview "继续上次开发" 按钮联调
+- SidebarPreview "繼續上次開發" 按鈕聯調
 
 **P0.7 TODO**：
 - TODO CRUD 工具
 - Tasks 看板
-- SidebarPreview Phase 进度条同步
+- SidebarPreview Phase 進度條同步
 
 **P0.8 Architecture + 收尾**：
 - Mermaid 渲染
 - Architecture 面板
-- SidebarPreview 跳转锚点联调
-- README + 截图
+- SidebarPreview 跳轉錨點聯調
+- README + 截圖
 
 ---
 
-# 12. 测试策略
+# 12. 測試策略
 
-## 12.1 单元测试范围
+## 12.1 單元測試範圍
 
-| 模块 | 测试重点 |
+| 模組 | 測試重點 |
 | --- | --- |
-| scanner | 5 语言 manifest 识别；ignore 规则；2 分钟超时 |
-| analyzer | 调用图正确性；环检测；增量更新 |
-| memory | 9 类型 schema 校验；去重；评分 |
-| summarizer | LLM 抽取稳定性；source 强制 |
-| **sidebar aggregator** | 5 区块数据正确性；RPC < 100ms |
-| rpc handlers | 入参校验；错误码 |
+| scanner | 5 語言 manifest 識別；ignore 規則；2 分鐘超時 |
+| analyzer | 呼叫圖正確性；環檢測；增量更新 |
+| memory | 9 型別 schema 校驗；去重；評分 |
+| summarizer | LLM 抽取穩定性；source 強制 |
+| **sidebar aggregator** | 5 區塊資料正確性；RPC < 100ms |
+| rpc handlers | 入參校驗；錯誤碼 |
 
-## 12.2 集成测试
+## 12.2 整合測試
 
 - [ ] 端到端：在 `tests/fixtures/ts-sample` 上跑 init → ask → continue 流程
-- [ ] 5 语言（TS/JS/Python 必做；Go/Java 可选）各跑一遍
-- [ ] Session 开始 → 写 TODO → Session 结束 → Memory 自动新增 → SidebarPreview 刷新
+- [ ] 5 語言（TS/JS/Python 必做；Go/Java 可選）各跑一遍
+- [ ] Session 開始 → 寫 TODO → Session 結束 → Memory 自動新增 → SidebarPreview 重新整理
 
-## 12.3 验收用例
+## 12.3 驗收用例
 
-| 用例 | 验收标准 |
+| 用例 | 驗收標準 |
 | --- | --- |
-| A | 5k~20k LOC 陌生项目 init 后 5 分钟内 Overview + Architecture + CodeMap 可见 |
-| B | 真实 feature 后 Memory 自动新增至少 1 条 decision / change / lesson |
-| C | 新 Session `/project continue` 给出 Top-5 Memory + 当前 TODO |
-| D | `/project ask 为什么这里这么设计` 返回 Decision Memory + 来源 |
-| E | 手动改 3 文件 → 增量扫描 < 10 秒 → 架构图更新 |
-| **F — SidebarPreview** | DSH 启动立即看到 SidebarTab；未 init 显示引导；init 后 5 区块正确；区块点击正确跳转 |
+| A | 5k~20k LOC 陌生專案 init 後 5 分鐘內 Overview + Architecture + CodeMap 可見 |
+| B | 真實 feature 後 Memory 自動新增至少 1 條 decision / change / lesson |
+| C | 新 Session `/project continue` 給出 Top-5 Memory + 當前 TODO |
+| D | `/project ask 為什麼這裡這麼設計` 返回 Decision Memory + 來源 |
+| E | 手動改 3 檔案 → 增量掃描 < 10 秒 → 架構圖更新 |
+| **F — SidebarPreview** | DSH 啟動立即看到 SidebarTab；未 init 顯示引導；init 後 5 區塊正確；區塊點選正確跳轉 |
 
-## 12.4 测试数据
+## 12.4 測試資料
 
-**P0.0 必做**（1 个）：
-- `ts-sample/`：Express + TypeScript，2 API，1 DB 模型，1 跨文件调用链
+**P0.0 必做**（1 個）：
+- `ts-sample/`：Express + TypeScript，2 API，1 DB 模型，1 跨檔案呼叫鏈
 
-**P0.3a 必做**（再加 2 个，共 3 个）：
-- `js-sample/`：Vanilla JS（3 文件）
-- `py-sample/`：FastAPI + SQLAlchemy（6 文件）
+**P0.3a 必做**（再加 2 個，共 3 個）：
+- `js-sample/`：Vanilla JS（3 檔案）
+- `py-sample/`：FastAPI + SQLAlchemy（6 檔案）
 
-**P0.3b 可选**（再加 2 个，共 5 个）：
-- `go-sample/`：Gin + GORM（5 文件）
-- `java-sample/`：Spring Boot（4 文件）
+**P0.3b 可選**（再加 2 個，共 5 個）：
+- `go-sample/`：Gin + GORM（5 檔案）
+- `java-sample/`：Spring Boot（4 檔案）
 
-每个 fixture 必须：可编译运行 + manifest 文件 + 至少一个调用链贯穿的 feature。
+每個 fixture 必須：可編譯執行 + manifest 檔案 + 至少一個呼叫鏈貫穿的 feature。
 
 ---
 
-# 13. 调试指南
+# 13. 除錯指南
 
-## 13.1 调试入口优先级
+## 13.1 除錯入口優先順序
 
-1. **首选：DSH 日志面板 + `ctx.logger`** — 所有 Service / Tool / RPC 入口必打 `ctx.logger.info('entry', { method, argsSummary })`。
-2. 次选：浏览器 DevTools（F12）— Client UI、Console、Elements、Network。
-3. RPC 主动复现：`await host.call('project_brain/xxx', args)`。
-4. SQLite Browser：直接打开 `.project-brain/memory.db`。
-5. Node `--inspect-brk` 远程断点（仅在 Host 代码死循环/崩溃时用）。
+1. **首選：DSH 日誌面板 + `ctx.logger`** — 所有 Service / Tool / RPC 入口必打 `ctx.logger.info('entry', { method, argsSummary })`。
+2. 次選：瀏覽器 DevTools（F12）— Client UI、Console、Elements、Network。
+3. RPC 主動復現：`await host.call('project_brain/xxx', args)`。
+4. SQLite Browser：直接開啟 `.project-brain/memory.db`。
+5. Node `--inspect-brk` 遠端斷點（僅在 Host 程式碼死迴圈/崩潰時用）。
 
-## 13.2 必备日志点清单（每个模块必打）
+## 13.2 必備日誌點清單（每個模組必打）
 
-| 位置 | 日志内容 |
+| 位置 | 日誌內容 |
 | --- | --- |
 | Service 方法入口 | `logger.info('service:enter', { method, argsSummary })` |
 | Tool 入口 | `logger.info('tool:enter', { tool, argsSummary })` |
 | RPC handler 入口 | `logger.info('rpc:enter', { method, argsSummary })` |
-| SQLite 查询（debug） | `logger.debug('sql', { sql, params })` |
+| SQLite 查詢（debug） | `logger.debug('sql', { sql, params })` |
 | emit `preview.changed` | `logger.debug('pubsub:emit', { projectId, trigger })` |
-| LLM 调用 | `logger.info('llm:call', { promptTokens, maxTokens })` |
-| 错误 | `logger.error('xxx:failed', { code, message, stack })` |
+| LLM 呼叫 | `logger.info('llm:call', { promptTokens, maxTokens })` |
+| 錯誤 | `logger.error('xxx:failed', { code, message, stack })` |
 
-`argsSummary` 只输出字段名 + 长度/计数，**绝不打印整个对象**。
+`argsSummary` 只輸出欄位名 + 長度/計數，**絕不列印整個物件**。
 
-## 13.3 常见问题
+## 13.3 常見問題
 
 ### Q1：SidebarTab 看不到
-1. 检查 Slot ID 是否正确（Inspect `Slots.listSubTree`）。
-2. 检查 `ctx.slot()` 注册返回值。
-3. 检查 `apply(ctx)` 是否被调用。
-4. 检查 DSH 日志是否有 plugin 加载错误。
+1. 檢查 Slot ID 是否正確（Inspect `Slots.listSubTree`）。
+2. 檢查 `ctx.slot()` 註冊返回值。
+3. 檢查 `apply(ctx)` 是否被呼叫。
+4. 檢查 DSH 日誌是否有 plugin 載入錯誤。
 
-### Q2：RPC 调用超时
-1. 检查 Host 是否注册对应 `harness.handle`。
-2. 检查入参字段拼写。
-3. 检查 SQLite 锁（DB Browser 看 `.project-brain/*.db-wal`）。
-4. 检查 Pub/Sub debounce。
+### Q2：RPC 呼叫超時
+1. 檢查 Host 是否註冊對應 `harness.handle`。
+2. 檢查入參欄位拼寫。
+3. 檢查 SQLite 鎖（DB Browser 看 `.project-brain/*.db-wal`）。
+4. 檢查 Pub/Sub debounce。
 
-### Q3：Memory 写入失败
-1. 检查 schema 校验（按 §4.4）。
-2. 检查 `E_MEMORY_SCHEMA` 详情。
-3. 检查 source 字段是否齐全。
+### Q3：Memory 寫入失敗
+1. 檢查 schema 校驗（按 §4.4）。
+2. 檢查 `E_MEMORY_SCHEMA` 詳情。
+3. 檢查 source 欄位是否齊全。
 
-### Q4：扫描超时
-1. 检查 ignore 列表。
-2. 检查 `maxFileSizeBytes`。
-3. 文件 >10k 应提前 partial。
+### Q4：掃描超時
+1. 檢查 ignore 列表。
+2. 檢查 `maxFileSizeBytes`。
+3. 檔案 >10k 應提前 partial。
 
 ### Q5：HMR 不生效
-1. 确认 DSH 启动参数含 `--expose-internals`。
-2. 确认 `cordis-plugin-hmr` 已挂载。
-3. 检查 chokidar watch 范围。
+1. 確認 DSH 啟動引數含 `--expose-internals`。
+2. 確認 `cordis-plugin-hmr` 已掛載。
+3. 檢查 chokidar watch 範圍。
 
-### Q6：SidebarPreview 角标不更新
-1. 检查是否订阅 `preview.changed`。
-2. 检查 Pub/Sub debounce。
-3. 检查 TODO 写入路径是否 emit。
+### Q6：SidebarPreview 角標不更新
+1. 檢查是否訂閱 `preview.changed`。
+2. 檢查 Pub/Sub debounce。
+3. 檢查 TODO 寫入路徑是否 emit。
 
-## 13.4 排错 SOP
+## 13.4 排錯 SOP
 
 ```
-1. 现象描述（截图 / 错误码 / 日志）
+1. 現象描述（截圖 / 錯誤碼 / 日誌）
    ↓
-2. cordis_inspect_self 读 Package 状态
+2. cordis_inspect_self 讀 Package 狀態
    ↓
-3. cordis_inspect_query 查相关 Service / Slot
+3. cordis_inspect_query 查相關 Service / Slot
    ↓
-4. host.call 主动复现 RPC
+4. host.call 主動復現 RPC
    ↓
-5. SQLite Browser 直查数据
+5. SQLite Browser 直查資料
    ↓
-6. 锁代码 → 提 issue → 修
+6. 鎖程式碼 → 提 issue → 修
 ```
 
 ---
 
-# 14. 编码规约
+# 14. 編碼規約
 
-## 14.1 JavaScript / TypeScript 风格
+## 14.1 JavaScript / TypeScript 風格
 
-- 默认严格模式（strict, noImplicitAny, noUncheckedIndexedAccess）。
-- **`enum` 默认不用**，必要时用 union literal types；DSH 内部约定也是 union。
-- **`any` 默认不用**；边界处用 `unknown` + 类型守卫；RPC 桥接 / DSH 内部反射场景在 PR 注释中说明后可破例。
-- **`as` 类型断言尽量避免**；JSDoc cast 在 schemastery 推断场景下可破例。
-- 动态插件代码（host/client 的 `apply）`内）禁止 `import` / `require` / JSX / 装饰器；用打包后的 bundle 或纯 function body。
+- 預設嚴格模式（strict, noImplicitAny, noUncheckedIndexedAccess）。
+- **`enum` 預設不用**，必要時用 union literal types；DSH 內部約定也是 union。
+- **`any` 預設不用**；邊界處用 `unknown` + 型別守衛；RPC 橋接 / DSH 內部反射場景在 PR 註釋中說明後可破例。
+- **`as` 型別斷言儘量避免**；JSDoc cast 在 schemastery 推斷場景下可破例。
+- 動態外掛程式碼（host/client 的 `apply）`內）禁止 `import` / `require` / JSX / 裝飾器；用打包後的 bundle 或純 function body。
 
-## 14.2 文件命名
+## 14.2 檔案命名
 
-- 文件名 `kebab-case.js` / `kebab-case.jsx`。
-- React 组件 `PascalCase.js` / `PascalCase.jsx`。
-- 测试 `*.test.js` / `*.test.jsx`。
+- 檔名 `kebab-case.js` / `kebab-case.jsx`。
+- React 元件 `PascalCase.js` / `PascalCase.jsx`。
+- 測試 `*.test.js` / `*.test.jsx`。
 
-## 14.3 错误处理
+## 14.3 錯誤處理
 
-- 永远不吞错；不空 catch。
-- 错误必须含 `code` + `message` + 可选 `cause`。
-- 上抛错误由 Service 边界统一转换（带 trace）。
+- 永遠不吞錯；不空 catch。
+- 錯誤必須含 `code` + `message` + 可選 `cause`。
+- 上拋錯誤由 Service 邊界統一轉換（帶 trace）。
 
-## 14.4 日志
+## 14.4 日誌
 
-- 关键决策 / 状态变更必 `logger.info`。
-- 错误必 `logger.warn` 或 `logger.error`。
-- 调试日志 `logger.debug`，生产可关。
-- **禁止打印整个对象**；只打印 id + 关键字段（见 §13.2）。
+- 關鍵決策 / 狀態變更必 `logger.info`。
+- 錯誤必 `logger.warn` 或 `logger.error`。
+- 除錯日誌 `logger.debug`，生產可關。
+- **禁止列印整個物件**；只打印 id + 關鍵欄位（見 §13.2）。
 
-## 14.5 注释
+## 14.5 註釋
 
-- 公共 API 必带 JSDoc。
-- 模块顶部 1~3 行说明。
-- TODO 格式：`// TODO(name): ...`，含负责人。
+- 公共 API 必帶 JSDoc。
+- 模組頂部 1~3 行說明。
+- TODO 格式：`// TODO(name): ...`，含負責人。
 
 ## 14.6 Git 提交
 
@@ -1437,214 +1437,214 @@ const ConfigSchema = {
 | type | 用途 |
 | --- | --- |
 | `feat` | 新功能 |
-| `fix` | Bug 修复 |
-| `refactor` | 重构 |
-| `docs` | 文档 |
-| `test` | 测试 |
-| `chore` | 构建 / 依赖 |
+| `fix` | Bug 修復 |
+| `refactor` | 重構 |
+| `docs` | 文件 |
+| `test` | 測試 |
+| `chore` | 構建 / 依賴 |
 
 例：`feat(sidebar): add preview panel with 5 blocks`
 
-## 14.7 依赖
+## 14.7 依賴
 
-- 不引入与 DSH 重复的依赖。
-- 优先使用 DSH export 的服务（llm, storage, tools）。
-- 新增依赖必须 PR 注释说明理由。
+- 不引入與 DSH 重複的依賴。
+- 優先使用 DSH export 的服務（llm, storage, tools）。
+- 新增依賴必須 PR 註釋說明理由。
 
 ---
 
-# 15. 完成定义（Definition of Done）
+# 15. 完成定義（Definition of Done）
 
-## 15.1 单个 PR / 提交
+## 15.1 單個 PR / 提交
 
-- [ ] `tsc --noEmit` 通过
-- [ ] 新增功能有单元测试
+- [ ] `tsc --noEmit` 通過
+- [ ] 新增功能有單元測試
 - [ ] 公共 API 有 JSDoc
-- [ ] 错误处理符合 §4.5 / §7.3 / §8.4
-- [ ] 没有 console.log 残留
-- [ ] 没有 TODO 残留（除非有负责人 + issue）
-- [ ] 提交信息符合 §14.6
-- [ ] 本地链接 profile 后实际验证过
+- [ ] 錯誤處理符合 §4.5 / §7.3 / §8.4
+- [ ] 沒有 console.log 殘留
+- [ ] 沒有 TODO 殘留（除非有負責人 + issue）
+- [ ] 提交資訊符合 §14.6
+- [ ] 本地連結 profile 後實際驗證過
 
-## 15.2 整个 MVP
+## 15.2 整個 MVP
 
-满足 §12.3 所有用例（A~F），并：
-- [ ] 3 语言 fixture 全部通过（TS / JS / Python）
-- [ ] 端到端：init → 开发 → session 结束 → 新 session continue
-- [ ] SidebarPreview 全功能验证（§9.10 12 条全部勾选）
-- [ ] 性能：扫描 < 2 分钟；增量 < 10 秒；SidebarRPC < 100ms（p95）
-- [ ] 主要路径各跑 100 次无崩溃，内存增长 < 50MB（替代原 24h smoke test）
+滿足 §12.3 所有用例（A~F），並：
+- [ ] 3 語言 fixture 全部通過（TS / JS / Python）
+- [ ] 端到端：init → 開發 → session 結束 → 新 session continue
+- [ ] SidebarPreview 全功能驗證（§9.10 12 條全部勾選）
+- [ ] 效能：掃描 < 2 分鐘；增量 < 10 秒；SidebarRPC < 100ms（p95）
+- [ ] 主要路徑各跑 100 次無崩潰，記憶體增長 < 50MB（替代原 24h smoke test）
 - [ ] README / SPEC / PRD / DESIGN 全部同步
 
-## 15.3 单个 P0 阶段
+## 15.3 單個 P0 階段
 
-- [ ] 该阶段所有任务勾选完成
-- [ ] 阶段验收用例通过
-- [ ] 文档（如有新增）已更新
+- [ ] 該階段所有任務勾選完成
+- [ ] 階段驗收用例通過
+- [ ] 文件（如有新增）已更新
 - [ ] 已 commit 到 git
 
 ---
 
-# 16. 未决问题与未来工作
+# 16. 未決問題與未來工作
 
-## 16.1 已确认
+## 16.1 已確認
 
-| # | 决策 | 结果 |
+| # | 決策 | 結果 |
 | --- | --- | --- |
-| 1 | 多项目策略 | 单活动项目 + cwd 探测 |
-| 2 | MVP 语言 | TS / JS / Python（必）/ Go / Java（可选） |
-| 3 | LLM 路由 | 复用 DSH 默认 route |
-| 4 | 首次扫描超时 | 2 分钟硬上限 |
-| 5 | UI 形态 | SidebarPreview 常驻 + Dashboard 按需 |
-| 6 | 命名约定 | SidebarPreview / SidebarTab / `preview.changed` / `sidebar.getPreview` |
-| 7 | DB 策略 | MVP 单 SQLite 文件 `memory.db` |
-| 8 | Perf 目标 | SidebarRPC < 100ms p95；折叠态渲染 < 50ms |
+| 1 | 多專案策略 | 單活動專案 + cwd 探測 |
+| 2 | MVP 語言 | TS / JS / Python（必）/ Go / Java（可選） |
+| 3 | LLM 路由 | 複用 DSH 預設 route |
+| 4 | 首次掃描超時 | 2 分鐘硬上限 |
+| 5 | UI 形態 | SidebarPreview 常駐 + Dashboard 按需 |
+| 6 | 命名約定 | SidebarPreview / SidebarTab / `preview.changed` / `sidebar.getPreview` |
+| 7 | DB 策略 | MVP 單 SQLite 檔案 `memory.db` |
+| 8 | Perf 目標 | SidebarRPC < 100ms p95；摺疊態渲染 < 50ms |
 
-## 16.2 仍待确认（不阻塞 P0.1）
+## 16.2 仍待確認（不阻塞 P0.1）
 
-| # | 问题 | 倾向 / 阻塞阶段 |
+| # | 問題 | 傾向 / 阻塞階段 |
 | --- | --- | --- |
-| 9 | **SidebarTab Slot ID** | **P0.1 Inspect 确认；阻塞 P0.2** |
-| 10 | **Dashboard Slot ID** | **P0.1 Inspect 确认；阻塞 P0.2** |
-| 11 | 主题 token 实际命名（推测 `--dsh-*`） | P0.1 验证 |
-| 12 | DSH `storage` Service 真实名称 | P0.1 验证（§5.6） |
-| 13 | 远程项目（GitHub URL 直接扫描） | V2 |
-| 14 | 团队共享（`.project-brain/` 跟 Git） | 不做 |
-| 15 | 大文件阈值默认 1MB | OK |
+| 9 | **SidebarTab Slot ID** | **P0.1 Inspect 確認；阻塞 P0.2** |
+| 10 | **Dashboard Slot ID** | **P0.1 Inspect 確認；阻塞 P0.2** |
+| 11 | 主題 token 實際命名（推測 `--dsh-*`） | P0.1 驗證 |
+| 12 | DSH `storage` Service 真實名稱 | P0.1 驗證（§5.6） |
+| 13 | 遠端專案（GitHub URL 直接掃描） | V2 |
+| 14 | 團隊共享（`.project-brain/` 跟 Git） | 不做 |
+| 15 | 大檔案閾值預設 1MB | OK |
 
 ---
 
-# 17. 数据迁移与备份
+# 17. 資料遷移與備份
 
-## 17.1 SQLite Schema 迁移
+## 17.1 SQLite Schema 遷移
 
-- `src/host/storage/migrations.js` 维护迁移脚本数组。
-- 启动时读 `schema_version` 表（无则创建），按 `version` 顺序执行未跑过的脚本。
-- 每个迁移脚本签名：`async function up(db) { ... }` + `async function down(db) { ... }`（down 仅 dev 用）。
-- MVP 仅 v1，无 down 强制；V2 起强制双向迁移。
+- `src/host/storage/migrations.js` 維護遷移指令碼陣列。
+- 啟動時讀 `schema_version` 表（無則建立），按 `version` 順序執行未跑過的指令碼。
+- 每個遷移指令碼簽名：`async function up(db) { ... }` + `async function down(db) { ... }`（down 僅 dev 用）。
+- MVP 僅 v1，無 down 強制；V2 起強制雙向遷移。
 
-## 17.2 项目数据导出 / 导入
+## 17.2 專案資料匯出 / 匯入
 
-**MVP 不做**，但预留 Tool：
+**MVP 不做**，但預留 Tool：
 
-- `project_export`：导出 `.project-brain/` 为 `.tar.gz`，含 JSON + SQLite dump。
-- `project_import`：从 `.tar.gz` 重建（注意路径替换）。
+- `project_export`：匯出 `.project-brain/` 為 `.tar.gz`，含 JSON + SQLite dump。
+- `project_import`：從 `.tar.gz` 重建（注意路徑替換）。
 
-**V2 实现**，V1 阶段用户可手动 `tar`/解压。
+**V2 實現**，V1 階段使用者可手動 `tar`/解壓。
 
-## 17.3 用户级误删恢复
+## 17.3 使用者級誤刪恢復
 
-- `.project-brain/` 删除后不可自动恢复（无云备份）。
-- 提示：UI 显示一次性的"未检测到项目大脑，是否重新 init？"卡片。
-
----
-
-# 18. 安全与沙箱
-
-## 18.1 文件系统访问范围
-
-- **只读路径**：用户授权的 `<project>` 根目录。
-- **写路径**：仅限 `<project>/.project-brain/` 子树。
-- 其他路径一律 `E_PERMISSION`。
-
-## 18.2 LLM 数据脱敏
-
-- 喂给 LLM 的 prompt 中：
-  - 文件路径可保留（项目内相对路径）。
-  - 完整文件内容按 §6 token 预算切片，**不发送整个项目**。
-  - 聊天原文不外泄到 LLM（只摘要后送）。
-
-## 18.3 网络访问
-
-- 默认**不发起任何外部网络请求**。
-- LLM 调用走 DSH 内部 route，host 由 DSH 控制。
-
-## 18.4 DSH Sandbox 兼容
-
-- 遵循 DSH 的 sandbox policy（来自 `@deepseek-ai/dsh-sandbox-policy`）。
-- 不尝试绕过 sandbox 边界。
+- `.project-brain/` 刪除後不可自動恢復（無雲備份）。
+- 提示：UI 顯示一次性的"未檢測到專案大腦，是否重新 init？"卡片。
 
 ---
 
-# 19. 失败模式与恢复
+# 18. 安全與沙箱
 
-| 失败模式 | 检测 | 恢复策略 |
+## 18.1 檔案系統訪問範圍
+
+- **只讀路徑**：使用者授權的 `<project>` 根目錄。
+- **寫路徑**：僅限 `<project>/.project-brain/` 子樹。
+- 其他路徑一律 `E_PERMISSION`。
+
+## 18.2 LLM 資料脫敏
+
+- 餵給 LLM 的 prompt 中：
+  - 檔案路徑可保留（專案內相對路徑）。
+  - 完整檔案內容按 §6 token 預算切片，**不傳送整個專案**。
+  - 聊天原文不外洩到 LLM（只摘要後送）。
+
+## 18.3 網路訪問
+
+- 預設**不發起任何外部網路請求**。
+- LLM 呼叫走 DSH 內部 route，host 由 DSH 控制。
+
+## 18.4 DSH Sandbox 相容
+
+- 遵循 DSH 的 sandbox policy（來自 `@deepseek-ai/dsh-sandbox-policy`）。
+- 不嘗試繞過 sandbox 邊界。
+
+---
+
+# 19. 失敗模式與恢復
+
+| 失敗模式 | 檢測 | 恢復策略 |
 | --- | --- | --- |
-| SQLite 文件损坏 | `db.prepare()` 抛错 | 备份原文件 → 重建 → 提示用户 Memory 丢失 |
-| `project.json` 缺失 | `fs.existsSync` | 提示重新 init；不重建（避免覆盖用户手动改动） |
-| tree-sitter grammar 不支持 | `loader.load()` 抛错 | 跳过该文件，记 warning，继续扫描其他文件 |
-| LLM 调用超时 | 30s timeout | 重试 1 次；失败则降级到规则抽取 |
-| Git 仓库不存在 | `git rev-parse` 失败 | 跳过 git 相关步骤，记 warning |
-| 文件权限不足 | `EACCES` | 跳过该文件，记 warning，汇总报告 |
-| 网络（远程项目） | 不适用（V2） | — |
-| SidebarTab Slot 注册失败 | DSH 启动日志 | 降级：仅保留 Onboarding 卡片，提示重启 DSH |
-| Memory 容量超限 | `count(*) > maxMemories` | 自动触发 Dream 'light'；归档低 importance 的 Memory |
-| Schema 版本不兼容 | 旧 client 读新 db | 强制迁移；不能迁移则 `E_INTERNAL` 提示升级 |
+| SQLite 檔案損壞 | `db.prepare()` 拋錯 | 備份原檔案 → 重建 → 提示使用者 Memory 丟失 |
+| `project.json` 缺失 | `fs.existsSync` | 提示重新 init；不重建（避免覆蓋使用者手動改動） |
+| tree-sitter grammar 不支援 | `loader.load()` 拋錯 | 跳過該檔案，記 warning，繼續掃描其他檔案 |
+| LLM 呼叫超時 | 30s timeout | 重試 1 次；失敗則降級到規則抽取 |
+| Git 倉庫不存在 | `git rev-parse` 失敗 | 跳過 git 相關步驟，記 warning |
+| 檔案許可權不足 | `EACCES` | 跳過該檔案，記 warning，彙總報告 |
+| 網路（遠端專案） | 不適用（V2） | — |
+| SidebarTab Slot 註冊失敗 | DSH 啟動日誌 | 降級：僅保留 Onboarding 卡片，提示重啟 DSH |
+| Memory 容量超限 | `count(*) > maxMemories` | 自動觸發 Dream 'light'；歸檔低 importance 的 Memory |
+| Schema 版本不相容 | 舊 client 讀新 db | 強制遷移；不能遷移則 `E_INTERNAL` 提示升級 |
 
-所有失败必须有降级路径，**不能崩溃 DSH 进程**。
+所有失敗必須有降級路徑，**不能崩潰 DSH 程序**。
 
 ---
 
-# 20. 变更日志（Changelog）
+# 20. 變更日誌（Changelog）
 
-| 版本 | 日期 | 变更摘要 | 触发 |
+| 版本 | 日期 | 變更摘要 | 觸發 |
 | --- | --- | --- | --- |
 | v0.1 | 初版 | 初稿 | — |
-| v0.2 | 评审后修订 | ① TS-as-contract 提示；② Slot ID 提前到 P0.1；③ P0.1 加 Inspect 任务；④ 工时 38~48d；⑤ SQLite PRAGMA；⑥ fixture 拆 P0.0；⑦ SidebarPreview 性能改目标+测量；⑧ 日志面板优先；⑨ 术语统一；⑩ 编码规约放宽；+§17/§18/§19/§20 | 评审反馈 |
-| **v0.2.1** | **P0.1 Inspect 校正** | **① SidebarPreview 实际注册到 `conversation.view` Slot（order=35，紧随 `dsh-mneme-memory` order=30），不是侧边栏 tab；② 主题 token 实际前缀 `--dsw-*`（不是 `--dsh-*`）；③ Host Session 事件为 `agent/session-start` / `session/disposed`（不是 `session:started/ended`）；④ Service 名校正：`storage` + `storageDomain` 都存在；`sessionPersistence` 是 Session 日志而非事件** | **P0.1 Inspect 结果** |
-| **v0.2.2** | **P0.4.1 修复 + 工具面补全** | **① `project_init` 重跑保留 projectId/createdAt + 写 timeline 事件；② 新增 `project_rescan` / `project_continue`（P0.6 最小）/ `project_memory_add|list`（补全 P0.4）/ `project_todo_add|list|done`（P0.7-lite）共 8 工具；③ SidebarPreview Stats 改为真实数据（todo/memory jsonl）；④ 新增 TODO 区块 + Dashboard 展开区（Actions 按钮真功能：复制提示词 / DOM toggle，非 console.log 占位）；⑤ 文档校正：数据通道为 build-time embed（非 runtime fetch）** | **P0.4.1 实现** |
-| **v0.2.3** | **契约确认** | **`conversation.view` 注册项仅 {id, order, label}，无 badge 字段 → Tab 角标（P0.2b-3/P0.5）无法实现，改为 Dashboard 内展示待办；`conversation.input.dock`（composer 上方 TODO strip）为 P0.7 潜在入口** | **Slots Inspect** |
-| **v0.2.4** | **P0.4.2 切换 workspace 动态更新** | **① host 注册 `webServer` route `/plugins/dsh-project-brain/preview.json`（`buildWorkspacePreview` 按 `sandboxPolicy.workspaceRoot` 读 `.project-brain/`，读已生成数据零 token）；② client 改 class component + `componentDidMount` `fetch` 拉动态数据，失败 fallback 到 build-time embed（不崩）；③ 切换 workspace 即更新，未生成的显示 Onboarding；④ 新增 `src/host/rpc/preview.js` + `scripts/verify-preview.mjs`** | **用户反馈"切换 workspace 不更新"** |
-| **v0.2.5** | **P0.4.2-final 架构结论 + 真正修复** | **① 用户截图证实：静态 workspace client 下 `typeof host === 'undefined'`、`typeof window.host === 'undefined'`、webServer route 404——**静态 plugin fiber 没有任何 host→client 数据通道**（host.call 不存在、webServer named route 被 DSH 静态 server fallback 抢先 404）；② 最终方案：build 时扫 `~/.dsh/storages/workspace.json`，对每个 DSH workspace 递归 `.project-brain/`，把 `(sessionId → workspaceId → previewData)` map 全部 inline 进 client bundle；③ client 启动用 `props.sessionId` 查表 → 命中当前 session 所属 workspace 的预览数据（纯 build-time lookup，**零 token**）；⑤ 切换 workspace = conversation.view 重新挂载（新 sessionId）→ 自动取新数据；⑥ 已生成直接读，未生成显示 Onboarding；⑦ `src/client.js` 改回纯函数组件（不再需要 class component + 异步 state）；⑧ 撤销 `host.call`/`fetch`/`webServer route`/`harness 探测修复`/`tab 调试条`等所有无效尝试** | **用户三次反馈"切换不更新"+ 截图证实静态 client 下 host/webServer 全部不可用** |
-| **v0.2.6** | **P0.4.8 scanner 真实运行时修复** | **`fs.listDir` 返回 `FsDirEntry { name, type: 'file'\|'directory'\|'other', target: FsTarget }`（DSH dsh-fs-local 实现）；旧 scanner 用 `e.isFile`/`e.isDirectory`（boolean — DSH 没这俩字段）→ 实测 `files:0 / languages:{}`。新 `entryKind(e)` 优先读 `e.type`，回退 `e.isFile`/`e.isDirectory`（boolean 或 method，兼容 node Dirent adapter）；递归用 `e.target`（已 resolved FsTarget），仅缺失时回退 `fs.resolve(e.name, {cwd})`；深度 3 → 5** | **运行 `project_init` dryRun 实测 files:0 + P0.4.7 bundle 已带此 bug** |
-| **v0.2.7** | **P0.4.9 跨项目 todo 隔离** | **新增 `src/host/store/path-resolver.js`：`resolveProjectPath(args, exec, sandboxPolicy)` 优先级链 = `args.path` → `exec.session.cwd` → `exec.ctx.session` → `exec.sessionId + ctx.get('sessions')` → `agents.currentInitiator()` → `sandboxPolicy.workspaceRoot` → `.`。`project_continue` / `project_memory_add\|list` / `project_todo_add\|list\|done` 全部切换到此 resolver。`project_init/rescan` 仍必传 path（`E_NO_PATH` 守卫）。根因是静态 plugin fiber 的 `sandboxPolicy.workspaceRoot` 是 profile 级固定值（DSH install / 首个 workspace），与用户当前 session 的 workspace 解耦 → todos/memory 串台** | **实测发现 session workspace 与工具 fallback workspace 不一致，导致项目数据串台。** |
-| **v0.2.8** | **P0.5 Session 摘要（最小可用）** | **新增 `src/host/summarizer.js`：`setupSummarizer(ctx, fs, sandboxPolicy)` 订阅 `session/disposed`；从 session cwd 解析项目路径 → `git diff --name-only HEAD~1`（5s 超时，swallow 失败）→ 若有变更写一条 `type=change` memory + `eventType=session_summary` timeline 事件 + `emit('project_brain/preview.changed')`。fire-and-forget，全部 try/catch + fallback。LLM 抽取留 TODO 占位（合约未稳，避免拖累）** | **P0.5 SPEC §16 任务** |
-| **v0.2.9** | **P0.5.x 工具面补全（8 → 12）** | **新增 4 工具：`project_status`（项目快照：各类型 Memory 计数 + TODO 统计 + 最近活动 + lastActivityAge）；`project_todo_update`（按 id/title 改 status/priority/title/description，写 `todo_update` timeline）；`project_ask`（纯规则关键词检索：title 命中 ×2 + importance 加权，零 token，返回 sources + confidence）；`project_dream`（light：title Jaccard ≥ 0.92 同类合并候选 + importance<0.15 且年龄>30d 归档候选；full 模式占位）。`src/index.js` toolBuilders 扩展到 12 个，build 后 lib/index.js 87.0kb** | **SPEC §7.2 余下工具 + 用户"开发完所有功能"要求** |
-| **v0.3.0** | **架构重做：live 数据通道 + Context Injector + LLM RAG** | **打破 build-time embed 架构（违反"实时同步"偏好）：① 启用 `webServer.register` route `/dsh-project-brain/preview.json`（避开 `/plugins/` 前缀防 DSH 静态 server 抢先 404），host 端用 `sessions.get(sessionId).meta.cwd` 反查项目路径，每次请求重新读 `.project-brain/` 实时数据；② `src/client.js` 改 class component + `componentDidMount` + `setInterval(5000)` 拉取，失败时保留上次成功数据 + 显示"离线"徽章；首次渲染用 `__ALL_WORKSPACES_JSON__` 兜底避免空白；增加 LiveBadge 显示 "实时同步 / 离线 / 本地快照" 三态；③ 新增 `src/host/injector.js`：通过 `systemPrompt.service.section()` 注册 `project-brain-context` 段，监听 `agent/session-start` + `preview.changed` 预读 `.project-brain/`，render 时按 SPEC §4.5 算法 `importance*0.5 + recency*0.3 + moduleMatch*0.2` 选 Top-5 记忆 + 活跃 TODO + 最近活动，组装 markdown，自动注入到每个新 session 的 system prompt；token 预算 1500，超出按段落截断；④ `project_ask` 加 `useLLM` 参数（默认 false 兼容旧用法），true 时调 `llm.stream` 用 RAG prompt 合成答案，LLM 失败 fallback 到纯规则版（错误信息写在 `data.llm.error`）；⑤ `summarizer` 改用 DSH `shell.service.run` 跑 `git diff`（之前 `child_process.spawn` 在某些 sandbox 下 EPERM）。build 后 lib/index.js 105.7kb / lib/client.js 53.9kb** | **用户指出"内容改动后能实时同步（不要求立即）+ 跨 Session 自动恢复上下文"是核心目的；P0.4.2 build-time embed 架构与该目的根本矛盾；project_ask 阉割版纯规则检索价值低于 SPEC 设计意图** |
-| **v0.3.1** | **PromptSection 字段修复（DSH session 崩溃）** | **`systemPrompt.service.section()` 期望 `PromptSection = { name: string, order: number, text: string \| ((context) => string), complete?: boolean }`（DSH `packages/core/system-prompt/src/index.ts`）。v0.3.0 误传 `{ name, order, id, priority, render }`，DSH 合并 sections 时对 undefined 调 `.indexOf` 抛错（错误显示在 goal section 调用栈是因为 waterfall 失败连带），整个 DSH session 无法运行。修复：`render` → `text`，接受 `AssembleContext` 参数；删除 `id` / `priority`（非合约字段）。Injector 重新启用** | **用户截图显示 "本轮运行失败 Cannot read properties of undefined (reading 'indexOf')"；目标对齐后排查 GitHub DSH 源码确认 PromptSection 字段名** |
-| **v0.3.2** | **Electron 实时同步诊断（DSH Desktop）** | **LiveBadge 改为实时显示真实 fetch 错误（`data-error` 属性 + `title` hover），连续失败后保留 build-time embed；webServer route handler 写 `.project-brain/.webserver-last-hit.json` 诊断 marker（hitAt/sessionId/workspaceRoot/url/method），方便排查 DSH Desktop 下 fetch 是否走 webServer（Electron renderer fetch 走 IPC bridge，可能不通）；添加 CORS `access-control-allow-origin: *` 头（万一跨 fiber / 跨端口）。lib/index.js 106.2kb / lib/client.js 61.2kb** | **用户在 DSH Desktop（Electron）下重启后 LiveBadge 仍"离线"且 sidebar 数据用 build-time 兜底；推断 Electron renderer fetch 走 IPC bridge，不直接打 webServer，需要诊断信号** |
-| **v0.3.3** | **路径重试（prefix + 独特命名空间）** | **webServer route path 从 `/dsh-project-brain/preview.json` 改为 `/__dsh_brain__/preview.json`（DSH 内部约定下划线命名空间），route kind 从 `exact` 改为 `prefix`。client fetch URL 同步更新。lib/index.js 106.2kb / lib/client.js 61.3kb** | **v0.3.2 用户截图显示 `HTTP 404`，怀疑 DSH frontend-static SPA fallback 抢先响应；改 prefix + 独特路径规避** |
-| **v0.3.4** | **完整回退：放弃 webServer route，回到 build-time embed + auto-rebuild** | **用户截图（DSH Desktop **和** browser）均 `HTTP 404`——确认 v0.3.0 重走 P0.4.5 回头路根本不通（static plugin fiber 没有 webServer service，browser 模式也被 SPA fallback 抢先）。彻底回退：① `src/index.js` 注释 `registerPreviewRoute` 调用，保留 import 作为工具；② `src/client.js` 回退为纯函数组件 + build-time embed，删除 class component / setInterval / fetch / LiveBadge 实时状态；新增 `SnapshotBadge` 显示"📦 快照 · Xs"（提示用户这是 build-time 数据而非实时）；③ 数据通道改为 `preview.changed → setupAutoRebuild → spawn node build.js → clientModules.rebuilt → renderer 热重载 client bundle`，用户无需重启 DSH（renderer 内部重载），代价是每次 update 1-3 秒 build 时间。lib/index.js 105.7kb / lib/client.js 51.7kb（减少 10kb）** | **用户确认 v0.3.3 在 browser 也是 404，证明 static plugin fiber 下 webServer 完全不可用；放弃 live 通道，回到 P0.4.7 的 build-time embed 架构但强化 auto-rebuild** |
-| **v0.3.5** | **build.js 排除 plugin 自身 .project-brain** | **`findBrainsUnder` 在递归时遇到 `cordis.patch.yml` 直接 return（跳过），避免把 plugin 自己的 `.project-brain/` 当成 workspace 的项目嵌入。之前 plugins workspace 显示 `dsh-project-brain` 项目（错把 plugin 自己的 brain 算成 plugins workspace 的项目），现在正确显示空 → 触发 Onboarding 提示用户调 project_init。scanned: 4 → 3。lib/client.js 47.0kb（继续减少）** | **v0.3.4 用户截图确认 build-time embed 工作（绿色📦快照徽章），但 sidebar 错误显示 `dsh-project-brain` 项目（plugin 自己），不是用户当前 workspace 的真实项目** |
-| **v0.3.6** | **tools schema 补 path + output additionalProperties: true + setupAutoRebuild 用 DSH shell service** | **① tools.parameters 补全 `path` 字段（memory/todo/todo_update），否则 DSH 自动剥离 path 参数，导致 fallback 写错位置；② output schema 把 `additionalProperties: false` 改成 `true`，并显式声明 `code/message` 字段，错误路径返回不再被拒；③ `setupAutoRebuild` 用 DSH `shell.service.run` 替代 `child_process.spawn`，避免 plugin fiber sandbox EPERM。lib/index.js 110.7kb / lib/client.js 48.2kb** | **v0.3.5 用户截图确认 plugins workspace 显示正确（绿色📦快照 + Onboarding 卡片）** |
-| **v0.3.7** | **brain-files 默认 danger-full-access policy** | **`writeText/appendJsonl` 在调用方没传 `writePolicy` 时，自动从 `fs.sandboxPolicy` 取 `danger-full-access` mode（绕过 workspace 路径限制）。旧调用方（todo.js/memory.js 等）无需修改即可写到其他 workspace。修复 E_WRITE_FAILED（DSH 默认 sandbox 模式只读 workspace 根）** | **v0.3.6 后调 `project_todo_add path="..."` 返回 E_WRITE_FAILED（schema 修好了但 sandbox 拒绝写跨 workspace 目录）** |
-| **v0.3.9** | **BOM strip + project.json 用 readJson + ask JSON round-trip** | **① `parseJsonl` / `readJson` 加 `U+FEFF` BOM strip（PowerShell `Set-Content -Encoding utf8` 写入 jsonl 时加了 BOM，导致第一行 JSON.parse 失败） ② `src/tools/ask.js` 改用 `readJson` 读 `project.json`（之前用 `readJsonl` 读 multi-line pretty-printed JSON 必然失败，导致 `projectInfo.name` undefined，render 暴露问题）③ ask execute return 加 `JSON.parse(JSON.stringify(ret))` 防御性 round-trip + `_diag` 字段（万一某字段含不可序列化数据能定位）** | **用户重启后 `project_ask` 报 "value is not lossless JSON"。离线 debug（scripts/debug-ask.js）找到真因：project.json 是 pretty-printed 多行 JSON，但 ask.js 用 readJsonl 按行解析** |
-| **v0.3.8** | **path-resolver 加 workspaceRegistry + 跳过 DSH Desktop 污染 fallback** | **实测发现：DSH Desktop Electron 下，`sandboxPolicy.workspaceRoot` 可能是 `<user-home>/AppData/Local/Programs/DSH Desktop`（DSH 安装目录），不是用户当前 session 的 workspace。所有不带 path 的工具调用都写到 DSH Desktop 安装目录的 `.project-brain/`。修复：① `readCwdFromWorkspaceRegistry`：用 `ctx.get('sessions').list()` 拿所有 session 的 cwd（user 当前打开的 workspace）；② `isDshDesktopInstall`：检测 sandboxPolicy.workspaceRoot 是否命中 DSH Desktop 安装路径，是则跳过 fallback。优先级链：args.path → exec.session → workspaceRegistry(sessions) → sandboxPolicy（非 DSH Desktop）→ "."** | **v0.3.7 实测发现数据被写入 DSH Desktop 安装目录，而非当前 workspace。** |
-| **v0.3.10** | **传 path 写到 workspace 验证 + 12 工具端到端** | **① 验证显式传入目标 workspace 的场景正确落库，且不污染 DSH Desktop 安装目录；② 12 工具全部端到端跑通：init / rescan / status / continue / memory add+list / todo add+list+done+update / ask / dream；③ 实时同步 + auto-rebuild 链路稳定（preview.changed → shell.run build.js → clientModules.rebuilt → renderer 热重载），无需重启 DSH** | **重启 DSH 后实跑确认工具全部返回正确结果；显式路径与默认路径均落到正确 workspace。** |
-| **v0.3.11** | **SPEC v0.3 MINOR bump + 治理债 + P0.7 TODO strip 实质实现** | **① SPEC 顶部 bump v0.2 → v0.3（加 changelog 累积注脚，不新增章节）；② 修正 README/TODO 中"TODO strip 已实现"的虚构描述；③ git commit v0.3.0-v0.3.10 working tree（约 10 个新文件 + 文档同步），拆 2 个 commit（feat + docs）；④ `src/client.js` 注册 `conversation.input.dock` Slot（id: `project-brain-todo-strip`，order=10）+ TodoStrip 纯函数组件（折叠 top-3 / 点击展开全量 / uninit+empty 双 guard）；⑤ i18n 加 `todostrip.title/viewAll/close/empty` 4 key × 2 语言；⑥ `scripts/smoke-todostrip.mjs` 离线 10/10 PASS（bundle 含 dock 注册 + 组件 + 主题 token + 43 个 session embed）；⑦ 一次性 debug 脚本归档到 `scripts/_archive/`（保留不删）** | **本轮用户复盘"梳理开发情况，进入下一阶段"；发现 working tree 大量未提交、文档与代码不同步** |
-| **v0.3.12** | **P0.8 第一波收尾 — dream commit/full + locale-aware + 跨 Session 端到端** | **① `project_dream` dryRun=false 真写 jsonl（merge: dropped 移除 + keep status=reinforced + importance +0.05；archive: status=archived + 写 timeline + emit preview.changed）；② `mode=full` 额外清 archived 行 + 按 importance DESC 排序；③ dream 算法抽到 `brain-logic.computeDreamActions/applyDreamCommit`（纯函数，避开 dsh-tools runtime）；④ `brain-files.js` 加 `writeJsonl`；⑤ `client.js` 加 `resolveLocaleCode(props)` 从 `props._dshLocale.getLocale()` 取实时语言（不再硬编码 zh-CN），支持 zh-CN/en-US/zh/en 宽松匹配；⑥ `smoke-dream-commit.mjs` 33/33 PASS（light/full/边界）；⑦ `smoke-session-lifecycle.mjs` 25/25 PASS（scanner → memory/todo → summarizer 走真 git diff → injector 输出 markdown 含 Top-K memories + active TODO + recent activity → build-time embed loadProjectData 验证全量数据）；⑧ 4 个 smoke test 共 30+10+33+25 = **98 项全 PASS**。lib/index.js 110.3→114.8kb；lib/client.js 68.3→74.8kb** | **用户「继续」指令；P0.8 todo 启动第一波收尾** |
-| **v0.3.13** | **P0.8 第二波收尾 — 跨 workspace 隔离实测 + dark/light 主题 token 取证** | **① 新增 `scripts/smoke-multi-workspace.mjs`（25/25 PASS）：path-resolver 显式 path 隔离、session cwd 隔离、DSH Desktop 安装路径过滤（Windows + Mac）、todo.jsonl A vs B 物理隔离、loadProjectData(A) vs loadProjectData(B) 互不污染、memory 隔离；② `cordis_inspect_query Theme.listTokens` 取证 DSH 真实主题 token（13 个，全 requiresLightAndDark=true），写 `scripts/smoke-theme-tokens.mjs`（14/14 PASS）静态校验 client.js 11 个 token 全在真名内、无悬空 token、无硬编码 hex 颜色、覆盖 background/border/brand/label/state 五类；③ 6 个 smoke test 共 30+10+33+25+25+14 = **137 项全 PASS**。未改 src/ 业务代码（纯验证）。lib/client.js 74.8→80.1kb（+5.3kb 来自 build-time embed 多 workspace 数据，非代码变化）** | **用户「继续人完成」「继续任务」指令；P0.8 第二波启动** |
-| **v0.3.14** | **P0.8 第三波 — auto-rebuild 跨 fiber 事件隔离 bug 修复** | **根因：v0.3.13 重启实测发现 `project_dream dryRun=false` 写完 jsonl 后 8 秒查 bundle mtime 未变。`cordis_inspect_query Event.listEvents` 取证 `project_brain/preview.changed` 不在 DSH 原生事件；Cordis 4 `Scoped<Context>` 模型 `ctx.emit/on` 只在同 fiber 内 dispatch；dsh-project-brain host bundle 在 host fiber 注册 `setupAutoRebuild`，工具 `exec.ctx` 是 agent fiber → emit 收不到。修复：`src/host/rebuild.js` 从 `ctx.on("preview.changed")` 改成 `ctx.effect(() => ctx.timer.interval(checkMtime, 5000))` —— 每 5 秒扫 `.project-brain/{project,memory,todo,timeline}.json*` 的 mtime，变化触发 `runBuild()`（100ms debounce）。改动单文件 ~20 行，不动 `src/index.js` 注册结构，不引入 fs.watch / chokidar 依赖；137 项 smoke test 仍全 PASS；5 秒轮询 vs 原 ~1-3s 实时延迟变长但跨 fiber 稳定** | **v0.3.13 重启实测 8 项工具 PASS + 1 项 auto-rebuild 失效；用户「开始修复」指令** |
-| **v0.3.15** | **P0.8 第四波 — inject 加 timer 让 ctx.timer 真可用（v0.3.14 修复未生效的根因补漏）** | **v0.3.14 重启实测失败：`project_dream dryRun=false` 6 秒后查 bundle mtime 仍是手动 build 时间。根因：`src/index.js` inject 数组 `["tools", "fs", "sandboxPolicy", "clientModules"]` 未声明 `timer`；Cordis 4 `Scoped<Context>` 默认 service 不可见，必须 inject 才能 `ctx.get` 拿到；rebuild.js 调 `ctx.get("timer")` 返回 undefined，进入"退化"分支 warn 后默默失败 → 整个轮询逻辑没启动。修复（单文件 1 行）：`src/index.js` inject 数组末尾加 `"timer"`。教训（永久）：Cordis 4 任何 `ctx.get('xxx')` 之前必须先在 inject 数组声明；debug-fix 应列依赖 → inject → ctx.get 完整链路；auto-rebuild 关键基础设施必须 DSH Desktop 重启实测一次完整链路才算 done。**重 build 后用户需再重启一次 DSH 验证** | **v0.3.14 重启实测失败 6 秒后 bundle 未变；用户「帮我修复」指令** |
-| **v0.3.16** | **P0.8 第五波 — 监听 DSH 原生事件主动唤醒 + 冷启动诊断 log（v0.3.15 仍未生效的根因定位）** | **v0.3.15 重启实测第三次失败：bundle mtime 仍是 22:37:37。推测根因：host fiber 在 DSH Desktop 冷启动时 `resolveWatchPaths()` 返回空数组（sandboxPolicy.workspaceRoot 被 `safeCwd` 过滤掉 DSH Desktop 安装路径；workspaceRegistry/sessions/agents 都为空）→ timer interval 启动但 paths=[] → mtime 变化无人监听。修复（src/host/rebuild.js +30 行）：(1) setupAutoRebuild 顶部加冷启动诊断 log（ctx.timer / ctx.get('timer') / sandboxPolicy.workspaceRoot / workspaceRegistry.list 数量 / sessions.list 数量 / agents.currentInitiator / 初始 paths 数量），让 DSH Desktop 启动时通过 ctx.logger 输出；(2) 监听 DSH 原生 `agent/created` / `session/created` 事件（DSH 框架跨 fiber 自动路由），事件回调里重新 resolveWatchPaths + 立即 pollMtime + 启动 timer interval；(3) 保留 timer interval + ctx.on('preview.changed') 双兜底。**这次重 build 后用户需再重启一次 DSH 验证 + 我会主动查诊断 log 定位真因**，不再靠推断** | **v0.3.15 重启实测失败 6 秒后 bundle 未变；用户「帮我修」指令** |
-| **v0.3.17** | **P0.8 第七波 — spawn 子进程 watcher（彻底脱离 Cordis 抽象，终极 fallback）** | **v0.3.16 重启实测第四次失败：诊断 log 设计上对但观测链断了（DSH Desktop Electron 无主 log 文件，ctx.logger.info 输出位置未知）。**所有 ctx.timer/ctx.effect/ctx.on 的 silent failure 不可观测。终极方案：放弃 Cordis 抽象，`setupAutoRebuild` 用 `child_process.spawn` 启动一个常驻 node 子进程跑独立 watcher 脚本（`src/host/rebuild-watcher.mjs`）。子进程用 node:fs.watch + 2 秒兜底轮询监听 `.project-brain/*.json*` mtime，变化直接 `child_process.execFileSync('node', ['build.js'])`。写 log 到 `.project-brain/.dsh-project-brain-watcher.log`（绕开 ctx.logger）。**完全脱离 Cordis fiber 抽象**（子进程是独立 process）→ 跨 fiber 问题不存在；node:fs/child_process 都是 Node 内置 → 零新依赖；sandbox 友好（spawn 默认 allowed）。**用户需再重启一次 DSH（第五次）验证** | **v0.3.16 重启实测失败 6 秒后 bundle 未变 + 诊断 log 看不到；用户「修」指令** |
-| **v0.3.18** | **P0.8 第八波 — 工具层同步 rebuild（工程止血，不再依赖 host bundle silent failure）** | **v0.3.17 重启实测第五次失败：`.project-brain/.dsh-project-brain-watcher.log` 不存在 → watcher 子进程要么没 spawn 成功、要么 sandbox 阻止写文件。本地手动 spawn 测试 watcher 能跑 → 真因是 DSH Desktop 静态 plugin fiber 的 silent failure。**不再让用户重启第 6 次**，改思路：放弃 host bundle "被动监听"模式，**改为工具层"主动触发"**：新文件 `src/host/rebuild-sync.js` 导出 `runSyncRebuild(reason)`，在 dream/memory/todo 工具的 execute 函数里写完 jsonl 后**立即同步**调 `execFileSync('node', ['build.js'])`（v0.3.6 已验证 execFileSync 能跑）。Rebuild 失败不影响工具本身返回值（try/catch 吞）。保留 `src/host/rebuild.js` 的 host bundle 监听逻辑作为 fallback（未来 DSH 修好了再恢复）。**只动 lib bundle，不动 host bundle → 用户不需要重启 DSH** | **v0.3.17 第五次失败 + 用户第 5 次重启；工程止血** |
-| **v0.3.19** | **端到端验证完成 + auto-rebuild 接受手动 build fallback** | **v0.3.18 端到端实测：tool 写文件完全 work（project_todo_add/dream 都正确写 todo.jsonl + timeline.jsonl），但 `lib/client.js` mtime 不变 → 6 次失败累计确认 DSH Desktop 静态 plugin fiber 任何主动行为（ctx.timer/ctx.effect/ctx.on/spawn/execFileSync）都 silent failure。**终局方案：接受手动 build fallback** —— 调任何写工具后手动跑 `node build.js`（~1 秒）刷新 sidebar bundle。**不再投入修复资源**。端到端验证 5 层面（基础环境/工具注册/工具调用/sidebar/主题）大部分 PASS（仅 auto-rebuild 失败）。12 个工具 100% 调通，数据闭环 OK | **v0.3.18 验证失败 + 用户实测接受手动 fallback** |
-| **v0.3.20** | **清理过时 todo + 完善 Project Memory（5 类混合填充）** | **(1) 关闭 5 条过时 todo**（3 条 auto-rebuild 死循环：v0.3.7 / v0.3.9 / v0.3.7b debug；1 条陈旧 P0.4.1 文档目标；1 条 stale P0.5 in_progress），活跃 7 → 2；(2) 补 5 条类型混合 memory**：① decision: 采用 Project-First 数据模型；② decision: 三层数据通道架构（Cordis + build-time embed + manual build fallback）；③ decision: brain-logic 纯逻辑层 + smoke test 策略；④ architecture: 8 类记忆类型混合填充策略；⑤ requirement: manual build fallback 永久不被信赖。memory.jsonl 17 → 22 条，类型分布从 `lesson:2, change:8, bug:6, decision:1` 升级为 `decision:4, architecture:1, requirement:1, change:8, bug:6, lesson:2`（decision 从 1 → 4，提升 sidebar 决策密度） | **v0.3.19 端到端验证完成后 Phase 2 完善工作** |
-| **v0.3.21** | **P0.8 收尾大结局 — 关闭最后 1 条 todo + 写入 P0.8 完成度总结** | **关闭最后 1 条 todo（`补全 init/rescan/continue 工具与 RPC continueSession 联调验证`，实际已被 smoke-session-lifecycle.mjs 25/25 PASS 覆盖）；P0.8 全局完成度 100%（auto-rebuild 例外）。所有 P0 阶段（P0.0-P0.8）全部完成。最终用户工作流：调工具写 `.project-brain/` → 手动跑 `node build.js`（1 秒）→ DSH client bundle 自动热重载 → sidebar 立刻更新。137 项 smoke test 全 PASS。下一步进入 v0.4.x / v1.0 MVP** | **v0.3.20 完成后 Phase 3 收尾** |
-| **v0.4.0** | **P1 起步 — appendJsonl 性能优化 O(N) → O(1)** | **P0.8 v0.3.21 收尾后的第一个 P1 工作。`src/host/store/brain-files.js` 的 `appendJsonl` 之前是"读整个 jsonl → push → 全文件重写"，memory.jsonl / timeline.jsonl 有几百条记录时性能差。修复：新增 `appendLine(fs, path, line, writePolicy)` 用 `fs.appendFile` 同步追加（DSH 单线程 fiber 安全）；`appendJsonl` 改为兼容 wrapper（直接调 appendLine，不读全文件）；边界处理（文件不存在 → 创建；末尾无换行 → 补 "\n"）；保留 `writeJsonl`（dream commit 全文件写）。smoke-test 加 12 项覆盖 appendLine 行为 + appendJsonl 兼容路径 + 性能基准（小文件 + 模拟 1000 行）。137 项 smoke test 仍全 PASS。bundle size +3.5kb** | **v0.3.21 P0.8 收尾大结局后 P1 起步** |
-| **v0.4.3** | **DSH Desktop 发布准备 — INSTALL.md + CHANGELOG.md + STORE_LISTING.md** | **v0.4.0 性能优化是"内功"（用户看不到），v0.4.3 发布准备是"外功"（用户能直接看到）。纯文档工作。交付物：① INSTALL.md（系统要求 + 三种安装方式 + 验证步骤 + FAQ：auto-rebuild 不 work / path 显式传 / sandboxPolicy 警告）；② CHANGELOG.md（Keep a Changelog 规范，v0.2-v0.4.3 全部 milestone，Added/Changed/Fixed/Known Limitations 四象限）；③ STORE_LISTING.md（一句话描述 ≤80 字 + 长描述 ≤500 字 + 标签 + 截图位）；④ README.md 加 Documentation 章节链接到 INSTALL/CHANGELOG/TODO/SPEC。DSH Desktop 商店发布 PR 描述就用 STORE_LISTING.md 内容** | **v0.4.0 性能优化完成后 P1 第二波** |
-| **v0.4.1** | **dream 真实架构 diff — LLM 接入 + project_diff 工具** | **在 v0.4.0 性能优化 + v0.4.3 发布准备基础上，给 dsh-project-brain 接入 LLM 真正理解项目架构变化。`project_dream` (v0.3.12) 只做 title 合并 + status=archived，不动代码层面；新 `project_diff` 扫 git diff + 调 DSH llm service → 生成 architecture change memory。DSH llm 接口（已验证）：ctx.get('llm').stream(options) / prepareCall / resolveCallConfig。风险：DSH Desktop 静态 plugin fiber 可能 silent failure（v0.3.14-v0.3.18 教训）→ 写 mock LLM provider 让 smoke test 可跑 + 用户实测验证真实路径。交付物：① src/host/integrations/llm.js（mock LLM + DSH llm 抽象）；② src/host/diff/detector.js（git diff 扫描）；③ src/tools/diff.js（新工具）；④ scripts/smoke-project-diff.mjs（mock LLM 验证）；⑤ 加进 src/index.js 的 toolBuilders 数组。190 项 smoke test 全 PASS**。**用户实测（2026-08-28）：13 个工具注册 ✅ + project_diff dryRun=true 调通 ✅ + project_diff dryRun=false 0 文件 0 commits（DSH Desktop shell service 静默阻止 git 调用，**和 v0.3.14-v0.3.18 同根因**）**。**接受 fallback 策略**：mock LLM fallback 兜底，工具调用永远有结果不 silent failure；真实 git + 真实 LLM 等 DSH Desktop 修复后启用** | **v0.4.3 发布准备完成后 P1 第三波** |
-| **v0.4.2** | **真实 git + 真实 LLM（绕过 DSH Desktop sandbox）** | **v0.4.1 mock fallback 永远拿不到真实数据，用户决策"先把功能完善"。** 走方向 1+2：① detector 重写用 node 内置模块（fs + zlib + crypto）实现纯 git 客户端，读 .git/HEAD / refs/heads / objects/，loose object MVP 完整，pack 文件 fallback 提示用户；② llm.js 重写用 node:fetch 调 user-configured OpenAI 兼容 API（参数 llmApiUrl/llmApiKey/llmModel 或 env DSH_LLM_*），fallback 到 mock。零新依赖（node 内置）。**完全脱离 DSH shell service / ctx.llm**：自己读 .git + 自己 fetch API。**用户需配 LLM API key**（DeepSeek / 通义千问 / 本地 Ollama 兼容）。190+ 项 smoke test 仍全 PASS** | **v0.4.1 用户实测确认 mock fallback 不够（决策记录在 .project-brain/memory.jsonl mem-mtccn6uf）** |
-| **v0.4.4** | **summarizer 真实 git + detector 真实 git 格式修复** | **v0.4.2 只给 project_diff 的 detector 换了纯 node git 客户端，但 summarizer（session/disposed 自动摘要）仍依赖 DSH shell service 跑 git diff（DSH Desktop 上 silent failure，拿不到真实 diff → 不写 change memory）。修复 1：summarizer.js 删除 gitCapture(shell)，改用 detectChanges（v0.4.2 detector），setupSummarizer 不再读 ctx.get('shell')。修复 2（调试发现 v0.4.2 detector 在真实 git 仓库报 cannot read current commit，3 个 bug）：① inflateRawSync → inflateSync（真实 git loose object 用 zlib deflate 带 header，实测 78 01 + inflateSync 成功 / inflateRawSync 报 invalid stored block lengths）；② 目录 mode 判断 parseInt(mode,8)===40000 永不匹配（git tree mode 是省略前导零的八进制，目录="40000"=0o40000=16384）→ 改为 ===0o40000，目录才能递归展开（src 而非 src/index.js）；③ smoke-project-diff.mjs fixture 误用 deflateRawSync（raw deflate）与 inflateRawSync 互相匹配 → 假阳性 PASS，改为 deflateSync（zlib 格式）匹配真实 git。验证：真实 git 仓库（git init + commit 含 src/ 子目录）被正确读取 + 8 个 smoke test 198/198 PASS。**现在 project_diff + summarizer 在真实 git 仓库上都能工作，不再依赖 DSH shell service** | **v0.4.2 收尾后补齐 summarizer 依赖 + 修复 detector 真实 git 格式隐藏 bug** |
-| **v0.4.5** | **detector 移除 pack 整体拒绝 — commit/tree 在 loose 即可 diff** | **v0.4.4 后用户重启 DSH 实测 project_diff 遇到新限制：pack file not supported。调试发现 detector 的 hasPackFiles 只要检测到仓库有 .pack 就整体 fallback——但真实 git 仓库普遍有 pack（git gc / 自动打包），且 detector 的 diff 只比较 tree 里的 hash 从不读 blob 内容，所以只要 commit + tree 在 loose 就能完整工作。修复：删除 hasPackFiles + detectChanges 的整体拒绝分支；仅当 readCommit(head) 真的读不到（commit object 在 pack）时才返回明确错误。验证：真实 dsh-project-brain 仓库（2 pack + 32 loose）返回 18 个真实文件变更（正是 v0.4.4 commit 内容）；smoke-project-diff pack 测试改为"有 .pack 但 commit/tree 在 loose → 仍能 diff"；8 个 smoke test 199/199 PASS** | **v0.4.4 用户重启实测 project_diff 触发** |
-| **v0.4.6** | **detector pack 真实支持 — 解析 .idx v2 + .pack v2 + packed-refs + delta 解码** | **v0.4.5 后用户重启 DSH 实测，真实仓库（git gc 后 pack + packed-refs）依然报 "cannot read current commit"。v0.4.5 的"loose 即可"假设不成立：git gc 后所有 object 在 pack，ref 在 packed-refs。修复 7 处：① readHead 加 packed-refs fallback；② 新增 parseIdxV2（.idx v2 big-endian fanout + hash + offset）；③ 新增 readPackObject / readPackEntryByOffset（varint size+type header + inflate）；④ OFS_DELTA / REF_DELTA 解码（applyDelta）；⑤ readGitObject = 先 loose 后 pack fallback；⑥ idxCache 用 gitDir+idxPath 为 key（跨仓库隔离）；⑦ 6 个调试 bug 修复（minSize 公式、varint 累加、pack inflate 无 header、REF_DELTA 递归等）。验证：临时 git 仓（git init + 2 commit + git gc --prune=now）detectChanges 返回 files:["README.md"] modified；smoke-project-diff 加 2 个 packed-refs 断言；8 个 smoke test 201/201 PASS**。**MVP 限制：multi-pack-index（MIDX，git 2.20+）不支持——dsh-project-brain 自身仓库是 MIDX，本仓库仍 fallback 提示** | **v0.4.5 用户重启实测 git gc 仓库触发** |
-| **v0.4.7** | **llm.js 加 Anthropic 兼容协议** | **v0.4.6 后用户实测 project_diff 走 mock fallback（未配 LLM key）。用户提供 MiniMax 端点 https://api.minimaxi.com/anthropic，实测必须走 Anthropic 协议（POST /v1/messages + x-api-key header）而非默认 OpenAI 兼容。修复：① detectProtocol(apiUrl)：baseUrl 含 "anthropic"（路径或子域）→ Anthropic，否则 OpenAI；② fetchAnthropic：POST {baseUrl}/v1/messages，headers x-api-key + anthropic-version:2023-06-01，response content[0].text；③ realFetchLLM 自动选。smoke-project-diff 加 11 断言（5 个 Anthropic 真实路径 + 6 个 detectProtocol URL 模式）；8 个 smoke test 210/210 PASS** | **v0.4.6 用户实测触发 LLM 配置需求** |
-| **v0.4.8 - v0.4.12** | **Sidebar UI 视觉升级（emoji + StatusBanner + ActionsBlock 文案统一 + Dashboard Quick Actions）** | **v0.4.7 团队内部使用稳定后进入 UI 打磨阶段。优化 sidebar 8 区块视觉层次、加 emoji 图标、引入 StatusBanner 三大数字汇总、ActionsBlock 按钮文案稳定化、Dashboard 默认展开 + Quick Actions 2x2 网格 + MemoriesBlock toggle 改 React useState 修复重渲染 bug。purely frontend + build-time embed 改造，无 RPC / host 改动** | **v0.4.7 UI 打磨** |
-| **v0.5.0** | **OnboardingBlock 自动启动流程：点击按钮直接调 host.call RPC，无需用户复制粘贴** | **v0.4.12 UI 打磨后，用户反馈"启动项目大脑"按钮只复制命令到剪贴板需要手动粘贴，不合目的。改造 OnboardingBlock 为带状态机组件（idle/loading/error），点击后调用 `host.call('project_brain/initProject', { args: { path } })`，期间 CSS 转圈 + 3 阶段步骤条（扫描项目结构 → 写入项目大脑 → 分析技术栈与依赖），RPC 完成后用返回值（projectId/name/scanDurationMs/stats）拼最小 preview 结构（project/phase/recentActivity/stats），通过 overrideData state 让父组件立即展示 dashboard 而非等 host rebuild。失败时显示错误卡片（具体 error.message）+ 重试按钮 + 复制启动指令兜底按钮。父组件 SidebarPreviewRoot 把 workspacePath 通过 props 传给 OnboardingBlock；host builtin 在 apply 阶段通过 ctx.host 拿到并保存到模块级变量 `__DSH_CLIENT_HOST__`（避免子组件拿不到 client builtin）。新增 build-inline.js：sandbox 阻止 esbuild spawn 子进程时的退路，纯 Node FS 拼接（IIFE wrap + 占位符替换）。验证：用户重启 DSH → sidebar 显示新 OnboardingBlock → 点击按钮 → 转圈 → dashboard 自动出现** | **v0.4.12 用户反馈"启动按钮不合目的"** |
+| v0.2 | 評審後修訂 | ① TS-as-contract 提示；② Slot ID 提前到 P0.1；③ P0.1 加 Inspect 任務；④ 工時 38~48d；⑤ SQLite PRAGMA；⑥ fixture 拆 P0.0；⑦ SidebarPreview 效能改目標+測量；⑧ 日誌面板優先；⑨ 術語統一；⑩ 編碼規約放寬；+§17/§18/§19/§20 | 評審反饋 |
+| **v0.2.1** | **P0.1 Inspect 校正** | **① SidebarPreview 實際註冊到 `conversation.view` Slot（order=35，緊隨 `dsh-mneme-memory` order=30），不是側邊欄 tab；② 主題 token 實際字首 `--dsw-*`（不是 `--dsh-*`）；③ Host Session 事件為 `agent/session-start` / `session/disposed`（不是 `session:started/ended`）；④ Service 名校正：`storage` + `storageDomain` 都存在；`sessionPersistence` 是 Session 日誌而非事件** | **P0.1 Inspect 結果** |
+| **v0.2.2** | **P0.4.1 修復 + 工具面補全** | **① `project_init` 重跑保留 projectId/createdAt + 寫 timeline 事件；② 新增 `project_rescan` / `project_continue`（P0.6 最小）/ `project_memory_add|list`（補全 P0.4）/ `project_todo_add|list|done`（P0.7-lite）共 8 工具；③ SidebarPreview Stats 改為真實資料（todo/memory jsonl）；④ 新增 TODO 區塊 + Dashboard 展開區（Actions 按鈕真功能：複製提示詞 / DOM toggle，非 console.log 佔位）；⑤ 文件校正：資料通道為 build-time embed（非 runtime fetch）** | **P0.4.1 實現** |
+| **v0.2.3** | **契約確認** | **`conversation.view` 註冊項僅 {id, order, label}，無 badge 欄位 → Tab 角標（P0.2b-3/P0.5）無法實現，改為 Dashboard 內展示待辦；`conversation.input.dock`（composer 上方 TODO strip）為 P0.7 潛在入口** | **Slots Inspect** |
+| **v0.2.4** | **P0.4.2 切換 workspace 動態更新** | **① host 註冊 `webServer` route `/plugins/dsh-project-brain/preview.json`（`buildWorkspacePreview` 按 `sandboxPolicy.workspaceRoot` 讀 `.project-brain/`，讀已生成資料零 token）；② client 改 class component + `componentDidMount` `fetch` 拉動態資料，失敗 fallback 到 build-time embed（不崩）；③ 切換 workspace 即更新，未生成的顯示 Onboarding；④ 新增 `src/host/rpc/preview.js` + `scripts/verify-preview.mjs`** | **使用者反饋"切換 workspace 不更新"** |
+| **v0.2.5** | **P0.4.2-final 架構結論 + 真正修復** | **① 使用者截圖證實：靜態 workspace client 下 `typeof host === 'undefined'`、`typeof window.host === 'undefined'`、webServer route 404——**靜態 plugin fiber 沒有任何 host→client 資料通道**（host.call 不存在、webServer named route 被 DSH 靜態 server fallback 搶先 404）；② 最終方案：build 時掃 `~/.dsh/storages/workspace.json`，對每個 DSH workspace 遞迴 `.project-brain/`，把 `(sessionId → workspaceId → previewData)` map 全部 inline 進 client bundle；③ client 啟動用 `props.sessionId` 查表 → 命中當前 session 所屬 workspace 的預覽資料（純 build-time lookup，**零 token**）；⑤ 切換 workspace = conversation.view 重新掛載（新 sessionId）→ 自動取新資料；⑥ 已生成直接讀，未生成顯示 Onboarding；⑦ `src/client.js` 改回純函式元件（不再需要 class component + 非同步 state）；⑧ 撤銷 `host.call`/`fetch`/`webServer route`/`harness 探測修復`/`tab 除錯條`等所有無效嘗試** | **使用者三次反饋"切換不更新"+ 截圖證實靜態 client 下 host/webServer 全部不可用** |
+| **v0.2.6** | **P0.4.8 scanner 真實執行時修復** | **`fs.listDir` 返回 `FsDirEntry { name, type: 'file'\|'directory'\|'other', target: FsTarget }`（DSH dsh-fs-local 實現）；舊 scanner 用 `e.isFile`/`e.isDirectory`（boolean — DSH 沒這倆欄位）→ 實測 `files:0 / languages:{}`。新 `entryKind(e)` 優先讀 `e.type`，回退 `e.isFile`/`e.isDirectory`（boolean 或 method，相容 node Dirent adapter）；遞迴用 `e.target`（已 resolved FsTarget），僅缺失時回退 `fs.resolve(e.name, {cwd})`；深度 3 → 5** | **執行 `project_init` dryRun 實測 files:0 + P0.4.7 bundle 已帶此 bug** |
+| **v0.2.7** | **P0.4.9 跨專案 todo 隔離** | **新增 `src/host/store/path-resolver.js`：`resolveProjectPath(args, exec, sandboxPolicy)` 優先順序鏈 = `args.path` → `exec.session.cwd` → `exec.ctx.session` → `exec.sessionId + ctx.get('sessions')` → `agents.currentInitiator()` → `sandboxPolicy.workspaceRoot` → `.`。`project_continue` / `project_memory_add\|list` / `project_todo_add\|list\|done` 全部切換到此 resolver。`project_init/rescan` 仍必傳 path（`E_NO_PATH` 守衛）。根因是靜態 plugin fiber 的 `sandboxPolicy.workspaceRoot` 是 profile 級固定值（DSH install / 首個 workspace），與使用者當前 session 的 workspace 解耦 → todos/memory 串臺** | **實測發現 session workspace 與工具 fallback workspace 不一致，導致專案資料串臺。** |
+| **v0.2.8** | **P0.5 Session 摘要（最小可用）** | **新增 `src/host/summarizer.js`：`setupSummarizer(ctx, fs, sandboxPolicy)` 訂閱 `session/disposed`；從 session cwd 解析專案路徑 → `git diff --name-only HEAD~1`（5s 超時，swallow 失敗）→ 若有變更寫一條 `type=change` memory + `eventType=session_summary` timeline 事件 + `emit('project_brain/preview.changed')`。fire-and-forget，全部 try/catch + fallback。LLM 抽取留 TODO 佔位（合約未穩，避免拖累）** | **P0.5 SPEC §16 任務** |
+| **v0.2.9** | **P0.5.x 工具面補全（8 → 12）** | **新增 4 工具：`project_status`（專案快照：各型別 Memory 計數 + TODO 統計 + 最近活動 + lastActivityAge）；`project_todo_update`（按 id/title 改 status/priority/title/description，寫 `todo_update` timeline）；`project_ask`（純規則關鍵詞檢索：title 命中 ×2 + importance 加權，零 token，返回 sources + confidence）；`project_dream`（light：title Jaccard ≥ 0.92 同類合併候選 + importance<0.15 且年齡>30d 歸檔候選；full 模式佔位）。`src/index.js` toolBuilders 擴充套件到 12 個，build 後 lib/index.js 87.0kb** | **SPEC §7.2 餘下工具 + 使用者"開發完所有功能"要求** |
+| **v0.3.0** | **架構重做：live 資料通道 + Context Injector + LLM RAG** | **打破 build-time embed 架構（違反"即時同步"偏好）：① 啟用 `webServer.register` route `/dsh-project-brain/preview.json`（避開 `/plugins/` 字首防 DSH 靜態 server 搶先 404），host 端用 `sessions.get(sessionId).meta.cwd` 反查專案路徑，每次請求重新讀 `.project-brain/` 即時資料；② `src/client.js` 改 class component + `componentDidMount` + `setInterval(5000)` 拉取，失敗時保留上次成功資料 + 顯示"離線"徽章；首次渲染用 `__ALL_WORKSPACES_JSON__` 兜底避免空白；增加 LiveBadge 顯示 "即時同步 / 離線 / 本地快照" 三態；③ 新增 `src/host/injector.js`：通過 `systemPrompt.service.section()` 註冊 `project-brain-context` 段，監聽 `agent/session-start` + `preview.changed` 預讀 `.project-brain/`，render 時按 SPEC §4.5 演算法 `importance*0.5 + recency*0.3 + moduleMatch*0.2` 選 Top-5 記憶 + 活躍 TODO + 最近活動，組裝 markdown，自動注入到每個新 session 的 system prompt；token 預算 1500，超出按段落截斷；④ `project_ask` 加 `useLLM` 引數（預設 false 相容舊用法），true 時調 `llm.stream` 用 RAG prompt 合成答案，LLM 失敗 fallback 到純規則版（錯誤資訊寫在 `data.llm.error`）；⑤ `summarizer` 改用 DSH `shell.service.run` 跑 `git diff`（之前 `child_process.spawn` 在某些 sandbox 下 EPERM）。build 後 lib/index.js 105.7kb / lib/client.js 53.9kb** | **使用者指出"內容改動後能即時同步（不要求立即）+ 跨 Session 自動恢復上下文"是核心目的；P0.4.2 build-time embed 架構與該目的根本矛盾；project_ask 閹割版純規則檢索價值低於 SPEC 設計意圖** |
+| **v0.3.1** | **PromptSection 欄位修復（DSH session 崩潰）** | **`systemPrompt.service.section()` 期望 `PromptSection = { name: string, order: number, text: string \| ((context) => string), complete?: boolean }`（DSH `packages/core/system-prompt/src/index.ts`）。v0.3.0 誤傳 `{ name, order, id, priority, render }`，DSH 合併 sections 時對 undefined 調 `.indexOf` 拋錯（錯誤顯示在 goal section 呼叫棧是因為 waterfall 失敗連帶），整個 DSH session 無法執行。修復：`render` → `text`，接受 `AssembleContext` 引數；刪除 `id` / `priority`（非合約欄位）。Injector 重新啟用** | **使用者截圖顯示 "本輪執行失敗 Cannot read properties of undefined (reading 'indexOf')"；目標對齊後排查 GitHub DSH 原始碼確認 PromptSection 欄位名** |
+| **v0.3.2** | **Electron 即時同步診斷（DSH Desktop）** | **LiveBadge 改為即時顯示真實 fetch 錯誤（`data-error` 屬性 + `title` hover），連續失敗後保留 build-time embed；webServer route handler 寫 `.project-brain/.webserver-last-hit.json` 診斷 marker（hitAt/sessionId/workspaceRoot/url/method），方便排查 DSH Desktop 下 fetch 是否走 webServer（Electron renderer fetch 走 IPC bridge，可能不通）；新增 CORS `access-control-allow-origin: *` 頭（萬一跨 fiber / 跨埠）。lib/index.js 106.2kb / lib/client.js 61.2kb** | **使用者在 DSH Desktop（Electron）下重啟後 LiveBadge 仍"離線"且 sidebar 資料用 build-time 兜底；推斷 Electron renderer fetch 走 IPC bridge，不直接打 webServer，需要診斷訊號** |
+| **v0.3.3** | **路徑重試（prefix + 獨特名稱空間）** | **webServer route path 從 `/dsh-project-brain/preview.json` 改為 `/__dsh_brain__/preview.json`（DSH 內部約定下劃線名稱空間），route kind 從 `exact` 改為 `prefix`。client fetch URL 同步更新。lib/index.js 106.2kb / lib/client.js 61.3kb** | **v0.3.2 使用者截圖顯示 `HTTP 404`，懷疑 DSH frontend-static SPA fallback 搶先響應；改 prefix + 獨特路徑規避** |
+| **v0.3.4** | **完整回退：放棄 webServer route，回到 build-time embed + auto-rebuild** | **使用者截圖（DSH Desktop **和** browser）均 `HTTP 404`——確認 v0.3.0 重走 P0.4.5 回頭路根本不通（static plugin fiber 沒有 webServer service，browser 模式也被 SPA fallback 搶先）。徹底回退：① `src/index.js` 註釋 `registerPreviewRoute` 呼叫，保留 import 作為工具；② `src/client.js` 回退為純函式元件 + build-time embed，刪除 class component / setInterval / fetch / LiveBadge 即時狀態；新增 `SnapshotBadge` 顯示"📦 快照 · Xs"（提示使用者這是 build-time 資料而非即時）；③ 資料通道改為 `preview.changed → setupAutoRebuild → spawn node build.js → clientModules.rebuilt → renderer 熱過載 client bundle`，使用者無需重啟 DSH（renderer 內部過載），代價是每次 update 1-3 秒 build 時間。lib/index.js 105.7kb / lib/client.js 51.7kb（減少 10kb）** | **使用者確認 v0.3.3 在 browser 也是 404，證明 static plugin fiber 下 webServer 完全不可用；放棄 live 通道，回到 P0.4.7 的 build-time embed 架構但強化 auto-rebuild** |
+| **v0.3.5** | **build.js 排除 plugin 自身 .project-brain** | **`findBrainsUnder` 在遞迴時遇到 `cordis.patch.yml` 直接 return（跳過），避免把 plugin 自己的 `.project-brain/` 當成 workspace 的專案嵌入。之前 plugins workspace 顯示 `dsh-project-brain` 專案（錯把 plugin 自己的 brain 算成 plugins workspace 的專案），現在正確顯示空 → 觸發 Onboarding 提示使用者調 project_init。scanned: 4 → 3。lib/client.js 47.0kb（繼續減少）** | **v0.3.4 使用者截圖確認 build-time embed 工作（綠色📦快照徽章），但 sidebar 錯誤顯示 `dsh-project-brain` 專案（plugin 自己），不是使用者當前 workspace 的真實專案** |
+| **v0.3.6** | **tools schema 補 path + output additionalProperties: true + setupAutoRebuild 用 DSH shell service** | **① tools.parameters 補全 `path` 欄位（memory/todo/todo_update），否則 DSH 自動剝離 path 引數，導致 fallback 寫錯位置；② output schema 把 `additionalProperties: false` 改成 `true`，並顯式宣告 `code/message` 欄位，錯誤路徑返回不再被拒；③ `setupAutoRebuild` 用 DSH `shell.service.run` 替代 `child_process.spawn`，避免 plugin fiber sandbox EPERM。lib/index.js 110.7kb / lib/client.js 48.2kb** | **v0.3.5 使用者截圖確認 plugins workspace 顯示正確（綠色📦快照 + Onboarding 卡片）** |
+| **v0.3.7** | **brain-files 預設 danger-full-access policy** | **`writeText/appendJsonl` 在呼叫方沒傳 `writePolicy` 時，自動從 `fs.sandboxPolicy` 取 `danger-full-access` mode（繞過 workspace 路徑限制）。舊呼叫方（todo.js/memory.js 等）無需修改即可寫到其他 workspace。修復 E_WRITE_FAILED（DSH 預設 sandbox 模式只讀 workspace 根）** | **v0.3.6 後調 `project_todo_add path="..."` 返回 E_WRITE_FAILED（schema 修好了但 sandbox 拒絕寫跨 workspace 目錄）** |
+| **v0.3.9** | **BOM strip + project.json 用 readJson + ask JSON round-trip** | **① `parseJsonl` / `readJson` 加 `U+FEFF` BOM strip（PowerShell `Set-Content -Encoding utf8` 寫入 jsonl 時加了 BOM，導致第一行 JSON.parse 失敗） ② `src/tools/ask.js` 改用 `readJson` 讀 `project.json`（之前用 `readJsonl` 讀 multi-line pretty-printed JSON 必然失敗，導致 `projectInfo.name` undefined，render 暴露問題）③ ask execute return 加 `JSON.parse(JSON.stringify(ret))` 防禦性 round-trip + `_diag` 欄位（萬一某欄位含不可序列化資料能定位）** | **使用者重啟後 `project_ask` 報 "value is not lossless JSON"。離線 debug（scripts/debug-ask.js）找到真因：project.json 是 pretty-printed 多行 JSON，但 ask.js 用 readJsonl 按行解析** |
+| **v0.3.8** | **path-resolver 加 workspaceRegistry + 跳過 DSH Desktop 汙染 fallback** | **實測發現：DSH Desktop Electron 下，`sandboxPolicy.workspaceRoot` 可能是 `<user-home>/AppData/Local/Programs/DSH Desktop`（DSH 安裝目錄），不是使用者當前 session 的 workspace。所有不帶 path 的工具呼叫都寫到 DSH Desktop 安裝目錄的 `.project-brain/`。修復：① `readCwdFromWorkspaceRegistry`：用 `ctx.get('sessions').list()` 拿所有 session 的 cwd（user 當前開啟的 workspace）；② `isDshDesktopInstall`：檢測 sandboxPolicy.workspaceRoot 是否命中 DSH Desktop 安裝路徑，是則跳過 fallback。優先順序鏈：args.path → exec.session → workspaceRegistry(sessions) → sandboxPolicy（非 DSH Desktop）→ "."** | **v0.3.7 實測發現數據被寫入 DSH Desktop 安裝目錄，而非當前 workspace。** |
+| **v0.3.10** | **傳 path 寫到 workspace 驗證 + 12 工具端到端** | **① 驗證顯式傳入目標 workspace 的場景正確落庫，且不汙染 DSH Desktop 安裝目錄；② 12 工具全部端到端跑通：init / rescan / status / continue / memory add+list / todo add+list+done+update / ask / dream；③ 即時同步 + auto-rebuild 鏈路穩定（preview.changed → shell.run build.js → clientModules.rebuilt → renderer 熱過載），無需重啟 DSH** | **重啟 DSH 後實跑確認工具全部返回正確結果；顯式路徑與預設路徑均落到正確 workspace。** |
+| **v0.3.11** | **SPEC v0.3 MINOR bump + 治理債 + P0.7 TODO strip 實質實現** | **① SPEC 頂部 bump v0.2 → v0.3（加 changelog 累積註腳，不新增章節）；② 修正 README/TODO 中"TODO strip 已實現"的虛構描述；③ git commit v0.3.0-v0.3.10 working tree（約 10 個新檔案 + 文件同步），拆 2 個 commit（feat + docs）；④ `src/client.js` 註冊 `conversation.input.dock` Slot（id: `project-brain-todo-strip`，order=10）+ TodoStrip 純函式元件（摺疊 top-3 / 點選展開全量 / uninit+empty 雙 guard）；⑤ i18n 加 `todostrip.title/viewAll/close/empty` 4 key × 2 語言；⑥ `scripts/smoke-todostrip.mjs` 離線 10/10 PASS（bundle 含 dock 註冊 + 元件 + 主題 token + 43 個 session embed）；⑦ 一次性 debug 指令碼歸檔到 `scripts/_archive/`（保留不刪）** | **本輪使用者復盤"梳理開發情況，進入下一階段"；發現 working tree 大量未提交、文件與程式碼不同步** |
+| **v0.3.12** | **P0.8 第一波收尾 — dream commit/full + locale-aware + 跨 Session 端到端** | **① `project_dream` dryRun=false 真寫 jsonl（merge: dropped 移除 + keep status=reinforced + importance +0.05；archive: status=archived + 寫 timeline + emit preview.changed）；② `mode=full` 額外清 archived 行 + 按 importance DESC 排序；③ dream 演算法抽到 `brain-logic.computeDreamActions/applyDreamCommit`（純函式，避開 dsh-tools runtime）；④ `brain-files.js` 加 `writeJsonl`；⑤ `client.js` 加 `resolveLocaleCode(props)` 從 `props._dshLocale.getLocale()` 取即時語言（不再硬編碼 zh-CN），支援 zh-CN/en-US/zh/en 寬鬆匹配；⑥ `smoke-dream-commit.mjs` 33/33 PASS（light/full/邊界）；⑦ `smoke-session-lifecycle.mjs` 25/25 PASS（scanner → memory/todo → summarizer 走真 git diff → injector 輸出 markdown 含 Top-K memories + active TODO + recent activity → build-time embed loadProjectData 驗證全量資料）；⑧ 4 個 smoke test 共 30+10+33+25 = **98 項全 PASS**。lib/index.js 110.3→114.8kb；lib/client.js 68.3→74.8kb** | **使用者「繼續」指令；P0.8 todo 啟動第一波收尾** |
+| **v0.3.13** | **P0.8 第二波收尾 — 跨 workspace 隔離實測 + dark/light 主題 token 取證** | **① 新增 `scripts/smoke-multi-workspace.mjs`（25/25 PASS）：path-resolver 顯式 path 隔離、session cwd 隔離、DSH Desktop 安裝路徑過濾（Windows + Mac）、todo.jsonl A vs B 物理隔離、loadProjectData(A) vs loadProjectData(B) 互不汙染、memory 隔離；② `cordis_inspect_query Theme.listTokens` 取證 DSH 真實主題 token（13 個，全 requiresLightAndDark=true），寫 `scripts/smoke-theme-tokens.mjs`（14/14 PASS）靜態校驗 client.js 11 個 token 全在真名內、無懸空 token、無硬編碼 hex 顏色、覆蓋 background/border/brand/label/state 五類；③ 6 個 smoke test 共 30+10+33+25+25+14 = **137 項全 PASS**。未改 src/ 業務程式碼（純驗證）。lib/client.js 74.8→80.1kb（+5.3kb 來自 build-time embed 多 workspace 資料，非程式碼變化）** | **使用者「繼續人完成」「繼續任務」指令；P0.8 第二波啟動** |
+| **v0.3.14** | **P0.8 第三波 — auto-rebuild 跨 fiber 事件隔離 bug 修復** | **根因：v0.3.13 重啟實測發現 `project_dream dryRun=false` 寫完 jsonl 後 8 秒查 bundle mtime 未變。`cordis_inspect_query Event.listEvents` 取證 `project_brain/preview.changed` 不在 DSH 原生事件；Cordis 4 `Scoped<Context>` 模型 `ctx.emit/on` 只在同 fiber 內 dispatch；dsh-project-brain host bundle 在 host fiber 註冊 `setupAutoRebuild`，工具 `exec.ctx` 是 agent fiber → emit 收不到。修復：`src/host/rebuild.js` 從 `ctx.on("preview.changed")` 改成 `ctx.effect(() => ctx.timer.interval(checkMtime, 5000))` —— 每 5 秒掃 `.project-brain/{project,memory,todo,timeline}.json*` 的 mtime，變化觸發 `runBuild()`（100ms debounce）。改動單檔案 ~20 行，不動 `src/index.js` 註冊結構，不引入 fs.watch / chokidar 依賴；137 項 smoke test 仍全 PASS；5 秒輪詢 vs 原 ~1-3s 即時延遲變長但跨 fiber 穩定** | **v0.3.13 重啟實測 8 項工具 PASS + 1 項 auto-rebuild 失效；使用者「開始修復」指令** |
+| **v0.3.15** | **P0.8 第四波 — inject 加 timer 讓 ctx.timer 真可用（v0.3.14 修復未生效的根因補漏）** | **v0.3.14 重啟實測失敗：`project_dream dryRun=false` 6 秒後查 bundle mtime 仍是手動 build 時間。根因：`src/index.js` inject 陣列 `["tools", "fs", "sandboxPolicy", "clientModules"]` 未宣告 `timer`；Cordis 4 `Scoped<Context>` 預設 service 不可見，必須 inject 才能 `ctx.get` 拿到；rebuild.js 調 `ctx.get("timer")` 返回 undefined，進入"退化"分支 warn 後默默失敗 → 整個輪詢邏輯沒啟動。修復（單檔案 1 行）：`src/index.js` inject 陣列末尾加 `"timer"`。教訓（永久）：Cordis 4 任何 `ctx.get('xxx')` 之前必須先在 inject 陣列宣告；debug-fix 應列依賴 → inject → ctx.get 完整鏈路；auto-rebuild 關鍵基礎設施必須 DSH Desktop 重啟實測一次完整鏈路才算 done。**重 build 後用戶需再重啟一次 DSH 驗證** | **v0.3.14 重啟實測失敗 6 秒後 bundle 未變；使用者「幫我修復」指令** |
+| **v0.3.16** | **P0.8 第五波 — 監聽 DSH 原生事件主動喚醒 + 冷啟動診斷 log（v0.3.15 仍未生效的根因定位）** | **v0.3.15 重啟實測第三次失敗：bundle mtime 仍是 22:37:37。推測根因：host fiber 在 DSH Desktop 冷啟動時 `resolveWatchPaths()` 返回空陣列（sandboxPolicy.workspaceRoot 被 `safeCwd` 過濾掉 DSH Desktop 安裝路徑；workspaceRegistry/sessions/agents 都為空）→ timer interval 啟動但 paths=[] → mtime 變化無人監聽。修復（src/host/rebuild.js +30 行）：(1) setupAutoRebuild 頂部加冷啟動診斷 log（ctx.timer / ctx.get('timer') / sandboxPolicy.workspaceRoot / workspaceRegistry.list 數量 / sessions.list 數量 / agents.currentInitiator / 初始 paths 數量），讓 DSH Desktop 啟動時通過 ctx.logger 輸出；(2) 監聽 DSH 原生 `agent/created` / `session/created` 事件（DSH 框架跨 fiber 自動路由），事件回撥裡重新 resolveWatchPaths + 立即 pollMtime + 啟動 timer interval；(3) 保留 timer interval + ctx.on('preview.changed') 雙兜底。**這次重 build 後用戶需再重啟一次 DSH 驗證 + 我會主動查診斷 log 定位真因**，不再靠推斷** | **v0.3.15 重啟實測失敗 6 秒後 bundle 未變；使用者「幫我修」指令** |
+| **v0.3.17** | **P0.8 第七波 — spawn 子程序 watcher（徹底脫離 Cordis 抽象，終極 fallback）** | **v0.3.16 重啟實測第四次失敗：診斷 log 設計上對但觀測鏈斷了（DSH Desktop Electron 無主 log 檔案，ctx.logger.info 輸出位置未知）。**所有 ctx.timer/ctx.effect/ctx.on 的 silent failure 不可觀測。終極方案：放棄 Cordis 抽象，`setupAutoRebuild` 用 `child_process.spawn` 啟動一個常駐 node 子程序跑獨立 watcher 指令碼（`src/host/rebuild-watcher.mjs`）。子程序用 node:fs.watch + 2 秒兜底輪詢監聽 `.project-brain/*.json*` mtime，變化直接 `child_process.execFileSync('node', ['build.js'])`。寫 log 到 `.project-brain/.dsh-project-brain-watcher.log`（繞開 ctx.logger）。**完全脫離 Cordis fiber 抽象**（子程序是獨立 process）→ 跨 fiber 問題不存在；node:fs/child_process 都是 Node 內建 → 零新依賴；sandbox 友好（spawn 預設 allowed）。**使用者需再重啟一次 DSH（第五次）驗證** | **v0.3.16 重啟實測失敗 6 秒後 bundle 未變 + 診斷 log 看不到；使用者「修」指令** |
+| **v0.3.18** | **P0.8 第八波 — 工具層同步 rebuild（工程止血，不再依賴 host bundle silent failure）** | **v0.3.17 重啟實測第五次失敗：`.project-brain/.dsh-project-brain-watcher.log` 不存在 → watcher 子程序要麼沒 spawn 成功、要麼 sandbox 阻止寫檔案。本地手動 spawn 測試 watcher 能跑 → 真因是 DSH Desktop 靜態 plugin fiber 的 silent failure。**不再讓使用者重啟第 6 次**，改思路：放棄 host bundle "被動監聽"模式，**改為工具層"主動觸發"**：新檔案 `src/host/rebuild-sync.js` 匯出 `runSyncRebuild(reason)`，在 dream/memory/todo 工具的 execute 函數裡寫完 jsonl 後**立即同步**調 `execFileSync('node', ['build.js'])`（v0.3.6 已驗證 execFileSync 能跑）。Rebuild 失敗不影響工具本身返回值（try/catch 吞）。保留 `src/host/rebuild.js` 的 host bundle 監聽邏輯作為 fallback（未來 DSH 修好了再恢復）。**只動 lib bundle，不動 host bundle → 使用者不需要重啟 DSH** | **v0.3.17 第五次失敗 + 使用者第 5 次重啟；工程止血** |
+| **v0.3.19** | **端到端驗證完成 + auto-rebuild 接受手動 build fallback** | **v0.3.18 端到端實測：tool 寫檔案完全 work（project_todo_add/dream 都正確寫 todo.jsonl + timeline.jsonl），但 `lib/client.js` mtime 不變 → 6 次失敗累計確認 DSH Desktop 靜態 plugin fiber 任何主動行為（ctx.timer/ctx.effect/ctx.on/spawn/execFileSync）都 silent failure。**終局方案：接受手動 build fallback** —— 調任何寫工具後手動跑 `node build.js`（~1 秒）重新整理 sidebar bundle。**不再投入修復資源**。端到端驗證 5 層面（基礎環境/工具註冊/工具呼叫/sidebar/主題）大部分 PASS（僅 auto-rebuild 失敗）。12 個工具 100% 調通，資料閉環 OK | **v0.3.18 驗證失敗 + 使用者實測接受手動 fallback** |
+| **v0.3.20** | **清理過時 todo + 完善 Project Memory（5 類混合填充）** | **(1) 關閉 5 條過時 todo**（3 條 auto-rebuild 死迴圈：v0.3.7 / v0.3.9 / v0.3.7b debug；1 條陳舊 P0.4.1 文件目標；1 條 stale P0.5 in_progress），活躍 7 → 2；(2) 補 5 條型別混合 memory**：① decision: 採用 Project-First 資料模型；② decision: 三層資料通道架構（Cordis + build-time embed + manual build fallback）；③ decision: brain-logic 純邏輯層 + smoke test 策略；④ architecture: 8 類記憶型別混合填充策略；⑤ requirement: manual build fallback 永久不被信賴。memory.jsonl 17 → 22 條，型別分佈從 `lesson:2, change:8, bug:6, decision:1` 升級為 `decision:4, architecture:1, requirement:1, change:8, bug:6, lesson:2`（decision 從 1 → 4，提升 sidebar 決策密度） | **v0.3.19 端到端驗證完成後 Phase 2 完善工作** |
+| **v0.3.21** | **P0.8 收尾大結局 — 關閉最後 1 條 todo + 寫入 P0.8 完成度總結** | **關閉最後 1 條 todo（`補全 init/rescan/continue 工具與 RPC continueSession 聯調驗證`，實際已被 smoke-session-lifecycle.mjs 25/25 PASS 覆蓋）；P0.8 全域性完成度 100%（auto-rebuild 例外）。所有 P0 階段（P0.0-P0.8）全部完成。終端使用者工作流：調工具寫 `.project-brain/` → 手動跑 `node build.js`（1 秒）→ DSH client bundle 自動熱過載 → sidebar 立刻更新。137 項 smoke test 全 PASS。下一步進入 v0.4.x / v1.0 MVP** | **v0.3.20 完成後 Phase 3 收尾** |
+| **v0.4.0** | **P1 起步 — appendJsonl 效能最佳化 O(N) → O(1)** | **P0.8 v0.3.21 收尾後的第一個 P1 工作。`src/host/store/brain-files.js` 的 `appendJsonl` 之前是"讀整個 jsonl → push → 全檔案重寫"，memory.jsonl / timeline.jsonl 有幾百條記錄時效能差。修復：新增 `appendLine(fs, path, line, writePolicy)` 用 `fs.appendFile` 同步追加（DSH 單執行緒 fiber 安全）；`appendJsonl` 改為相容 wrapper（直接調 appendLine，不讀全檔案）；邊界處理（檔案不存在 → 建立；末尾無換行 → 補 "\n"）；保留 `writeJsonl`（dream commit 全檔案寫）。smoke-test 加 12 項覆蓋 appendLine 行為 + appendJsonl 相容路徑 + 效能基準（小檔案 + 模擬 1000 行）。137 項 smoke test 仍全 PASS。bundle size +3.5kb** | **v0.3.21 P0.8 收尾大結局後 P1 起步** |
+| **v0.4.3** | **DSH Desktop 釋出準備 — INSTALL.md + CHANGELOG.md + STORE_LISTING.md** | **v0.4.0 效能最佳化是"內功"（使用者看不到），v0.4.3 釋出準備是"外功"（使用者能直接看到）。純文件工作。交付物：① INSTALL.md（系統要求 + 三種安裝方式 + 驗證步驟 + FAQ：auto-rebuild 不 work / path 顯式傳 / sandboxPolicy 警告）；② CHANGELOG.md（Keep a Changelog 規範，v0.2-v0.4.3 全部 milestone，Added/Changed/Fixed/Known Limitations 四象限）；③ STORE_LISTING.md（一句話描述 ≤80 字 + 長描述 ≤500 字 + 標籤 + 截圖位）；④ README.md 加 Documentation 章節連結到 INSTALL/CHANGELOG/TODO/SPEC。DSH Desktop 商店釋出 PR 描述就用 STORE_LISTING.md 內容** | **v0.4.0 效能最佳化完成後 P1 第二波** |
+| **v0.4.1** | **dream 真實架構 diff — LLM 接入 + project_diff 工具** | **在 v0.4.0 效能最佳化 + v0.4.3 釋出準備基礎上，給 dsh-project-brain 接入 LLM 真正理解專案架構變化。`project_dream` (v0.3.12) 只做 title 合併 + status=archived，不動程式碼層面；新 `project_diff` 掃 git diff + 調 DSH llm service → 生成 architecture change memory。DSH llm 介面（已驗證）：ctx.get('llm').stream(options) / prepareCall / resolveCallConfig。風險：DSH Desktop 靜態 plugin fiber 可能 silent failure（v0.3.14-v0.3.18 教訓）→ 寫 mock LLM provider 讓 smoke test 可跑 + 使用者實測驗證真實路徑。交付物：① src/host/integrations/llm.js（mock LLM + DSH llm 抽象）；② src/host/diff/detector.js（git diff 掃描）；③ src/tools/diff.js（新工具）；④ scripts/smoke-project-diff.mjs（mock LLM 驗證）；⑤ 加進 src/index.js 的 toolBuilders 陣列。190 項 smoke test 全 PASS**。**使用者實測（2026-08-28）：13 個工具註冊 ✅ + project_diff dryRun=true 調通 ✅ + project_diff dryRun=false 0 檔案 0 commits（DSH Desktop shell service 靜默阻止 git 呼叫，**和 v0.3.14-v0.3.18 同根因**）**。**接受 fallback 策略**：mock LLM fallback 兜底，工具呼叫永遠有結果不 silent failure；真實 git + 真實 LLM 等 DSH Desktop 修復後啟用** | **v0.4.3 釋出準備完成後 P1 第三波** |
+| **v0.4.2** | **真實 git + 真實 LLM（繞過 DSH Desktop sandbox）** | **v0.4.1 mock fallback 永遠拿不到真實資料，使用者決策"先把功能完善"。** 走方向 1+2：① detector 重寫用 node 內建模組（fs + zlib + crypto）實現純 git 客戶端，讀 .git/HEAD / refs/heads / objects/，loose object MVP 完整，pack 檔案 fallback 提示使用者；② llm.js 重寫用 node:fetch 調 user-configured OpenAI 相容 API（引數 llmApiUrl/llmApiKey/llmModel 或 env DSH_LLM_*），fallback 到 mock。零新依賴（node 內建）。**完全脫離 DSH shell service / ctx.llm**：自己讀 .git + 自己 fetch API。**使用者需配 LLM API key**（DeepSeek / 通義千問 / 本地 Ollama 相容）。190+ 項 smoke test 仍全 PASS** | **v0.4.1 使用者實測確認 mock fallback 不夠（決策記錄在 .project-brain/memory.jsonl mem-mtccn6uf）** |
+| **v0.4.4** | **summarizer 真實 git + detector 真實 git 格式修復** | **v0.4.2 只給 project_diff 的 detector 換了純 node git 客戶端，但 summarizer（session/disposed 自動摘要）仍依賴 DSH shell service 跑 git diff（DSH Desktop 上 silent failure，拿不到真實 diff → 不寫 change memory）。修復 1：summarizer.js 刪除 gitCapture(shell)，改用 detectChanges（v0.4.2 detector），setupSummarizer 不再讀 ctx.get('shell')。修復 2（除錯發現 v0.4.2 detector 在真實 git 倉庫報 cannot read current commit，3 個 bug）：① inflateRawSync → inflateSync（真實 git loose object 用 zlib deflate 帶 header，實測 78 01 + inflateSync 成功 / inflateRawSync 報 invalid stored block lengths）；② 目錄 mode 判斷 parseInt(mode,8)===40000 永不匹配（git tree mode 是省略前導零的八進位制，目錄="40000"=0o40000=16384）→ 改為 ===0o40000，目錄才能遞迴展開（src 而非 src/index.js）；③ smoke-project-diff.mjs fixture 誤用 deflateRawSync（raw deflate）與 inflateRawSync 互相匹配 → 假陽性 PASS，改為 deflateSync（zlib 格式）匹配真實 git。驗證：真實 git 倉庫（git init + commit 含 src/ 子目錄）被正確讀取 + 8 個 smoke test 198/198 PASS。**現在 project_diff + summarizer 在真實 git 倉庫上都能工作，不再依賴 DSH shell service** | **v0.4.2 收尾後補齊 summarizer 依賴 + 修復 detector 真實 git 格式隱藏 bug** |
+| **v0.4.5** | **detector 移除 pack 整體拒絕 — commit/tree 在 loose 即可 diff** | **v0.4.4 後用戶重啟 DSH 實測 project_diff 遇到新限制：pack file not supported。除錯發現 detector 的 hasPackFiles 只要檢測到倉庫有 .pack 就整體 fallback——但真實 git 倉庫普遍有 pack（git gc / 自動打包），且 detector 的 diff 只比較 tree 裡的 hash 從不讀 blob 內容，所以只要 commit + tree 在 loose 就能完整工作。修復：刪除 hasPackFiles + detectChanges 的整體拒絕分支；僅當 readCommit(head) 真的讀不到（commit object 在 pack）時才返回明確錯誤。驗證：真實 dsh-project-brain 倉庫（2 pack + 32 loose）返回 18 個真實檔案變更（正是 v0.4.4 commit 內容）；smoke-project-diff pack 測試改為"有 .pack 但 commit/tree 在 loose → 仍能 diff"；8 個 smoke test 199/199 PASS** | **v0.4.4 使用者重啟實測 project_diff 觸發** |
+| **v0.4.6** | **detector pack 真實支援 — 解析 .idx v2 + .pack v2 + packed-refs + delta 解碼** | **v0.4.5 後用戶重啟 DSH 實測，真實倉庫（git gc 後 pack + packed-refs）依然報 "cannot read current commit"。v0.4.5 的"loose 即可"假設不成立：git gc 後所有 object 在 pack，ref 在 packed-refs。修復 7 處：① readHead 加 packed-refs fallback；② 新增 parseIdxV2（.idx v2 big-endian fanout + hash + offset）；③ 新增 readPackObject / readPackEntryByOffset（varint size+type header + inflate）；④ OFS_DELTA / REF_DELTA 解碼（applyDelta）；⑤ readGitObject = 先 loose 後 pack fallback；⑥ idxCache 用 gitDir+idxPath 為 key（跨倉庫隔離）；⑦ 6 個除錯 bug 修復（minSize 公式、varint 累加、pack inflate 無 header、REF_DELTA 遞迴等）。驗證：臨時 git 倉（git init + 2 commit + git gc --prune=now）detectChanges 返回 files:["README.md"] modified；smoke-project-diff 加 2 個 packed-refs 斷言；8 個 smoke test 201/201 PASS**。**MVP 限制：multi-pack-index（MIDX，git 2.20+）不支援——dsh-project-brain 自身倉庫是 MIDX，本倉庫仍 fallback 提示** | **v0.4.5 使用者重啟實測 git gc 倉庫觸發** |
+| **v0.4.7** | **llm.js 加 Anthropic 相容協議** | **v0.4.6 後用戶實測 project_diff 走 mock fallback（未配 LLM key）。使用者提供 MiniMax 端點 https://api.minimaxi.com/anthropic，實測必須走 Anthropic 協議（POST /v1/messages + x-api-key header）而非預設 OpenAI 相容。修復：① detectProtocol(apiUrl)：baseUrl 含 "anthropic"（路徑或子域）→ Anthropic，否則 OpenAI；② fetchAnthropic：POST {baseUrl}/v1/messages，headers x-api-key + anthropic-version:2023-06-01，response content[0].text；③ realFetchLLM 自動選。smoke-project-diff 加 11 斷言（5 個 Anthropic 真實路徑 + 6 個 detectProtocol URL 模式）；8 個 smoke test 210/210 PASS** | **v0.4.6 使用者實測觸發 LLM 配置需求** |
+| **v0.4.8 - v0.4.12** | **Sidebar UI 視覺升級（emoji + StatusBanner + ActionsBlock 文案統一 + Dashboard Quick Actions）** | **v0.4.7 團隊內部使用穩定後進入 UI 打磨階段。最佳化 sidebar 8 區塊視覺層次、加 emoji 圖示、引入 StatusBanner 三大數字彙總、ActionsBlock 按鈕文案穩定化、Dashboard 預設展開 + Quick Actions 2x2 網格 + MemoriesBlock toggle 改 React useState 修復重渲染 bug。purely frontend + build-time embed 改造，無 RPC / host 改動** | **v0.4.7 UI 打磨** |
+| **v0.5.0** | **OnboardingBlock 自動啟動流程：點選按鈕直接調 host.call RPC，無需使用者複製貼上** | **v0.4.12 UI 打磨後，使用者反饋"啟動專案大腦"按鈕只複製命令到剪貼簿需要手動貼上，不合目的。改造 OnboardingBlock 為帶狀態機元件（idle/loading/error），點選後呼叫 `host.call('project_brain/initProject', { args: { path } })`，期間 CSS 轉圈 + 3 階段步驟條（掃描專案結構 → 寫入專案大腦 → 分析技術棧與依賴），RPC 完成後用返回值（projectId/name/scanDurationMs/stats）拼最小 preview 結構（project/phase/recentActivity/stats），通過 overrideData state 讓父元件立即展示 dashboard 而非等 host rebuild。失敗時顯示錯誤卡片（具體 error.message）+ 重試按鈕 + 複製啟動指令兜底按鈕。父元件 SidebarPreviewRoot 把 workspacePath 通過 props 傳給 OnboardingBlock；host builtin 在 apply 階段通過 ctx.host 拿到並儲存到模組級變數 `__DSH_CLIENT_HOST__`（避免子元件拿不到 client builtin）。新增 build-inline.js：sandbox 阻止 esbuild spawn 子程序時的退路，純 Node FS 拼接（IIFE wrap + 佔位符替換）。驗證：使用者重啟 DSH → sidebar 顯示新 OnboardingBlock → 點選按鈕 → 轉圈 → dashboard 自動出現** | **v0.4.12 使用者反饋"啟動按鈕不合目的"** |
 
-**修订流程**：
-1. 任何对 SPEC 的修改先开 PR。
-2. PR 必须更新本节（添加新行）。
-3. PRD / DESIGN 与 SPEC 冲突时回写 PRD / DESIGN，并在该行标注"sync"。
-4. SPEC 版本号语义：MAJOR（破坏性变更）/ MINOR（新增章节）/ PATCH（错别字、表述优化）。
+**修訂流程**：
+1. 任何對 SPEC 的修改先開 PR。
+2. PR 必須更新本節（新增新行）。
+3. PRD / DESIGN 與 SPEC 衝突時回寫 PRD / DESIGN，並在該行標註"sync"。
+4. SPEC 版本號語義：MAJOR（破壞性變更）/ MINOR（新增章節）/ PATCH（錯別字、表述最佳化）。
 
 ---
 
-# 附录 A：核心 RPC 契约 Schema（schemastery 示例）
+# 附錄 A：核心 RPC 契約 Schema（schemastery 示例）
 
 ```js
-// src/shared/types.js —— 契约示意，运行时按 JSDoc + schemastery 实现
+// src/shared/types.js —— 契約示意，執行時按 JSDoc + schemastery 實現
 const SidebarPreviewSchema = {
   initialized: 'boolean',
   project: { id: 'string', name: 'string', type: 'string?', lastUpdateAt: 'number' },
@@ -1659,12 +1659,12 @@ const ErrorSchema = { ok: 'false', code: 'string', message: 'string', details: '
 
 ---
 
-# 附录 B：SidebarPreview 数据流时序
+# 附錄 B：SidebarPreview 資料流時序
 
 ```
-用户打开 DSH
+使用者開啟 DSH
    ↓
-SidebarTab 渲染（active 状态变化）
+SidebarTab 渲染（active 狀態變化）
    ↓
 Client useEffect: host.call('project_brain/sidebar.getPreview', { projectId })
    ↓
@@ -1675,64 +1675,64 @@ Host aggregator:
    ↓
 返回 SidebarPreview
    ↓
-Client 渲染 5 区块（或 Onboarding）
+Client 渲染 5 區塊（或 Onboarding）
    ↓
-后续：Host 任意 emit('project_brain/preview.changed', { projectId })
+後續：Host 任意 emit('project_brain/preview.changed', { projectId })
    ↓
 Client 重新拉取
 ```
 
 ---
 
-# 附录 C：版本与兼容
+# 附錄 C：版本與相容
 
 - 本 SPEC 版本：`v0.2`
 - 配套 PRD：`REQUIREMENTS.md` v0.1
 - 配套 DESIGN：`DESIGN.md` v0.1
-- 数据库 schema 版本：`v1`（迁移系统见 §17）
-- 后续 schema 变更通过 `src/host/storage/migrations.js` 管理
+- 資料庫 schema 版本：`v1`（遷移系統見 §17）
+- 後續 schema 變更通過 `src/host/storage/migrations.js` 管理
 
 ---
 
-# 附录 D：Cordis 注入清单速查
+# 附錄 D：Cordis 注入清單速查
 
-| 依赖 | 类型 | 必需？ | 验证方法 |
+| 依賴 | 型別 | 必需？ | 驗證方法 |
 | --- | --- | --- | --- |
 | `llm` | Service | 是 | `cordis_inspect_query llm` |
 | `tools` | Service | 是 | 同上 |
 | `session` | Service | 是 | 同上 |
 | `timer` | Service | 是 | 同上 |
 | `loader` | Service | 否（用 `ctx.get`） | 同上 |
-| `storage` / `storageDomain` | Service | 是（**名待验**） | 同上 |
+| `storage` / `storageDomain` | Service | 是（**名待驗**） | 同上 |
 | `ctx.baseUrl` | — | — | Loader 注入的 base URL |
-| `ctx.logger` | — | — | 全局可用 |
+| `ctx.logger` | — | — | 全域性可用 |
 
 ---
 
-# 附录 E：术语表
+# 附錄 E：術語表
 
-| 术语 | 类别 | 含义 |
+| 術語 | 類別 | 含義 |
 | --- | --- | --- |
-| **SidebarPreview** | 功能 | 侧边栏折叠态预览面板整体功能 |
-| **SidebarTab** | UI | 侧边栏顶部 tab 栏的单个 tab 元素 |
-| **Onboarding** | 状态 | 项目未 init 时 SidebarPreview 展示的空状态分支 |
-| **`project_brain/preview.changed`** | 事件 | Host 推送的 preview 数据变更信号 |
-| **`project_brain/sidebar.getPreview`** | RPC | Client 拉取 SidebarPreview 数据的 RPC |
-| **`project_brain/sidebar.subscribe`** | RPC | Client 订阅 preview 变更的 RPC |
-| **`project_init` 等** | Tool | LLM 可调用的工具，命令前缀 `/project` |
-| **Project Brain** | 产品 | dsh-project-brain 的中文别名 |
-| **MVP** | 阶段 | Minimum Viable Product，对应 §11.1 |
-| **P0.x** | 阶段 | MVP 内阶段编号 |
+| **SidebarPreview** | 功能 | 側邊欄摺疊態預覽面板整體功能 |
+| **SidebarTab** | UI | 側邊欄頂部 tab 欄的單個 tab 元素 |
+| **Onboarding** | 狀態 | 專案未 init 時 SidebarPreview 展示的空狀態分支 |
+| **`project_brain/preview.changed`** | 事件 | Host 推送的 preview 資料變更訊號 |
+| **`project_brain/sidebar.getPreview`** | RPC | Client 拉取 SidebarPreview 資料的 RPC |
+| **`project_brain/sidebar.subscribe`** | RPC | Client 訂閱 preview 變更的 RPC |
+| **`project_init` 等** | Tool | LLM 可呼叫的工具，命令字首 `/project` |
+| **Project Brain** | 產品 | dsh-project-brain 的中文別名 |
+| **MVP** | 階段 | Minimum Viable Product，對應 §11.1 |
+| **P0.x** | 階段 | MVP 內階段編號 |
 
 ---
 
-## 附录 F：v0.6.x Memory V2 实现补充
+## 附錄 F：v0.6.x Memory V2 實現補充
 
-- 原始存储继续使用工作区内的 `memory.jsonl`；新记录增加 `schemaVersion=2`、`status`、`confidence`、`source` 与 `updatedAt`，旧记录保持向后兼容。
-- active 过滤是所有消费端的统一前置条件；`archived/superseded/deleted` 不进入 ask、continue、system prompt、Dashboard 或状态计数。
-- 默认召回为本地 BM25，并混合 importance/confidence/recency/type；Top-K 增加内容和类型多样性约束。
-- 向量模式必须显式启用并配置 OpenAI-compatible endpoint/model。索引缓存位于 `.project-brain/cache/embeddings.jsonl`，按模型键和内容哈希增量更新。
-- 向量配置、凭据、网络或响应异常均降级为关键词检索；原始记忆、待办、扫描和上下文恢复不受影响。
-- 远程 Embedding 的输入包含记忆标题、正文、标签和相关文件；默认关闭，密钥只从 DSH Credentials/环境变量解析。
+- 原始儲存繼續使用工作區內的 `memory.jsonl`；新記錄增加 `schemaVersion=2`、`status`、`confidence`、`source` 與 `updatedAt`，舊記錄保持向後相容。
+- active 過濾是所有消費端的統一前置條件；`archived/superseded/deleted` 不進入 ask、continue、system prompt、Dashboard 或狀態計數。
+- 預設召回為本地 BM25，並混合 importance/confidence/recency/type；Top-K 增加內容和型別多樣性約束。
+- 向量模式必須顯式啟用並配置 OpenAI-compatible endpoint/model。索引快取位於 `.project-brain/cache/embeddings.jsonl`，按模型鍵和內容雜湊增量更新。
+- 向量配置、憑據、網路或響應異常均降級為關鍵詞檢索；原始記憶、待辦、掃描和上下文恢復不受影響。
+- 遠端 Embedding 的輸入包含記憶標題、正文、標籤和相關檔案；預設關閉，金鑰只從 DSH Credentials/環境變數解析。
 
-**结束。所有开发、调试、提交、Code Review 行为均以本文档 v0.2 为基准。若发现冲突或遗漏，先更新本文档再改代码，并在 §20 记录变更。**
+**結束。所有開發、除錯、提交、Code Review 行為均以本文件 v0.2 為基準。若發現衝突或遺漏，先更新本文件再改程式碼，並在 §20 記錄變更。**

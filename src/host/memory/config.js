@@ -85,8 +85,8 @@ export function normalizeMemoryConfig(value) {
   });
 }
 
-// 全大写蛇形（如 PROJECT_BRAIN_EMBEDDING_API_KEY）当环境变量/凭据名；
-// 其余（方舟 UUID、sk-…）当直接填写的 API Key。
+// 全大寫蛇形（如 PROJECT_BRAIN_EMBEDDING_API_KEY）當環境變數/憑據名；
+// 其餘（方舟 UUID、sk-…）當直接填寫的 API Key。
 export function isEmbeddingEnvRef(value) {
   return /^[A-Z][A-Z0-9_]{2,127}$/.test(String(value || "").trim());
 }
@@ -149,8 +149,8 @@ export function publicMemoryConfig(config) {
 
 export function createMemoryConfigRuntime(ctx, entryConfig) {
   let current = normalizeMemoryConfig(entryConfig);
-  // Core 限额得让 injector / aggregator / dream 这些拿不到 config 的路径也看得见，
-  // 否则同一份 memory.jsonl 会被两套上限来回挤。
+  // Core 限額得讓 injector / aggregator / dream 這些拿不到 config 的路徑也看得見，
+  // 否則同一份 memory.jsonl 會被兩套上限來回擠。
   setCoreLimits(current);
   let credentials = null;
   let settingsService = null;
@@ -207,7 +207,7 @@ export function createMemoryConfigRuntime(ctx, entryConfig) {
         throw error;
       }
       // update = merge patch into user layer, validate, persist, commit, emit.
-      // scope.watch 已在注册时挂上，commit 后会自动把 current 刷成新值。
+      // scope.watch 已在註冊時掛上，commit 後會自動把 current 刷成新值。
       await settingsService.update(MEMORY_SETTINGS_NS, patch);
       return normalizeMemoryConfig(settingsService.get(MEMORY_SETTINGS_NS));
     },

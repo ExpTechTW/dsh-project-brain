@@ -93,8 +93,8 @@ function normalizeScoreMap(map) {
 }
 
 function recencyScore(memory, now) {
-  // 被检索命中过的按命中时间算「新鲜」。只看 updatedAt 的话，一条常被查到但很久
-  // 没改过的记忆会一路沉下去，而那恰恰是最该留着的。
+  // 被檢索命中過的按命中時間算「新鮮」。只看 updatedAt 的話，一條常被查到但很久
+  // 沒改過的記憶會一路沉下去，而那恰恰是最該留著的。
   const touched = Math.max(
     Number(memory.lastAccessedAt) || 0,
     Number(memory.updatedAt) || 0,
@@ -104,8 +104,8 @@ function recencyScore(memory, now) {
   return ageDays <= 7 ? 1 : Math.max(0, 1 - ageDays / 180);
 }
 
-// grounding 失败的记忆 confidence 会被压到 0.4，但 confidence 在加权和里只占 0.10，
-// 折算下来疑似幻觉和可靠事实只差 0.05 分。低可信度改成乘性打折，让差距真的体现出来。
+// grounding 失敗的記憶 confidence 會被壓到 0.4，但 confidence 在加權和裡只佔 0.10，
+// 折算下來疑似幻覺和可靠事實只差 0.05 分。低可信度改成乘性打折，讓差距真的體現出來。
 export const TRUSTED_CONFIDENCE = 0.6;
 
 export function trustFactor(confidence) {
@@ -123,9 +123,9 @@ function tokenJaccard(a, b) {
   return intersection / (aa.size + bb.size - intersection);
 }
 
-// ─── 召回层（v0.7.x 拆出）：单路打分 → 排序后的候选 ─────────────────────────
+// ─── 召回層（v0.7.x 拆出）：單路打分 → 排序後的候選 ─────────────────────────
 
-// BM25 召回：返回按 BM25 归一化分降序的候选列表 [{memory, score}]
+// BM25 召回：返回按 BM25 歸一化分降序的候選列表 [{memory, score}]
 export function bm25Recall(memories, query, options = {}) {
   const candidates = activeMemories(memories);
   const scores = normalizeScoreMap(bm25Scores(candidates, query, options));
@@ -135,7 +135,7 @@ export function bm25Recall(memories, query, options = {}) {
     .sort((a, b) => b.score - a.score);
 }
 
-// Vector 召回：返回按余弦相似度降序的候选列表 [{memory, score}]
+// Vector 召回：返回按餘弦相似度降序的候選列表 [{memory, score}]
 export function vectorRecall(memories, vectors, queryVector) {
   const candidates = activeMemories(memories);
   if (!queryVector || !vectors) return [];
@@ -149,11 +149,11 @@ export function vectorRecall(memories, vectors, queryVector) {
   return out.sort((a, b) => b.score - a.score);
 }
 
-// ─── 融合层（v0.7.x 新增）：RRF (Reciprocal Rank Fusion) ─────────────────────
+// ─── 融合層（v0.7.x 新增）：RRF (Reciprocal Rank Fusion) ─────────────────────
 //   公式: rrf(mem) = Σ_i  1 / (k + rank_i(mem))
-//   k 默认 60（Cormack 等 2009 论文标准值），两路贡献对称。
-//   任一路未命中 → 该路贡献 0（不计入分母 / 分子）。
-//   输出 {memory, relevance, keywordScore, vectorScore}，与旧字段兼容。
+//   k 預設 60（Cormack 等 2009 論文標準值），兩路貢獻對稱。
+//   任一路未命中 → 該路貢獻 0（不計入分母 / 分子）。
+//   輸出 {memory, relevance, keywordScore, vectorScore}，與舊欄位相容。
 
 export const DEFAULT_RRF_K = 60;
 
@@ -169,7 +169,7 @@ export function rrfMerge(rankedLists, options = {}) {
         acc.set(hit.memory.id, entry);
       }
       entry.rrf += 1 / (k + rank);
-      // 按列表顺序填回原分（第一个列表视为 BM25，第二个视为 vector）
+      // 按列表順序填回原分（第一個列表視為 BM25，第二個視為 vector）
       if (entry.bm25Score === 0 && hit.score > 0) entry.bm25Score = hit.score;
       else if (entry.vecScore === 0 && hit.score > 0) entry.vecScore = hit.score;
     });
@@ -184,7 +184,7 @@ export function rrfMerge(rankedLists, options = {}) {
     .sort((a, b) => b.relevance - a.relevance);
 }
 
-// ─── 多样性选择（MMR 风格）：保留旧行为，复用到 RRF / 加权两种模式 ─────────────
+// ─── 多樣性選擇（MMR 風格）：保留舊行為，複用到 RRF / 加權兩種模式 ─────────────
 
 function diverseSelect(ranked, topK) {
   const selected = [];
@@ -212,18 +212,18 @@ function diverseSelect(ranked, topK) {
   return selected;
 }
 
-// ─── 主入口（Durable Core：加权融合；RRF 仅保留为可测算法，不作为 ask 主路径） ──
+// ─── 主入口（Durable Core：加權融合；RRF 僅保留為可測演算法，不作為 ask 主路徑） ──
 //
-// 返回 hit 形状：{memory, relevance, score, keywordScore, vectorScore}
-//   - score: 多样性惩罚后的最终输出分（兼容 ask.js: hit.score）
-//   - relevance: 加权和
-//   - keywordScore / vectorScore: BM25 归一化分 / 余弦相似度
+// 返回 hit 形狀：{memory, relevance, score, keywordScore, vectorScore}
+//   - score: 多樣性懲罰後的最終輸出分（相容 ask.js: hit.score）
+//   - relevance: 加權和
+//   - keywordScore / vectorScore: BM25 歸一化分 / 餘弦相似度
 
 export function retrieveMemories({ memories, query = "", topK = 5, now = Date.now(), vectors, queryVector, config = {} } = {}) {
   const candidates = activeMemories(memories);
   const hasQuery = tokenizeMemoryText(query).length > 0;
 
-  // Ask 主路径始终是 BM25 + 重要度/时效加权；向量只作为可选加分，不用 RRF 当主合同。
+  // Ask 主路徑始終是 BM25 + 重要度/時效加權；向量只作為可選加分，不用 RRF 當主合同。
   const keyword = normalizeScoreMap(bm25Scores(candidates, query));
   const vectorRaw = new Map();
   if (queryVector && vectors) {
@@ -233,9 +233,9 @@ export function retrieveMemories({ memories, query = "", topK = 5, now = Date.no
     }
   }
   const vector = normalizeScoreMap(vectorRaw);
-  // 重平衡：importance 主导（用户标记过重要的应该最相关），recency 跟上（"近期关注"），
-  // vector 兜底（语义相似），keyword 仅在明确查询时贡献少量信号，confidence 反映 LLM 可信度。
-  // 旧权重 keyword 0.45 / vector 0.35 / importance 0.1 导致关键词淹没真正重要的记忆。
+  // 重平衡：importance 主導（使用者標記過重要的應該最相關），recency 跟上（"近期關注"），
+  // vector 兜底（語義相似），keyword 僅在明確查詢時貢獻少量訊號，confidence 反映 LLM 可信度。
+  // 舊權重 keyword 0.45 / vector 0.35 / importance 0.1 導致關鍵詞淹沒真正重要的記憶。
   const weights = {
     keyword: hasQuery ? Number(config.keywordWeight ?? 0.15) : 0,
     vector: vector.size > 0 ? Number(config.vectorWeight ?? 0.25) : 0,

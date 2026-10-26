@@ -1,50 +1,50 @@
-// detector.js - v0.4.2/v0.4.4/v0.4.5/v0.4.6 真实 git diff 扫描器（不依赖 DSH shell service）
+// detector.js - v0.4.2/v0.4.4/v0.4.5/v0.4.6 真實 git diff 掃描器（不依賴 DSH shell service）
 //
-// v0.4.1 教训：DSH Desktop 静态 plugin fiber 静默阻止 ctx.get('shell').run('git ...')。
-// v0.4.2 改用 node 内置模块（fs + zlib + crypto）直接读 .git 仓库，
-// 完全脱离 DSH shell service / spawn / execFileSync。
+// v0.4.1 教訓：DSH Desktop 靜態 plugin fiber 靜默阻止 ctx.get('shell').run('git ...')。
+// v0.4.2 改用 node 內建模組（fs + zlib + crypto）直接讀 .git 倉庫，
+// 完全脫離 DSH shell service / spawn / execFileSync。
 //
 // Git object format：
-//   - .git/HEAD 文件：ref: refs/heads/<branch> 或直接 commit hash
-//   - .git/refs/heads/<branch> 文件：commit hash（40 字符 hex）
-//   - .git/objects/<hash[:2]>/<hash[2:]> loose object 文件：
-//     zlib deflate（带 zlib header，首字节 0x78）压缩，inflate 后格式 = <type> <size>\0<content>
+//   - .git/HEAD 檔案：ref: refs/heads/<branch> 或直接 commit hash
+//   - .git/refs/heads/<branch> 檔案：commit hash（40 字元 hex）
+//   - .git/objects/<hash[:2]>/<hash[2:]> loose object 檔案：
+//     zlib deflate（帶 zlib header，首位元組 0x78）壓縮，inflate 後格式 = <type> <size>\0<content>
 //     type: commit | tree | blob | tag
-//     ⚠️ v0.4.4 修复：真实 git 用 zlib deflate（带 header），必须用 inflateSync；
-//        不能用 inflateRawSync（期望无 header 的 raw deflate，真实 git object 会解失败）
+//     ⚠️ v0.4.4 修復：真實 git 用 zlib deflate（帶 header），必須用 inflateSync；
+//        不能用 inflateRawSync（期望無 header 的 raw deflate，真實 git object 會解失敗）
 //   - tree object 格式：<mode> <name>\0<20-byte-binary-hash> 序列
-//   - blob object 格式：原始文件内容
+//   - blob object 格式：原始檔案內容
 //
-// v0.4.5 关键改进：detector 只读 commit + tree object（diff 只比 hash，从不读 blob 内容）。
-//   所以只要 commit/tree 在 loose 就能完整工作，即使 blob 被 git 打包进 .pack 也没关系。
-//   移除了"仓库存在 pack 文件就整体 fallback"的过保守设计——只有真正读不到 commit/tree
-//   时才提示 pack 不支持。
+// v0.4.5 關鍵改進：detector 只讀 commit + tree object（diff 只比 hash，從不讀 blob 內容）。
+//   所以只要 commit/tree 在 loose 就能完整工作，即使 blob 被 git 打包進 .pack 也沒關係。
+//   移除了"倉庫存在 pack 檔案就整體 fallback"的過保守設計——只有真正讀不到 commit/tree
+//   時才提示 pack 不支援。
 //
-// v0.4.6 pack 支持：loose 找不到时 fallback 解析 .idx v2 + .pack v2（含 OFS_DELTA + REF_DELTA）。
-//   还不支持 multi-pack-index（MIDX，git 2.20+）；遇到 MIDX-only 仓库回退到"在 pack 里"提示。
+// v0.4.6 pack 支援：loose 找不到時 fallback 解析 .idx v2 + .pack v2（含 OFS_DELTA + REF_DELTA）。
+//   還不支援 multi-pack-index（MIDX，git 2.20+）；遇到 MIDX-only 倉庫回退到"在 pack 裡"提示。
 //
 // MVP 限制：
-//   - pack idx v1 不支持（git 1.4 以前格式，几乎绝迹）
-//   - multi-pack-index（MIDX）不支持（v0.4.7 计划）
-//   - diff 只做 file-level（add/modify/delete），不做行级 diff
-//   - 工作树状态只读 commit 之间差异（HEAD vs HEAD~1 之类），不读 index
+//   - pack idx v1 不支援（git 1.4 以前格式，幾乎絕跡）
+//   - multi-pack-index（MIDX）不支援（v0.4.7 計劃）
+//   - diff 只做 file-level（add/modify/delete），不做行級 diff
+//   - 工作樹狀態只讀 commit 之間差異（HEAD vs HEAD~1 之類），不讀 index
 
 import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { inflateSync } from "node:zlib";
 
-// 解压 git object（loose object = zlib deflate 压缩 + "type size\0content"）
+// 解壓 git object（loose object = zlib deflate 壓縮 + "type size\0content"）
 function inflateGitObject(compressed) {
   try {
     const inflated = inflateSync(compressed);
-    // 找第一个 null byte
+    // 找第一個 null byte
     const nullIdx = inflated.indexOf(0);
     if (nullIdx < 0) return null;
     const header = inflated.slice(0, nullIdx).toString("binary");
     const spaceIdx = header.indexOf(" ");
     if (spaceIdx < 0) return null;
     const type = header.slice(0, spaceIdx);
-    // size parse（不严格校验）
+    // size parse（不嚴格校驗）
     const content = inflated.slice(nullIdx + 1);
     return { type, content };
   } catch (e) {
@@ -52,9 +52,9 @@ function inflateGitObject(compressed) {
   }
 }
 
-// 读 loose object by hash（只读 .git/objects/<aa>/<bbcc...>）
-// 返回 null if 不存在 / 解压失败 / 不在 .git/objects 路径下
-// v0.4.6：原 readGitObject 重命名为 readLooseObject，下面有 readGitObject 包装做 pack fallback
+// 讀 loose object by hash（只讀 .git/objects/<aa>/<bbcc...>）
+// 返回 null if 不存在 / 解壓失敗 / 不在 .git/objects 路徑下
+// v0.4.6：原 readGitObject 重新命名為 readLooseObject，下面有 readGitObject 包裝做 pack fallback
 function readLooseObject(gitDir, hash) {
   if (!/^[0-9a-f]{40}$/i.test(hash)) return null;
   const objPath = join(gitDir, "objects", hash.slice(0, 2), hash.slice(2));
@@ -69,15 +69,15 @@ function readLooseObject(gitDir, hash) {
 //   8 byte magic (\377tOc) + version (4 byte, =2)
 //   256 × 4 byte fanout table
 //   N × 20 byte SHA-1（按 hash 排序）
-//   N × 4 byte CRC32（每个 object）
-//   N × 4 byte offset（每个 object 在 pack 内的 offset）
-//   N × 4 byte CRC32（整个 pack 文件的 CRC32，分段存储）
+//   N × 4 byte CRC32（每個 object）
+//   N × 4 byte offset（每個 object 在 pack 內的 offset）
+//   N × 4 byte CRC32（整個 pack 檔案的 CRC32，分段儲存）
 //   20 byte pack checksum
 //
 // .pack v2 格式：object entry 序列，每 entry = <type byte + size varint> + zlib compressed data
 // type: OBJ_COMMIT=1, OBJ_TREE=2, OBJ_BLOB=3, OBJ_TAG=4, OBJ_OFS_DELTA=6, OBJ_REF_DELTA=7
-// OFS_DELTA: 头后是 negative offset to base（varint encoding）
-// REF_DELTA: 头后是 20-byte base hash
+// OFS_DELTA: 頭後是 negative offset to base（varint encoding）
+// REF_DELTA: 頭後是 20-byte base hash
 
 const OBJ_COMMIT = 1;
 const OBJ_TREE = 2;
@@ -86,22 +86,22 @@ const OBJ_TAG = 4;
 const OBJ_OFS_DELTA = 6;
 const OBJ_REF_DELTA = 7;
 
-// 读 big-endian 32-bit int
+// 讀 big-endian 32-bit int
 function readBE32(buf, off) {
   return ((buf[off] << 24) | (buf[off + 1] << 16) | (buf[off + 2] << 8) | buf[off + 3]) >>> 0;
 }
 
 // 解析 .idx v2 → Map<hash, packOffset>（或 null if 不是 v2）
-// 不硬校验 size（git 各版本 idx 可能略有多余字节），用 fanout[255] 拿 N，按结构读
-// v2 idx 实际布局：header(8) + fanout(1024) + N×hash(20) + N×CRC(4) + N×offset(4) + N×pack_CRC(4) + pack_checksum(20)
-// 注：N*4 在 offset 之后是 pack file 的 CRC32 列表（不是 large offset table，large offset 是 N*8 编码）
+// 不硬校驗 size（git 各版本 idx 可能略有多餘位元組），用 fanout[255] 拿 N，按結構讀
+// v2 idx 實際佈局：header(8) + fanout(1024) + N×hash(20) + N×CRC(4) + N×offset(4) + N×pack_CRC(4) + pack_checksum(20)
+// 注：N*4 在 offset 之後是 pack file 的 CRC32 列表（不是 large offset table，large offset 是 N*8 編碼）
 function parseIdxV2(idxBytes) {
   if (idxBytes.length < 8 + 1024) return null;
   if (idxBytes[0] !== 0xff || idxBytes[1] !== 0x74 || idxBytes[2] !== 0x4f || idxBytes[3] !== 0x63) return null;
   const version = readBE32(idxBytes, 4);
   if (version !== 2) return null;
   const n = readBE32(idxBytes, 8 + 255 * 4);
-  const minSize = 1072 + n * 28;  // v2 idx 实际 size（无 large offset）：header(8)+fanout(1024)+N*20(hash)+N*4(obj_CRC)+N*4(offset)+20(checksum) = 1052+28N+20 = 1072+28N
+  const minSize = 1072 + n * 28;  // v2 idx 實際 size（無 large offset）：header(8)+fanout(1024)+N*20(hash)+N*4(obj_CRC)+N*4(offset)+20(checksum) = 1052+28N+20 = 1072+28N
   if (idxBytes.length < minSize) return null;
   const hashStart = 8 + 1024;
   // offset list 在 hashStart + N×20(hash) + N×4(CRC)
@@ -114,10 +114,10 @@ function parseIdxV2(idxBytes) {
     const oStart = offsetStart + i * 4;
     const packOffset = readBE32(idxBytes, oStart);
     if ((packOffset & 0x80000000) !== 0) {
-      // large offset：跳到 large offset table（idxBytes 末尾前 20 字节之前）
+      // large offset：跳到 large offset table（idxBytes 末尾前 20 位元組之前）
       const largeOffsetStart = offsetStart + n * 4;
       // 大 offset table 索引 = i
-      // 实际我们这里直接跳过（简化：large offset 处理留给后续）
+      // 實際我們這裡直接跳過（簡化：large offset 處理留給後續）
       skipped++;
       continue;
     }
@@ -126,7 +126,7 @@ function parseIdxV2(idxBytes) {
   return map;
 }
 
-// cache：idxPath -> Map<（hash, offset)>（避免重复解析；key 包含 gitDir 避免跨仓库污染）
+// cache：idxPath -> Map<（hash, offset)>（避免重複解析；key 包含 gitDir 避免跨倉庫汙染）
 const idxCache = new Map();
 function loadIdxMap(gitDir, idxPath) {
   const key = gitDir + "|" + idxPath;
@@ -138,10 +138,10 @@ function loadIdxMap(gitDir, idxPath) {
   return map;
 }
 
-// 读 pack entry type + size（git pack v2 变长编码）
-// 格式：第一个字节 = (type << 4) | (size & 0x0f)；如果 bit 7=1，size 还有后续 7-bit 字节
-// 后续字节：每字节 = (size bits) | (continue << 7)；最高位为 continue flag
-// 解码：size = (b1 & 0x0f) | ((b2 & 0x7f) << 4) | ((b3 & 0x7f) << 11) | ((b4 & 0x7f) << 18) | ...
+// 讀 pack entry type + size（git pack v2 變長編碼）
+// 格式：第一個位元組 = (type << 4) | (size & 0x0f)；如果 bit 7=1，size 還有後續 7-bit 位元組
+// 後續位元組：每位元組 = (size bits) | (continue << 7)；最高位為 continue flag
+// 解碼：size = (b1 & 0x0f) | ((b2 & 0x7f) << 4) | ((b3 & 0x7f) << 11) | ((b4 & 0x7f) << 18) | ...
 function readPackEntryHead(buf, offset) {
   let b = buf[offset];
   const t = (b >> 4) & 0x07;
@@ -157,8 +157,8 @@ function readPackEntryHead(buf, offset) {
   return { type: t, size, dataOffset: p };
 }
 
-// 读 OFS_DELTA 的 negative offset to base
-// 标准 git encoding：每字节高 7 位为数据 bit，最后一个字节高位为 0
+// 讀 OFS_DELTA 的 negative offset to base
+// 標準 git encoding：每位元組高 7 位為資料 bit，最後一個位元組高位為 0
 function readOFSOffset(buf, offset) {
   let p = offset;
   let b = buf[p++];
@@ -171,7 +171,7 @@ function readOFSOffset(buf, offset) {
   return { offset: ofs, nextPos: p };
 }
 
-// 应用 delta 数据到 base，返回 result buffer
+// 應用 delta 資料到 base，返回 result buffer
 function applyDelta(base, deltaBytes) {
   let p = 0;
   function readVarint() {
@@ -216,7 +216,7 @@ function applyDelta(base, deltaBytes) {
       } else if (offN === 0) {
         copyOff = 0x10000;
       } else {
-        return null;  // offN > 4 不支持
+        return null;  // offN > 4 不支援
       }
       if (szN > 0 && szN <= 3) {
         for (let i = 0; i < szN; i++) {
@@ -226,7 +226,7 @@ function applyDelta(base, deltaBytes) {
       } else if (szN === 0) {
         copySz = 0x10000;
       } else {
-        return null;  // szN > 3 不支持
+        return null;  // szN > 3 不支援
       }
       if (copySz === 0) continue;
       if (copyOff >= base.length) return null;
@@ -242,7 +242,7 @@ function applyDelta(base, deltaBytes) {
 
 // pack cache：packPath -> Map<offset, {type, content}>
 const packCache = new Map();
-// 当前 gitDir（REF_DELTA 递归 base 用）—— detector 单线程使用
+// 當前 gitDir（REF_DELTA 遞迴 base 用）—— detector 單執行緒使用
 let gitDirCurrent = "";
 
 function readPackEntryByOffset(packPath, packBytes, offset) {
@@ -254,7 +254,7 @@ function readPackEntryByOffset(packPath, packBytes, offset) {
   if (!head) return null;
   const { type, dataOffset } = head;
 
-  // pack 内 object 用 raw deflate（无 zlib header），必须 inflateRawSync
+  // pack 內 object 用 raw deflate（無 zlib header），必須 inflateRawSync
   if (type === OBJ_OFS_DELTA) {
     const ofs = readOFSOffset(packBytes, dataOffset);
     if (!ofs) return null;
@@ -276,7 +276,7 @@ function readPackEntryByOffset(packPath, packBytes, offset) {
   } else if (type === OBJ_REF_DELTA) {
     const baseHash = packBytes.slice(dataOffset, dataOffset + 20).toString("hex");
     const dataStart = dataOffset + 20;
-    // 递归 base：先 loose 再 pack
+    // 遞迴 base：先 loose 再 pack
     let baseRes = readLooseObject(gitDirCurrent, baseHash);
     if (!baseRes) baseRes = readPackObjectInternal(gitDirCurrent, baseHash);
     if (!baseRes) return null;
@@ -292,7 +292,7 @@ function readPackEntryByOffset(packPath, packBytes, offset) {
     cache.set(offset, ret);
     return ret;
   } else if (type === OBJ_COMMIT || type === OBJ_TREE || type === OBJ_BLOB || type === OBJ_TAG) {
-    // pack inflate 出的是纯 content（无 header 无 null byte），type 已在 entry header 里
+    // pack inflate 出的是純 content（無 header 無 null byte），type 已在 entry header 裡
     let content;
     try { content = inflateSync(packBytes.slice(dataOffset)); } catch (e) { return null; }
     if (!content) return null;
@@ -304,7 +304,7 @@ function readPackEntryByOffset(packPath, packBytes, offset) {
   return null;
 }
 
-// 内部 readPackObject：所有 pack 索引里找 hash
+// 內部 readPackObject：所有 pack 索引裡找 hash
 function readPackObjectInternal(gitDir, hash) {
   const packDir = join(gitDir, "objects", "pack");
   if (!existsSync(packDir)) return null;
@@ -326,20 +326,20 @@ function readPackObjectInternal(gitDir, hash) {
   return null;
 }
 
-// 读 pack 中的 object by hash（设 gitDirCurrent 以支持 REF_DELTA 递归）
+// 讀 pack 中的 object by hash（設 gitDirCurrent 以支援 REF_DELTA 遞迴）
 function readPackObject(gitDir, hash) {
   gitDirCurrent = gitDir;
   return readPackObjectInternal(gitDir, hash);
 }
 
-// v0.4.6：readGitObject = 先 loose 后 pack fallback
+// v0.4.6：readGitObject = 先 loose 後 pack fallback
 function readGitObject(gitDir, hash) {
   const loose = readLooseObject(gitDir, hash);
   if (loose) return loose;
   return readPackObject(gitDir, hash);
 }
 
-// 读 HEAD 拿 current branch + commit
+// 讀 HEAD 拿 current branch + commit
 // v0.4.6：ref 可能在 loose (.git/refs/heads/<branch>) 或 packed (.git/packed-refs)
 function readHead(gitDir) {
   const headPath = join(gitDir, "HEAD");
@@ -347,12 +347,12 @@ function readHead(gitDir) {
   let head;
   try { head = readFileSync(headPath, "utf8").trim(); } catch (e) { return null; }
   if (!head) return null;
-  // 两种格式：ref: refs/heads/main（detached HEAD 时直接是 hash）
+  // 兩種格式：ref: refs/heads/main（detached HEAD 時直接是 hash）
   if (head.startsWith("ref: ")) {
     const refName = head.slice("ref: ".length);  // e.g. "refs/heads/main"
     const refPath = join(gitDir, refName);
     let commit = null;
-    // 先读 loose ref
+    // 先讀 loose ref
     if (existsSync(refPath)) {
       try { commit = readFileSync(refPath, "utf8").trim(); } catch (e) {}
     }
@@ -362,10 +362,10 @@ function readHead(gitDir) {
       if (existsSync(packedRefsPath)) {
         try {
           const content = readFileSync(packedRefsPath, "utf8");
-          // 格式：每行 "<hash> <refname>"（行首可能是 # 注释）
+          // 格式：每行 "<hash> <refname>"（行首可能是 # 註釋）
           for (const line of content.split(/\r?\n/)) {
             if (line.startsWith("#") || !line.trim()) continue;
-            // 可能还有 peeled 行（hash 在 ref 旁）
+            // 可能還有 peeled 行（hash 在 ref 旁）
             const m = line.match(/^([0-9a-f]{40})\s+(\S+)$/);
             if (m && m[2] === refName) {
               commit = m[1];
@@ -376,7 +376,7 @@ function readHead(gitDir) {
       }
     }
     if (!commit) return null;
-    // 从 refName（"refs/heads/main"）切出 branch 名（"main"），而不是直接从含 "ref: " 前缀的 head 切
+    // 從 refName（"refs/heads/main"）切出 branch 名（"main"），而不是直接從含 "ref: " 字首的 head 切
     const branch = refName.startsWith("refs/heads/") ? refName.slice("refs/heads/".length) : refName;
     return { branch, commit };
   }
@@ -389,17 +389,17 @@ function parseTree(treeContent) {
   const entries = {};
   let i = 0;
   while (i < treeContent.length) {
-    // 找空格（mode 与 name 分隔）
+    // 找空格（mode 與 name 分隔）
     const spaceIdx = treeContent.indexOf(0x20, i);
     if (spaceIdx < 0) break;
     const mode = treeContent.slice(i, spaceIdx).toString("binary");
     i = spaceIdx + 1;
-    // 找 null（name 与 hash 分隔）
+    // 找 null（name 與 hash 分隔）
     const nullIdx = treeContent.indexOf(0, i);
     if (nullIdx < 0) break;
     const name = treeContent.slice(i, nullIdx).toString("utf8");
     i = nullIdx + 1;
-    // 20 字节 binary hash
+    // 20 位元組 binary hash
     if (i + 20 > treeContent.length) break;
     const hashBuf = treeContent.slice(i, i + 20);
     const hash = hashBuf.toString("hex");
@@ -409,7 +409,7 @@ function parseTree(treeContent) {
   return entries;
 }
 
-// 递归 collect tree：返回 flat { filePath: hash } map
+// 遞迴 collect tree：返回 flat { filePath: hash } map
 function collectTreeFiles(gitDir, treeHash, prefix = "") {
   const obj = readGitObject(gitDir, treeHash);
   if (!obj || obj.type !== "tree") return {};
@@ -421,10 +421,10 @@ function collectTreeFiles(gitDir, treeHash, prefix = "") {
       // skip submodules + node_modules + .git
       continue;
     }
-    // git tree mode（八进制但省略前导零，均无空格）：目录 = "40000"（= 0o40000 = 16384），
-    // 文件 = "100644" / "100755"，符号链接 = "120000"，子模块 = "160000"。
-    // v0.4.3 修复：不能用 parseInt(entry.mode, 8) === 40000（那是十进制 40000），
-    //   也不能匹配 "040000"（git 实际省略前导 0）；统一用 parseInt(mode,8) === 0o40000。
+    // git tree mode（八進位制但省略前導零，均無空格）：目錄 = "40000"（= 0o40000 = 16384），
+    // 檔案 = "100644" / "100755"，符號連結 = "120000"，子模組 = "160000"。
+    // v0.4.3 修復：不能用 parseInt(entry.mode, 8) === 40000（那是十進位制 40000），
+    //   也不能匹配 "040000"（git 實際省略前導 0）；統一用 parseInt(mode,8) === 0o40000。
     if (parseInt(entry.mode, 8) === 0o40000) {
       // directory
       Object.assign(files, collectTreeFiles(gitDir, entry.hash, path));
@@ -436,7 +436,7 @@ function collectTreeFiles(gitDir, treeHash, prefix = "") {
   return files;
 }
 
-// 读 commit object 拿 tree hash + parents
+// 讀 commit object 拿 tree hash + parents
 function readCommit(gitDir, commitHash) {
   const obj = readGitObject(gitDir, commitHash);
   if (!obj || obj.type !== "commit") return null;
@@ -447,13 +447,13 @@ function readCommit(gitDir, commitHash) {
   for (const line of lines) {
     if (line.startsWith("tree ")) tree = line.slice(5).trim();
     else if (line.startsWith("parent ")) parents.push(line.slice(7).trim());
-    else if (line === "") break;  // 后面是 commit message
+    else if (line === "") break;  // 後面是 commit message
   }
   return tree ? { tree, parents } : null;
 }
 
-// 完整 commit 解析（含 author / committer / 时间 / message）— 供 history.js 用
-// 不影响 detectChanges 内部用 readCommit 的逻辑（readCommit 仍是最小结构）
+// 完整 commit 解析（含 author / committer / 時間 / message）— 供 history.js 用
+// 不影響 detectChanges 內部用 readCommit 的邏輯（readCommit 仍是最小結構）
 export function readCommitFull(gitDir, commitHash) {
   const obj = readGitObject(gitDir, commitHash);
   if (!obj || obj.type !== "commit") return null;
@@ -490,11 +490,11 @@ export function readCommitFull(gitDir, commitHash) {
   };
 }
 
-// 导出底层 API 供 history.js 复用（git object 读取 + HEAD 解析 + tree 遍历）
+// 匯出底層 API 供 history.js 複用（git object 讀取 + HEAD 解析 + tree 遍歷）
 export { readGitObject, readHead, parseTree, collectTreeFiles };
 
-// 主入口：扫描项目从 since（commit 数）开始的代码变化
-// 简化为"对比 commit N 与 commit N+since"（不是真的时间窗口）
+// 主入口：掃描專案從 since（commit 數）開始的程式碼變化
+// 簡化為"對比 commit N 與 commit N+since"（不是真的時間視窗）
 export async function detectChanges({ projectPath, since = "1 day ago" }) {
   const gitDir = join(projectPath, ".git");
   if (!existsSync(gitDir)) {
@@ -502,46 +502,46 @@ export async function detectChanges({ projectPath, since = "1 day ago" }) {
   }
 
   // 解析 since：'1 day ago' / '7 days ago' / '2 hours ago' / 'N'
-  // MVP：只支持 N（commit 数），其它转默认 1
+  // MVP：只支援 N（commit 數），其它轉預設 1
   let sinceN = 1;
   const m = String(since).match(/^(\d+)/);
   if (m) sinceN = Math.max(1, Math.min(100, parseInt(m[1], 10)));
 
-  // 读 HEAD
+  // 讀 HEAD
   const head = readHead(gitDir);
   if (!head || !head.commit) {
     return { files: [], stat: "", commits: [], error: "cannot read HEAD" };
   }
-  // 验证 commit hash 格式
+  // 驗證 commit hash 格式
   if (!/^[0-9a-f]{40}$/i.test(head.commit)) {
     return { files: [], stat: "", commits: [], error: "HEAD is not a valid commit hash: " + head.commit };
   }
 
-  // 读 current commit
+  // 讀 current commit
   const curCommit = readCommit(gitDir, head.commit);
   if (!curCommit) {
-    // v0.4.5：可能是 commit object 在 pack 里（git gc 打包），而不是不存在
+    // v0.4.5：可能是 commit object 在 pack 裡（git gc 打包），而不是不存在
     return {
       files: [], stat: "", commits: [],
-      error: "cannot read current commit " + head.commit + "（commit object 可能在 .pack 中，需 pack 支持，或 git repack -d 解开 loose object）",
+      error: "cannot read current commit " + head.commit + "（commit object 可能在 .pack 中，需 pack 支援，或 git repack -d 解開 loose object）",
     };
   }
 
-  // 拿 current tree 文件集
+  // 拿 current tree 檔案集
   const curFiles = collectTreeFiles(gitDir, curCommit.tree);
 
-  // 走 parent 链 sinceN 步（since=1 即 HEAD~1；since=2 即 HEAD~2）
+  // 走 parent 鏈 sinceN 步（since=1 即 HEAD~1；since=2 即 HEAD~2）
   let parentHash = head.commit;
   let parentCommit = null;
   for (let i = 0; i < sinceN; i++) {
     const cur = readCommit(gitDir, parentHash);
     if (!cur || !cur.parents || cur.parents.length === 0) {
-      // 没有更早的 parent
+      // 沒有更早的 parent
       break;
     }
     parentHash = cur.parents[0];
   }
-  // parentHash 现在是 HEAD~sinceN（如果链足够长）
+  // parentHash 現在是 HEAD~sinceN（如果鏈足夠長）
   if (parentHash !== head.commit) {
     parentCommit = readCommit(gitDir, parentHash);
   }
@@ -564,7 +564,7 @@ export async function detectChanges({ projectPath, since = "1 day ago" }) {
   }
 
   // commits 列表（HEAD + HEAD~1 + ... + HEAD~sinceN+1）
-  // since=1 → [HEAD]；since=2 → [HEAD, HEAD~1]；since=N → N 个
+  // since=1 → [HEAD]；since=2 → [HEAD, HEAD~1]；since=N → N 個
   const commits = [head.commit];
   let p = curCommit.parents[0];
   let depth = 1;
@@ -576,8 +576,8 @@ export async function detectChanges({ projectPath, since = "1 day ago" }) {
   }
 
   return {
-    files: files.map((f) => f.path),  // 简化为路径数组（兼容 v0.4.1 smoke）
-    changes: files,  // 详细 change 列表（new field）
+    files: files.map((f) => f.path),  // 簡化為路徑陣列（相容 v0.4.1 smoke）
+    changes: files,  // 詳細 change 列表（new field）
     stat: files.length === 0
       ? ""
       : ` ${files.filter((f) => f.type === "added").length} files added, ${files.filter((f) => f.type === "modified").length} modified, ${files.filter((f) => f.type === "deleted").length} deleted`,
@@ -587,40 +587,40 @@ export async function detectChanges({ projectPath, since = "1 day ago" }) {
   };
 }
 
-// 把 detector 输出组装成 LLM prompt
+// 把 detector 輸出組裝成 LLM prompt
 export function buildDiffPrompt({ changes, projectPath, maxChars = 4000 }) {
   const fileList = (changes.changes || changes.files || []).map((f) =>
     typeof f === "string" ? `  - ${f}` : `  - [${f.type}] ${f.path}`
-  ).join("\n") || "  (无文件变更)";
+  ).join("\n") || "  (無檔案變更)";
 
-  const commitList = (changes.commits || []).map((c) => `  - ${c}`).join("\n") || "  (无 commit 记录)";
+  const commitList = (changes.commits || []).map((c) => `  - ${c}`).join("\n") || "  (無 commit 記錄)";
 
-  const prompt = `你是一个项目架构分析师。请基于以下 git diff 信息，输出 JSON 格式的架构变更分析。
+  const prompt = `你是一個專案架構分析師。請基於以下 git diff 資訊，輸出 JSON 格式的架構變更分析。
 
-项目路径: ${projectPath}
-扫描时间窗口: since=${changes.since || "commit+1"}
+專案路徑: ${projectPath}
+掃描時間視窗: since=${changes.since || "commit+1"}
 
-变更文件:
+變更檔案:
 ${fileList}
 
 最近 commit:
 ${commitList}
 
-变更统计:
-${changes.stat ? changes.stat : "(无统计)"}
+變更統計:
+${changes.stat ? changes.stat : "(無統計)"}
 
-请输出 JSON（不要 markdown code block，不要其他文字）：
+請輸出 JSON（不要 markdown code block，不要其他文字）：
 {
-  "changes": [{"file": "相对路径", "type": "added|modified|deleted", "summary": "一句话描述"}],
+  "changes": [{"file": "相對路徑", "type": "added|modified|deleted", "summary": "一句話描述"}],
   "architectureMemory": {
-    "title": "架构变更一句话标题（<=50 字）",
-    "content": "what + why（200-400 字，说明架构层面的变化）"
+    "title": "架構變更一句話標題（<=50 字）",
+    "content": "what + why（200-400 字，說明架構層面的變化）"
   }
 }
 
 要求：
-- 关注架构层面变化（新模块、新依赖、新模式），不要逐文件描述
-- 如果只是文档修改或杂项变更，architectureMemory.title 写 "非架构变更（杂项）"
+- 關注架構層面變化（新模組、新依賴、新模式），不要逐檔案描述
+- 如果只是文件修改或雜項變更，architectureMemory.title 寫 "非架構變更（雜項）"
 - content 用中文`;
 
   return prompt.slice(0, maxChars);

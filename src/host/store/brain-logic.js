@@ -1,6 +1,6 @@
-// brain-logic.js - 纯逻辑层（无 IO、无宿主依赖）
-// 供 Host tools（经 esbuild 打包）与 scripts/smoke-test.mjs（node 直跑）共用。
-// 数据格式与 scripts/brain-memory.mjs 写入的 jsonl 保持一致。
+// brain-logic.js - 純邏輯層（無 IO、無宿主依賴）
+// 供 Host tools（經 esbuild 打包）與 scripts/smoke-test.mjs（node 直跑）共用。
+// 資料格式與 scripts/brain-memory.mjs 寫入的 jsonl 保持一致。
 
 export const MEMORY_TYPES = [
   "decision", "requirement", "architecture", "change",
@@ -99,7 +99,7 @@ export function makeTodoEntry(input, now) {
   };
 }
 
-// 活跃 todo（未 done / 未 cancelled），优先级高在前，同优先级新创建在前
+// 活躍 todo（未 done / 未 cancelled），優先順序高在前，同優先順序新建立在前
 export function activeTodos(todos) {
   const list = (todos || []).filter(function (t) {
     return t && t.status !== "done" && t.status !== "cancelled";
@@ -121,7 +121,7 @@ export function todoStats(todos) {
 }
 
 // Memory 排序分：importance*0.5 + recency*0.3 + typeBoost*0.2
-// recency: 7 天内 1.0，90 天线性衰减到 0
+// recency: 7 天內 1.0，90 天線性衰減到 0
 export function memoryScore(m, now) {
   const nowMs = now != null ? now : Date.now();
   const importance = typeof m.importance === "number" ? m.importance : 0.5;
@@ -166,7 +166,7 @@ export function techStackToType(techStack) {
   return parts.length > 0 ? parts.join(" · ") : "Untyped";
 }
 
-// project_continue 的数据组装（纯函数）
+// project_continue 的資料組裝（純函式）
 export function buildContinueData(brain, now) {
   const nowMs = now != null ? now : Date.now();
   const p = brain && brain.project;
@@ -198,13 +198,13 @@ export function buildContinueData(brain, now) {
 
   let suggestedNextStep;
   if (inProgress) {
-    suggestedNextStep = "继续进行中任务：" + inProgress.title;
+    suggestedNextStep = "繼續進行中任務：" + inProgress.title;
   } else if (active.length > 0) {
-    suggestedNextStep = "建议开始：" + active[0].title;
+    suggestedNextStep = "建議開始：" + active[0].title;
   } else if (activity.length > 0) {
-    suggestedNextStep = "无待办；可参考最近活动：" + activity[0].title;
+    suggestedNextStep = "無待辦；可參考最近活動：" + activity[0].title;
   } else {
-    suggestedNextStep = "暂无待办；建议用 project_todo_add 规划下一步";
+    suggestedNextStep = "暫無待辦；建議用 project_todo_add 規劃下一步";
   }
 
   return {
@@ -229,7 +229,7 @@ export function buildContinueData(brain, now) {
   };
 }
 
-// 按 id 前缀或标题精确匹配找活跃 todo（project_todo_done 用）
+// 按 id 字首或標題精確匹配找活躍 todo（project_todo_done 用）
 export function findTodo(todos, ref) {
   const key = String(ref || "").trim();
   if (!key) return null;
@@ -244,12 +244,12 @@ export function findTodo(todos, ref) {
   return null;
 }
 
-// ─── Dream 整合算法（v0.3.12 新增）───
-// 纯逻辑：从 memory 列表算 merge + archive 候选（plannedActions）。
-// 抽到 brain-logic 是为了让 smoke 测试不依赖 dsh-tools runtime。
+// ─── Dream 整合演算法（v0.3.12 新增）───
+// 純邏輯：從 memory 列表算 merge + archive 候選（plannedActions）。
+// 抽到 brain-logic 是為了讓 smoke 測試不依賴 dsh-tools runtime。
 //
-// 参数：
-//   memories:        现有 memory 列表
+// 引數：
+//   memories:        現有 memory 列表
 //   opts:            { now, mergeThreshold=0.92, archiveImportance=0.15, archiveAgeDays=30 }
 // 返回：{ plannedActions, mergeCount, archiveCount }
 export function computeDreamActions(memories, opts) {
@@ -263,7 +263,7 @@ export function computeDreamActions(memories, opts) {
   const plannedActions = [];
   const seen = new Set();
 
-  // 1) 去重候选（Jaccard ≥ threshold）
+  // 1) 去重候選（Jaccard ≥ threshold）
   const items = list.filter(isActiveMemory).map((m, i) => ({ m, i, bg: titleBigrams(m.title) }));
   for (let i = 0; i < items.length; i++) {
     if (seen.has(items[i].i)) continue;
@@ -291,13 +291,13 @@ export function computeDreamActions(memories, opts) {
         keepTitle: keep.title,
         dropIds: drop.map((m) => m.id),
         dropTitles: drop.map((m) => m.title),
-        note: "Jaccard ≥ " + mergeThreshold + "（title 相似），保留 importance 高 + content 长的",
+        note: "Jaccard ≥ " + mergeThreshold + "（title 相似），保留 importance 高 + content 長的",
       });
     }
     seen.add(items[i].i);
   }
 
-  // 2) 归档候选（低 importance + 超过 archiveAgeDays 天，且未 archived）
+  // 2) 歸檔候選（低 importance + 超過 archiveAgeDays 天，且未 archived）
   for (const m of list) {
     if ((m.importance || 0) >= archiveImp) continue;
     const age = now - (m.createdAt || 0);
@@ -310,7 +310,7 @@ export function computeDreamActions(memories, opts) {
       title: m.title,
       importance: m.importance,
       ageDays: Math.round(age / 86400000),
-      note: "importance < " + archiveImp + " 且年龄 > " + archiveAgeDays + " 天",
+      note: "importance < " + archiveImp + " 且年齡 > " + archiveAgeDays + " 天",
     });
   }
 
@@ -321,10 +321,10 @@ export function computeDreamActions(memories, opts) {
   };
 }
 
-// 应用 commit 计划到 memory 列表（不写文件，纯返回 next list）
-//   merge:    dropped 移除；keep 加 reinforced + importance +0.05 + relatedMemoryIds 合并
+// 應用 commit 計劃到 memory 列表（不寫檔案，純返回 next list）
+//   merge:    dropped 移除；keep 加 reinforced + importance +0.05 + relatedMemoryIds 合併
 //   archive:  status 改成 archived
-//   mode=full 时：archived 的 memory 真正从列表中移除（清理 dead bytes）
+//   mode=full 時：archived 的 memory 真正從列表中移除（清理 dead bytes）
 export function applyDreamCommit(memories, plannedActions, now, mode) {
   const list = (memories || []).slice();
   const merges = (plannedActions || []).filter((a) => a.action === "merge");
@@ -351,11 +351,11 @@ export function applyDreamCommit(memories, plannedActions, now, mode) {
     if (!archiveIds.has(mem.id)) return mem;
     return Object.assign({}, mem, { status: "archived", lastAccessedAt: now });
   });
-  // full 模式：archived 的 memory 真正移除（已标记完，下一步清理）
+  // full 模式：archived 的 memory 真正移除（已標記完，下一步清理）
   if (mode === "full") {
     next = next.filter((mem) => mem.status !== "archived");
   }
-  // 稳定排序：按 importance DESC, createdAt DESC（让 build-time embed Top-K 更准）
+  // 穩定排序：按 importance DESC, createdAt DESC（讓 build-time embed Top-K 更準）
   next.sort((a, b) => {
     const ai = (b.importance || 0) - (a.importance || 0);
     if (ai !== 0) return ai;
@@ -364,7 +364,7 @@ export function applyDreamCommit(memories, plannedActions, now, mode) {
   return next;
 }
 
-// title 归一化 + 双字bigram（Jaccard 相似度用）
+// title 歸一化 + 雙字bigram（Jaccard 相似度用）
 function titleBigrams(s) {
   const t = String(s || "").toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/gi, " ").trim();
   if (t.length < 2) return new Set([t]);

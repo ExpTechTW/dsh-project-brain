@@ -7,33 +7,33 @@ import { markArchitectureStale, scanAndWrite } from "../src/host/scan-and-write.
 
 assert.equal(sourceChangeFiles(["src/index.js"]), true);
 
-// 排除项：文档 / lockfile / 测试
+// 排除項：文件 / lockfile / 測試
 assert.equal(architectureTriggerFiles(["README.md"]), false);
 assert.equal(architectureRelevantFiles(["README.md"]), false);
 assert.equal(architectureTriggerFiles(["package-lock.json"]), false);
 assert.equal(architectureTriggerFiles(["src/foo.test.js"]), false);
 assert.equal(architectureTriggerFiles(["CHANGELOG.md"]), false);
 
-// manifest 与约定入口文件
+// manifest 與約定入口檔案
 assert.equal(architectureTriggerFiles(["package.json"]), true);
 assert.equal(architectureTriggerFiles(["cordis.patch.yml"]), true);
 assert.equal(architectureTriggerFiles(["src/index.js"]), true);
 assert.equal(architectureTriggerFiles(["cmd/server/main.go"]), true);
 assert.equal(architectureTriggerFiles(["app/__init__.py"]), true);
 
-// 普通源码「改内容」不再触发 LLM 架构：规则必须结构化，不能硬编码本仓库路径
+// 普通原始碼「改內容」不再觸發 LLM 架構：規則必須結構化，不能硬編碼本倉庫路徑
 assert.equal(architectureTriggerFiles(["src/client.js"]), false);
 assert.equal(architectureTriggerFiles(["src/host/memory/briefing.js"]), false);
 assert.equal(architectureTriggerFiles(["src/host/injector.js"]), false);
 assert.equal(architectureTriggerFiles(["src/host/scan-and-write.js"]), false);
 assert.equal(architectureTriggerFiles(["src/host/architecture/analyzer.js"]), false);
 
-// 声明入口（来自 project.json.entrypoints）被改动 → 触发
+// 宣告入口（來自 project.json.entrypoints）被改動 → 觸發
 assert.equal(architectureTriggerFiles(["src/host/injector.js"], { entrypoints: ["src/host/injector.js"] }), true);
 assert.equal(architectureTriggerFiles(["src/host/injector.js"], { entrypoints: [{ path: "src/host/injector.js", type: "service" }] }), true);
 assert.equal(architectureTriggerFiles(["src/client.js"], { entrypoints: ["npm run build"] }), false);
 
-// 增删源码文件 = 结构变化 → 触发；改内容 → 不触发
+// 增刪原始碼檔案 = 結構變化 → 觸發；改內容 → 不觸發
 const added = [{ path: "src/host/memory/new-module.js", type: "added" }];
 const removed = [{ path: "src/host/memory/old-module.js", type: "removed" }];
 const modified = [{ path: "src/host/memory/briefing.js", type: "modified" }];
@@ -86,7 +86,7 @@ const project = JSON.parse(readFileSync(join(root, ".project-brain", "project.js
 assert.equal(project.architectureStale, true);
 assert.ok(Array.isArray(project.entrypoints));
 
-// markArchitectureStale：只改标记，不动 architecture.json
+// markArchitectureStale：只改標記，不動 architecture.json
 assert.equal(await markArchitectureStale(fsAdapter, null, root, false), true);
 assert.equal(JSON.parse(readFileSync(join(root, ".project-brain", "project.json"), "utf8")).architectureStale, false);
 assert.equal(await markArchitectureStale(fsAdapter, null, root, true), true);

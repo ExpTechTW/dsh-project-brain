@@ -1,12 +1,12 @@
-// SidebarPreview aggregator（runtime RPC 路径）：project.json + timeline/memory/todo -> 5 区块数据
-// 5s 内存缓存；preview.changed 事件清缓存
+// SidebarPreview aggregator（runtime RPC 路徑）：project.json + timeline/memory/todo -> 5 區塊資料
+// 5s 記憶體快取；preview.changed 事件清快取
 //
-// 注意：静态 workspace client 无法 host.call（已知限制#2），SidebarPreview 日常数据
-// 走 build-time embed（build.js --workspace）；本模块只在 cordis-loader 正常启动、
-// harness 可用的动态路径下提供 runtime 数据（RPC getPreview）。
+// 注意：靜態 workspace client 無法 host.call（已知限制#2），SidebarPreview 日常資料
+// 走 build-time embed（build.js --workspace）；本模組只在 cordis-loader 正常啟動、
+// harness 可用的動態路徑下提供 runtime 資料（RPC getPreview）。
 //
-// P0.4.1：stats/activity 改为真实数据（todo.jsonl / memory.jsonl / timeline.jsonl），
-// 与 build.js 的 embed 口径一致；删除已死的 writePreviewCache（webServer 路由方案遗留）。
+// P0.4.1：stats/activity 改為真實資料（todo.jsonl / memory.jsonl / timeline.jsonl），
+// 與 build.js 的 embed 口徑一致；刪除已死的 writePreviewCache（webServer 路由方案遺留）。
 
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
@@ -65,9 +65,9 @@ function readJsonlSync(filePath) {
   return out;
 }
 
-// 只在内存里整理一遍供展示，绝不回写。
-// 这条是同步路径，用 writeFileSync 落盘的话会绕过 write-lock，和异步的 admit /
-// 人工编辑互相覆盖。落盘交给 ensureHousekeepOnRead 与 persistHousekeep。
+// 只在記憶體裡整理一遍供展示，絕不回寫。
+// 這條是同步路徑，用 writeFileSync 落盤的話會繞過 write-lock，和非同步的 admit /
+// 人工編輯互相覆蓋。落盤交給 ensureHousekeepOnRead 與 persistHousekeep。
 function readMemoriesHousekeptSync(filePath) {
   const memories = readJsonlSync(filePath);
   const hk = housekeepMemories(memories);
@@ -79,23 +79,23 @@ function deriveFallbackPhase(p) {
   const ts = (p && (p.updatedAt || p.lastScannedAt)) || now;
   const ageMs = now - ts;
   if (ageMs < 60_000) {
-    return { title: "Project Brain 已就绪", progress: { done: 1, total: 1 } };
+    return { title: "Project Brain 已就緒", progress: { done: 1, total: 1 } };
   }
   if (ageMs < 24 * 3600_000) {
-    return { title: "今日活跃", progress: { done: 1, total: 2 } };
+    return { title: "今日活躍", progress: { done: 1, total: 2 } };
   }
-  return { title: "维护中", progress: { done: 1, total: 3 } };
+  return { title: "維護中", progress: { done: 1, total: 3 } };
 }
 
-// 有 todo 数据时：Phase = 任务进度（done/total 非 cancelled）
+// 有 todo 資料時：Phase = 任務進度（done/total 非 cancelled）
 function derivePhase(p, todos) {
   const active = todos.filter((t) => t && t.status !== "cancelled");
   if (active.length === 0) return deriveFallbackPhase(p);
   const done = active.filter((t) => t.status === "done").length;
   const inProgress = active.filter((t) => t.status === "in_progress");
   const title = inProgress.length > 0
-    ? "进行中：" + inProgress[0].title
-    : "待办 " + (active.length - done) + " 项";
+    ? "進行中：" + inProgress[0].title
+    : "待辦 " + (active.length - done) + " 項";
   return { title: title, progress: { done: done, total: active.length } };
 }
 
@@ -138,7 +138,7 @@ export function buildSidebarPreview(projectPath) {
       phase: derivePhase(p, todos),
       recentActivity: activity.length > 0 ? activity : (p.lastScannedAt ? [{
         id: "scan",
-        title: "完成 project_init 扫描",
+        title: "完成 project_init 掃描",
         occurredAt: p.lastScannedAt,
         eventType: "init",
       }] : []),
@@ -161,10 +161,10 @@ export function buildSidebarPreview(projectPath) {
   return data;
 }
 
-// ─── P0.4.2 动态数据（webServer route 用）：按 workspaceRoot 异步读 .project-brain/ ───
-// 供 HTTP route `/plugins/dsh-project-brain/preview.json` 复用，client 启动时 fetch。
-// 已生成的 workspace 直接读文件（零 token）；未生成返回 initialized:false（Onboarding）。
-// 返回结构与 build.js 的 build-time embed 对齐，client 无需区分来源。
+// ─── P0.4.2 動態資料（webServer route 用）：按 workspaceRoot 非同步讀 .project-brain/ ───
+// 供 HTTP route `/plugins/dsh-project-brain/preview.json` 複用，client 啟動時 fetch。
+// 已生成的 workspace 直接讀檔案（零 token）；未生成返回 initialized:false（Onboarding）。
+// 返回結構與 build.js 的 build-time embed 對齊，client 無需區分來源。
 
 export async function buildWorkspacePreview(fs, workspaceRoot) {
   if (!workspaceRoot) workspaceRoot = ".";
@@ -236,11 +236,11 @@ export async function buildWorkspacePreview(fs, workspaceRoot) {
   const activeForPhase = todosAll.filter((t) => t && t.status !== "cancelled");
   const phase = activeForPhase.length > 0
     ? {
-        title: inProgress.length > 0 ? "进行中：" + inProgress[0].title : "待办 " + stats.pendingTodos + " 项",
+        title: inProgress.length > 0 ? "進行中：" + inProgress[0].title : "待辦 " + stats.pendingTodos + " 項",
         progress: { done: stats.completedTodos, total: activeForPhase.length },
       }
     : {
-        title: "已扫描（" + (p.entrypoints ? p.entrypoints.length : 0) + " 个入口）",
+        title: "已掃描（" + (p.entrypoints ? p.entrypoints.length : 0) + " 個入口）",
         progress: { done: 1, total: 1 },
       };
   const todosActive = activeTodos(todosAll);
@@ -269,7 +269,7 @@ export async function buildWorkspacePreview(fs, workspaceRoot) {
     phase: phase,
     recentActivity: recentActivity.length > 0 ? recentActivity : (p.lastScannedAt ? [{
       id: "scan",
-      title: "完成 project_init 扫描",
+      title: "完成 project_init 掃描",
       occurredAt: p.lastScannedAt,
       eventType: "init",
     }] : []),
@@ -280,7 +280,7 @@ export async function buildWorkspacePreview(fs, workspaceRoot) {
       if (ac !== bc) return ac - bc;
       return (b.importance || 0) - (a.importance || 0);
     }).slice(0, 50),
-    // 归档不是删除：页面要能看到它们才谈得上「恢复」。
+    // 歸檔不是刪除：頁面要能看到它們才談得上「恢復」。
     memoriesArchived: (Array.isArray(memoriesAll) ? memoriesAll : [])
       .filter((m) => m && (m.status === "archived" || m.status === "superseded"))
       .slice()

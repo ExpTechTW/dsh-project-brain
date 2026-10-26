@@ -1,7 +1,7 @@
-// scripts/dev-reload.mjs — 本地开发一键 reload
+// scripts/dev-reload.mjs — 本地開發一鍵 reload
 //
-// 用途：改完 src/ 后跑一次，自动 build lib/ + 检查 DSH Desktop 进程 + 提示下一步。
-// 不会自动重启 DSH Desktop（破坏用户会话，只提示用户手动重启）。
+// 用途：改完 src/ 後跑一次，自動 build lib/ + 檢查 DSH Desktop 程序 + 提示下一步。
+// 不會自動重啟 DSH Desktop（破壞使用者會話，只提示使用者手動重啟）。
 //
 // 用法：
 //   node scripts/dev-reload.mjs
@@ -30,7 +30,7 @@ try {
   process.exit(1);
 }
 
-// 2) 确认 bundle 产物存在
+// 2) 確認 bundle 產物存在
 const hostBundle = join(PKG_ROOT, "dsh-project-brain", "lib", "index.js");
 const clientBundle = join(PKG_ROOT, "dsh-project-brain", "lib", "client.js");
 console.log("\n[dev-reload] step 2/3: verifying bundles ...");
@@ -45,7 +45,7 @@ const clientSize = (statSync(clientBundle).size / 1024).toFixed(1);
 console.log(`[dev-reload]   ✓ lib/index.js  ${hostSize}KB`);
 console.log(`[dev-reload]   ✓ lib/client.js ${clientSize}KB`);
 
-// 3) 检查 DSH Desktop 进程（仅检测，不重启）
+// 3) 檢查 DSH Desktop 程序（僅檢測，不重啟）
 console.log("\n[dev-reload] step 3/3: checking DSH Desktop processes ...");
 let dshRunning = false;
 try {
@@ -66,8 +66,8 @@ try {
 }
 
 if (!dshRunning) {
-  console.log("[dev-reload]   ℹ DSH Desktop NOT running. 启动方式：");
-  console.log("[dev-reload]     - 双击桌面 DSH Desktop 图标");
+  console.log("[dev-reload]   ℹ DSH Desktop NOT running. 啟動方式：");
+  console.log("[dev-reload]     - 雙擊桌面 DSH Desktop 圖示");
   console.log("[dev-reload]     - 或：C:\\Users\\liuzp16\\AppData\\Local\\Programs\\DSH Desktop\\DSH Desktop.exe");
 }
 
@@ -75,12 +75,12 @@ console.log("\n[dev-reload] done.\n");
 console.log("─────────────────────────────────────────────────────────────");
 console.log("下一步操作：");
 if (dshRunning) {
-  console.log("  ⮕ 完全退出 DSH Desktop（右键托盘 → Quit，不要只关窗口）");
-  console.log("  ⮕ 重新启动 DSH Desktop（cordis-loader 会重新加载 host bundle）");
+  console.log("  ⮕ 完全退出 DSH Desktop（右鍵托盤 → Quit，不要只關視窗）");
+  console.log("  ⮕ 重新啟動 DSH Desktop（cordis-loader 會重新載入 host bundle）");
 } else {
-  console.log("  ⮕ 启动 DSH Desktop");
+  console.log("  ⮕ 啟動 DSH Desktop");
 }
-console.log("  ⮕ 打开任意 workspace → 顶部「项目」Tab → 「启动项目大脑」");
-console.log("  ⮕ 验证 4 个 Dashboard Tab（概览 / 架构 / 任务动态 / 项目记忆）");
-console.log("  ⮕ 如果失败，DSH Desktop 终端窗口会输出 [dsh-project-brain] 日志");
+console.log("  ⮕ 開啟任意 workspace → 頂部「專案」Tab → 「啟動專案大腦」");
+console.log("  ⮕ 驗證 4 個 Dashboard Tab（概覽 / 架構 / 任務動態 / 專案記憶）");
+console.log("  ⮕ 如果失敗，DSH Desktop 終端視窗會輸出 [dsh-project-brain] 日誌");
 console.log("─────────────────────────────────────────────────────────────");

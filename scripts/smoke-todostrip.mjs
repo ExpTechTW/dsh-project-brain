@@ -1,8 +1,8 @@
-// 离线验证 build 产物 lib/client.js 在 DSH 静态 client 框架下的 register 流程
-// 不启 DSH，纯模拟 slots.register 注册两个 Slot，验证注册参数正确 + 返回值结构合理
+// 離線驗證 build 產物 lib/client.js 在 DSH 靜態 client 框架下的 register 流程
+// 不啟 DSH，純模擬 slots.register 註冊兩個 Slot，驗證註冊引數正確 + 返回值結構合理
 //
 // 用法：node scripts/smoke-todostrip.mjs
-// 退出码：0 = PASS，1 = FAIL
+// 退出碼：0 = PASS，1 = FAIL
 
 import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -22,19 +22,19 @@ const bundle = readFileSync(BUNDLE, "utf8");
 
 const checks = [];
 
-// 1) conversation.view 注册项存在
+// 1) conversation.view 註冊項存在
 const viewMatch = bundle.match(/name:\s*"conversation\.view"[\s\S]{0,200}?id:\s*"project-brain"[\s\S]{0,200}?order:\s*35/);
 checks.push({ name: "conversation.view / project-brain / order=35", ok: !!viewMatch });
 
-// 2) conversation.input.dock 注册项存在 + id + order
+// 2) conversation.input.dock 註冊項存在 + id + order
 const dockMatch = bundle.match(/name:\s*"conversation\.input\.dock"[\s\S]{0,200}?id:\s*"project-brain-todo-strip"[\s\S]{0,200}?order:\s*10/);
 checks.push({ name: "conversation.input.dock / project-brain-todo-strip / order=10", ok: !!dockMatch });
 
-// 3) TodoStrip 函数存在
+// 3) TodoStrip 函式存在
 const fnMatch = /function\s+TodoStrip\s*\(/.test(bundle);
 checks.push({ name: "function TodoStrip(props) declared", ok: fnMatch });
 
-// 4) i18n dict 中有 todostrip.* 关键文案
+// 4) i18n dict 中有 todostrip.* 關鍵文案
 const i18nHits = [
   "todostrip.title",
   "todostrip.viewAll",
@@ -43,7 +43,7 @@ const i18nHits = [
 ].every((k) => bundle.includes(k));
 checks.push({ name: "i18n dict has todostrip.title/viewAll/close/empty", ok: i18nHits });
 
-// 5) 发布构建不得嵌入本机 Session；运行时必须走 Connection RPC。
+// 5) 釋出構建不得嵌入本機 Session；執行時必須走 Connection RPC。
 const runtimeRpc = bundle.includes('"/project-brain"')
   && bundle.includes('"preview"')
   && bundle.includes('"init"');
@@ -54,23 +54,23 @@ checks.push({ name: "runtime Connection RPC present and release bundle contains 
 const filterCode = bundle.includes('status !== "done"') && bundle.includes('status !== "cancelled"');
 checks.push({ name: "active filter excludes done/cancelled", ok: filterCode });
 
-// 7) toggle 按钮 onClick 存在
+// 7) toggle 按鈕 onClick 存在
 const onClickMatch = /onClick:\s*onToggle/.test(bundle);
 checks.push({ name: "viewAll/close button onClick=onToggle wired", ok: onClickMatch });
 
-// 8) data-todo-item 渲染属性
+// 8) data-todo-item 渲染屬性
 const dataAttr = bundle.includes('"data-todo-item"');
 checks.push({ name: "data-todo-item attribute on todo rows", ok: dataAttr });
 
-// 9) TODO strip empty-state: 当 active.length === 0 返回 null（已包含在 return null 段）
+// 9) TODO strip empty-state: 當 active.length === 0 返回 null（已包含在 return null 段）
 const emptyGuard = /if \(active\.length === 0\) return null/.test(bundle);
 checks.push({ name: "empty-state guard (active.length === 0 return null)", ok: emptyGuard });
 
-// 10) uninit guard（项目未初始化时整个 strip 不渲染）
+// 10) uninit guard（專案未初始化時整個 strip 不渲染）
 const uninitGuard = /if \(!data \|\| !data\.initialized\) return null/.test(bundle);
 checks.push({ name: "uninit guard (data.initialized === false return null)", ok: uninitGuard });
 
-// 11) Dashboard Quick Actions 必须走后台 RPC，不能再复制 prompt。
+// 11) Dashboard Quick Actions 必須走後臺 RPC，不能再複製 prompt。
 const quickActionRpc = bundle.includes('"action"')
   && bundle.includes('action: "rescan"')
   && bundle.includes('action: "todos"')
@@ -78,7 +78,7 @@ const quickActionRpc = bundle.includes('"action"')
   && bundle.includes('action: "overview"');
 checks.push({ name: "Dashboard Quick Actions call runtime action RPC", ok: quickActionRpc });
 
-// 12) 卡片有 loading/confirm/success/error 状态与 spinner。
+// 12) 卡片有 loading/confirm/success/error 狀態與 spinner。
 const quickActionStates = bundle.includes('status: "loading"')
   && bundle.includes('status: "confirm"')
   && bundle.includes('status: "success"')
@@ -86,12 +86,12 @@ const quickActionStates = bundle.includes('status: "loading"')
   && bundle.includes('"data-action-state"');
 checks.push({ name: "Quick Actions expose loading/confirm/success/error UI states", ok: quickActionStates });
 
-// 13) 记忆整理先 dry-run，再由独立 dreamCommit 动作确认提交。
+// 13) 記憶整理先 dry-run，再由獨立 dreamCommit 動作確認提交。
 const dreamConfirmation = bundle.includes('action === "dreamCommit"')
   && bundle.includes('previous.status === "confirm"');
 checks.push({ name: "memory organization requires preview then confirmation", ok: dreamConfirmation });
 
-// 14) Dashboard 架构图使用语义分层；点层/点模块看结构详情，不把并列模块画成顺序链路。
+// 14) Dashboard 架構圖使用語義分層；點層/點模組看結構詳情，不把並列模組畫成順序鏈路。
 const architectureSvg = bundle.includes("function ArchitectureGraphBlock")
   && bundle.includes('"data-block": "architecture-graph"')
   && bundle.includes('"data-architecture-diagram": "semantic-layers"')
@@ -102,7 +102,7 @@ const architectureSvg = bundle.includes("function ArchitectureGraphBlock")
   && bundle.includes('"arch.flowEmpty"');
 checks.push({ name: "architecture tab shows peer layers and click-to-inspect modules", ok: architectureSvg });
 
-// 15) 架构图明确区分本地分析与当前 DSH LLM 增强结果。
+// 15) 架構圖明確區分本地分析與當前 DSH LLM 增強結果。
 checks.push({ name: "architecture source badges are bundled", ok: bundle.includes('"arch.hybrid"') && bundle.includes('"arch.local"') });
 
 const settingsProbe = bundle.includes('"probe-" + target')
@@ -130,7 +130,7 @@ checks.push({
     && bundle.includes("rgb(236, 245, 252)"),
 });
 
-// 16) Dashboard 使用单一页签工作台，避免架构、任务、记忆在首页重复堆叠。
+// 16) Dashboard 使用單一頁籤工作臺，避免架構、任務、記憶在首頁重複堆疊。
 const dashboardTabs = bundle.includes('"data-dashboard-tab"')
   && bundle.includes('"dash.tab.overview"')
   && bundle.includes('"dash.tab.architecture"')
@@ -139,13 +139,13 @@ const dashboardTabs = bundle.includes('"data-dashboard-tab"')
   && bundle.includes('aria-selected');
 checks.push({ name: "Dashboard single-workbench tabs and accessible selection state are bundled", ok: dashboardTabs });
 
-// 17) 顶部摘要采用独立响应式容器，窄窗口下可自动单列。
+// 17) 頂部摘要採用獨立響應式容器，窄視窗下可自動單列。
 const responsiveSummary = bundle.includes('"data-block": "summary-grid"')
   && bundle.includes(".dsh-brain-summary-grid")
   && bundle.includes("@media(max-width:760px)");
 checks.push({ name: "responsive summary grid is bundled", ok: responsiveSummary });
 
-// 18) v0.4.15 智能续接建议卡：调用 /project-brain 的 suggest RPC，含数据属性
+// 18) v0.4.15 智慧續接建議卡：呼叫 /project-brain 的 suggest RPC，含資料屬性
 const suggestRpc = bundle.includes('"/project-brain"')
   && bundle.includes('"suggest"')
   && bundle.includes('"data-block": "suggestion"')
@@ -153,7 +153,7 @@ const suggestRpc = bundle.includes('"/project-brain"')
   && bundle.includes('"data-suggestion-reason"');
 checks.push({ name: "SuggestionCard calls runtime suggest RPC and renders title/reason", ok: suggestRpc });
 
-// 19) SuggestionCard 标记 source（llm / local / llm_failed）+ 置信度
+// 19) SuggestionCard 標記 source（llm / local / llm_failed）+ 置信度
 const suggestMeta = bundle.includes('"data-suggest-source"')
   && bundle.includes('"suggest.llmTag"')
   && bundle.includes('"suggest.localTag"')
@@ -161,12 +161,12 @@ const suggestMeta = bundle.includes('"data-suggest-source"')
   && bundle.includes('"suggest.refresh"');
 checks.push({ name: "SuggestionCard shows source tag + confidence + refresh/dismiss", ok: suggestMeta });
 
-// 20) SuggestionCard dismiss 后允许重新展开（不影响其它 UI 状态）
+// 20) SuggestionCard dismiss 後允許重新展開（不影響其它 UI 狀態）
 const suggestDismiss = bundle.includes('"data-action": "suggest-dismiss"')
   && bundle.includes('"data-action": "suggest-show"');
 checks.push({ name: "SuggestionCard dismiss + re-show is bundled", ok: suggestDismiss });
 
-// 21) 技术栈主视野不含 CI；交付层与 Dockerfile→Docker 分层文案打进 bundle
+// 21) 技術棧主視野不含 CI；交付層與 Dockerfile→Docker 分層文案打進 bundle
 const techStackLayers = bundle.includes("previewStackLayers")
   && bundle.includes('"dash.devops"')
   && bundle.includes("framework-backend")
@@ -176,7 +176,7 @@ checks.push({ name: "tech stack runtime chips exclude CI; delivery row is bundle
 let pass = 0;
 let fail = 0;
 console.log("=== dsh-project-brain TodoStrip smoke test ===");
-console.log("(offline: build产物静态校验，不启 DSH)\n");
+console.log("(offline: build產物靜態校驗，不啟 DSH)\n");
 for (const c of checks) {
   if (c.ok) {
     console.log(`  [PASS] ${c.name}`);

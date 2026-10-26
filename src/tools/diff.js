@@ -1,5 +1,5 @@
 // project_diff Tool
-// dryRun 默认 true。mock / parse-fallback 禁止写入。真实输出走 admitMemory。
+// dryRun 預設 true。mock / parse-fallback 禁止寫入。真實輸出走 admitMemory。
 
 import { defineTool } from "@deepseek-ai/dsh-tools";
 import { brainPath, appendJsonl } from "../host/store/brain-files.js";
@@ -12,17 +12,17 @@ export function buildDiffTool({ fs, sandboxPolicy }) {
   return defineTool({
     name: "project_diff",
     description:
-      "dsh-project-brain: 读取 git diff 并用 LLM 分析架构变化。" +
-      " dryRun 默认 true（只扫描不写记忆）；dryRun=false 时仅真实 LLM 输出可经 admit 写入 architecture 记忆。" +
-      " mock / fallback 禁止写入。",
+      "dsh-project-brain: 讀取 git diff 並用 LLM 分析架構變化。" +
+      " dryRun 預設 true（只掃描不寫記憶）；dryRun=false 時僅真實 LLM 輸出可經 admit 寫入 architecture 記憶。" +
+      " mock / fallback 禁止寫入。",
     parameters: {
-      path: { type: "string", description: "项目根路径（绝对路径，必传）" },
-      since: { type: "string", description: "git diff 窗口（commit 数，默认 1）" },
-      maxTokens: { type: "number", description: "LLM 输出 token 预算（默认 2000）" },
-      dryRun: { type: "boolean", description: "只扫描不写 memory（默认 true）" },
-      llmApiUrl: { type: "string", description: "LLM API endpoint（可选）" },
-      llmApiKey: { type: "string", description: "LLM API key（可选）" },
-      llmModel: { type: "string", description: "LLM 模型名（默认 gpt-4o-mini）" },
+      path: { type: "string", description: "專案根路徑（絕對路徑，必傳）" },
+      since: { type: "string", description: "git diff 視窗（commit 數，預設 1）" },
+      maxTokens: { type: "number", description: "LLM 輸出 token 預算（預設 2000）" },
+      dryRun: { type: "boolean", description: "只掃描不寫 memory（預設 true）" },
+      llmApiUrl: { type: "string", description: "LLM API endpoint（可選）" },
+      llmApiKey: { type: "string", description: "LLM API key（可選）" },
+      llmModel: { type: "string", description: "LLM 模型名（預設 gpt-4o-mini）" },
     },
     output: {
       schema: {
@@ -55,7 +55,7 @@ export function buildDiffTool({ fs, sandboxPolicy }) {
           return { ok: false, code: "E_DIFF_SCAN_FAILED", message: changes.error };
         }
         if (!changes.files.length && !changes.changes.length) {
-          return { ok: true, data: { changes, llmSkipped: "no changes detected", note: "无代码变更，无需调 LLM", dryRun } };
+          return { ok: true, data: { changes, llmSkipped: "no changes detected", note: "無程式碼變更，無需調 LLM", dryRun } };
         }
 
         const prompt = buildDiffPrompt({ changes, projectPath });
@@ -73,7 +73,7 @@ export function buildDiffTool({ fs, sandboxPolicy }) {
           return {
             ok: false,
             code: "E_ADMIT_MOCK_FORBIDDEN",
-            message: "mock / fallback LLM 输出禁止写入 memory.jsonl",
+            message: "mock / fallback LLM 輸出禁止寫入 memory.jsonl",
             data: {
               changes: {
                 files: changes.files || [],
@@ -118,7 +118,7 @@ export function buildDiffTool({ fs, sandboxPolicy }) {
           if (admitted.action === "insert") {
             await appendJsonl(fs, brainPath(projectPath, "timeline.jsonl"), {
               id: "evt-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-              title: "project_diff 完成（" + (parsed.changes ? parsed.changes.length : 0) + " 文件变化）",
+              title: "project_diff 完成（" + (parsed.changes ? parsed.changes.length : 0) + " 檔案變化）",
               eventType: "diff",
               occurredAt: Date.now(),
               detail: "since=" + since + " files=" + (changes.files ? changes.files.length : 0),
@@ -160,8 +160,8 @@ function renderDiff(value) {
     const files = d.changes.files || [];
     const commits = d.changes.commits || [];
     const detailed = d.changes.changes || [];
-    lines.push({ type: "text", text: "  变更文件: " + files.length + " 个 / commits: " + commits.length + " 条 / detailed: " + detailed.length + " 条" });
-    if (d.changes.since) lines.push({ type: "text", text: "  时间窗口: " + d.changes.since });
+    lines.push({ type: "text", text: "  變更檔案: " + files.length + " 個 / commits: " + commits.length + " 條 / detailed: " + detailed.length + " 條" });
+    if (d.changes.since) lines.push({ type: "text", text: "  時間視窗: " + d.changes.since });
   }
   if (d.architectureMemory && d.architectureMemory.title) {
     lines.push({ type: "text", text: "  ✓ architecture memory: " + d.architectureMemory.title });
@@ -172,6 +172,6 @@ function renderDiff(value) {
     }
   }
   if (d.note) lines.push({ type: "text", text: "  note: " + d.note });
-  if (d.dryRun) lines.push({ type: "text", text: "  dryRun=true，未写 memory" });
+  if (d.dryRun) lines.push({ type: "text", text: "  dryRun=true，未寫 memory" });
   return lines;
 }

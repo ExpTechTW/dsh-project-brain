@@ -24,8 +24,8 @@ function textFromContent(content) {
   return content.filter((block) => block && block.type === "text").map((block) => block.text || "").join("\n");
 }
 
-// 把 session 里的 user/assistant 消息转成带角色前缀、已脱敏的行。
-// 挑哪几条是调用方的事：做会话总结要最近的，做指代消解还得带上开头。
+// 把 session 裡的 user/assistant 訊息轉成帶角色字首、已脫敏的行。
+// 挑哪幾條是呼叫方的事：做會話總結要最近的，做指代消解還得帶上開頭。
 export function sessionMessageLines(session, perMessageChars = 6000) {
   let messages = [];
   try {
@@ -65,9 +65,9 @@ function fingerprint(item) {
   return memoryFingerprint(item);
 }
 
-// Grounding check：模糊匹配 evidence 字符串是否真实存在于 transcript 里
-//   目的：阻止 LLM 把临时讨论幻觉成决策落盘
-//   实现：去掉空格/标点后做 substring 匹配（容忍少量字符差异），允许 evidence 截断到 80 字
+// Grounding check：模糊匹配 evidence 字串是否真實存在於 transcript 裡
+//   目的：阻止 LLM 把臨時討論幻覺成決策落盤
+//   實現：去掉空格/標點後做 substring 匹配（容忍少量字元差異），允許 evidence 截斷到 80 字
 export function evidenceMatchesTranscript(evidence, transcript) {
   if (!evidence || typeof evidence !== "string") return false;
   const evidenceText = evidence.trim().slice(0, 200);
@@ -76,9 +76,9 @@ export function evidenceMatchesTranscript(evidence, transcript) {
   const normEvidence = normalize(evidenceText);
   const normTranscript = normalize(transcript);
   if (normEvidence.length < 6) return false;
-  // 直接 substring 匹配（容忍标点和大小写差异）
+  // 直接 substring 匹配（容忍標點和大小寫差異）
   if (normTranscript.includes(normEvidence)) return true;
-  // 滑动窗口：如果 evidence 较长，按 30 字符窗口部分匹配（容忍 LLM 轻微改写）
+  // 滑動視窗：如果 evidence 較長，按 30 字元視窗部分匹配（容忍 LLM 輕微改寫）
   if (normEvidence.length > 30) {
     const windowSize = 30;
     for (let i = 0; i <= normEvidence.length - windowSize; i += 15) {
@@ -90,23 +90,23 @@ export function evidenceMatchesTranscript(evidence, transcript) {
 
 function sessionMemoryPrompt(transcript, maxItems, diffEvidence) {
   const parts = [
-    "从下面的软件开发 Session 中提取值得跨会话长期保存的项目知识，并总结本次会话做了什么。",
-    "只保留有明确证据的架构决策、稳定需求、Bug 根因与修复、可复用教训、长期问题或重要项目背景。",
-    "用户明确表达的长期协作口径与工作偏好（输出结构、沉淀目标、语气要求等）用 type=preference 记下来，它和技术事实同样重要。",
-    "每条记忆必须能脱离本次对话独立阅读：正文里不允许出现「这个 / 那个 / 上面说的 / 这样 / this / that」这类指代词，一律替换成它真正指的东西。",
-    "忽略寒暄、临时步骤、命令输出、未确认猜测、个人信息、凭据；没有稳定知识时 memories 返回空数组。",
-    "summary 用 1–3 句话写本次做成了什么重要的以及为什么，作为下一个 Session 的续接上下文，不编造。禁止写成「改了 N 个文件」、验收清单或 changelog。",
-    `最多 ${maxItems} 条记忆。只输出严格 JSON 对象，不要 Markdown。`,
-    "每条记忆必须带 evidence：原文中能直接验证该记忆的连续片段（建议 8-60 字），用于 grounding 校验。",
-    "如果某条记忆无法在原文中找到对应证据，请降低 confidence 或不输出。",
-    "durable=true 仅当该事实去掉日期/版本号后仍为真；changelog、本次改了哪些文件、会话流水账必须 durable=false。",
-    "title 写成站立事实句（例如「路径以 session cwd 为准」），不要写成 v1.2.0 patch 或验收清单。content 用 2–4 句把 what+why 写完。",
-    "格式：" + JSON.stringify({ summary: "本次会话总结（2-4 句话）", memories: [{ type: "decision|requirement|architecture|bug|lesson|preference", title: "简洁标题", content: "自包含的事实与理由", evidence: "原文片段（8-60 字）", durable: true, importance: 0.8, confidence: 0.9, relatedFiles: ["相对路径"], tags: ["标签"], supersedes: null }] }),
+    "從下面的軟體開發 Session 中提取值得跨會話長期儲存的專案知識，並總結本次會話做了什麼。",
+    "只保留有明確證據的架構決策、穩定需求、Bug 根因與修復、可複用教訓、長期問題或重要專案背景。",
+    "使用者明確表達的長期協作口徑與工作偏好（輸出結構、沉澱目標、語氣要求等）用 type=preference 記下來，它和技術事實同樣重要。",
+    "每條記憶必須能脫離本次對話獨立閱讀：正文裡不允許出現「這個 / 那個 / 上面說的 / 這樣 / this / that」這類指代詞，一律替換成它真正指的東西。",
+    "忽略寒暄、臨時步驟、命令輸出、未確認猜測、個人資訊、憑據；沒有穩定知識時 memories 返回空陣列。",
+    "summary 用 1–3 句話寫本次做成了什麼重要的以及為什麼，作為下一個 Session 的續接上下文，不編造。禁止寫成「改了 N 個檔案」、驗收清單或 changelog。",
+    `最多 ${maxItems} 條記憶。只輸出嚴格 JSON 物件，不要 Markdown。`,
+    "每條記憶必須帶 evidence：原文中能直接驗證該記憶的連續片段（建議 8-60 字），用於 grounding 校驗。",
+    "如果某條記憶無法在原文中找到對應證據，請降低 confidence 或不輸出。",
+    "durable=true 僅當該事實去掉日期/版本號後仍為真；changelog、本次改了哪些檔案、會話流水賬必須 durable=false。",
+    "title 寫成站立事實句（例如「路徑以 session cwd 為準」），不要寫成 v1.2.0 patch 或驗收清單。content 用 2–4 句把 what+why 寫完。",
+    "格式：" + JSON.stringify({ summary: "本次會話總結（2-4 句話）", memories: [{ type: "decision|requirement|architecture|bug|lesson|preference", title: "簡潔標題", content: "自包含的事實與理由", evidence: "原文片段（8-60 字）", durable: true, importance: 0.8, confidence: 0.9, relatedFiles: ["相對路徑"], tags: ["標籤"], supersedes: null }] }),
   ];
   if (diffEvidence && String(diffEvidence).trim()) {
-    parts.push("【git diff 参考证据（仅辅助核对文件级事实，不要逐条复述为记忆）】\n" + String(diffEvidence).trim());
+    parts.push("【git diff 參考證據（僅輔助核對檔案級事實，不要逐條複述為記憶）】\n" + String(diffEvidence).trim());
   }
-  parts.push("Session 对话：\n" + transcript);
+  parts.push("Session 對話：\n" + transcript);
   return parts.join("\n");
 }
 
@@ -145,20 +145,20 @@ export async function extractSessionMemories({ session, llm, route, sessionId, e
     if (known.has(hash)) continue;
     known.add(hash);
 
-    // Grounding check：evidence 必须能在 transcript 里找到，否则降级 confidence
+    // Grounding check：evidence 必須能在 transcript 裡找到，否則降級 confidence
     let groundingConfidence = typeof item.confidence === "number" ? item.confidence : 0.7;
     let groundingPassed = true;
     if (evidence && evidence.length >= 6) {
       if (evidenceMatchesTranscript(evidence, transcript)) {
         groundedCount += 1;
       } else {
-        // evidence 给出但无法在 transcript 找到 → 高度疑似幻觉，confidence 大幅降级
+        // evidence 給出但無法在 transcript 找到 → 高度疑似幻覺，confidence 大幅降級
         groundingConfidence = Math.min(groundingConfidence, 0.4);
         ungroundedCount += 1;
         groundingPassed = false;
       }
     } else {
-      // 没给 evidence：无法校验，降级 confidence 但保留记忆（中等怀疑）
+      // 沒給 evidence：無法校驗，降級 confidence 但保留記憶（中等懷疑）
       groundingConfidence = Math.min(groundingConfidence, 0.55);
       ungroundedCount += 1;
       groundingPassed = false;

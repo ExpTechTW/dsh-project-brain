@@ -1,4 +1,4 @@
-// project_status Tool - 当前项目状态快照（project + memoryCounts + todoCounts + lastActivity）
+// project_status Tool - 當前專案狀態快照（project + memoryCounts + todoCounts + lastActivity）
 
 import { defineTool } from "@deepseek-ai/dsh-tools";
 import { readBrain } from "../host/store/brain-files.js";
@@ -21,10 +21,10 @@ export function buildStatusTool({ fs, sandboxPolicy, getMemoryConfig }) {
   return defineTool({
     name: "project_status",
     description:
-      "dsh-project-brain: 返回当前项目的快速状态快照（项目元信息 + 各类型 Memory 计数 + " +
-      "TODO 统计 + 最近活动 + 是否初始化）。比 project_continue 更轻、不需要排序算法。",
+      "dsh-project-brain: 返回當前專案的快速狀態快照（專案元資訊 + 各型別 Memory 計數 + " +
+      "TODO 統計 + 最近活動 + 是否初始化）。比 project_continue 更輕、不需要排序演算法。",
     parameters: {
-      path: { type: "string", description: "项目根路径（绝对路径），默认从 session cwd 推断" },
+      path: { type: "string", description: "專案根路徑（絕對路徑），預設從 session cwd 推斷" },
     },
     output: { schema: baseOutputSchema, render: (_args, value) => renderStatus(value) },
     async execute(args, exec) {
@@ -34,7 +34,7 @@ export function buildStatusTool({ fs, sandboxPolicy, getMemoryConfig }) {
         const brain = await readBrain(fs, projectPath);
         const p = brain && brain.project;
         if (!p || p.__error) {
-          return { ok: false, data: { error: { code: "E_NOT_INITIALIZED", message: "该项目尚未初始化，请先调用 project_init", projectPath }, projectPath } };
+          return { ok: false, data: { error: { code: "E_NOT_INITIALIZED", message: "該專案尚未初始化，請先呼叫 project_init", projectPath }, projectPath } };
         }
 
         const tStats = todoStats(brain.todos);

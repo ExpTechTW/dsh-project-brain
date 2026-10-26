@@ -1,31 +1,31 @@
 // scan-and-write.js
 //
-// 从 tools.js 拆出的纯逻辑层：扫描项目 + 写入 .project-brain/ 目录 + 调架构分析。
-// **不依赖 @deepseek-ai/dsh-tools**，可被 smoke 测试和纯 Node 脚本直接 import，
+// 從 tools.js 拆出的純邏輯層：掃描專案 + 寫入 .project-brain/ 目錄 + 調架構分析。
+// **不依賴 @deepseek-ai/dsh-tools**，可被 smoke 測試和純 Node 指令碼直接 import，
 // 不被 DSH 工具 runtime 拖入。
 //
-// 设计动机（v0.7.0-beta.3 release-fix）：
-//   旧实现把 scanAndWrite 与 defineTool 混在 src/tools.js 里，导致：
+// 設計動機（v0.7.0-beta.3 release-fix）：
+//   舊實現把 scanAndWrite 與 defineTool 混在 src/tools.js 裡，導致：
 //     - src/host/summarizer.js / src/host/rpc/sidebar.js / scripts/smoke-*.mjs
-//       任何 import scanAndWrite 的位置都会传递拉起 @deepseek-ai/dsh-tools，
-//       在干净 node 环境（没装 optional peer）下整树 ERR_MODULE_NOT_FOUND。
-//   拆分后 tools.js 只保留 DSH tool 适配层（运行时必须），纯逻辑下沉到这里。
+//       任何 import scanAndWrite 的位置都會傳遞拉起 @deepseek-ai/dsh-tools，
+//       在乾淨 node 環境（沒裝 optional peer）下整樹 ERR_MODULE_NOT_FOUND。
+//   拆分後 tools.js 只保留 DSH tool 適配層（執行時必須），純邏輯下沉到這裡。
 //
-// 行为与原 tools.js 完全一致：相同的入参/出参/错误码，调用方零改动。
+// 行為與原 tools.js 完全一致：相同的入參/出參/錯誤碼，呼叫方零改動。
 
 import { sanitizeProjectDescription, scanProject } from "../scanner.js";
 import { assertSafeProjectPath, brainPath, readJson, writeJson, appendJsonl } from "./store/brain-files.js";
 import { makeId } from "./store/brain-logic.js";
 import { buildArchitecture, resolveSessionRoute } from "./architecture/analyzer.js";
 
-// 拿一个宽松的沙箱 policy（fs.writeText 第 5 参数）
-// P0.4.4 修复：之前用 mode 'workspace-write' 仍然限制在 workspaceRoot
-// (插件 fiber 启动时 = dsh-project-brain 自身目录，不随 session 切换)。
-// 改用 mode 'danger-full-access' 完全跳过文件路径限制（参考 DSH sandbox 文档：
+// 拿一個寬鬆的沙箱 policy（fs.writeText 第 5 引數）
+// P0.4.4 修復：之前用 mode 'workspace-write' 仍然限制在 workspaceRoot
+// (外掛 fiber 啟動時 = dsh-project-brain 自身目錄，不隨 session 切換)。
+// 改用 mode 'danger-full-access' 完全跳過檔案路徑限制（參考 DSH sandbox 文件：
 // "danger-full-access bypasses confinement"）。
-// 安全边界：Host 服务需要跨动态 workspace 写入，因此底层 policy 必须放宽；应用层
-// 始终让 live Session cwd 优先，并由 assertSafeProjectPath + brainPath 把目标限制到
-// 已解析项目的 .project-brain/，拒绝缺失路径、文件系统根目录和路径逃逸。
+// 安全邊界：Host 服務需要跨動態 workspace 寫入，因此底層 policy 必須放寬；應用層
+// 始終讓 live Session cwd 優先，並由 assertSafeProjectPath + brainPath 把目標限制到
+// 已解析專案的 .project-brain/，拒絕缺失路徑、檔案系統根目錄和路徑逃逸。
 export function resolveWritePolicy(sandboxPolicy) {
   if (!sandboxPolicy) return null;
   try {
@@ -36,8 +36,8 @@ export function resolveWritePolicy(sandboxPolicy) {
   return sandboxPolicy;
 }
 
-// 只改 project.json 的架构过期标记，不重扫、不碰 architecture.json。
-// 用于「触发文件变了，但这次架构刷新没跑成」——此时旧泳道不能再当真理。
+// 只改 project.json 的架構過期標記，不重掃、不碰 architecture.json。
+// 用於「觸發檔案變了，但這次架構重新整理沒跑成」——此時舊泳道不能再當真理。
 export async function markArchitectureStale(fs, sandboxPolicy, projectPath, stale) {
   try {
     assertSafeProjectPath(projectPath);
@@ -62,17 +62,17 @@ export function emitPreviewChanged(exec, projectPath) {
   } catch (e) { /* ignore */ }
 }
 
-// 共享扫描 + 写入逻辑（被 project_init / project_rescan tool 与 rescan RPC 共用）
+// 共享掃描 + 寫入邏輯（被 project_init / project_rescan tool 與 rescan RPC 共用）
 export async function scanAndWrite(fs, sandboxPolicy, args, toolLabel, runtime = {}) {
   const startMs = Date.now();
-  // P0.4.2 修复：path 必传（不传直接 fail）。
-  // 原先 fallback 到 process.cwd() 会扫到 DSH Desktop 安装目录。
+  // P0.4.2 修復：path 必傳（不傳直接 fail）。
+  // 原先 fallback 到 process.cwd() 會掃到 DSH Desktop 安裝目錄。
   const explicit = (args && typeof args.path === "string" && args.path.trim()) ? args.path.trim() : null;
   if (!explicit) {
     return {
       ok: false,
       data: {
-        error: { code: "E_NO_PATH", message: "path 参数必传（不传会扫到 DSH Desktop 安装目录）" },
+        error: { code: "E_NO_PATH", message: "path 引數必傳（不傳會掃到 DSH Desktop 安裝目錄）" },
         scanDurationMs: Date.now() - startMs,
       },
     };
@@ -165,14 +165,14 @@ export async function scanAndWrite(fs, sandboxPolicy, args, toolLabel, runtime =
   };
 
   if (!dryRun) {
-    // P0.4.2 修复：显式拿 workspace-write policy，传给 fs.writeText 第 5 参数。
+    // P0.4.2 修復：顯式拿 workspace-write policy，傳給 fs.writeText 第 5 引數。
     const writePolicy = resolveWritePolicy(sandboxPolicy);
     const wroteProject = await writeJson(fs, brainPath(projectPath, "project.json"), projectData, writePolicy);
     if (!wroteProject) {
       return {
         ok: false,
         data: {
-          error: { code: "E_WRITE_FAILED", message: "failed to write " + brainPath(projectPath, "project.json") + "（可能是 sandbox 拒绝）" },
+          error: { code: "E_WRITE_FAILED", message: "failed to write " + brainPath(projectPath, "project.json") + "（可能是 sandbox 拒絕）" },
           scanDurationMs: Date.now() - startMs,
         },
       };
@@ -180,13 +180,13 @@ export async function scanAndWrite(fs, sandboxPolicy, args, toolLabel, runtime =
     if (architecture && !architecture.error) {
       const wroteArchitecture = await writeJson(fs, brainPath(projectPath, "architecture.json"), architecture, writePolicy);
       if (!wroteArchitecture) {
-        architecture = { error: { code: "ARCHITECTURE_WRITE_FAILED", message: "架构数据写入失败，项目基础扫描仍已完成" } };
+        architecture = { error: { code: "ARCHITECTURE_WRITE_FAILED", message: "架構資料寫入失敗，專案基礎掃描仍已完成" } };
       }
     }
     try {
       await appendJsonl(fs, brainPath(projectPath, "timeline.jsonl"), {
         id: makeId("evt", now),
-        title: isRescan ? "完成重扫（" + toolLabel + "）" : "完成 project_init 扫描",
+        title: isRescan ? "完成重掃（" + toolLabel + "）" : "完成 project_init 掃描",
         eventType: isRescan ? "rescan" : "init",
         occurredAt: now,
         architectureMode: architectureMode,
@@ -197,7 +197,7 @@ export async function scanAndWrite(fs, sandboxPolicy, args, toolLabel, runtime =
           (architecture && !architecture.error ? " modules=" + architecture.stats.modules + " edges=" + architecture.stats.edges + " architecture=" + architecture.source : ""),
       }, writePolicy);
     } catch (e) {
-      // timeline 写入失败不阻塞整体成功
+      // timeline 寫入失敗不阻塞整體成功
     }
   }
 

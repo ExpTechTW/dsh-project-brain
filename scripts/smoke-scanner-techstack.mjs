@@ -1,5 +1,5 @@
-// smoke-scanner-techstack.mjs — v0.4.14 验证 scanner 扩展技术栈推断
-// 覆盖：JS/TS（Next + Prisma + Redis + Bull + Tailwind + Vite + Vitest + TS）
+// smoke-scanner-techstack.mjs — v0.4.14 驗證 scanner 擴充套件技術棧推斷
+// 覆蓋：JS/TS（Next + Prisma + Redis + Bull + Tailwind + Vite + Vitest + TS）
 //       Python（FastAPI + SQLAlchemy + asyncpg + redis）
 //       Go（Gin + GORM + go-redis）
 //       Rust（Axum + Tokio + Serde + SQLx）
@@ -20,7 +20,7 @@ function pass(name) { _pass++; RESULTS.push({ ok: true, name }); }
 function fail(name, msg) { _fail++; RESULTS.push({ ok: false, name, msg }); console.error("FAIL:", name, "-", msg); }
 function assert(cond, name, msg) { cond ? pass(name) : fail(name, msg || "assertion failed"); }
 
-// 用纯 Node fs adapter（不走 DSH sandbox）
+// 用純 Node fs adapter（不走 DSH sandbox）
 function makeFs() {
   const cache = new Map();
   function pathToRel(p) { return p.replaceAll("\\", "/"); }
@@ -39,7 +39,7 @@ function makeFs() {
     resolve: async (p) => ({ path: p === FIXTURE_DIR ? FIXTURE_DIR : join(FIXTURE_DIR, p).replaceAll("\\", "/") }),
     listDir: async (target) => {
       const abs = typeof target === "string" ? target : target.path;
-      // 把绝对路径转回相对 FIXTURE_DIR 的相对路径
+      // 把絕對路徑轉回相對 FIXTURE_DIR 的相對路徑
       const rel = abs === FIXTURE_DIR ? "" : abs.startsWith(FIXTURE_DIR) ? abs.slice(FIXTURE_DIR.length).replace(/^[/\\]/, "") : abs;
       return listDirImpl(rel);
     },
@@ -59,13 +59,13 @@ console.log("[smoke-scanner-techstack] start");
 const fs = makeFs();
 const scan = await scanProject(fs, FIXTURE_DIR);
 
-// 必须包含的 manifest 文件
+// 必須包含的 manifest 檔案
 const expectedFiles = ["package.json", "requirements.txt", "Cargo.toml", "go.mod"];
 for (const f of expectedFiles) {
   assert(scan.topLevel.includes(f), `fixture manifest present: ${f}`);
 }
 
-// 工具函数：支持 string 和数组两种形态
+// 工具函式：支援 string 和陣列兩種形態
 function includes(stack, field, value) {
   const v = stack[field];
   if (v === value) return true;
@@ -98,7 +98,7 @@ assert(includes(scan.techStack, "orm", "SQLx"), `Rust orm contains SQLx (got ${J
 assert(scan.tooling.includes("Tokio"), `Rust tooling includes Tokio`);
 assert(scan.tooling.includes("Serde"), `Rust tooling includes Serde`);
 
-// 核心收益：orm 数组同时包含 Prisma + SQLAlchemy + GORM + SQLx（之前会被覆盖）
+// 核心收益：orm 陣列同時包含 Prisma + SQLAlchemy + GORM + SQLx（之前會被覆蓋）
 const ormArr = Array.isArray(scan.techStack.orm) ? scan.techStack.orm : [scan.techStack.orm];
 assert(ormArr.includes("Prisma") && ormArr.includes("SQLAlchemy") && ormArr.includes("GORM") && ormArr.includes("SQLx"), `orm array preserves all languages (got ${ormArr.join(",")})`);
 

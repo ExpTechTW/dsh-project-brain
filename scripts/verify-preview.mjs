@@ -1,5 +1,5 @@
-// 一次性验证：buildWorkspacePreview 按不同 workspace 读 .project-brain 是否正确
-// 用 DSH fs 服务适配器（node 实现）跑，模拟"已生成 A 项目 / 未生成 B 项目"
+// 一次性驗證：buildWorkspacePreview 按不同 workspace 讀 .project-brain 是否正確
+// 用 DSH fs 服務介面卡（node 實現）跑，模擬"已生成 A 專案 / 未生成 B 專案"
 import { mkdtempSync, writeFileSync, mkdirSync, readFileSync, readdirSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -24,13 +24,13 @@ writeFileSync(join(projA, "src", "index.js"), "const a=1;");
 writeFileSync(join(projB, "package.json"), JSON.stringify({ name: "projB", dependencies: { react: "18" } }));
 writeFileSync(join(projB, "src", "index.js"), "const b=2;");
 
-// 只给 A 生成 .project-brain（project.json + todo + memory + timeline）
+// 只給 A 生成 .project-brain（project.json + todo + memory + timeline）
 const brainA = join(projA, ".project-brain");
 mkdirSync(brainA, { recursive: true });
 const scanA = await scanProject(fsAdapter, projA);
 writeFileSync(join(brainA, "project.json"), JSON.stringify({ id: "brain-A", name: "projA", techStack: scanA.techStack, languages: scanA.languages, updatedAt: 1000, lastScannedAt: 1000 }));
-writeFileSync(join(brainA, "todo.jsonl"), JSON.stringify({ id: "t1", title: "projA 待办", status: "pending", priority: "high", createdAt: 1000, updatedAt: 1000 }) + "\n");
-writeFileSync(join(brainA, "memory.jsonl"), JSON.stringify({ id: "m1", type: "decision", title: "projA 决策", content: "c", importance: 0.9, createdAt: 1000 }) + "\n");
+writeFileSync(join(brainA, "todo.jsonl"), JSON.stringify({ id: "t1", title: "projA 待辦", status: "pending", priority: "high", createdAt: 1000, updatedAt: 1000 }) + "\n");
+writeFileSync(join(brainA, "memory.jsonl"), JSON.stringify({ id: "m1", type: "decision", title: "projA 決策", content: "c", importance: 0.9, createdAt: 1000 }) + "\n");
 writeFileSync(join(brainA, "timeline.jsonl"), JSON.stringify({ id: "e1", title: "projA init", eventType: "init", occurredAt: 1000 }) + "\n");
 
 let failed = 0;
@@ -41,9 +41,9 @@ const pa = await buildWorkspacePreview(fsAdapter, projA);
 check("A initialized", pa.initialized === true);
 check("A project.name == projA", pa.project && pa.project.name === "projA");
 check("A stats.pendingTodos == 1", pa.stats.pendingTodos === 1);
-check("A memories 决策 == 1", pa.stats.decisions === 1);
+check("A memories 決策 == 1", pa.stats.decisions === 1);
 check("A timelineAll == 1", pa.timelineAll.length === 1);
-check("A phase 待办", pa.phase && String(pa.phase.title).indexOf("待办") >= 0, JSON.stringify(pa.phase));
+check("A phase 待辦", pa.phase && String(pa.phase.title).indexOf("待辦") >= 0, JSON.stringify(pa.phase));
 
 console.log("== B 未生成 ==");
 const pb = await buildWorkspacePreview(fsAdapter, projB);

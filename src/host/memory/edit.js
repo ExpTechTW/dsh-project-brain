@@ -1,13 +1,13 @@
-// edit.js — 人工维护记忆的纯逻辑层（编辑 / 归档 / 恢复 / 永久删除）。
+// edit.js — 人工維護記憶的純邏輯層（編輯 / 歸檔 / 恢復 / 永久刪除）。
 //
-// 与 admit.js 的分工：admit 管「机器写入」，要过规则门和模型确认；
-// 这里管「人工修正」，用户是权威，只拦明显坏掉的输入（空标题、正文过短、非法枚举）。
-// 全部是纯函数：接收 rows，返回新 rows，IO 由调用方（RPC / tool）负责。
+// 與 admit.js 的分工：admit 管「機器寫入」，要過規則門和模型確認；
+// 這裡管「人工修正」，使用者是權威，只攔明顯壞掉的輸入（空標題、正文過短、非法列舉）。
+// 全部是純函式：接收 rows，返回新 rows，IO 由呼叫方（RPC / tool）負責。
 
 import { enforceCoreCap, maxPinnedCount, memoryFingerprint, pinnedMemories } from "./admit.js";
 import { isRetrievableMemory, normalizeMemoryType } from "../store/brain-logic.js";
 
-// 人工可直接切换的状态。archived 走归档动作，superseded 由 supersede 链维护，都不在表单里。
+// 人工可直接切換的狀態。archived 走歸檔動作，superseded 由 supersede 鏈維護，都不在表單裡。
 export const EDITABLE_STATUSES = ["active", "dormant"];
 export const RESTORABLE_STATUSES = ["archived", "superseded", "deleted"];
 export const MIN_EDITED_CONTENT_CHARS = 12;
@@ -18,14 +18,14 @@ function fail(code, message) {
   return { ok: false, code, message };
 }
 
-// id 可以给前缀（UI 传完整 id，tool 可能只给前几位）。includeArchived 决定归档条目算不算命中。
+// id 可以給字首（UI 傳完整 id，tool 可能只給前幾位）。includeArchived 決定歸檔條目算不算命中。
 export function findMemoryById(rows, idPrefix, { includeArchived = false } = {}) {
   const needle = String(idPrefix || "").trim();
   if (!needle) return fail("E_NO_ID", "id 必填");
   const pool = (rows || []).filter((m) => m && m.id && (includeArchived || isRetrievableMemory(m)));
   const matches = pool.filter((m) => m.id === needle || m.id.indexOf(needle) === 0);
-  if (matches.length === 0) return fail("E_NOT_FOUND", "未找到 id=" + needle + " 的记忆");
-  if (matches.length > 1) return fail("E_AMBIGUOUS_ID", "id=" + needle + " 匹配到 " + matches.length + " 条，请提供更精确的 id");
+  if (matches.length === 0) return fail("E_NOT_FOUND", "未找到 id=" + needle + " 的記憶");
+  if (matches.length > 1) return fail("E_AMBIGUOUS_ID", "id=" + needle + " 匹配到 " + matches.length + " 條，請提供更精確的 id");
   return { ok: true, entry: matches[0] };
 }
 
@@ -41,7 +41,7 @@ function normalizeTags(value, previous) {
   return out;
 }
 
-// 只接受表单里那几个字段；id / createdAt / source.kind 一律保留，改错字不该变成另一条记忆。
+// 只接受表單裡那幾個欄位；id / createdAt / source.kind 一律保留，改錯字不該變成另一條記憶。
 export function applyMemoryEdit(rows, { id, patch = {}, now = Date.now(), limits } = {}) {
   const found = findMemoryById(rows, id);
   if (!found.ok) return found;
@@ -51,43 +51,43 @@ export function applyMemoryEdit(rows, { id, patch = {}, now = Date.now(), limits
 
   if (patch.title !== undefined) {
     const title = String(patch.title).trim();
-    if (!title) return fail("E_NO_TITLE", "标题不能为空");
+    if (!title) return fail("E_NO_TITLE", "標題不能為空");
     next.title = title.slice(0, MAX_EDITED_TITLE_CHARS);
   }
   if (patch.content !== undefined) {
     const content = String(patch.content).trim();
     if (content.length < MIN_EDITED_CONTENT_CHARS) {
-      return fail("E_CONTENT_TOO_SHORT", "正文至少 " + MIN_EDITED_CONTENT_CHARS + " 个字符");
+      return fail("E_CONTENT_TOO_SHORT", "正文至少 " + MIN_EDITED_CONTENT_CHARS + " 個字元");
     }
     next.content = content.slice(0, MAX_EDITED_CONTENT_CHARS);
   }
   if (patch.type !== undefined) {
     const type = normalizeMemoryType(patch.type);
-    if (!type) return fail("E_INVALID_TYPE", "记忆类型不合法");
+    if (!type) return fail("E_INVALID_TYPE", "記憶型別不合法");
     next.type = type;
   }
   if (patch.importance !== undefined) {
     const importance = Number(patch.importance);
     if (!Number.isFinite(importance) || importance < 0 || importance > 1) {
-      return fail("E_INVALID_IMPORTANCE", "重要性必须是 0~1 之间的数字");
+      return fail("E_INVALID_IMPORTANCE", "重要性必須是 0~1 之間的數字");
     }
     next.importance = Math.round(importance * 100) / 100;
   }
   if (patch.status !== undefined) {
     const status = String(patch.status).trim();
     if (EDITABLE_STATUSES.indexOf(status) < 0) {
-      return fail("E_INVALID_STATUS", "状态只能是 " + EDITABLE_STATUSES.join(" / "));
+      return fail("E_INVALID_STATUS", "狀態只能是 " + EDITABLE_STATUSES.join(" / "));
     }
     next.status = status;
   }
   if (patch.pinned !== undefined) {
     const pinned = patch.pinned === true;
     if (pinned && target.pinned !== true) {
-      // 置顶配额留一半给自动写入，否则淘汰时挑不出victim，置顶这条保证就形同虚设。
+      // 置頂配額留一半給自動寫入，否則淘汰時挑不出victim，置頂這條保證就形同虛設。
       const cap = maxPinnedCount(limits);
       const current = pinnedMemories(rows).filter((m) => m.id !== target.id).length;
       if (current >= cap) {
-        return fail("E_PIN_LIMIT", "置顶最多 " + cap + " 条，请先取消其他置顶");
+        return fail("E_PIN_LIMIT", "置頂最多 " + cap + " 條，請先取消其他置頂");
       }
     }
     if (pinned) next.pinned = true;
@@ -102,7 +102,7 @@ export function applyMemoryEdit(rows, { id, patch = {}, now = Date.now(), limits
     && JSON.stringify(next.tags || []) === JSON.stringify(target.tags || []);
   if (unchanged) return { ok: true, changed: false, rows: (rows || []).slice(), entry: target };
 
-  // fingerprint 是 type+title+content 的哈希，正文改了不重算的话去重会认错人。
+  // fingerprint 是 type+title+content 的雜湊，正文改了不重算的話去重會認錯人。
   next.source = Object.assign({}, target.source || {}, {
     fingerprint: memoryFingerprint(next),
     editedBy: "user",
@@ -111,13 +111,13 @@ export function applyMemoryEdit(rows, { id, patch = {}, now = Date.now(), limits
   next.updatedAt = now;
 
   const replaced = (rows || []).map((m) => (m && m.id === target.id ? next : m));
-  // 手动激活一条记忆时，该被挤出 Core 的是别人，不是它自己。
+  // 手動啟用一條記憶時，該被擠出 Core 的是別人，不是它自己。
   const capped = enforceCoreCap(replaced, { pinnedIds: [target.id], now, limits });
   return { ok: true, changed: true, rows: capped.rows, entry: next, previous: target };
 }
 
 export function applyMemoryStatus(rows, { id, status, reason = "", now = Date.now(), limits } = {}) {
-  // 归档态的条目也要能被命中，否则「恢复」和「重复归档」都会撞上 E_NOT_FOUND。
+  // 歸檔態的條目也要能被命中，否則「恢復」和「重複歸檔」都會撞上 E_NOT_FOUND。
   const found = findMemoryById(rows, id, { includeArchived: true });
   if (!found.ok) return found;
   const target = found.entry;
@@ -130,7 +130,7 @@ export function applyMemoryStatus(rows, { id, status, reason = "", now = Date.no
   if (archiving) {
     if (reason) next.archiveReason = reason;
   } else {
-    // 恢复时把归档/替换的痕迹清掉，否则 housekeep 下一轮又按旧理由把它归回去。
+    // 恢復時把歸檔/替換的痕跡清掉，否則 housekeep 下一輪又按舊理由把它歸回去。
     delete next.archiveReason;
     delete next.supersededBy;
     delete next.supersededReason;
@@ -142,13 +142,13 @@ export function applyMemoryStatus(rows, { id, status, reason = "", now = Date.no
   return { ok: true, changed: true, rows: capped.rows, entry: next, previous: target };
 }
 
-// 物理删行。会打断 supersededBy 指向链，所以调用方必须做二次确认。
+// 物理刪行。會打斷 supersededBy 指向鏈，所以呼叫方必須做二次確認。
 export function applyMemoryDelete(rows, { id } = {}) {
   const found = findMemoryById(rows, id, { includeArchived: true });
   if (!found.ok) return found;
   const target = found.entry;
   const remaining = (rows || []).filter((m) => !(m && m.id === target.id));
-  // 被删掉的那条如果是别人的替代者，留着悬空指针会让 UI 显示「已被替换」却找不到替代者。
+  // 被刪掉的那條如果是別人的替代者，留著懸空指標會讓 UI 顯示「已被替換」卻找不到替代者。
   const cleaned = remaining.map((m) => {
     if (!m || m.supersededBy !== target.id) return m;
     const copy = Object.assign({}, m);

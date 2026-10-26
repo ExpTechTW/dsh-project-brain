@@ -1,14 +1,14 @@
-// project_ask Tool - 自然语言查询项目脑（v0.3.0：可选 LLM RAG）
+// project_ask Tool - 自然語言查詢專案腦（v0.3.0：可選 LLM RAG）
 //
-// MVP 实现：纯规则检索（标题 / 内容 / 相关文件关键词匹配）。
-// v0.3.0 升级：当 useLLM=true 且 llm service 可用时，调 llm.stream 合成答案。
-//              llm 不可用 / 失败时 fallback 到纯规则版。
-// 参数：
+// MVP 實現：純規則檢索（標題 / 內容 / 相關檔案關鍵詞匹配）。
+// v0.3.0 升級：當 useLLM=true 且 llm service 可用時，調 llm.stream 合成答案。
+//              llm 不可用 / 失敗時 fallback 到純規則版。
+// 引數：
 //   - question (必填)
-//   - topK: 返回 source 数（默认 5）
-//   - useLLM: 是否调 LLM 合成答案（默认 false，兼容零 token 用法）
-//   - path: 项目路径
-// 返回：sources（Top-K）+ answer（LLM 合成，可选）+ counts + confidence
+//   - topK: 返回 source 數（預設 5）
+//   - useLLM: 是否調 LLM 合成答案（預設 false，相容零 token 用法）
+//   - path: 專案路徑
+// 返回：sources（Top-K）+ answer（LLM 合成，可選）+ counts + confidence
 
 import { defineTool } from "@deepseek-ai/dsh-tools";
 import { brainPath, readJson, readJsonl } from "../host/store/brain-files.js";
@@ -61,32 +61,32 @@ function scoreEntry(entry, tokens, fields) {
   return hits > 0 ? score : -1;
 }
 
-// 用 sources 构造 RAG prompt
+// 用 sources 構造 RAG prompt
 function buildRagPrompt(question, sources, projectInfo) {
   const parts = [];
-  parts.push("你是 dsh-project-brain 助手。用户问了一个关于项目的问题，请仅基于下面提供的 sources 回答，不要编造信息。");
+  parts.push("你是 dsh-project-brain 助手。使用者問了一個關於專案的問題，請僅基於下面提供的 sources 回答，不要編造資訊。");
   parts.push("");
   if (projectInfo) {
-    parts.push("【项目概况】");
-    parts.push("- 名称: " + (projectInfo.name || "(未命名)"));
-    if (projectInfo.type) parts.push("- 类型: " + projectInfo.type);
+    parts.push("【專案概況】");
+    parts.push("- 名稱: " + (projectInfo.name || "(未命名)"));
+    if (projectInfo.type) parts.push("- 型別: " + projectInfo.type);
     parts.push("");
   }
-  parts.push("【相关 Memory / TODO / Timeline（Top sources）】");
+  parts.push("【相關 Memory / TODO / Timeline（Top sources）】");
   sources.forEach((s, i) => {
     const tag = s.kind + " + " + (s.type || s.status || s.eventType || "");
     parts.push(`[${i + 1}] (${tag}) ${s.title}`);
     if (s.snippet) parts.push("    " + s.snippet);
     parts.push("");
   });
-  parts.push("【用户问题】");
+  parts.push("【使用者問題】");
   parts.push(question);
   parts.push("");
-  parts.push("请用简洁的中文回答（3-5 句话），并在末尾列出引用的来源编号 [1][2]...。如果 sources 无法回答，直接说『信息不足』。");
+  parts.push("請用簡潔的中文回答（3-5 句話），並在末尾列出引用的來源編號 [1][2]...。如果 sources 無法回答，直接說『資訊不足』。");
   return parts.join("\n");
 }
 
-// 从 exec 解析 session model route（与 tools/suggest.js 一致）
+// 從 exec 解析 session model route（與 tools/suggest.js 一致）
 function executionRoute(exec) {
   if (!exec) return null;
   return resolveSessionRoute(exec.session)
@@ -103,9 +103,9 @@ function executionSessionId(exec) {
     || (exec.agent && exec.agent.session && exec.agent.session.id)) || null;
 }
 
-// 调 LLM 合成答案；失败返回 null（让 caller fallback 到纯 BM25）
-// 修复：改用 apply 时缓存的 llm service（getLlm）+ 完整 model route，
-//      不再从 exec.ctx 现场取 llm（工具执行上下文拿不到，导致 useLLM 静默失效）。
+// 調 LLM 合成答案；失敗返回 null（讓 caller fallback 到純 BM25）
+// 修復：改用 apply 時快取的 llm service（getLlm）+ 完整 model route，
+//      不再從 exec.ctx 現場取 llm（工具執行上下文拿不到，導致 useLLM 靜默失效）。
 async function synthesizeAnswer({ llm, route, sessionId, question, sources, projectInfo }) {
   if (!sources || sources.length === 0) return null;
   if (!llm || typeof llm.stream !== "function") return null;
@@ -114,7 +114,7 @@ async function synthesizeAnswer({ llm, route, sessionId, question, sources, proj
   const prompt = buildRagPrompt(question, sources, projectInfo);
   try {
     const text = await streamLlmText(llm, route, prompt, sessionId, 30000, {
-      system: "你是 dsh-project-brain 助手，仅基于提供的 sources 回答，不要编造信息。",
+      system: "你是 dsh-project-brain 助手，僅基於提供的 sources 回答，不要編造資訊。",
       maxTokens: 800,
       purpose: "project-brain-ask",
     });
@@ -128,15 +128,15 @@ export function buildAskTool({ fs, sandboxPolicy, getMemoryConfig, resolveEmbedd
   return defineTool({
     name: "project_ask",
     description:
-      "dsh-project-brain: 自然语言查询项目脑。默认 BM25 + 重要度/时效（含 dormant）；向量若已配置只作为加分。" +
-      " 返回 Top-K sources + 项目概览。useLLM=true 时额外调 LLM 合成答案（RAG 风格）。" +
-      "可用于回答「为什么这么设计 / 之前踩过什么坑 / 最近改了什么」等问题。",
+      "dsh-project-brain: 自然語言查詢專案腦。預設 BM25 + 重要度/時效（含 dormant）；向量若已配置只作為加分。" +
+      " 返回 Top-K sources + 專案概覽。useLLM=true 時額外調 LLM 合成答案（RAG 風格）。" +
+      "可用於回答「為什麼這麼設計 / 之前踩過什麼坑 / 最近改了什麼」等問題。",
     parameters: {
-      question: { type: "string", description: "自然语言问题（必填）" },
-      topK: { type: "number", description: "返回条目数上限，默认 5" },
-      useLLM: { type: "boolean", description: "是否调 LLM 合成答案（默认 false，纯规则返回 sources）" },
-      includeArchived: { type: "boolean", description: "是否检索 archived/superseded，默认 false" },
-      path: { type: "string", description: "项目根路径（默认从 session cwd 推断）" },
+      question: { type: "string", description: "自然語言問題（必填）" },
+      topK: { type: "number", description: "返回條目數上限，預設 5" },
+      useLLM: { type: "boolean", description: "是否調 LLM 合成答案（預設 false，純規則返回 sources）" },
+      includeArchived: { type: "boolean", description: "是否檢索 archived/superseded，預設 false" },
+      path: { type: "string", description: "專案根路徑（預設從 session cwd 推斷）" },
     },
     output: { schema: baseOutputSchema, render: (_args, value) => renderAsk(value) },
     async execute(args, exec) {
@@ -171,7 +171,7 @@ export function buildAskTool({ fs, sandboxPolicy, getMemoryConfig, resolveEmbedd
         };
         if (vectorState.requested) {
           if (!memoryConfig.embeddingBaseURL || !memoryConfig.embeddingModel) {
-            vectorState.fallbackReason = { code: "EMBEDDING_NOT_CONFIGURED", message: "向量检索已启用，但 endpoint 或 model 未配置" };
+            vectorState.fallbackReason = { code: "EMBEDDING_NOT_CONFIGURED", message: "向量檢索已啟用，但 endpoint 或 model 未配置" };
           } else {
             const indexState = await ensureEmbeddingIndex({
               fs,
@@ -194,7 +194,7 @@ export function buildAskTool({ fs, sandboxPolicy, getMemoryConfig, resolveEmbedd
                 queryVector = null;
                 vectorState.fallbackReason = {
                   code: "EMBEDDING_DIMENSION_MISMATCH",
-                  message: "查询向量维度与索引不一致，请检查模型配置或删除派生缓存后重试",
+                  message: "查詢向量維度與索引不一致，請檢查模型配置或刪除派生快取後重試",
                 };
               } else {
                 vectorState.used = vectors.size > 0;
@@ -228,7 +228,7 @@ export function buildAskTool({ fs, sandboxPolicy, getMemoryConfig, resolveEmbedd
         }).filter(Boolean);
         tlScored.sort((a, b) => (b._score || 0) - (a._score || 0));
 
-        // 命中即「用过」：排序和淘汰都靠 lastAccessedAt 才能认出哪些记忆真的常用。
+        // 命中即「用過」：排序和淘汰都靠 lastAccessedAt 才能認出哪些記憶真的常用。
         await recordMemoryAccess({
           fs,
           projectPath,
@@ -262,7 +262,7 @@ export function buildAskTool({ fs, sandboxPolicy, getMemoryConfig, resolveEmbedd
           lastUpdateAt: projectJson.updatedAt || projectJson.lastScannedAt || null,
         } : null;
 
-        // 可选 LLM 合成
+        // 可選 LLM 合成
         let answer = null;
         let llmUsed = false;
         let llmError = null;
@@ -282,8 +282,8 @@ export function buildAskTool({ fs, sandboxPolicy, getMemoryConfig, resolveEmbedd
           }
         }
 
-        // v0.3.9 修复：之前 "value is not lossless JSON" 是因为 sources 数组里某项含不可序列化字段
-        // 强制 JSON round-trip 把 undefined/Symbol/Function 都剥掉
+        // v0.3.9 修復：之前 "value is not lossless JSON" 是因為 sources 數組裡某項含不可序列化欄位
+        // 強制 JSON round-trip 把 undefined/Symbol/Function 都剝掉
         const ret = {
           ok: true,
           data: {
@@ -318,10 +318,10 @@ export function buildAskTool({ fs, sandboxPolicy, getMemoryConfig, resolveEmbedd
               requested: useLLM,
               error: llmError,
             },
-            hint: sources.length === 0 ? "没有匹配条目。可考虑放宽关键词，或先调用 project_init / project_memory_add 录入更多上下文。" : null,
+            hint: sources.length === 0 ? "沒有匹配條目。可考慮放寬關鍵詞，或先呼叫 project_init / project_memory_add 錄入更多上下文。" : null,
           },
         };
-        // 诊断：先尝试 JSON round-trip，如果失败就在 data 里加 _diag
+        // 診斷：先嚐試 JSON round-trip，如果失敗就在 data 裡加 _diag
         try {
           const roundtrip = JSON.parse(JSON.stringify(ret));
           return roundtrip;

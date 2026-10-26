@@ -15,7 +15,7 @@ Locked product bar: each new session continues like the same practitioner — st
 
 ## Key decisions
 - Decision: Only durable facts qualify as memory (not changelogs). Reason: current jsonl is mostly release notes. Alternative: capture-all and rank.
-- Decision: Rules veto + LLM confirm on automatic writes only; user “记住” skips LLM. Reason: reliability without blocking explicit remember. Alternative: LLM on every write, or rules-only for agent tools.
+- Decision: Rules veto + LLM confirm on automatic writes only; user “記住” skips LLM. Reason: reliability without blocking explicit remember. Alternative: LLM on every write, or rules-only for agent tools.
 - Decision: `project_memory_add` is automatic, not explicit. Reason: almost all junk came from the agent tool. Alternative: treat tool writes as explicit.
 - Decision: Existing corpus is not precious; rule-hard-hits auto-archive. Reason: still in development. Alternative: manual review of all 19 rows.
 - Decision: Inject Core (all active) + last session summary from timeline. Reason: continue fidelity without stuffing recap into memory. Alternative: Core only, or old Top-K dump.

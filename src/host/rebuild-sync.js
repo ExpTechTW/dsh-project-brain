@@ -1,16 +1,16 @@
-// rebuild-sync.js - v0.3.18 工具层同步 rebuild
+// rebuild-sync.js - v0.3.18 工具層同步 rebuild
 //
-// 目的：放弃 host bundle "被动监听" 模式（v0.3.4-v0.3.17 连续 5 次失败），
-//      改为工具层 "主动触发" — 工具写完 jsonl 后立即同步 execFileSync('node', ['build.js'])。
+// 目的：放棄 host bundle "被動監聽" 模式（v0.3.4-v0.3.17 連續 5 次失敗），
+//      改為工具層 "主動觸發" — 工具寫完 jsonl 後立即同步 execFileSync('node', ['build.js'])。
 //
-// 已知能跑：v0.3.6 已验证 child_process.execFileSync 在 DSH host bundle 里能跑（summarizer 走 shell service 跑 git diff 同源机制）。
+// 已知能跑：v0.3.6 已驗證 child_process.execFileSync 在 DSH host bundle 裡能跑（summarizer 走 shell service 跑 git diff 同源機制）。
 //
-// 不依赖：
-// - dsh-tools（让多个工具文件都能 import）
+// 不依賴：
+// - dsh-tools（讓多個工具檔案都能 import）
 // - ctx.timer / ctx.effect / ctx.on（避免再次 silent failure）
-// - 子进程 / spawn（不再依赖 host fiber 行为）
+// - 子程序 / spawn（不再依賴 host fiber 行為）
 //
-// 失败处理：所有 catch 都吞（不能因为 rebuild 失败影响工具本身的返回值）。
+// 失敗處理：所有 catch 都吞（不能因為 rebuild 失敗影響工具本身的返回值）。
 
 import { execFileSync } from "node:child_process";
 import { existsSync, appendFileSync } from "node:fs";
@@ -24,7 +24,7 @@ const BUILD_SCRIPT = join(PLUGIN_DIR, "build.js");
 const SKIP_FILE = join(PLUGIN_DIR, ".project-brain", ".dsh-project-brain-skip-sync");
 const LOG_FILE = join(PLUGIN_DIR, ".project-brain", ".dsh-project-brain-sync.log");
 
-// v0.3.18：写文件 log（绕过 DSH Desktop 黑盒调试）
+// v0.3.18：寫檔案 log（繞過 DSH Desktop 黑盒除錯）
 function log(level, msg) {
   try {
     appendFileSync(LOG_FILE, "[" + new Date().toISOString() + "] [" + level + "] " + msg + "\n", "utf8");
@@ -33,14 +33,14 @@ function log(level, msg) {
   }
 }
 
-// v0.3.18：备用 log 路径 — 如果 PLUGIN_DIR/.project-brain/ 写不了，写到 process.cwd()/.project-brain/ 或用户 HOME
+// v0.3.18：備用 log 路徑 — 如果 PLUGIN_DIR/.project-brain/ 寫不了，寫到 process.cwd()/.project-brain/ 或使用者 HOME
 const FALLBACK_LOG_PATHS = [
   LOG_FILE,
   join(process.cwd(), ".dsh-project-brain-sync.log"),
   join(process.env.USERPROFILE || process.env.HOME || ".", ".dsh-project-brain-sync.log"),
 ];
 function logFallback(level, msg) {
-  // 多路径尝试，找到第一个能写的
+  // 多路徑嘗試，找到第一個能寫的
   for (const p of FALLBACK_LOG_PATHS) {
     try {
       appendFileSync(p, "[" + new Date().toISOString() + "] [" + level + "] " + msg + "\n", "utf8");
@@ -50,7 +50,7 @@ function logFallback(level, msg) {
   return null;
 }
 
-// 是否启用（默认启用；可通过 .dsh-project-brain-skip-sync 文件临时关闭）
+// 是否啟用（預設啟用；可通過 .dsh-project-brain-skip-sync 檔案臨時關閉）
 function isEnabled() {
   try {
     return !existsSync(SKIP_FILE);
@@ -59,13 +59,13 @@ function isEnabled() {
   }
 }
 
-// 同步 rebuild（吞所有错误）
-// reason: 简短描述写入 stderr（DSH Desktop 可能不可见，但 stdout 至少能透传）
+// 同步 rebuild（吞所有錯誤）
+// reason: 簡短描述寫入 stderr（DSH Desktop 可能不可見，但 stdout 至少能透傳）
 let rebuildCount = 0;
 let lastError = null;
 
 export function runSyncRebuild(reason) {
-  // 多路径 log 写入（绕开 sandbox 拦截）
+  // 多路徑 log 寫入（繞開 sandbox 攔截）
   const fallbackLogWrittenTo = logFallback("info", "runSyncRebuild called: reason=" + reason + " enabled=" + isEnabled() + " PLUGIN_DIR=" + PLUGIN_DIR + " BUILD_SCRIPT=" + BUILD_SCRIPT + " process.cwd=" + process.cwd());
   log("info", "fallback log written to: " + fallbackLogWrittenTo);
   if (!isEnabled()) return;
@@ -93,7 +93,7 @@ export function runSyncRebuild(reason) {
   }
 }
 
-// 诊断接口（让 agent / 用户能查询 rebuild 状态）
+// 診斷介面（讓 agent / 使用者能查詢 rebuild 狀態）
 export function getSyncRebuildStats() {
   return { rebuildCount, lastError };
 }

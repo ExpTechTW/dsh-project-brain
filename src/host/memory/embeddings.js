@@ -71,8 +71,8 @@ async function readCache(fs, projectPath) {
   try { return await readJsonl(fs, brainPath(projectPath, CACHE_FILE)); } catch (e) { return []; }
 }
 
-// knownMemoryIds：memory.jsonl 里当前存在的全部 id。只有拿到全集才敢清理缓存行——
-// 用调用方传进来的候选子集做 GC，会把没参与本次检索的向量整片删掉，下次要重新付费重建。
+// knownMemoryIds：memory.jsonl 裡當前存在的全部 id。只有拿到全集才敢清理快取行——
+// 用呼叫方傳進來的候選子集做 GC，會把沒參與本次檢索的向量整片刪掉，下次要重新付費重建。
 export async function ensureEmbeddingIndex({ fs, projectPath, memories, config, resolveCredential, signal, fetchImpl, knownMemoryIds } = {}) {
   const active = activeMemories(memories);
   const modelKey = embeddingModelKey(config);

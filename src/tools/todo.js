@@ -1,6 +1,6 @@
 // project_todo_add / project_todo_list / project_todo_done Tools
-// P0.7-lite 工具面：TODO CRUD（add/list/done），数据在 .project-brain/todo.jsonl。
-// SidebarPreview 的 Phase 进度与 Stats 待办数由 build.js 从 todo.jsonl 统计（build-time embed）。
+// P0.7-lite 工具面：TODO CRUD（add/list/done），資料在 .project-brain/todo.jsonl。
+// SidebarPreview 的 Phase 進度與 Stats 待辦數由 build.js 從 todo.jsonl 統計（build-time embed）。
 
 import { defineTool } from "@deepseek-ai/dsh-tools";
 import { brainPath, appendJsonl, readJsonl, writeText, serializeJsonl } from "../host/store/brain-files.js";
@@ -20,14 +20,14 @@ export function buildTodoAddTool({ fs, sandboxPolicy }) {
   return defineTool({
     name: "project_todo_add",
     description:
-      "dsh-project-brain: 为当前项目添加一条开发待办（写入 .project-brain/todo.jsonl）。" +
-      "规划出下一步任务、或用户提出新需求时调用；完成时用 project_todo_done 关闭。",
+      "dsh-project-brain: 為當前專案新增一條開發待辦（寫入 .project-brain/todo.jsonl）。" +
+      "規劃出下一步任務、或使用者提出新需求時呼叫；完成時用 project_todo_done 關閉。",
     parameters: {
-      title: { type: "string", description: "待办标题（一句话）" },
-      description: { type: "string", description: "详情（可选）" },
-      priority: { type: "string", description: "优先级：urgent | high | medium（默认） | low" },
-      relatedFiles: { type: "array", items: { type: "string" }, description: "相关文件（可选）" },
-      path: { type: "string", description: "项目根路径（默认从 session cwd 推断；不传会用当前工作区）" },
+      title: { type: "string", description: "待辦標題（一句話）" },
+      description: { type: "string", description: "詳情（可選）" },
+      priority: { type: "string", description: "優先順序：urgent | high | medium（預設） | low" },
+      relatedFiles: { type: "array", items: { type: "string" }, description: "相關檔案（可選）" },
+      path: { type: "string", description: "專案根路徑（預設從 session cwd 推斷；不傳會用當前工作區）" },
     },
     output: {
       schema: {
@@ -41,7 +41,7 @@ export function buildTodoAddTool({ fs, sandboxPolicy }) {
       render: (_args, value) => {
         if (value.ok) {
           const d = value.data || {};
-          return [{ type: "text", text: `dsh-project-brain: todo added [${d.priority}] ${d.title} (${d.id})，活跃待办 ${d.activeCount}` }];
+          return [{ type: "text", text: `dsh-project-brain: todo added [${d.priority}] ${d.title} (${d.id})，活躍待辦 ${d.activeCount}` }];
         }
         return [{ type: "text", text: `dsh-project-brain: todo add FAILED - ${value && value.code}: ${value && value.message}` }];
       },
@@ -58,7 +58,7 @@ export function buildTodoAddTool({ fs, sandboxPolicy }) {
         if (!wrote) return { ok: false, code: "E_WRITE_FAILED", message: "failed to write todo.jsonl" };
         await appendJsonl(fs, brainPath(projectPath, "timeline.jsonl"), {
           id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-          title: "新增待办：" + entry.title,
+          title: "新增待辦：" + entry.title,
           eventType: "todo",
           occurredAt: now,
         });
@@ -76,12 +76,12 @@ export function buildTodoListTool({ fs, sandboxPolicy }) {
   return defineTool({
     name: "project_todo_list",
     description:
-      "dsh-project-brain: 读取当前项目待办列表（默认活跃项，按优先级排序）。" +
-      "恢复开发上下文、确定下一步时调用。",
+      "dsh-project-brain: 讀取當前專案待辦列表（預設活躍項，按優先順序排序）。" +
+      "恢復開發上下文、確定下一步時呼叫。",
     parameters: {
-      status: { type: "string", description: "过滤状态（可选）：pending | in_progress | blocked | done | cancelled | all（默认活跃项）" },
-      limit: { type: "number", description: "返回条数上限，默认 20" },
-      path: { type: "string", description: "项目根路径（默认从 session cwd 推断）" },
+      status: { type: "string", description: "過濾狀態（可選）：pending | in_progress | blocked | done | cancelled | all（預設活躍項）" },
+      limit: { type: "number", description: "返回條數上限，預設 20" },
+      path: { type: "string", description: "專案根路徑（預設從 session cwd 推斷）" },
     },
     output: {
       schema: {
@@ -139,12 +139,12 @@ export function buildTodoDoneTool({ fs, sandboxPolicy }) {
   return defineTool({
     name: "project_todo_done",
     description:
-      "dsh-project-brain: 关闭一条待办（status -> done，写 timeline 事件）。" +
-      "按 todo id（支持前缀）或标题精确匹配。",
+      "dsh-project-brain: 關閉一條待辦（status -> done，寫 timeline 事件）。" +
+      "按 todo id（支援字首）或標題精確匹配。",
     parameters: {
-      id: { type: "string", description: "todo id 或其前缀（与 title 二选一）" },
-      title: { type: "string", description: "todo 标题精确匹配（与 id 二选一）" },
-      path: { type: "string", description: "项目根路径（默认从 session cwd 推断）" },
+      id: { type: "string", description: "todo id 或其字首（與 title 二選一）" },
+      title: { type: "string", description: "todo 標題精確匹配（與 id 二選一）" },
+      path: { type: "string", description: "專案根路徑（預設從 session cwd 推斷）" },
     },
     output: {
       schema: {
@@ -158,7 +158,7 @@ export function buildTodoDoneTool({ fs, sandboxPolicy }) {
       render: (_args, value) => {
         if (value.ok) {
           const d = value.data || {};
-          return [{ type: "text", text: `dsh-project-brain: todo done ✓ ${d.title}，剩余活跃 ${d.activeCount}` }];
+          return [{ type: "text", text: `dsh-project-brain: todo done ✓ ${d.title}，剩餘活躍 ${d.activeCount}` }];
         }
         return [{ type: "text", text: `dsh-project-brain: todo done FAILED - ${value && value.code}: ${value && value.message}` }];
       },
@@ -167,12 +167,12 @@ export function buildTodoDoneTool({ fs, sandboxPolicy }) {
       try {
         const projectPath = resolveProjectPath(args, exec, sandboxPolicy);
         const ref = (args && (args.id || args.title)) || "";
-        if (!ref) return { ok: false, code: "E_NO_REF", message: "id 或 title 必填一项" };
+        if (!ref) return { ok: false, code: "E_NO_REF", message: "id 或 title 必填一項" };
         const todoPath = brainPath(projectPath, "todo.jsonl");
         const todos = await readJsonl(fs, todoPath);
         const target = findTodo(todos, ref);
         if (!target) {
-          return { ok: false, code: "E_NOT_FOUND", message: "未找到匹配的活跃待办：" + ref };
+          return { ok: false, code: "E_NOT_FOUND", message: "未找到匹配的活躍待辦：" + ref };
         }
         const now = Date.now();
         for (const t of todos) {
@@ -185,7 +185,7 @@ export function buildTodoDoneTool({ fs, sandboxPolicy }) {
         if (!wrote) return { ok: false, code: "E_WRITE_FAILED", message: "failed to rewrite todo.jsonl" };
         await appendJsonl(fs, brainPath(projectPath, "timeline.jsonl"), {
           id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-          title: "完成待办：" + target.title,
+          title: "完成待辦：" + target.title,
           eventType: "todo",
           occurredAt: now,
         });

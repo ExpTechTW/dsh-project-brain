@@ -256,7 +256,7 @@ function createTokenStore({ ttlMs = DEFAULT_TTL_MS } = {}) {
   }
   return {
     /**
-     * 发放一个 confirmToken，附带 payload。
+     * 發放一個 confirmToken，附帶 payload。
      * @param {{ kind: string, payload: any }} args
      * @returns {string} token
      */
@@ -267,9 +267,9 @@ function createTokenStore({ ttlMs = DEFAULT_TTL_MS } = {}) {
       return token;
     },
     /**
-     * 校验并消费 token。成功返回 payload，失败返回 null。
+     * 校驗並消費 token。成功返回 payload，失敗返回 null。
      * @param {string} token
-     * @param {{ kind?: string }} args 期待的操作类型（可选）
+     * @param {{ kind?: string }} args 期待的操作型別（可選）
      * @returns {any} payload 或 null
      */
     consume(token, { kind } = {}) {
@@ -281,7 +281,7 @@ function createTokenStore({ ttlMs = DEFAULT_TTL_MS } = {}) {
       return entry.payload;
     },
     /**
-     * 仅校验（不消费），用于 dryRun 显示 / 调试。
+     * 僅校驗（不消費），用於 dryRun 顯示 / 除錯。
      */
     peek(token, { kind } = {}) {
       const entry = store.get(token);
@@ -293,9 +293,9 @@ function createTokenStore({ ttlMs = DEFAULT_TTL_MS } = {}) {
       }
       return entry.payload;
     },
-    /** 主动清理过期（测试 / 健康检查用） */
+    /** 主動清理過期（測試 / 健康檢查用） */
     sweep,
-    /** 当前活跃 token 数（调试用） */
+    /** 當前活躍 token 數（除錯用） */
     get size() {
       sweep();
       return store.size;
@@ -389,12 +389,12 @@ async function createBackup({ projectPath, customTs = null }) {
   try {
     brainStat = await fsp.stat(brainDir);
   } catch (e) {
-    const err = new Error("\u5F53\u524D\u9879\u76EE\u65E0\u8111\u53EF\u5907\u4EFD\uFF08.project-brain \u4E0D\u5B58\u5728\uFF09");
+    const err = new Error("\u7576\u524D\u5C08\u6848\u7121\u8166\u53EF\u5099\u4EFD\uFF08.project-brain \u4E0D\u5B58\u5728\uFF09");
     err.code = "E_BRAIN_NOT_FOUND";
     throw err;
   }
   if (!brainStat.isDirectory()) {
-    const err = new Error(".project-brain \u4E0D\u662F\u76EE\u5F55");
+    const err = new Error(".project-brain \u4E0D\u662F\u76EE\u9304");
     err.code = "E_BRAIN_NOT_FOUND";
     throw err;
   }
@@ -406,7 +406,7 @@ async function createBackup({ projectPath, customTs = null }) {
       await fsp.access(backupPath);
       attempt += 1;
       if (attempt > 50) {
-        const err = new Error("\u5907\u4EFD\u76EE\u5F55\u51B2\u7A81\u6B21\u6570\u8FC7\u591A\uFF0C\u8BF7\u7A0D\u540E\u518D\u8BD5");
+        const err = new Error("\u5099\u4EFD\u76EE\u9304\u885D\u7A81\u6B21\u6578\u904E\u591A\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66");
         err.code = "E_BACKUP_CONFLICT";
         throw err;
       }
@@ -540,7 +540,7 @@ async function cleanupBackups({
 async function previewRollback({ projectPath, backupTimestamp }) {
   const safe = assertSafeProjectPath(projectPath);
   if (!backupTimestamp || !matchBackupDir(`.project-brain.backup-${backupTimestamp}`)) {
-    const err = new Error(`\u5907\u4EFD\u65F6\u95F4\u6233\u683C\u5F0F\u65E0\u6548\uFF1A${backupTimestamp}\uFF08\u671F\u671B yyyymmdd-hhmmss-mmm\uFF0C\u517C\u5BB9\u65E7\u7248 hhmm-mmm\uFF09`);
+    const err = new Error(`\u5099\u4EFD\u6642\u9593\u6233\u683C\u5F0F\u7121\u6548\uFF1A${backupTimestamp}\uFF08\u671F\u671B yyyymmdd-hhmmss-mmm\uFF0C\u76F8\u5BB9\u820A\u7248 hhmm-mmm\uFF09`);
     err.code = "E_BACKUP_INVALID";
     throw err;
   }
@@ -550,12 +550,12 @@ async function previewRollback({ projectPath, backupTimestamp }) {
   try {
     backupStat = await fsp.stat(backupPath);
   } catch (e) {
-    const err = new Error(`\u5907\u4EFD\u4E0D\u5B58\u5728\uFF1A${backupName}`);
+    const err = new Error(`\u5099\u4EFD\u4E0D\u5B58\u5728\uFF1A${backupName}`);
     err.code = "E_BACKUP_NOT_FOUND";
     throw err;
   }
   if (!backupStat.isDirectory()) {
-    const err = new Error(`\u5907\u4EFD\u4E0D\u662F\u76EE\u5F55\uFF1A${backupName}`);
+    const err = new Error(`\u5099\u4EFD\u4E0D\u662F\u76EE\u9304\uFF1A${backupName}`);
     err.code = "E_BACKUP_INVALID";
     throw err;
   }
@@ -564,7 +564,7 @@ async function previewRollback({ projectPath, backupTimestamp }) {
   const tline = await readJsonlFile(path.join(backupPath, "timeline.jsonl"));
   const projectMeta = await readJsonFile(path.join(backupPath, "project.json"));
   if (!projectMeta || projectMeta.__error) {
-    const err = new Error(`\u5907\u4EFD\u7F3A\u5C11\u6216\u635F\u574F project.json\uFF1A${backupName}`);
+    const err = new Error(`\u5099\u4EFD\u7F3A\u5C11\u6216\u640D\u58DE project.json\uFF1A${backupName}`);
     err.code = "E_BACKUP_INVALID";
     throw err;
   }
@@ -745,7 +745,7 @@ async function collectBrainFiles(projectPath, { includeCache = true } = {}) {
             size: stat.size,
             sha256: sha,
             _buf: buf
-            // 内部用，外部不导出
+            // 內部用，外部不匯出
           });
         } catch (e) {
         }
@@ -827,13 +827,13 @@ async function buildBundleBuffer({ projectPath, pluginVersion, includeCache = tr
   const safePath = assertSafeProjectPath(projectPath);
   const projectMeta = await readJsonFile2(path2.join(safePath, ".project-brain", "project.json"));
   if (!projectMeta || projectMeta.__error) {
-    const err = new Error("\u9879\u76EE\u672A\u521D\u59CB\u5316\uFF0C\u8BF7\u5148\u8C03\u7528 project_init");
+    const err = new Error("\u5C08\u6848\u672A\u521D\u59CB\u5316\uFF0C\u8ACB\u5148\u547C\u53EB project_init");
     err.code = "E_BRAIN_NOT_FOUND";
     throw err;
   }
   const files = await collectBrainFiles(safePath, { includeCache });
   if (files.length === 0) {
-    const err = new Error(".project-brain \u76EE\u5F55\u4E3A\u7A7A");
+    const err = new Error(".project-brain \u76EE\u9304\u70BA\u7A7A");
     err.code = "E_BRAIN_EMPTY";
     throw err;
   }
@@ -888,12 +888,12 @@ async function writeBundleFile({ projectPath, outputPath, pluginVersion, include
   try {
     st = await fsp2.stat(outputPath);
   } catch (e) {
-    const err = new Error("zip \u5199\u5165\u540E\u65E0\u6CD5\u8BFB\u53D6\uFF1A" + outputPath + "\uFF08" + String(e && e.message || e) + "\uFF09");
+    const err = new Error("zip \u5BEB\u5165\u5F8C\u7121\u6CD5\u8B80\u53D6\uFF1A" + outputPath + "\uFF08" + String(e && e.message || e) + "\uFF09");
     err.code = "E_BUNDLE_WRITE_FAILED";
     throw err;
   }
   if (!st.isFile() || st.size <= 0) {
-    const err = new Error("zip \u5199\u5165\u540E\u6587\u4EF6\u65E0\u6548\uFF1A" + outputPath);
+    const err = new Error("zip \u5BEB\u5165\u5F8C\u6587\u4EF6\u7121\u6548\uFF1A" + outputPath);
     err.code = "E_BUNDLE_WRITE_FAILED";
     throw err;
   }
@@ -911,7 +911,7 @@ async function parseBundle(bundlePath) {
   try {
     buf = await fsp2.readFile(bundlePath);
   } catch (e) {
-    const err = new Error(`bundle \u6587\u4EF6\u4E0D\u5B58\u5728\u6216\u4E0D\u53EF\u8BFB\uFF1A${bundlePath}`);
+    const err = new Error(`bundle \u6A94\u6848\u4E0D\u5B58\u5728\u6216\u4E0D\u53EF\u8B80\uFF1A${bundlePath}`);
     err.code = "E_BUNDLE_NOT_FOUND";
     throw err;
   }
@@ -919,7 +919,7 @@ async function parseBundle(bundlePath) {
   try {
     files = await parseZip(buf);
   } catch (e) {
-    const err = new Error("bundle \u6587\u4EF6\u635F\u574F\u6216\u683C\u5F0F\u65E0\u6548");
+    const err = new Error("bundle \u6A94\u6848\u640D\u58DE\u6216\u683C\u5F0F\u7121\u6548");
     err.code = "E_BUNDLE_INVALID";
     err.detail = e.message;
     throw err;
@@ -935,14 +935,14 @@ async function parseBundle(bundlePath) {
   try {
     manifest = JSON.parse(manifestEntry.data.toString("utf8"));
   } catch (e) {
-    const err = new Error("bundle manifest.json \u89E3\u6790\u5931\u8D25");
+    const err = new Error("bundle manifest.json \u89E3\u6790\u5931\u6557");
     err.code = "E_BUNDLE_INVALID";
     err.detail = e.message;
     throw err;
   }
   if (!manifest.schemaVersion || manifest.schemaVersion > BUNDLE_SCHEMA_VERSION) {
     const err = new Error(
-      `bundle \u7531\u66F4\u65B0\u7248\u672C dsh-project-brain v${manifest.pluginVersion || "?"} \u5BFC\u51FA\uFF0C\u5F53\u524D\u63D2\u4EF6\u4EC5\u652F\u6301 schemaVersion<=${BUNDLE_SCHEMA_VERSION}\uFF0C\u8BF7\u5148\u5347\u7EA7\u63D2\u4EF6\u518D\u5BFC\u5165\u3002`
+      `bundle \u7531\u66F4\u65B0\u7248\u672C dsh-project-brain v${manifest.pluginVersion || "?"} \u532F\u51FA\uFF0C\u7576\u524D\u5916\u639B\u50C5\u652F\u63F4 schemaVersion<=${BUNDLE_SCHEMA_VERSION}\uFF0C\u8ACB\u5148\u5347\u7D1A\u5916\u639B\u518D\u532F\u5165\u3002`
     );
     err.code = "E_BUNDLE_SCHEMA_UNSUPPORTED";
     err.detail = `bundle.schemaVersion=${manifest.schemaVersion}, supported<=${BUNDLE_SCHEMA_VERSION}`;
@@ -952,7 +952,7 @@ async function parseBundle(bundlePath) {
   for (const f of files) {
     const zipName = String(f.name || "").replace(/\\/g, "/");
     if (!isSafeBundleEntry(zipName)) {
-      const err = new Error("bundle \u542B\u6709\u975E\u6CD5\u8DEF\u5F84\uFF08\u7981\u6B62\u5199\u5230 .project-brain/ \u4E4B\u5916\uFF09\uFF1A" + zipName);
+      const err = new Error("bundle \u542B\u6709\u975E\u6CD5\u8DEF\u5F91\uFF08\u7981\u6B62\u5BEB\u5230 .project-brain/ \u4E4B\u5916\uFF09\uFF1A" + zipName);
       err.code = "E_BUNDLE_INVALID";
       err.detail = "zip-slip:" + zipName;
       throw err;
@@ -962,7 +962,7 @@ async function parseBundle(bundlePath) {
     const relInside = zipName.replace(/^\.project-brain\//, "");
     const expected = manifest.checksum && manifest.checksum.files && manifest.checksum.files[relInside];
     if (expected && expected !== sha) {
-      const err = new Error(`bundle \u6587\u4EF6 ${relInside} \u6821\u9A8C\u548C\u4E0D\u4E00\u81F4`);
+      const err = new Error(`bundle \u6A94\u6848 ${relInside} \u6821\u9A57\u548C\u4E0D\u4E00\u81F4`);
       err.code = "E_BUNDLE_CHECKSUM_MISMATCH";
       err.detail = `expected=${expected}, actual=${sha}`;
       throw err;
@@ -1500,7 +1500,7 @@ var IGNORE_DIRS = /* @__PURE__ */ new Set([
   ".cache",
   "out",
   ".project-brain"
-  // 自身的项目脑数据目录，不应被扫
+  // 自身的專案腦資料目錄，不應被掃
 ]);
 function shouldIgnoreDir(name2) {
   return IGNORE_DIRS.has(name2) || /^node_modules(?:[._-].*)?$/i.test(name2) || /(?:^|[._-])backup(?:[._-]|$)/i.test(name2) || /\.bak(?:[._-]|$)/i.test(name2);
@@ -1706,7 +1706,7 @@ var STACK_POPULARITY = {
   // === payment ===
   "Stripe": 90,
   "PayPal": 50,
-  // === ai（v1.2.x patch #4：AI/ML 框架提升到主视野）===
+  // === ai（v1.2.x patch #4：AI/ML 框架提升到主視野）===
   "LangChain": 90,
   "LangGraph": 88,
   "LlamaIndex": 75,
@@ -2033,7 +2033,7 @@ async function fallbackScanImports(fs, rootTarget, result) {
     for (const [hint, field] of Object.entries(IMPORT_HINTS)) {
       const esc = hint.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       const patterns = [
-        // 1) Python: import foo (后跟空白/; /行尾)
+        // 1) Python: import foo (後跟空白/; /行尾)
         new RegExp(`(?:^|\\s)import\\s+['"]?` + esc + `['"]?(?:\\s*as\\s+\\w+|\\s|;|$)`, "m"),
         // 2) Python: from foo import / from foo.bar import
         new RegExp(`(?:^|\\s)from\\s+['"]?` + esc + `(?:\\.\\w+)?['"]?\\s+import`, "m"),
@@ -2113,7 +2113,7 @@ function sanitizeProjectDescription(value) {
 function isMeaningfulDescription(value) {
   const text = String(value || "").trim();
   if (text.length < 12) return false;
-  if (/^(?:english|中文|简体中文|繁體中文|docs?|documentation|homepage)(?:\s*[|·/]\s*(?:english|中文|简体中文|繁體中文|docs?|documentation|homepage))*$/i.test(text)) return false;
+  if (/^(?:english|中文|簡體中文|繁體中文|docs?|documentation|homepage)(?:\s*[|·/]\s*(?:english|中文|簡體中文|繁體中文|docs?|documentation|homepage))*$/i.test(text)) return false;
   const chinese = (text.match(/[\u3400-\u9fff]/g) || []).length;
   const words = (text.match(/[A-Za-z0-9][A-Za-z0-9'_-]*/g) || []).length;
   return chinese >= 6 || words >= 3;
@@ -2198,14 +2198,14 @@ async function scanProject(fs, projectPath) {
     projectName: null,
     description: null,
     techStack: {},
-    // 老 schema（保留向后兼容）
+    // 老 schema（保留向後相容）
     stack: {},
-    // 新 schema（主视野：框架/中间件/运行时）
+    // 新 schema（主視野：框架/中介軟體/執行時）
     structure: [],
-    // 代码结构标签（Monorepo/Cargo Workspace）单独
+    // 程式碼結構標籤（Monorepo/Cargo Workspace）單獨
     languages: {},
     tooling: [],
-    // 工程工具（构建/Lint/测试/类型/包管理）
+    // 工程工具（構建/Lint/測試/型別/包管理）
     fileCount: 0,
     topLevel: [],
     entrypoints: [],
@@ -3610,13 +3610,13 @@ var SOURCE_EXTENSIONS = /\.(?:[cm]?[jt]sx?|py|go|java|kt|kts|rs|cs|php|rb|swift|
 var MANIFEST_NAMES = /^(?:package\.json|pyproject\.toml|requirements\.txt|go\.mod|pom\.xml|build\.gradle(?:\.kts)?|cargo\.toml|docker-compose\.ya?ml|compose\.ya?ml|dockerfile|makefile|pnpm-workspace\.yaml|turbo\.json|nx\.json)$/i;
 var README_NAMES = /^readme(?:\.[a-z0-9]+)?$/i;
 var ROLES = [
-  { id: "presentation", name: "\u4EA4\u4E92\u4E0E\u5C55\u793A\u5C42", kind: "presentation", order: 0, match: /(?:^|\/)(?:client|frontend|web|ui|views?|pages?|components?|screens?)(?:\/|\.|$)/i },
-  { id: "interface", name: "\u63A5\u53E3\u4E0E\u63A5\u5165\u5C42", kind: "interface", order: 1, match: /(?:^|\/)(?:api|routes?|controllers?|handlers?|rpc|commands?|cli|gateway)(?:\/|\.|$)/i },
-  { id: "application", name: "\u5E94\u7528\u7F16\u6392\u5C42", kind: "application", order: 2, match: /(?:^|\/)(?:services?|use-?cases?|application|agents?|tools?|workflows?|orchestrators?)(?:\/|\.|$)/i },
-  { id: "domain", name: "\u6838\u5FC3\u9886\u57DF\u5C42", kind: "domain", order: 3, match: /(?:^|\/)(?:core|domain|engine|business|analysis|scanner|parser|compiler)(?:\/|\.|$)/i },
-  { id: "data", name: "\u6570\u636E\u4E0E\u8BB0\u5FC6\u5C42", kind: "data", order: 4, match: /(?:^|\/)(?:data|db|database|models?|schemas?|repositories?|stores?|storage|memory|cache|migrations?)(?:\/|\.|$)/i },
-  { id: "integration", name: "\u5E73\u53F0\u4E0E\u5916\u90E8\u96C6\u6210\u5C42", kind: "integration", order: 5, match: /(?:^|\/)(?:host|integrations?|adapters?|providers?|connectors?|plugins?|infra|runtime)(?:\/|\.|$)/i },
-  { id: "support", name: "\u5DE5\u7A0B\u652F\u6491", kind: "support", order: 6, match: /(?:^|\/)(?:tests?|specs?|fixtures?|scripts?|build|config|deploy)(?:\/|\.|$)/i }
+  { id: "presentation", name: "\u4E92\u52D5\u8207\u5C55\u793A\u5C64", kind: "presentation", order: 0, match: /(?:^|\/)(?:client|frontend|web|ui|views?|pages?|components?|screens?)(?:\/|\.|$)/i },
+  { id: "interface", name: "\u4ECB\u9762\u8207\u63A5\u5165\u5C64", kind: "interface", order: 1, match: /(?:^|\/)(?:api|routes?|controllers?|handlers?|rpc|commands?|cli|gateway)(?:\/|\.|$)/i },
+  { id: "application", name: "\u61C9\u7528\u7DE8\u6392\u5C64", kind: "application", order: 2, match: /(?:^|\/)(?:services?|use-?cases?|application|agents?|tools?|workflows?|orchestrators?)(?:\/|\.|$)/i },
+  { id: "domain", name: "\u6838\u5FC3\u9818\u57DF\u5C64", kind: "domain", order: 3, match: /(?:^|\/)(?:core|domain|engine|business|analysis|scanner|parser|compiler)(?:\/|\.|$)/i },
+  { id: "data", name: "\u8CC7\u6599\u8207\u8A18\u61B6\u5C64", kind: "data", order: 4, match: /(?:^|\/)(?:data|db|database|models?|schemas?|repositories?|stores?|storage|memory|cache|migrations?)(?:\/|\.|$)/i },
+  { id: "integration", name: "\u5E73\u81FA\u8207\u5916\u90E8\u6574\u5408\u5C64", kind: "integration", order: 5, match: /(?:^|\/)(?:host|integrations?|adapters?|providers?|connectors?|plugins?|infra|runtime)(?:\/|\.|$)/i },
+  { id: "support", name: "\u5DE5\u7A0B\u652F\u6490", kind: "support", order: 6, match: /(?:^|\/)(?:tests?|specs?|fixtures?|scripts?|build|config|deploy)(?:\/|\.|$)/i }
 ];
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -3722,18 +3722,18 @@ function roleForFile(file) {
 }
 function friendlyComponentName(role, files) {
   const hints = files.join(" ").toLowerCase();
-  if (role.id === "presentation") return /client|web|page|component/.test(hints) ? "\u7528\u6237\u754C\u9762\u4E0E\u53EF\u89C6\u5316" : "\u4EA4\u4E92\u5C55\u793A";
-  if (role.id === "interface") return /rpc/.test(hints) ? "\u8FD0\u884C\u65F6 RPC \u63A5\u53E3" : /cli|command/.test(hints) ? "\u547D\u4EE4\u4E0E\u63A5\u5165\u63A5\u53E3" : "\u63A5\u53E3\u9002\u914D";
-  if (role.id === "application") return /tool/.test(hints) ? "\u9879\u76EE\u80FD\u529B\u5DE5\u5177\u96C6" : /agent/.test(hints) ? "Agent \u7F16\u6392" : "\u5E94\u7528\u670D\u52A1\u7F16\u6392";
-  if (role.id === "domain") return /scan|analy|parser/.test(hints) ? "\u9879\u76EE\u5206\u6790\u5F15\u64CE" : "\u6838\u5FC3\u4E1A\u52A1\u5F15\u64CE";
-  if (role.id === "data") return /memory/.test(hints) ? "\u9879\u76EE\u8BB0\u5FC6\u4E0E\u68C0\u7D22" : "\u9879\u76EE\u6570\u636E\u5B58\u50A8";
-  if (role.id === "integration") return /host|plugin/.test(hints) ? "DSH Host \u96C6\u6210" : "\u5E73\u53F0\u4E0E\u5916\u90E8\u670D\u52A1\u96C6\u6210";
-  return "\u6784\u5EFA\u3001\u6D4B\u8BD5\u4E0E\u53D1\u5E03";
+  if (role.id === "presentation") return /client|web|page|component/.test(hints) ? "\u4F7F\u7528\u8005\u4ECB\u9762\u8207\u8996\u89BA\u5316" : "\u4E92\u52D5\u5C55\u793A";
+  if (role.id === "interface") return /rpc/.test(hints) ? "\u57F7\u884C\u6642 RPC \u4ECB\u9762" : /cli|command/.test(hints) ? "\u547D\u4EE4\u8207\u63A5\u5165\u4ECB\u9762" : "\u4ECB\u9762\u9069\u914D";
+  if (role.id === "application") return /tool/.test(hints) ? "\u5C08\u6848\u80FD\u529B\u5DE5\u5177\u96C6" : /agent/.test(hints) ? "Agent \u7DE8\u6392" : "\u61C9\u7528\u670D\u52D9\u7DE8\u6392";
+  if (role.id === "domain") return /scan|analy|parser/.test(hints) ? "\u5C08\u6848\u5206\u6790\u5F15\u64CE" : "\u6838\u5FC3\u696D\u52D9\u5F15\u64CE";
+  if (role.id === "data") return /memory/.test(hints) ? "\u5C08\u6848\u8A18\u61B6\u8207\u6AA2\u7D22" : "\u5C08\u6848\u8CC7\u6599\u5132\u5B58";
+  if (role.id === "integration") return /host|plugin/.test(hints) ? "DSH Host \u6574\u5408" : "\u5E73\u81FA\u8207\u5916\u90E8\u670D\u52D9\u6574\u5408";
+  return "\u69CB\u5EFA\u3001\u6E2C\u8A66\u8207\u91CB\u51FA";
 }
 function localPurpose(scan) {
   if (scan.description) return cleanText(scan.description, 800);
   const stacks = Object.values(scan.techStack || {}).filter(Boolean);
-  return (scan.projectName || "\u8BE5\u9879\u76EE") + (stacks.length ? " \u662F\u4E00\u4E2A\u57FA\u4E8E " + stacks.join("\u3001") + " \u7684\u8F6F\u4EF6\u9879\u76EE\u3002" : " \u662F\u4E00\u4E2A\u8F6F\u4EF6\u9879\u76EE\uFF0C\u53EF\u4ECE\u5165\u53E3\u4E0E\u6838\u5FC3\u7EC4\u4EF6\u7EE7\u7EED\u4E86\u89E3\u5176\u804C\u8D23\u3002");
+  return (scan.projectName || "\u8A72\u5C08\u6848") + (stacks.length ? " \u662F\u4E00\u500B\u57FA\u65BC " + stacks.join("\u3001") + " \u7684\u8EDF\u9AD4\u5C08\u6848\u3002" : " \u662F\u4E00\u500B\u8EDF\u9AD4\u5C08\u6848\uFF0C\u53EF\u5F9E\u5165\u53E3\u8207\u6838\u5FC3\u5143\u4EF6\u7E7C\u7E8C\u77AD\u89E3\u5176\u8077\u8CAC\u3002");
 }
 function withAliases(architecture) {
   return {
@@ -3757,25 +3757,25 @@ function buildLocalArchitecture(scan, evidence, previous, config) {
       name: friendlyComponentName(role, files),
       layerId: "layer-" + role.id,
       type: role.kind,
-      responsibility: role.name + "\uFF1A" + (facts.flatMap((fact) => fact.symbols).slice(0, 5).map((item) => item.name).join("\u3001") || "\u627F\u8F7D\u76F8\u5173\u9879\u76EE\u80FD\u529B"),
-      details: "\u7531 " + files.length + " \u4E2A\u5173\u952E\u6E90\u7801\u6587\u4EF6\u5F52\u7EB3\uFF1B\u76EE\u5F55\u53EA\u4F5C\u4E3A\u5206\u6790\u8BC1\u636E\u3002",
+      responsibility: role.name + "\uFF1A" + (facts.flatMap((fact) => fact.symbols).slice(0, 5).map((item) => item.name).join("\u3001") || "\u627F\u8F09\u76F8\u95DC\u5C08\u6848\u80FD\u529B"),
+      details: "\u7531 " + files.length + " \u500B\u95DC\u9375\u539F\u59CB\u78BC\u6A94\u6848\u6B78\u7D0D\uFF1B\u76EE\u9304\u53EA\u4F5C\u70BA\u5206\u6790\u8B49\u64DA\u3002",
       technologies: [...new Set(facts.map((fact) => fact.language))].filter((item) => item !== "other"),
       importantFiles: files.slice(0, 6),
       evidencePaths: files.slice(0, 12),
       confidence: 0.62
     };
   });
-  if (!components.length) components.push({ id: "component-project", name: "\u9879\u76EE\u4E3B\u4F53", layerId: "layer-domain", type: "domain", responsibility: "\u9879\u76EE\u6838\u5FC3\u80FD\u529B", details: "\u672A\u68C0\u6D4B\u5230\u53EF\u5206\u6790\u6E90\u7801\u3002", technologies: [], importantFiles: [], evidencePaths: [], confidence: 0.35 });
+  if (!components.length) components.push({ id: "component-project", name: "\u5C08\u6848\u4E3B\u9AD4", layerId: "layer-domain", type: "domain", responsibility: "\u5C08\u6848\u6838\u5FC3\u80FD\u529B", details: "\u672A\u6AA2\u6E2C\u5230\u53EF\u5206\u6790\u539F\u59CB\u78BC\u3002", technologies: [], importantFiles: [], evidencePaths: [], confidence: 0.35 });
   const componentIds = new Set(components.map((item) => item.id));
   const layers = ROLES.filter((role) => componentIds.has("component-" + role.id)).map((role) => ({ id: "layer-" + role.id, name: role.name, responsibility: role.name, order: role.order }));
-  if (!layers.length) layers.push({ id: "layer-domain", name: "\u6838\u5FC3\u9886\u57DF\u5C42", responsibility: "\u9879\u76EE\u6838\u5FC3\u80FD\u529B", order: 0 });
+  if (!layers.length) layers.push({ id: "layer-domain", name: "\u6838\u5FC3\u9818\u57DF\u5C64", responsibility: "\u5C08\u6848\u6838\u5FC3\u80FD\u529B", order: 0 });
   const relationships = [];
-  for (let i = 0; i < components.length - 1; i++) relationships.push({ id: "relation-local-" + (i + 1), from: components[i].id, to: components[i + 1].id, label: "\u8C03\u7528/\u534F\u4F5C", type: "uses", description: "\u4F9D\u636E\u5E38\u89C1\u5206\u5C42\u65B9\u5411\u63A8\u65AD\uFF0C\u9700\u7ED3\u5408\u4EE3\u7801\u9A8C\u8BC1", confidence: 0.42 });
-  const keyFiles = evidence.sourceFacts.slice(0, 12).map((fact) => ({ path: fact.file, role: fact.symbols.length ? "\u5B9A\u4E49 " + fact.symbols.slice(0, 4).map((item) => item.name).join("\u3001") : "\u5173\u952E\u5B9E\u73B0\u6587\u4EF6", whyImportant: fact.imports.length ? "\u8FDE\u63A5 " + fact.imports.slice(0, 4).join("\u3001") : "\u4F4D\u4E8E\u9879\u76EE\u5165\u53E3\u6216\u6838\u5FC3\u5B9E\u73B0\u8DEF\u5F84", category: roleForFile(fact.file).kind }));
+  for (let i = 0; i < components.length - 1; i++) relationships.push({ id: "relation-local-" + (i + 1), from: components[i].id, to: components[i + 1].id, label: "\u547C\u53EB/\u5354\u4F5C", type: "uses", description: "\u4F9D\u64DA\u5E38\u898B\u5206\u5C64\u65B9\u5411\u63A8\u65B7\uFF0C\u9700\u7D50\u5408\u7A0B\u5F0F\u78BC\u9A57\u8B49", confidence: 0.42 });
+  const keyFiles = evidence.sourceFacts.slice(0, 12).map((fact) => ({ path: fact.file, role: fact.symbols.length ? "\u5B9A\u7FA9 " + fact.symbols.slice(0, 4).map((item) => item.name).join("\u3001") : "\u95DC\u9375\u5BE6\u73FE\u6A94\u6848", whyImportant: fact.imports.length ? "\u9023\u7DDA " + fact.imports.slice(0, 4).join("\u3001") : "\u4F4D\u65BC\u5C08\u6848\u5165\u53E3\u6216\u6838\u5FC3\u5BE6\u73FE\u8DEF\u5F91", category: roleForFile(fact.file).kind }));
   const fingerprint2 = hashText(JSON.stringify({ files: evidence.sourceFacts.map((fact) => [fact.file, fact.hash, fact.imports]), manifests: evidence.manifests.map((item) => [item.path, item.hash]), readme: hashText(evidence.readme && evidence.readme.content), techStack: scan.techStack }));
   const changed = !previous || previous.schemaVersion !== 2 || previous.fingerprint !== fingerprint2;
-  const overview = { purpose: localPurpose(scan), audience: "\u9879\u76EE\u5F00\u53D1\u4E0E\u7EF4\u62A4\u4EBA\u5458", category: Object.values(scan.techStack || {})[0] || "\u8F6F\u4EF6\u9879\u76EE", architectureStyle: layers.length >= 3 ? "\u5206\u5C42\u67B6\u6784\uFF08\u672C\u5730\u63A8\u65AD\uFF09" : "\u6A21\u5757\u5316\u67B6\u6784\uFF08\u672C\u5730\u63A8\u65AD\uFF09", value: "\u5E2E\u52A9\u5F00\u53D1\u8005\u7406\u89E3\u9879\u76EE\u5165\u53E3\u3001\u6838\u5FC3\u80FD\u529B\u548C\u534F\u4F5C\u8FB9\u754C\u3002" };
-  const runtimeFlows = components.length >= 2 ? [{ id: "flow-main", name: "\u4E3B\u8981\u6267\u884C\u94FE\u8DEF\uFF08\u672C\u5730\u63A8\u65AD\uFF09", trigger: "\u7528\u6237\u6216\u5BBF\u4E3B\u89E6\u53D1\u9879\u76EE\u80FD\u529B", outcome: "\u6838\u5FC3\u80FD\u529B\u5B8C\u6210\u5E76\u8BFB\u5199\u9879\u76EE\u6570\u636E", steps: components.map((component, index) => ({ componentId: component.id, action: index === 0 ? "\u63A5\u6536\u8BF7\u6C42" : index === components.length - 1 ? "\u5B8C\u6210\u5904\u7406" : "\u5904\u7406\u5E76\u4F20\u9012" })) }] : [];
+  const overview = { purpose: localPurpose(scan), audience: "\u5C08\u6848\u958B\u767C\u8207\u7DAD\u8B77\u4EBA\u54E1", category: Object.values(scan.techStack || {})[0] || "\u8EDF\u9AD4\u5C08\u6848", architectureStyle: layers.length >= 3 ? "\u5206\u5C64\u67B6\u69CB\uFF08\u672C\u5730\u63A8\u65B7\uFF09" : "\u6A21\u7D44\u5316\u67B6\u69CB\uFF08\u672C\u5730\u63A8\u65B7\uFF09", value: "\u5E6B\u52A9\u958B\u767C\u8005\u7406\u89E3\u5C08\u6848\u5165\u53E3\u3001\u6838\u5FC3\u80FD\u529B\u548C\u5354\u4F5C\u908A\u754C\u3002" };
+  const runtimeFlows = components.length >= 2 ? [{ id: "flow-main", name: "\u4E3B\u8981\u57F7\u884C\u93C8\u8DEF\uFF08\u672C\u5730\u63A8\u65B7\uFF09", trigger: "\u4F7F\u7528\u8005\u6216\u5BBF\u4E3B\u89F8\u767C\u5C08\u6848\u80FD\u529B", outcome: "\u6838\u5FC3\u80FD\u529B\u5B8C\u6210\u4E26\u8B80\u5BEB\u5C08\u6848\u8CC7\u6599", steps: components.map((component, index) => ({ componentId: component.id, action: index === 0 ? "\u63A5\u6536\u8ACB\u6C42" : index === components.length - 1 ? "\u5B8C\u6210\u8655\u7406" : "\u8655\u7406\u4E26\u50B3\u905E" })) }] : [];
   return withAliases({
     schemaVersion: 2,
     version: previous && previous.version && changed ? previous.version + 1 : previous && previous.version || 1,
@@ -3791,7 +3791,7 @@ function buildLocalArchitecture(scan, evidence, previous, config) {
     relationships,
     runtimeFlows,
     keyFiles,
-    gettingStarted: ["\u5148\u9605\u8BFB README \u4E0E\u9879\u76EE\u6E05\u5355", "\u4ECE\u5165\u53E3\u6587\u4EF6\u8DDF\u8E2A\u4E3B\u8981\u8FD0\u884C\u94FE\u8DEF", "\u7ED3\u5408\u5173\u952E\u6587\u4EF6\u7406\u89E3\u6570\u636E\u4E0E\u5E73\u53F0\u8FB9\u754C"],
+    gettingStarted: ["\u5148\u95B1\u8B80 README \u8207\u5C08\u6848\u6E05\u55AE", "\u5F9E\u5165\u53E3\u6A94\u6848\u8DDF\u8E64\u4E3B\u8981\u57F7\u884C\u93C8\u8DEF", "\u7D50\u5408\u95DC\u9375\u6A94\u6848\u7406\u89E3\u8CC7\u6599\u8207\u5E73\u81FA\u908A\u754C"],
     designHighlights: [],
     risks: [],
     evidence: { readmeUsed: Boolean(evidence.readme && evidence.readme.content), manifestFiles: evidence.manifests.map((item) => item.path), sourceFilesAnalyzed: evidence.sourceFacts.length, sourceSnippetsShared: false },
@@ -3892,7 +3892,7 @@ function strings(value, max, limit) {
 function parseLlmArchitecture(text, base, knownFiles) {
   const parsed = parseArchitectureJson(text);
   const rawLayers = Array.isArray(parsed.layers) ? parsed.layers : [];
-  const layers = rawLayers.slice(0, 10).map((item, index) => ({ id: "layer-" + safeId(item.id || item.name || index + 1), name: cleanText(item.name, 80) || "\u67B6\u6784\u5C42 " + (index + 1), responsibility: cleanText(item.responsibility, 500), order: index }));
+  const layers = rawLayers.slice(0, 10).map((item, index) => ({ id: "layer-" + safeId(item.id || item.name || index + 1), name: cleanText(item.name, 80) || "\u67B6\u69CB\u5C64 " + (index + 1), responsibility: cleanText(item.responsibility, 500), order: index }));
   if (!layers.length) throw Object.assign(new Error("LLM architecture has no layers"), { code: "ARCHITECTURE_LLM_SCHEMA" });
   const layerByRaw = /* @__PURE__ */ new Map();
   rawLayers.slice(0, 10).forEach((item, index) => [item && item.id, item && item.name, layers[index].id].filter(Boolean).forEach((key) => layerByRaw.set(String(key), layers[index].id)));
@@ -3901,7 +3901,7 @@ function parseLlmArchitecture(text, base, knownFiles) {
   const components = rawComponents.slice(0, 18).map((item, index) => {
     const evidencePaths = strings(item.evidencePaths, 12, 240).filter((path7) => known.has(path7));
     const importantFiles = strings(item.importantFiles, 8, 240).filter((path7) => known.has(path7));
-    return { id: "component-" + safeId(item.id || item.name || index + 1), name: cleanText(item.name, 100) || "\u6838\u5FC3\u7EC4\u4EF6 " + (index + 1), layerId: layerByRaw.get(String(item.layerId || item.layer || "")) || layers[Math.min(index, layers.length - 1)].id, type: cleanText(item.type, 40) || "component", responsibility: cleanText(item.responsibility, 700), details: cleanText(item.details, 1200), technologies: strings(item.technologies, 10, 80), importantFiles: importantFiles.length ? importantFiles : evidencePaths.slice(0, 5), evidencePaths, confidence: clamp(Number(item.confidence) || 0.78, 0.2, 1) };
+    return { id: "component-" + safeId(item.id || item.name || index + 1), name: cleanText(item.name, 100) || "\u6838\u5FC3\u5143\u4EF6 " + (index + 1), layerId: layerByRaw.get(String(item.layerId || item.layer || "")) || layers[Math.min(index, layers.length - 1)].id, type: cleanText(item.type, 40) || "component", responsibility: cleanText(item.responsibility, 700), details: cleanText(item.details, 1200), technologies: strings(item.technologies, 10, 80), importantFiles: importantFiles.length ? importantFiles : evidencePaths.slice(0, 5), evidencePaths, confidence: clamp(Number(item.confidence) || 0.78, 0.2, 1) };
   }).filter((item) => item.name && item.responsibility);
   if (components.length < 2) throw Object.assign(new Error("LLM architecture has too few components"), { code: "ARCHITECTURE_LLM_SCHEMA" });
   const componentIds = new Set(components.map((item) => item.id));
@@ -3909,8 +3909,8 @@ function parseLlmArchitecture(text, base, knownFiles) {
   rawComponents.slice(0, 18).forEach((item, index) => {
     if (components[index]) [item && item.id, item && item.name, components[index].id].filter(Boolean).forEach((key) => rawToId.set(String(key), components[index].id));
   });
-  const relationships = (Array.isArray(parsed.relationships) ? parsed.relationships : []).slice(0, 36).map((item, index) => ({ id: "relation-" + (index + 1), from: rawToId.get(String(item.from || "")), to: rawToId.get(String(item.to || "")), label: cleanText(item.label, 80) || "\u8C03\u7528", type: cleanText(item.type, 40) || "uses", description: cleanText(item.description, 500), confidence: clamp(Number(item.confidence) || 0.75, 0.2, 1) })).filter((item) => componentIds.has(item.from) && componentIds.has(item.to) && item.from !== item.to);
-  const runtimeFlows = (Array.isArray(parsed.runtimeFlows) ? parsed.runtimeFlows : []).slice(0, 8).map((flow, index) => ({ id: "flow-" + (index + 1), name: cleanText(flow.name, 100) || "\u8FD0\u884C\u6D41\u7A0B " + (index + 1), trigger: cleanText(flow.trigger, 400), outcome: cleanText(flow.outcome, 400), steps: (Array.isArray(flow.steps) ? flow.steps : []).slice(0, 12).map((step) => ({ componentId: rawToId.get(String(step.componentId || step.component || "")), action: cleanText(step.action, 400), file: known.has(step.file) ? step.file : null })).filter((step) => componentIds.has(step.componentId)) })).filter((flow) => flow.steps.length >= 2);
+  const relationships = (Array.isArray(parsed.relationships) ? parsed.relationships : []).slice(0, 36).map((item, index) => ({ id: "relation-" + (index + 1), from: rawToId.get(String(item.from || "")), to: rawToId.get(String(item.to || "")), label: cleanText(item.label, 80) || "\u547C\u53EB", type: cleanText(item.type, 40) || "uses", description: cleanText(item.description, 500), confidence: clamp(Number(item.confidence) || 0.75, 0.2, 1) })).filter((item) => componentIds.has(item.from) && componentIds.has(item.to) && item.from !== item.to);
+  const runtimeFlows = (Array.isArray(parsed.runtimeFlows) ? parsed.runtimeFlows : []).slice(0, 8).map((flow, index) => ({ id: "flow-" + (index + 1), name: cleanText(flow.name, 100) || "\u57F7\u884C\u6D41\u7A0B " + (index + 1), trigger: cleanText(flow.trigger, 400), outcome: cleanText(flow.outcome, 400), steps: (Array.isArray(flow.steps) ? flow.steps : []).slice(0, 12).map((step) => ({ componentId: rawToId.get(String(step.componentId || step.component || "")), action: cleanText(step.action, 400), file: known.has(step.file) ? step.file : null })).filter((step) => componentIds.has(step.componentId)) })).filter((flow) => flow.steps.length >= 2);
   const keyFiles = (Array.isArray(parsed.keyFiles) ? parsed.keyFiles : []).slice(0, 16).map((item) => ({ path: cleanText(item.path, 240), role: cleanText(item.role, 300), whyImportant: cleanText(item.whyImportant, 600), category: cleanText(item.category, 50) })).filter((item) => known.has(item.path));
   const overviewInput = parsed.overview || {};
   const result = { ...base, source: "hybrid", overview: { purpose: cleanText(overviewInput.purpose, 1200) || base.overview.purpose, audience: cleanText(overviewInput.audience, 500) || base.overview.audience, category: cleanText(overviewInput.category, 160) || base.overview.category, architectureStyle: cleanText(overviewInput.architectureStyle, 300) || base.overview.architectureStyle, value: cleanText(overviewInput.value, 800) || base.overview.value }, summary: cleanText(parsed.summary, 1600) || cleanText(overviewInput.purpose, 1200) || base.summary, layers, components, relationships, runtimeFlows, keyFiles: keyFiles.length ? keyFiles : base.keyFiles, gettingStarted: strings(parsed.gettingStarted, 8, 600), designHighlights: strings(parsed.designHighlights, 10, 600), risks: strings(parsed.risks, 10, 600) };
@@ -3920,19 +3920,19 @@ function parseLlmArchitecture(text, base, knownFiles) {
 function llmPrompt(base, evidence, includeSource) {
   const payload = { project: base.project, localOverview: base.overview, readme: evidence.readme ? { path: evidence.readme.path, content: evidence.readme.content } : null, manifests: evidence.manifests.slice(0, 8).map((item) => ({ path: item.path, content: item.content })), sourceFacts: evidence.sourceFacts.slice(0, 24).map((fact) => ({ path: fact.file, language: fact.language, imports: fact.imports, symbols: fact.symbols, ...includeSource ? { excerpt: fact.excerpt } : {} })), entrypoints: base.project.entrypoints, techStack: base.project.techStack };
   return [
-    "\u4F60\u662F\u4E00\u540D\u8D44\u6DF1\u8F6F\u4EF6\u67B6\u6784\u5E08\u3002\u76EE\u6807\u662F\u8BA9\u7B2C\u4E00\u6B21\u63A5\u89E6\u4ED3\u5E93\u7684\u5F00\u53D1\u8005\u5728\u51E0\u5206\u949F\u5185\u7406\u89E3\u7CFB\u7EDF\u8BBE\u8BA1\uFF0C\u800C\u4E0D\u662F\u590D\u8FF0\u76EE\u5F55\u6811\u3002",
-    "\u56DE\u7B54\u9879\u76EE\u505A\u4EC0\u4E48\u3001\u670D\u52A1\u8C01\u3001\u91C7\u7528\u4EC0\u4E48\u67B6\u6784\u98CE\u683C\u3001\u6709\u54EA\u4E9B\u6982\u5FF5\u5C42\u548C\u6838\u5FC3\u7EC4\u4EF6\u3001\u7EC4\u4EF6\u5982\u4F55\u534F\u4F5C\u3001\u4E3B\u8981\u8FD0\u884C\u6D41\u7A0B\u3001\u5173\u952E\u6587\u4EF6\u3001\u8BBE\u8BA1\u4EAE\u70B9\u4E0E\u98CE\u9669\u3002",
-    "\u89C4\u5219\uFF1A\u7EC4\u4EF6\u5FC5\u987B\u662F\u6709\u804C\u8D23\u7684\u6982\u5FF5\u7EC4\u4EF6\uFF0C\u7981\u6B62\u628A src\u3001packages/foo\u3001scripts \u7B49\u76EE\u5F55\u540D\u76F4\u63A5\u5F53\u7EC4\u4EF6\u540D\uFF1B\u8DEF\u5F84\u53EA\u80FD\u4F5C\u4E3A evidencePaths/importantFiles/keyFiles \u8BC1\u636E\u3002\u5FFD\u7565 vendor\u3001\u5907\u4EFD\u3001\u751F\u6210\u7269\u548C\u6D4B\u8BD5\u5939\u5177\u5E72\u6270\u3002\u53EA\u9648\u8FF0\u8BC1\u636E\u652F\u6301\u7684\u5185\u5BB9\u3002\u8F93\u51FA\u4E2D\u6587\u4E25\u683C JSON\uFF0C\u4E0D\u8981 Markdown/HTML/Mermaid\u3002",
-    "JSON \u683C\u5F0F\uFF1A" + JSON.stringify({ overview: { purpose: "\u9879\u76EE\u89E3\u51B3\u4EC0\u4E48\u95EE\u9898", audience: "\u4F7F\u7528\u8005", category: "\u9879\u76EE\u7C7B\u578B", architectureStyle: "\u67B6\u6784\u98CE\u683C", value: "\u6838\u5FC3\u4EF7\u503C" }, summary: "\u6574\u4F53\u67B6\u6784\u8BF4\u660E", layers: [{ id: "interface", name: "\u63A5\u53E3\u5C42", responsibility: "\u5C42\u804C\u8D23" }], components: [{ id: "runtime-bridge", name: "\u8FD0\u884C\u65F6\u6865\u63A5", layerId: "interface", type: "service", responsibility: "\u804C\u8D23", details: "\u8FB9\u754C\u4E0E\u534F\u4F5C", technologies: ["\u6280\u672F"], importantFiles: ["\u771F\u5B9E\u76F8\u5BF9\u8DEF\u5F84"], evidencePaths: ["\u771F\u5B9E\u76F8\u5BF9\u8DEF\u5F84"], confidence: 0.85 }], relationships: [{ from: "runtime-bridge", to: "memory-store", label: "\u8BFB\u5199", type: "data-flow", description: "\u5173\u7CFB", confidence: 0.8 }], runtimeFlows: [{ name: "\u521D\u59CB\u5316\u6D41\u7A0B", trigger: "\u89E6\u53D1\u6761\u4EF6", outcome: "\u7ED3\u679C", steps: [{ componentId: "runtime-bridge", action: "\u52A8\u4F5C", file: "\u53EF\u9009\u771F\u5B9E\u8DEF\u5F84" }] }], keyFiles: [{ path: "\u771F\u5B9E\u76F8\u5BF9\u8DEF\u5F84", role: "\u6587\u4EF6\u89D2\u8272", whyImportant: "\u4E3A\u4EC0\u4E48\u5148\u8BFB", category: "entry|core|data|integration|config" }], gettingStarted: ["\u9605\u8BFB/\u8C03\u8BD5\u987A\u5E8F"], designHighlights: ["\u8BBE\u8BA1\u4EAE\u70B9"], risks: ["\u98CE\u9669\u6216\u4E0D\u786E\u5B9A\u9879"] }),
-    "\u9879\u76EE\u8BC1\u636E\uFF1A" + JSON.stringify(payload)
+    "\u4F60\u662F\u4E00\u540D\u8CC7\u6DF1\u8EDF\u9AD4\u67B6\u69CB\u5E2B\u3002\u76EE\u6A19\u662F\u8B93\u7B2C\u4E00\u6B21\u63A5\u89F8\u5009\u5EAB\u7684\u958B\u767C\u8005\u5728\u5E7E\u5206\u9418\u5167\u7406\u89E3\u7CFB\u7D71\u8A2D\u8A08\uFF0C\u800C\u4E0D\u662F\u8907\u8FF0\u76EE\u9304\u6A39\u3002",
+    "\u56DE\u7B54\u5C08\u6848\u505A\u4EC0\u9EBC\u3001\u670D\u52D9\u8AB0\u3001\u63A1\u7528\u4EC0\u9EBC\u67B6\u69CB\u98A8\u683C\u3001\u6709\u54EA\u4E9B\u6982\u5FF5\u5C64\u548C\u6838\u5FC3\u5143\u4EF6\u3001\u5143\u4EF6\u5982\u4F55\u5354\u4F5C\u3001\u4E3B\u8981\u57F7\u884C\u6D41\u7A0B\u3001\u95DC\u9375\u6A94\u6848\u3001\u8A2D\u8A08\u4EAE\u9EDE\u8207\u98A8\u96AA\u3002",
+    "\u898F\u5247\uFF1A\u5143\u4EF6\u5FC5\u9808\u662F\u6709\u8077\u8CAC\u7684\u6982\u5FF5\u5143\u4EF6\uFF0C\u7981\u6B62\u628A src\u3001packages/foo\u3001scripts \u7B49\u76EE\u9304\u540D\u76F4\u63A5\u7576\u5143\u4EF6\u540D\uFF1B\u8DEF\u5F91\u53EA\u80FD\u4F5C\u70BA evidencePaths/importantFiles/keyFiles \u8B49\u64DA\u3002\u5FFD\u7565 vendor\u3001\u5099\u4EFD\u3001\u751F\u6210\u7269\u548C\u6E2C\u8A66\u593E\u5177\u5E72\u64FE\u3002\u53EA\u9673\u8FF0\u8B49\u64DA\u652F\u63F4\u7684\u5167\u5BB9\u3002\u8F38\u51FA\u4E2D\u6587\u56B4\u683C JSON\uFF0C\u4E0D\u8981 Markdown/HTML/Mermaid\u3002",
+    "JSON \u683C\u5F0F\uFF1A" + JSON.stringify({ overview: { purpose: "\u5C08\u6848\u89E3\u6C7A\u4EC0\u9EBC\u554F\u984C", audience: "\u4F7F\u7528\u8005", category: "\u5C08\u6848\u578B\u5225", architectureStyle: "\u67B6\u69CB\u98A8\u683C", value: "\u6838\u5FC3\u50F9\u503C" }, summary: "\u6574\u9AD4\u67B6\u69CB\u8AAA\u660E", layers: [{ id: "interface", name: "\u4ECB\u9762\u5C64", responsibility: "\u5C64\u8077\u8CAC" }], components: [{ id: "runtime-bridge", name: "\u57F7\u884C\u6642\u6A4B\u63A5", layerId: "interface", type: "service", responsibility: "\u8077\u8CAC", details: "\u908A\u754C\u8207\u5354\u4F5C", technologies: ["\u6280\u8853"], importantFiles: ["\u771F\u5BE6\u76F8\u5C0D\u8DEF\u5F91"], evidencePaths: ["\u771F\u5BE6\u76F8\u5C0D\u8DEF\u5F91"], confidence: 0.85 }], relationships: [{ from: "runtime-bridge", to: "memory-store", label: "\u8B80\u5BEB", type: "data-flow", description: "\u95DC\u4FC2", confidence: 0.8 }], runtimeFlows: [{ name: "\u521D\u59CB\u5316\u6D41\u7A0B", trigger: "\u89F8\u767C\u689D\u4EF6", outcome: "\u7D50\u679C", steps: [{ componentId: "runtime-bridge", action: "\u52D5\u4F5C", file: "\u53EF\u9078\u771F\u5BE6\u8DEF\u5F91" }] }], keyFiles: [{ path: "\u771F\u5BE6\u76F8\u5C0D\u8DEF\u5F91", role: "\u6A94\u6848\u89D2\u8272", whyImportant: "\u70BA\u4EC0\u9EBC\u5148\u8B80", category: "entry|core|data|integration|config" }], gettingStarted: ["\u95B1\u8B80/\u9664\u932F\u9806\u5E8F"], designHighlights: ["\u8A2D\u8A08\u4EAE\u9EDE"], risks: ["\u98A8\u96AA\u6216\u4E0D\u78BA\u5B9A\u9805"] }),
+    "\u5C08\u6848\u8B49\u64DA\uFF1A" + JSON.stringify(payload)
   ].join("\n");
 }
 function repairArchitecturePrompt(value) {
   return [
-    "\u4E0B\u9762\u662F\u4E00\u6B21\u8F6F\u4EF6\u67B6\u6784\u5206\u6790\u7684\u6A21\u578B\u8F93\u51FA\uFF0C\u4F46\u5B83\u4E0D\u662F\u53EF\u89E3\u6790\u7684\u4E25\u683C JSON\u3002",
-    "\u8BF7\u53EA\u4FEE\u590D JSON \u8BED\u6CD5\u548C\u7F3A\u5931\u7684\u95ED\u5408\u7ED3\u6784\uFF0C\u4FDD\u7559\u5DF2\u6709\u4E8B\u5B9E\u4E0E\u76F8\u5BF9\u6587\u4EF6\u8DEF\u5F84\uFF1B\u4E0D\u8981\u6DFB\u52A0\u89E3\u91CA\u3001Markdown \u6216\u4EE3\u7801\u56F4\u680F\u3002",
-    "\u6700\u7EC8\u53EA\u80FD\u8F93\u51FA\u4E00\u4E2A JSON \u5BF9\u8C61\uFF0C\u5E76\u786E\u4FDD\u81F3\u5C11\u5305\u542B\u975E\u7A7A layers \u548C\u81F3\u5C11\u4E24\u4E2A components\u3002",
-    "\u5F85\u4FEE\u590D\u8F93\u51FA\uFF1A",
+    "\u4E0B\u9762\u662F\u4E00\u6B21\u8EDF\u9AD4\u67B6\u69CB\u5206\u6790\u7684\u6A21\u578B\u8F38\u51FA\uFF0C\u4F46\u5B83\u4E0D\u662F\u53EF\u89E3\u6790\u7684\u56B4\u683C JSON\u3002",
+    "\u8ACB\u53EA\u4FEE\u5FA9 JSON \u8A9E\u6CD5\u548C\u7F3A\u5931\u7684\u9589\u5408\u7D50\u69CB\uFF0C\u4FDD\u7559\u5DF2\u6709\u4E8B\u5BE6\u8207\u76F8\u5C0D\u6A94\u6848\u8DEF\u5F91\uFF1B\u4E0D\u8981\u65B0\u589E\u89E3\u91CB\u3001Markdown \u6216\u7A0B\u5F0F\u78BC\u570D\u6B04\u3002",
+    "\u6700\u7D42\u53EA\u80FD\u8F38\u51FA\u4E00\u500B JSON \u7269\u4EF6\uFF0C\u4E26\u78BA\u4FDD\u81F3\u5C11\u5305\u542B\u975E\u7A7A layers \u548C\u81F3\u5C11\u5169\u500B components\u3002",
+    "\u5F85\u4FEE\u5FA9\u8F38\u51FA\uFF1A",
     cleanText(value, 24e3)
   ].join("\n");
 }
@@ -3975,24 +3975,24 @@ function explainLlmError(error) {
   const message = String(err.message || err);
   const details = err.details && typeof err.details === "object" ? err.details : {};
   if (code === "ARCHITECTURE_LLM_SERVICE_UNAVAILABLE") {
-    return { code, message, reasonText: "DSH \u672A\u628A\u6A21\u578B\u670D\u52A1\u66B4\u9732\u7ED9\u9879\u76EE\u8111", actionKey: "check_settings" };
+    return { code, message, reasonText: "DSH \u672A\u628A\u6A21\u578B\u670D\u52D9\u66B4\u9732\u7D66\u5C08\u6848\u8166", actionKey: "check_settings" };
   }
   if (code === "ARCHITECTURE_LLM_SESSION_ROUTE_UNAVAILABLE") {
-    return { code, message, reasonText: "\u5F53\u524D\u4F1A\u8BDD\u8FD8\u6CA1\u6709\u53EF\u7528\u7684\u6A21\u578B\u8DEF\u7531", actionKey: "send_message" };
+    return { code, message, reasonText: "\u7576\u524D\u6703\u8A71\u9084\u6C92\u6709\u53EF\u7528\u7684\u6A21\u578B\u8DEF\u7531", actionKey: "send_message" };
   }
   if (code === "ARCHITECTURE_LLM_FINISH") {
     const kind = String(details.finishKind || "").toLowerCase();
-    if (kind === "length") return { code, message, reasonText: "\u6A21\u578B\u8F93\u51FA\u8D85\u8FC7 max_tokens \u88AB\u622A\u65AD\uFF0C\u672A\u80FD\u5199\u51FA\u5B8C\u6574 JSON", actionKey: "retry_scan" };
-    if (kind === "content_filter" || kind === "safety") return { code, message, reasonText: "\u6A21\u578B\u56E0\u5185\u5BB9\u5B89\u5168\u7B56\u7565\u4E2D\u65AD\u8F93\u51FA", actionKey: "retry_scan" };
-    if (kind === "cancel") return { code, message, reasonText: "\u8C03\u7528\u88AB\u4E3B\u52A8\u53D6\u6D88\uFF08\u53EF\u80FD\u8D85\u65F6\uFF09", actionKey: "retry_scan" };
-    if (kind === "error" || kind === "upstream") return { code, message, reasonText: "\u6A21\u578B\u4E0A\u6E38\u8FD4\u56DE\u9519\u8BEF\uFF08\u7F51\u7EDC\u6216\u670D\u52A1\u5F02\u5E38\uFF09", actionKey: "retry_scan" };
-    return { code, message, reasonText: "\u6A21\u578B\u672A\u6B63\u5E38\u7ED3\u675F\uFF08" + (kind || "\u672A\u77E5\u539F\u56E0") + "\uFF09", actionKey: "retry_scan" };
+    if (kind === "length") return { code, message, reasonText: "\u6A21\u578B\u8F38\u51FA\u8D85\u904E max_tokens \u88AB\u622A\u65B7\uFF0C\u672A\u80FD\u5BEB\u51FA\u5B8C\u6574 JSON", actionKey: "retry_scan" };
+    if (kind === "content_filter" || kind === "safety") return { code, message, reasonText: "\u6A21\u578B\u56E0\u5167\u5BB9\u5B89\u5168\u7B56\u7565\u4E2D\u65B7\u8F38\u51FA", actionKey: "retry_scan" };
+    if (kind === "cancel") return { code, message, reasonText: "\u547C\u53EB\u88AB\u4E3B\u52D5\u53D6\u6D88\uFF08\u53EF\u80FD\u8D85\u6642\uFF09", actionKey: "retry_scan" };
+    if (kind === "error" || kind === "upstream") return { code, message, reasonText: "\u6A21\u578B\u4E0A\u6E38\u8FD4\u56DE\u932F\u8AA4\uFF08\u7DB2\u8DEF\u6216\u670D\u52D9\u7570\u5E38\uFF09", actionKey: "retry_scan" };
+    return { code, message, reasonText: "\u6A21\u578B\u672A\u6B63\u5E38\u7D50\u675F\uFF08" + (kind || "\u672A\u77E5\u539F\u56E0") + "\uFF09", actionKey: "retry_scan" };
   }
-  if (code === "ARCHITECTURE_LLM_EMPTY") return { code, message, reasonText: "\u6A21\u578B\u8FD4\u56DE\u4E86\u7A7A\u5185\u5BB9", actionKey: "retry_scan" };
-  if (code === "ARCHITECTURE_LLM_INVALID_JSON") return { code, message, reasonText: "\u6A21\u578B\u8F93\u51FA\u65E0\u6CD5\u89E3\u6790\u4E3A JSON\uFF08\u81EA\u52A8\u4FEE\u590D\u4E5F\u5DF2\u5931\u8D25\uFF09", actionKey: "retry_scan" };
-  if (code === "ARCHITECTURE_LLM_SCHEMA") return { code, message, reasonText: "\u6A21\u578B\u8F93\u51FA\u4E0D\u7B26\u5408\u67B6\u6784 schema", actionKey: "retry_scan" };
-  if (code === "ARCHITECTURE_LLM_TIMEOUT" || /timeout/i.test(message)) return { code, message, reasonText: "\u8C03\u7528\u8D85\u65F6\uFF08\u9ED8\u8BA4 60 \u79D2\uFF09", actionKey: "retry_scan" };
-  return { code, message, reasonText: "\u67B6\u6784\u751F\u6210\u5931\u8D25\uFF1A" + (message || "\u672A\u77E5\u9519\u8BEF"), actionKey: "retry_scan" };
+  if (code === "ARCHITECTURE_LLM_EMPTY") return { code, message, reasonText: "\u6A21\u578B\u8FD4\u56DE\u4E86\u7A7A\u5167\u5BB9", actionKey: "retry_scan" };
+  if (code === "ARCHITECTURE_LLM_INVALID_JSON") return { code, message, reasonText: "\u6A21\u578B\u8F38\u51FA\u7121\u6CD5\u89E3\u6790\u70BA JSON\uFF08\u81EA\u52D5\u4FEE\u5FA9\u4E5F\u5DF2\u5931\u6557\uFF09", actionKey: "retry_scan" };
+  if (code === "ARCHITECTURE_LLM_SCHEMA") return { code, message, reasonText: "\u6A21\u578B\u8F38\u51FA\u4E0D\u7B26\u5408\u67B6\u69CB schema", actionKey: "retry_scan" };
+  if (code === "ARCHITECTURE_LLM_TIMEOUT" || /timeout/i.test(message)) return { code, message, reasonText: "\u547C\u53EB\u8D85\u6642\uFF08\u9810\u8A2D 60 \u79D2\uFF09", actionKey: "retry_scan" };
+  return { code, message, reasonText: "\u67B6\u69CB\u751F\u6210\u5931\u6557\uFF1A" + (message || "\u672A\u77E5\u932F\u8AA4"), actionKey: "retry_scan" };
 }
 async function collectEvidence(fs, projectPath, scan, config) {
   const allFiles = (scan.files || []).filter((file) => !isGeneratedOrVendor(file));
@@ -4067,7 +4067,7 @@ async function buildArchitecture({ fs, projectPath, scan, previous, config = {},
   if (!requested) return local;
   if (!local.changed && previous && previous.schemaVersion === 2 && previous.llm && previous.llm.used) return { ...previous, generatedAt: Date.now(), changed: false };
   if (!llm || typeof llm.stream !== "function") {
-    local.llm.error = explainLlmError({ code: "ARCHITECTURE_LLM_SERVICE_UNAVAILABLE", message: "DSH \u672A\u5411\u63D2\u4EF6\u63D0\u4F9B LLM \u670D\u52A1\uFF0C\u5DF2\u751F\u6210\u672C\u5730\u6982\u5FF5\u67B6\u6784", details: { serviceAvailable: false, routeAvailable: Boolean(route) } });
+    local.llm.error = explainLlmError({ code: "ARCHITECTURE_LLM_SERVICE_UNAVAILABLE", message: "DSH \u672A\u5411\u5916\u639B\u63D0\u4F9B LLM \u670D\u52D9\uFF0C\u5DF2\u751F\u6210\u672C\u5730\u6982\u5FF5\u67B6\u69CB", details: { serviceAvailable: false, routeAvailable: Boolean(route) } });
     return local;
   }
   if (!route && typeof getRoute === "function") {
@@ -4078,7 +4078,7 @@ async function buildArchitecture({ fs, projectPath, scan, previous, config = {},
     }
   }
   if (!route) {
-    local.llm.error = explainLlmError({ code: "ARCHITECTURE_LLM_SESSION_ROUTE_UNAVAILABLE", message: "\u5F53\u524D Session \u5C1A\u672A\u4EA7\u751F\u53EF\u590D\u7528\u7684\u6A21\u578B\u8DEF\u7531\uFF0C\u8BF7\u5148\u5B8C\u6210\u4E00\u6B21\u5BF9\u8BDD\u540E\u91CD\u8BD5", details: { serviceAvailable: true, routeAvailable: false, sessionId: sessionId || null } });
+    local.llm.error = explainLlmError({ code: "ARCHITECTURE_LLM_SESSION_ROUTE_UNAVAILABLE", message: "\u7576\u524D Session \u5C1A\u672A\u7522\u751F\u53EF\u8907\u7528\u7684\u6A21\u578B\u8DEF\u7531\uFF0C\u8ACB\u5148\u5B8C\u6210\u4E00\u6B21\u5C0D\u8A71\u5F8C\u91CD\u8A66", details: { serviceAvailable: true, routeAvailable: false, sessionId: sessionId || null } });
     return local;
   }
   local.llm.provider = route.provider;
@@ -4352,13 +4352,13 @@ function buildContinueData(brain, now) {
   })[0];
   let suggestedNextStep;
   if (inProgress) {
-    suggestedNextStep = "\u7EE7\u7EED\u8FDB\u884C\u4E2D\u4EFB\u52A1\uFF1A" + inProgress.title;
+    suggestedNextStep = "\u7E7C\u7E8C\u9032\u884C\u4E2D\u4EFB\u52D9\uFF1A" + inProgress.title;
   } else if (active.length > 0) {
-    suggestedNextStep = "\u5EFA\u8BAE\u5F00\u59CB\uFF1A" + active[0].title;
+    suggestedNextStep = "\u5EFA\u8B70\u958B\u59CB\uFF1A" + active[0].title;
   } else if (activity.length > 0) {
-    suggestedNextStep = "\u65E0\u5F85\u529E\uFF1B\u53EF\u53C2\u8003\u6700\u8FD1\u6D3B\u52A8\uFF1A" + activity[0].title;
+    suggestedNextStep = "\u7121\u5F85\u8FA6\uFF1B\u53EF\u53C3\u8003\u6700\u8FD1\u6D3B\u52D5\uFF1A" + activity[0].title;
   } else {
-    suggestedNextStep = "\u6682\u65E0\u5F85\u529E\uFF1B\u5EFA\u8BAE\u7528 project_todo_add \u89C4\u5212\u4E0B\u4E00\u6B65";
+    suggestedNextStep = "\u66AB\u7121\u5F85\u8FA6\uFF1B\u5EFA\u8B70\u7528 project_todo_add \u898F\u5283\u4E0B\u4E00\u6B65";
   }
   return {
     initialized: Boolean(p && !p.__error),
@@ -4436,7 +4436,7 @@ async function scanAndWrite(fs, sandboxPolicy, args, toolLabel, runtime = {}) {
     return {
       ok: false,
       data: {
-        error: { code: "E_NO_PATH", message: "path \u53C2\u6570\u5FC5\u4F20\uFF08\u4E0D\u4F20\u4F1A\u626B\u5230 DSH Desktop \u5B89\u88C5\u76EE\u5F55\uFF09" },
+        error: { code: "E_NO_PATH", message: "path \u5F15\u6578\u5FC5\u50B3\uFF08\u4E0D\u50B3\u6703\u6383\u5230 DSH Desktop \u5B89\u88DD\u76EE\u9304\uFF09" },
         scanDurationMs: Date.now() - startMs
       }
     };
@@ -4526,7 +4526,7 @@ async function scanAndWrite(fs, sandboxPolicy, args, toolLabel, runtime = {}) {
       return {
         ok: false,
         data: {
-          error: { code: "E_WRITE_FAILED", message: "failed to write " + brainPath2(projectPath, "project.json") + "\uFF08\u53EF\u80FD\u662F sandbox \u62D2\u7EDD\uFF09" },
+          error: { code: "E_WRITE_FAILED", message: "failed to write " + brainPath2(projectPath, "project.json") + "\uFF08\u53EF\u80FD\u662F sandbox \u62D2\u7D55\uFF09" },
           scanDurationMs: Date.now() - startMs
         }
       };
@@ -4534,13 +4534,13 @@ async function scanAndWrite(fs, sandboxPolicy, args, toolLabel, runtime = {}) {
     if (architecture && !architecture.error) {
       const wroteArchitecture = await writeJson(fs, brainPath2(projectPath, "architecture.json"), architecture, writePolicy);
       if (!wroteArchitecture) {
-        architecture = { error: { code: "ARCHITECTURE_WRITE_FAILED", message: "\u67B6\u6784\u6570\u636E\u5199\u5165\u5931\u8D25\uFF0C\u9879\u76EE\u57FA\u7840\u626B\u63CF\u4ECD\u5DF2\u5B8C\u6210" } };
+        architecture = { error: { code: "ARCHITECTURE_WRITE_FAILED", message: "\u67B6\u69CB\u8CC7\u6599\u5BEB\u5165\u5931\u6557\uFF0C\u5C08\u6848\u57FA\u790E\u6383\u63CF\u4ECD\u5DF2\u5B8C\u6210" } };
       }
     }
     try {
       await appendJsonl(fs, brainPath2(projectPath, "timeline.jsonl"), {
         id: makeId("evt", now),
-        title: isRescan ? "\u5B8C\u6210\u91CD\u626B\uFF08" + toolLabel + "\uFF09" : "\u5B8C\u6210 project_init \u626B\u63CF",
+        title: isRescan ? "\u5B8C\u6210\u91CD\u6383\uFF08" + toolLabel + "\uFF09" : "\u5B8C\u6210 project_init \u6383\u63CF",
         eventType: isRescan ? "rescan" : "init",
         occurredAt: now,
         architectureMode,
@@ -4598,8 +4598,8 @@ var baseOutputSchema = {
     message: { type: "string" }
   }
 };
-var pathParam = { type: "string", description: "\u9879\u76EE\u6839\u8DEF\u5F84\uFF08\u53EF\u9009\uFF1B\u9ED8\u8BA4\u4ECE\u5F53\u524D DSH Session \u7684 workspace \u81EA\u52A8\u89E3\u6790\uFF09" };
-var dryRunParam = { type: "boolean", description: "\u4EC5\u9884\u89C8\uFF0C\u4E0D\u5199\u6587\u4EF6\uFF08\u9ED8\u8BA4 false\uFF09" };
+var pathParam = { type: "string", description: "\u5C08\u6848\u6839\u8DEF\u5F91\uFF08\u53EF\u9078\uFF1B\u9810\u8A2D\u5F9E\u7576\u524D DSH Session \u7684 workspace \u81EA\u52D5\u89E3\u6790\uFF09" };
+var dryRunParam = { type: "boolean", description: "\u50C5\u9810\u89BD\uFF0C\u4E0D\u5BEB\u6A94\u6848\uFF08\u9810\u8A2D false\uFF09" };
 function executionRoute(exec) {
   if (!exec) return null;
   return resolveSessionRoute(exec.session) || resolveSessionRoute(exec.currentSession) || resolveSessionRoute(exec.agent && exec.agent.session) || resolveSessionRoute(exec.agent) || resolveSessionRoute(exec.ctx && exec.ctx.session);
@@ -4610,17 +4610,17 @@ function executionSessionId(exec) {
 function buildInitTool({ fs, sandboxPolicy, getMemoryConfig, getLlm }) {
   return defineTool({
     name: "project_init",
-    description: "dsh-project-brain: \u626B\u63CF\u76EE\u6807\u9879\u76EE\u3001\u8BC6\u522B\u6280\u672F\u6808\u3001\u751F\u6210 .project-brain/project.json\uFF08\u542B timeline init \u4E8B\u4EF6\uFF09\u3002\u9996\u6B21\u8BBF\u95EE\u65B0\u9879\u76EE\u65F6\u8C03\u7528\u4E00\u6B21\uFF1B\u91CD\u590D\u8C03\u7528\u5B89\u5168\uFF08\u4FDD\u7559 projectId/createdAt\uFF09\uFF1B\u589E\u91CF\u66F4\u65B0\u7528 project_rescan\u3002\u9ED8\u8BA4\u81EA\u52A8\u4F7F\u7528\u5F53\u524D DSH Session \u7684 workspace\uFF1B\u4EC5 CLI/\u65E7\u5BBF\u4E3B\u9700\u8981\u663E\u5F0F\u4F20 path\u3002",
+    description: "dsh-project-brain: \u6383\u63CF\u76EE\u6A19\u5C08\u6848\u3001\u8B58\u5225\u6280\u8853\u68E7\u3001\u751F\u6210 .project-brain/project.json\uFF08\u542B timeline init \u4E8B\u4EF6\uFF09\u3002\u9996\u6B21\u8A2A\u554F\u65B0\u5C08\u6848\u6642\u547C\u53EB\u4E00\u6B21\uFF1B\u91CD\u8907\u547C\u53EB\u5B89\u5168\uFF08\u4FDD\u7559 projectId/createdAt\uFF09\uFF1B\u589E\u91CF\u66F4\u65B0\u7528 project_rescan\u3002\u9810\u8A2D\u81EA\u52D5\u4F7F\u7528\u7576\u524D DSH Session \u7684 workspace\uFF1B\u50C5 CLI/\u820A\u5BBF\u4E3B\u9700\u8981\u986F\u5F0F\u50B3 path\u3002",
     parameters: { path: pathParam, dryRun: dryRunParam },
-    // 关键修复（P0.4.3）：render 必须嵌套在 output 里（dsh-tools 0.1.0-rc.x 期望
-    // options.output.render）。之前误把 render 放 top-level，导致 userRender 变 undefined，
-    // 框架调用时抛 "userRender is not a function"。
+    // 關鍵修復（P0.4.3）：render 必須巢狀在 output 裡（dsh-tools 0.1.0-rc.x 期望
+    // options.output.render）。之前誤把 render 放 top-level，導致 userRender 變 undefined，
+    // 框架呼叫時拋 "userRender is not a function"。
     output: { schema: baseOutputSchema, render: (_args, value) => renderProjectTool(value, "project init") },
     async execute(args, exec) {
       try {
         const projectPath = resolveProjectPath(args, exec, sandboxPolicy);
         if (projectPath === ".") {
-          return { ok: false, data: { error: { code: "E_NO_PATH", message: "\u65E0\u6CD5\u4ECE\u5F53\u524D Session \u89E3\u6790 workspace \u8DEF\u5F84" } } };
+          return { ok: false, data: { error: { code: "E_NO_PATH", message: "\u7121\u6CD5\u5F9E\u7576\u524D Session \u89E3\u6790 workspace \u8DEF\u5F91" } } };
         }
         const resolvedArgs = Object.assign({}, args || {}, { path: projectPath });
         const result = await scanAndWrite(fs, sandboxPolicy, resolvedArgs, "project_init", {
@@ -4646,14 +4646,14 @@ function buildInitTool({ fs, sandboxPolicy, getMemoryConfig, getLlm }) {
 function buildRescanTool({ fs, sandboxPolicy, getMemoryConfig, getLlm }) {
   return defineTool({
     name: "project_rescan",
-    description: "dsh-project-brain: \u91CD\u626B\u5DF2\u6709 .project-brain \u7684\u9879\u76EE\u5E76\u589E\u91CF\u5237\u65B0 project.json\uFF08\u4FDD\u7559 projectId/createdAt/\u8BB0\u5FC6/\u5F85\u529E\uFF0C\u53EA\u66F4\u65B0\u6280\u672F\u6808/\u5165\u53E3/\u8BED\u8A00\u7EDF\u8BA1\uFF09\uFF0C\u8FFD\u52A0 timeline rescan \u4E8B\u4EF6\u3002\u9879\u76EE\u7ED3\u6784\u53D8\u5316\u540E\u8C03\u7528\uFF1B\u9ED8\u8BA4\u81EA\u52A8\u4F7F\u7528\u5F53\u524D DSH Session \u7684 workspace\u3002",
+    description: "dsh-project-brain: \u91CD\u6383\u5DF2\u6709 .project-brain \u7684\u5C08\u6848\u4E26\u589E\u91CF\u91CD\u65B0\u6574\u7406 project.json\uFF08\u4FDD\u7559 projectId/createdAt/\u8A18\u61B6/\u5F85\u8FA6\uFF0C\u53EA\u66F4\u65B0\u6280\u8853\u68E7/\u5165\u53E3/\u8A9E\u8A00\u7D71\u8A08\uFF09\uFF0C\u8FFD\u52A0 timeline rescan \u4E8B\u4EF6\u3002\u5C08\u6848\u7D50\u69CB\u8B8A\u5316\u5F8C\u547C\u53EB\uFF1B\u9810\u8A2D\u81EA\u52D5\u4F7F\u7528\u7576\u524D DSH Session \u7684 workspace\u3002",
     parameters: { path: pathParam, dryRun: dryRunParam },
     output: { schema: baseOutputSchema, render: (_args, value) => renderProjectTool(value, "rescan") },
     async execute(args, exec) {
       try {
         const projectPath = resolveProjectPath(args, exec, sandboxPolicy);
         if (projectPath === ".") {
-          return { ok: false, data: { error: { code: "E_NO_PATH", message: "\u65E0\u6CD5\u4ECE\u5F53\u524D Session \u89E3\u6790 workspace \u8DEF\u5F84" } } };
+          return { ok: false, data: { error: { code: "E_NO_PATH", message: "\u7121\u6CD5\u5F9E\u7576\u524D Session \u89E3\u6790 workspace \u8DEF\u5F91" } } };
         }
         const resolvedArgs = Object.assign({}, args || {}, { path: projectPath });
         const result = await scanAndWrite(fs, sandboxPolicy, resolvedArgs, "project_rescan", {
@@ -4738,7 +4738,7 @@ function pinnedMemories(rows) {
   return (rows || []).filter((m) => m && m.pinned === true && isCoreMemory(m));
 }
 var DURABLE_TYPES = /* @__PURE__ */ new Set(["decision", "requirement", "architecture", "bug", "lesson", "preference"]);
-var DEIXIS_RE = /(这个|这些|这条|这段|这句|这点|这样|这种|这方面|这角度|那个|那些|上述|上面(?:说|提|讲)?的|前面(?:说|提|讲)?的|刚才(?:说|提|讲)?的|如上|此事|本次讨论|你说的|我说的|上文)|\b(?:this|these|those|the above)\b/i;
+var DEIXIS_RE = /(這個|這些|這條|這段|這句|這點|這樣|這種|這方面|這角度|那個|那些|上述|上面(?:說|提|講)?的|前面(?:說|提|講)?的|剛才(?:說|提|講)?的|如上|此事|本次討論|你說的|我說的|上文)|\b(?:this|these|those|the above)\b/i;
 var ANCHOR_RE = /[A-Za-z][A-Za-z0-9._/-]{1,}|[「『《"'`\[(][^\s」』》"'`\])]{2,}[」』》"'`\])]/;
 var DEIXIS_SELF_CONTAINED_CHARS = 30;
 function findDeixis(text) {
@@ -4791,13 +4791,13 @@ function isActivityReport(title, content) {
   const t = String(title || "");
   const c = String(content || "");
   const blob = t + "\n" + c;
-  if (/改了\s*\d+\s*个文件/.test(blob)) return true;
-  if (/本次\s*session\s*改动/i.test(blob)) return true;
+  if (/改了\s*\d+\s*個檔案/.test(blob)) return true;
+  if (/本次\s*session\s*改動/i.test(blob)) return true;
   if (fileListHeavy(c)) return true;
-  if (/^(本次完成|本次工作|完成情况|验收清单|工作总结)/.test(t.trim()) && /(验收|PASS|git 快进|改了)/.test(c)) return true;
-  const reportHits = (blob.match(/验收\s*\d+\s*\/\s*\d+|全套 smoke|git 快进|同步至 v\d/gi) || []).length;
+  if (/^(本次完成|本次工作|完成情況|驗收清單|工作總結)/.test(t.trim()) && /(驗收|PASS|git 快進|改了)/.test(c)) return true;
+  const reportHits = (blob.match(/驗收\s*\d+\s*\/\s*\d+|全套 smoke|git 快進|同步至 v\d/gi) || []).length;
   if (reportHits >= 3) return true;
-  if (reportHits >= 2 && !/根因/.test(c) && !/以后/.test(c)) return true;
+  if (reportHits >= 2 && !/根因/.test(c) && !/以後/.test(c)) return true;
   return false;
 }
 function isChangelogGenre(title, content) {
@@ -4805,12 +4805,12 @@ function isChangelogGenre(title, content) {
   const c = String(content || "");
   const versionLed = /^\s*v?\d+\.\d+(?:\.\d+)?\b/i.test(t);
   if (fileListHeavy(c)) return true;
-  if (/改了\s*\d+\s*个文件/.test(t) || /改了\s*\d+\s*个文件/.test(c)) return true;
-  if (/本次\s*session\s*改动/i.test(t) || /本次\s*session\s*改动/i.test(c)) return true;
+  if (/改了\s*\d+\s*個檔案/.test(t) || /改了\s*\d+\s*個檔案/.test(c)) return true;
+  if (/本次\s*session\s*改動/i.test(t) || /本次\s*session\s*改動/i.test(c)) return true;
   if (/^(git\s+)?commit\b/i.test(t.trim()) || /^PR\s*#\s*\d+/i.test(t.trim())) return true;
   if (/\b(changelog|release notes)\b/i.test(t)) return true;
   if (/\bpatch\s*#\s*\d+/i.test(t)) return true;
-  if (versionLed && /(release|改动|验收)/i.test(t) && isActivityReport(t, c)) return true;
+  if (versionLed && /(release|改動|驗收)/i.test(t) && isActivityReport(t, c)) return true;
   if (isActivityReport(t, c)) return true;
   return false;
 }
@@ -4965,7 +4965,7 @@ function collectSuggestSupersede(rows) {
         action: "suggest_supersede",
         ids: [a.id, b.id],
         titles: [a.title, b.title],
-        note: "title Jaccard \u2265 " + TITLE_JACCARD_SUGGEST + "\uFF1B\u9700\u663E\u5F0F supersede\uFF0C\u81EA\u52A8\u8DEF\u5F84\u4E0D\u5408\u5E76"
+        note: "title Jaccard \u2265 " + TITLE_JACCARD_SUGGEST + "\uFF1B\u9700\u986F\u5F0F supersede\uFF0C\u81EA\u52D5\u8DEF\u5F91\u4E0D\u5408\u4E26"
       });
     }
   }
@@ -5086,10 +5086,10 @@ function parseAdmitConfirm(text) {
 }
 function admitPrompt(candidate) {
   return [
-    "\u5224\u65AD\u4E0B\u9762\u8FD9\u6761\u5019\u9009\u662F\u5426\u5E94\u5199\u5165\u9879\u76EE\u957F\u671F\u8BB0\u5FC6\uFF08\u8DE8\u4F1A\u8BDD\u4ECD\u4E3A\u771F\u7684\u51B3\u7B56/\u7EA6\u675F/\u67B6\u6784\u4E8B\u5B9E/\u6559\u8BAD\uFF09\u3002",
-    "changelog\u3001\u672C\u6B21\u6539\u4E86\u54EA\u4E9B\u6587\u4EF6\u3001\u4F1A\u8BDD\u6D41\u6C34\u8D26\u4E0D\u8981 admit\u3002",
-    "\u53EA\u8F93\u51FA\u4E25\u683C JSON\uFF1A" + JSON.stringify({ admit: true, type: "decision", reason: "why", supersedes: null }),
-    "\u5019\u9009\uFF1A" + JSON.stringify({
+    "\u5224\u65B7\u4E0B\u9762\u9019\u689D\u5019\u9078\u662F\u5426\u61C9\u5BEB\u5165\u5C08\u6848\u9577\u671F\u8A18\u61B6\uFF08\u8DE8\u6703\u8A71\u4ECD\u70BA\u771F\u7684\u6C7A\u7B56/\u7D04\u675F/\u67B6\u69CB\u4E8B\u5BE6/\u6559\u8A13\uFF09\u3002",
+    "changelog\u3001\u672C\u6B21\u6539\u4E86\u54EA\u4E9B\u6A94\u6848\u3001\u6703\u8A71\u6D41\u6C34\u8CEC\u4E0D\u8981 admit\u3002",
+    "\u53EA\u8F38\u51FA\u56B4\u683C JSON\uFF1A" + JSON.stringify({ admit: true, type: "decision", reason: "why", supersedes: null }),
+    "\u5019\u9078\uFF1A" + JSON.stringify({
       type: candidate.type,
       title: candidate.title,
       content: String(candidate.content || "").slice(0, 800)
@@ -5257,7 +5257,7 @@ async function persistHousekeepTx(fs, projectPath, { now = Date.now(), pinnedIds
     const evicted = hk.actions.filter((a) => a.action === "evict_to_dormant").length;
     await appendJsonl(fs, brainPath2(projectPath, "timeline.jsonl"), {
       id: makeId("evt", now),
-      title: "\u8BB0\u5FC6\u6574\u7406\u5B8C\u6210\uFF08\u5F52\u6863 " + archived + " \xB7 \u4F11\u7720 " + evicted + "\uFF09",
+      title: "\u8A18\u61B6\u6574\u7406\u5B8C\u6210\uFF08\u6B78\u6A94 " + archived + " \xB7 \u4F11\u7720 " + evicted + "\uFF09",
       eventType: "dream",
       occurredAt: now,
       detail: "trigger=housekeep archived=" + archived + " evicted=" + evicted
@@ -5294,16 +5294,16 @@ function executionSessionId2(exec) {
 function buildMemoryAddTool({ fs, sandboxPolicy, getLlm }) {
   return defineTool2({
     name: "project_memory_add",
-    description: "dsh-project-brain: \u5199\u5165\u4E00\u6761\u8DE8\u4F1A\u8BDD\u4ECD\u4E3A\u771F\u7684\u9879\u76EE\u8BB0\u5FC6\uFF08decision/requirement/architecture/bug/lesson/preference\uFF09\u3002\u7528\u6237\u660E\u786E\u8868\u8FBE\u7684\u957F\u671F\u534F\u4F5C\u53E3\u5F84\u4E0E\u5DE5\u4F5C\u504F\u597D\u7528 preference\u3002\u4E0D\u8981\u5199\u5165 changelog\u3001\u672C\u6B21\u6539\u4E86\u54EA\u4E9B\u6587\u4EF6\u6216\u4F1A\u8BDD\u6D41\u6C34\u8D26\uFF1B\u8FDB\u884C\u4E2D\u7684\u5DE5\u4F5C\u7528 project_todo_*\u3002 content \u5FC5\u987B\u81EA\u5305\u542B\uFF1A\u4E0D\u8981\u51FA\u73B0\u300C\u8FD9\u4E2A/\u90A3\u4E2A/\u4E0A\u9762\u8BF4\u7684\u300D\u8FD9\u7C7B\u6307\u4EE3\u8BCD\uFF0C\u6362\u6210\u5B83\u771F\u6B63\u6307\u7684\u4E1C\u897F\u3002 importance 0~1\u3002\u5DE5\u5177\u53EF\u80FD\u56E0\u89C4\u5219\u6216\u6A21\u578B\u786E\u8BA4\u62D2\u7EDD\uFF0C\u4E0D\u8981\u6539\u5199\u6210 changelog \u518D\u8BD5\u3002",
+    description: "dsh-project-brain: \u5BEB\u5165\u4E00\u689D\u8DE8\u6703\u8A71\u4ECD\u70BA\u771F\u7684\u5C08\u6848\u8A18\u61B6\uFF08decision/requirement/architecture/bug/lesson/preference\uFF09\u3002\u4F7F\u7528\u8005\u660E\u78BA\u8868\u9054\u7684\u9577\u671F\u5354\u4F5C\u53E3\u5F91\u8207\u5DE5\u4F5C\u504F\u597D\u7528 preference\u3002\u4E0D\u8981\u5BEB\u5165 changelog\u3001\u672C\u6B21\u6539\u4E86\u54EA\u4E9B\u6A94\u6848\u6216\u6703\u8A71\u6D41\u6C34\u8CEC\uFF1B\u9032\u884C\u4E2D\u7684\u5DE5\u4F5C\u7528 project_todo_*\u3002 content \u5FC5\u9808\u81EA\u5305\u542B\uFF1A\u4E0D\u8981\u51FA\u73FE\u300C\u9019\u500B/\u90A3\u500B/\u4E0A\u9762\u8AAA\u7684\u300D\u9019\u985E\u6307\u4EE3\u8A5E\uFF0C\u63DB\u6210\u5B83\u771F\u6B63\u6307\u7684\u6771\u897F\u3002 importance 0~1\u3002\u5DE5\u5177\u53EF\u80FD\u56E0\u898F\u5247\u6216\u6A21\u578B\u78BA\u8A8D\u62D2\u7D55\uFF0C\u4E0D\u8981\u6539\u5BEB\u6210 changelog \u518D\u8A66\u3002",
     parameters: {
-      type: { type: "string", description: "\u8BB0\u5FC6\u7C7B\u578B\uFF0C\u679A\u4E3E\uFF1A" + MEMORY_TYPES.join(" | ") },
-      title: { type: "string", description: "\u6807\u9898\uFF08\u4E00\u53E5\u8BDD\uFF0C<=200 \u5B57\u7B26\uFF09" },
-      content: { type: "string", description: "\u6B63\u6587\uFF1Awhat + why\uFF08\u51B3\u7B56\u9700\u542B\u7406\u7531\u4E0E\u88AB\u5426\u65B9\u6848\uFF09" },
-      importance: { type: "number", description: "\u91CD\u8981\u6027 0~1\uFF0C\u9ED8\u8BA4 0.5" },
-      confidence: { type: "number", description: "\u53EF\u4FE1\u5EA6 0~1\uFF0C\u9ED8\u8BA4 0.7" },
-      relatedFiles: { type: "array", items: { type: "string" }, description: "\u76F8\u5173\u6587\u4EF6\u8DEF\u5F84\uFF08\u53EF\u9009\uFF09" },
-      tags: { type: "array", items: { type: "string" }, description: "\u6807\u7B7E\uFF08\u53EF\u9009\uFF09" },
-      path: { type: "string", description: "\u9879\u76EE\u6839\u8DEF\u5F84\uFF08\u9ED8\u8BA4\u4ECE session cwd \u63A8\u65AD\uFF09" }
+      type: { type: "string", description: "\u8A18\u61B6\u578B\u5225\uFF0C\u5217\u8209\uFF1A" + MEMORY_TYPES.join(" | ") },
+      title: { type: "string", description: "\u6A19\u984C\uFF08\u4E00\u53E5\u8A71\uFF0C<=200 \u5B57\u5143\uFF09" },
+      content: { type: "string", description: "\u6B63\u6587\uFF1Awhat + why\uFF08\u6C7A\u7B56\u9700\u542B\u7406\u7531\u8207\u88AB\u5426\u65B9\u6848\uFF09" },
+      importance: { type: "number", description: "\u91CD\u8981\u6027 0~1\uFF0C\u9810\u8A2D 0.5" },
+      confidence: { type: "number", description: "\u53EF\u4FE1\u5EA6 0~1\uFF0C\u9810\u8A2D 0.7" },
+      relatedFiles: { type: "array", items: { type: "string" }, description: "\u76F8\u95DC\u6A94\u6848\u8DEF\u5F91\uFF08\u53EF\u9078\uFF09" },
+      tags: { type: "array", items: { type: "string" }, description: "\u6A19\u7C64\uFF08\u53EF\u9078\uFF09" },
+      path: { type: "string", description: "\u5C08\u6848\u6839\u8DEF\u5F91\uFF08\u9810\u8A2D\u5F9E session cwd \u63A8\u65B7\uFF09" }
     },
     output: {
       schema: {
@@ -5329,7 +5329,7 @@ function buildMemoryAddTool({ fs, sandboxPolicy, getLlm }) {
         const projectPath = resolveProjectPath(args, exec, sandboxPolicy);
         const type = normalizeMemoryType(args && args.type);
         if (!type) {
-          return { ok: false, code: "E_INVALID_TYPE", message: "type \u5FC5\u987B\u662F " + MEMORY_TYPES.join("/") + " \u4E4B\u4E00" };
+          return { ok: false, code: "E_INVALID_TYPE", message: "type \u5FC5\u9808\u662F " + MEMORY_TYPES.join("/") + " \u4E4B\u4E00" };
         }
         if (!args || !args.title || !String(args.title).trim()) {
           return { ok: false, code: "E_NO_TITLE", message: "title \u5FC5\u586B" };
@@ -5370,7 +5370,7 @@ function buildMemoryAddTool({ fs, sandboxPolicy, getLlm }) {
           const entry = admitted.entry;
           await appendJsonl(fs, brainPath2(projectPath, "timeline.jsonl"), {
             id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-            title: "\u65B0\u589E\u8BB0\u5FC6[" + entry.type + "]\uFF1A" + entry.title,
+            title: "\u65B0\u589E\u8A18\u61B6[" + entry.type + "]\uFF1A" + entry.title,
             eventType: "memory",
             occurredAt: now
           });
@@ -5388,13 +5388,13 @@ function buildMemoryAddTool({ fs, sandboxPolicy, getLlm }) {
 function buildMemoryListTool({ fs, sandboxPolicy }) {
   return defineTool2({
     name: "project_memory_list",
-    description: "dsh-project-brain: \u8BFB\u53D6\u5F53\u524D\u9879\u76EE\u7684\u9879\u76EE\u8BB0\u5FC6\uFF0C\u6309\u91CD\u8981\u5EA6\u6392\u5E8F\u8FD4\u56DE\uFF08\u53EF\u6309 type \u8FC7\u6EE4\uFF09\u3002\u56DE\u7B54\u201C\u4E3A\u4EC0\u4E48\u8FD9\u4E48\u8BBE\u8BA1/\u4E4B\u524D\u8E29\u8FC7\u4EC0\u4E48\u5751\u201D\u7C7B\u95EE\u9898\u524D\u5148\u8C03\u7528\u3002",
+    description: "dsh-project-brain: \u8B80\u53D6\u7576\u524D\u5C08\u6848\u7684\u5C08\u6848\u8A18\u61B6\uFF0C\u6309\u91CD\u8981\u5EA6\u6392\u5E8F\u8FD4\u56DE\uFF08\u53EF\u6309 type \u904E\u6FFE\uFF09\u3002\u56DE\u7B54\u201C\u70BA\u4EC0\u9EBC\u9019\u9EBC\u8A2D\u8A08/\u4E4B\u524D\u8E29\u904E\u4EC0\u9EBC\u5751\u201D\u985E\u554F\u984C\u524D\u5148\u547C\u53EB\u3002",
     parameters: {
-      type: { type: "string", description: "\u53EA\u770B\u8BE5\u7C7B\u578B\uFF08\u53EF\u9009\uFF09\uFF1A" + MEMORY_TYPES.join(" | ") },
-      limit: { type: "number", description: "\u8FD4\u56DE\u6761\u6570\u4E0A\u9650\uFF0C\u9ED8\u8BA4 10" },
-      includeArchived: { type: "boolean", description: "\u662F\u5426\u5305\u542B archived/superseded \u8BB0\u5FC6\uFF0C\u9ED8\u8BA4 false" },
-      layer: { type: "string", description: "active\uFF08\u9ED8\u8BA4 Core\uFF09| dormant | all\uFF08active+dormant\uFF09" },
-      path: { type: "string", description: "\u9879\u76EE\u6839\u8DEF\u5F84\uFF08\u9ED8\u8BA4\u4ECE session cwd \u63A8\u65AD\uFF09" }
+      type: { type: "string", description: "\u53EA\u770B\u8A72\u578B\u5225\uFF08\u53EF\u9078\uFF09\uFF1A" + MEMORY_TYPES.join(" | ") },
+      limit: { type: "number", description: "\u8FD4\u56DE\u689D\u6578\u4E0A\u9650\uFF0C\u9810\u8A2D 10" },
+      includeArchived: { type: "boolean", description: "\u662F\u5426\u5305\u542B archived/superseded \u8A18\u61B6\uFF0C\u9810\u8A2D false" },
+      layer: { type: "string", description: "active\uFF08\u9810\u8A2D Core\uFF09| dormant | all\uFF08active+dormant\uFF09" },
+      path: { type: "string", description: "\u5C08\u6848\u6839\u8DEF\u5F91\uFF08\u9810\u8A2D\u5F9E session cwd \u63A8\u65B7\uFF09" }
     },
     output: {
       schema: {
@@ -5466,11 +5466,11 @@ function buildMemoryListTool({ fs, sandboxPolicy }) {
 function buildMemoryArchiveTool({ fs, sandboxPolicy }) {
   return defineTool2({
     name: "project_memory_archive",
-    description: "dsh-project-brain: \u5F52\u6863\u4E00\u6761\u9879\u76EE\u8BB0\u5FC6\uFF08status \u2192 archived\uFF0C\u4ECE\u68C0\u7D22/\u6CE8\u5165\u4E2D\u79FB\u9664\u4F46\u4FDD\u7559\u8BB0\u5F55\uFF09\u3002\u7528\u4E8E\u4FEE\u6B63\u9519\u8BEF/\u8FC7\u65F6/\u4E0E\u73B0\u5B9E\u51B2\u7A81\u7684\u8BB0\u5FC6\u3002\u9700\u4F20\u5165 id \u524D\u7F00\u6216\u7CBE\u786E id\u3002",
+    description: "dsh-project-brain: \u6B78\u6A94\u4E00\u689D\u5C08\u6848\u8A18\u61B6\uFF08status \u2192 archived\uFF0C\u5F9E\u6AA2\u7D22/\u6CE8\u5165\u4E2D\u79FB\u9664\u4F46\u4FDD\u7559\u8A18\u9304\uFF09\u3002\u7528\u65BC\u4FEE\u6B63\u932F\u8AA4/\u904E\u6642/\u8207\u73FE\u5BE6\u885D\u7A81\u7684\u8A18\u61B6\u3002\u9700\u50B3\u5165 id \u5B57\u9996\u6216\u7CBE\u78BA id\u3002",
     parameters: {
-      id: { type: "string", description: "\u8BB0\u5FC6 id \u6216\u5176\u524D\u7F00\uFF08\u552F\u4E00\u5339\u914D\uFF09" },
-      reason: { type: "string", description: "\u5F52\u6863\u539F\u56E0\uFF08\u8BB0\u5165 source \u5B57\u6BB5\u7528\u4E8E\u8FFD\u6EAF\uFF09" },
-      path: { type: "string", description: "\u9879\u76EE\u6839\u8DEF\u5F84\uFF08\u9ED8\u8BA4\u4ECE session cwd \u63A8\u65AD\uFF09" }
+      id: { type: "string", description: "\u8A18\u61B6 id \u6216\u5176\u5B57\u9996\uFF08\u552F\u4E00\u5339\u914D\uFF09" },
+      reason: { type: "string", description: "\u6B78\u6A94\u539F\u56E0\uFF08\u8A18\u5165 source \u6B04\u4F4D\u7528\u65BC\u8FFD\u6EAF\uFF09" },
+      path: { type: "string", description: "\u5C08\u6848\u6839\u8DEF\u5F91\uFF08\u9810\u8A2D\u5F9E session cwd \u63A8\u65B7\uFF09" }
     },
     output: {
       schema: {
@@ -5504,10 +5504,10 @@ function buildMemoryArchiveTool({ fs, sandboxPolicy }) {
           const memories = await readJsonl(fs, brainPath2(projectPath, "memory.jsonl"));
           const matches = memories.filter((m) => m && m.id && (m.id === idPrefix || m.id.indexOf(idPrefix) === 0) && isRetrievableMemory(m));
           if (matches.length === 0) {
-            return { ok: false, code: "E_NOT_FOUND", message: `\u672A\u627E\u5230 id=${idPrefix} \u7684\u6D3B\u8DC3\u8BB0\u5FC6` };
+            return { ok: false, code: "E_NOT_FOUND", message: `\u672A\u627E\u5230 id=${idPrefix} \u7684\u6D3B\u8E8D\u8A18\u61B6` };
           }
           if (matches.length > 1) {
-            return { ok: false, code: "E_AMBIGUOUS_ID", message: `id=${idPrefix} \u5339\u914D\u5230 ${matches.length} \u6761\uFF0C\u8BF7\u63D0\u4F9B\u66F4\u7CBE\u786E\u7684 id` };
+            return { ok: false, code: "E_AMBIGUOUS_ID", message: `id=${idPrefix} \u5339\u914D\u5230 ${matches.length} \u689D\uFF0C\u8ACB\u63D0\u4F9B\u66F4\u7CBE\u78BA\u7684 id` };
           }
           const hit = matches[0];
           const updated = memories.map((m) => {
@@ -5527,7 +5527,7 @@ function buildMemoryArchiveTool({ fs, sandboxPolicy }) {
         const target = archived.target;
         await appendJsonl(fs, brainPath2(projectPath, "timeline.jsonl"), {
           id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-          title: "\u5F52\u6863\u8BB0\u5FC6[" + target.type + "]\uFF1A" + target.title + (reason ? "\uFF08" + reason + "\uFF09" : ""),
+          title: "\u6B78\u6A94\u8A18\u61B6[" + target.type + "]\uFF1A" + target.title + (reason ? "\uFF08" + reason + "\uFF09" : ""),
           eventType: "memory_archive",
           occurredAt: now,
           detail: "id=" + target.id + (reason ? " reason=" + reason : "")
@@ -5543,18 +5543,18 @@ function buildMemoryArchiveTool({ fs, sandboxPolicy }) {
 function buildMemorySupersedeTool({ fs, sandboxPolicy }) {
   return defineTool2({
     name: "project_memory_supersede",
-    description: "dsh-project-brain: \u7528\u65B0\u8BB0\u5FC6\u66FF\u6362\u65E7\u8BB0\u5FC6\uFF08\u65E7\u8BB0\u5FC6 \u2192 superseded\uFF0C\u65B0\u8BB0\u5FC6\u6B63\u5E38 append\uFF09\u3002\u7528\u4E8E\u51B3\u7B56\u66F4\u65B0\u3001\u67B6\u6784\u53D8\u66F4\u7B49\u573A\u666F\u3002\u65B0\u8BB0\u5FC6\u53EF\u7531 type/title/content \u5B8C\u6574\u6307\u5B9A\u3002",
+    description: "dsh-project-brain: \u7528\u65B0\u8A18\u61B6\u66FF\u63DB\u820A\u8A18\u61B6\uFF08\u820A\u8A18\u61B6 \u2192 superseded\uFF0C\u65B0\u8A18\u61B6\u6B63\u5E38 append\uFF09\u3002\u7528\u65BC\u6C7A\u7B56\u66F4\u65B0\u3001\u67B6\u69CB\u8B8A\u66F4\u7B49\u5834\u666F\u3002\u65B0\u8A18\u61B6\u53EF\u7531 type/title/content \u5B8C\u6574\u6307\u5B9A\u3002",
     parameters: {
-      oldId: { type: "string", description: "\u88AB\u66FF\u6362\u7684\u65E7\u8BB0\u5FC6 id \u6216\u524D\u7F00" },
-      type: { type: "string", description: "\u65B0\u8BB0\u5FC6\u7C7B\u578B\uFF08\u5FC5\u586B\uFF09" },
-      title: { type: "string", description: "\u65B0\u8BB0\u5FC6\u6807\u9898\uFF08\u5FC5\u586B\uFF09" },
-      content: { type: "string", description: "\u65B0\u8BB0\u5FC6\u6B63\u6587\uFF08\u5FC5\u586B\uFF09" },
+      oldId: { type: "string", description: "\u88AB\u66FF\u63DB\u7684\u820A\u8A18\u61B6 id \u6216\u5B57\u9996" },
+      type: { type: "string", description: "\u65B0\u8A18\u61B6\u578B\u5225\uFF08\u5FC5\u586B\uFF09" },
+      title: { type: "string", description: "\u65B0\u8A18\u61B6\u6A19\u984C\uFF08\u5FC5\u586B\uFF09" },
+      content: { type: "string", description: "\u65B0\u8A18\u61B6\u6B63\u6587\uFF08\u5FC5\u586B\uFF09" },
       importance: { type: "number", description: "\u91CD\u8981\u6027 0~1" },
       confidence: { type: "number", description: "\u53EF\u4FE1\u5EA6 0~1" },
-      relatedFiles: { type: "array", items: { type: "string" }, description: "\u76F8\u5173\u6587\u4EF6\u8DEF\u5F84" },
-      tags: { type: "array", items: { type: "string" }, description: "\u6807\u7B7E" },
-      reason: { type: "string", description: "\u66FF\u6362\u539F\u56E0\uFF08\u5199\u5165\u65E7\u8BB0\u5FC6\u7684 supersededReason\uFF09" },
-      path: { type: "string", description: "\u9879\u76EE\u6839\u8DEF\u5F84\uFF08\u9ED8\u8BA4\u4ECE session cwd \u63A8\u65AD\uFF09" }
+      relatedFiles: { type: "array", items: { type: "string" }, description: "\u76F8\u95DC\u6A94\u6848\u8DEF\u5F91" },
+      tags: { type: "array", items: { type: "string" }, description: "\u6A19\u7C64" },
+      reason: { type: "string", description: "\u66FF\u63DB\u539F\u56E0\uFF08\u5BEB\u5165\u820A\u8A18\u61B6\u7684 supersededReason\uFF09" },
+      path: { type: "string", description: "\u5C08\u6848\u6839\u8DEF\u5F91\uFF08\u9810\u8A2D\u5F9E session cwd \u63A8\u65B7\uFF09" }
     },
     output: {
       schema: {
@@ -5583,14 +5583,14 @@ function buildMemorySupersedeTool({ fs, sandboxPolicy }) {
         const title = args && typeof args.title === "string" ? args.title.trim() : "";
         const content = args && typeof args.content === "string" ? args.content : "";
         if (!oldId) return { ok: false, code: "E_NO_OLD_ID", message: "oldId \u5FC5\u586B" };
-        if (!type) return { ok: false, code: "E_INVALID_TYPE", message: "type \u5FC5\u987B\u662F " + MEMORY_TYPES.join("/") + " \u4E4B\u4E00" };
+        if (!type) return { ok: false, code: "E_INVALID_TYPE", message: "type \u5FC5\u9808\u662F " + MEMORY_TYPES.join("/") + " \u4E4B\u4E00" };
         if (!title) return { ok: false, code: "E_NO_TITLE", message: "title \u5FC5\u586B" };
         if (!content || String(content).length < 20) return { ok: false, code: "E_NO_CONTENT", message: "content \u5FC5\u586B\u4E14 \u2265 20 \u5B57" };
         const reason = args && typeof args.reason === "string" ? args.reason.trim().slice(0, 500) : "";
         const memories = await readJsonl(fs, brainPath2(projectPath, "memory.jsonl"));
         const matches = memories.filter((m) => m && m.id && (m.id === oldId || m.id.indexOf(oldId) === 0) && isRetrievableMemory(m));
-        if (matches.length === 0) return { ok: false, code: "E_OLD_NOT_FOUND", message: `\u672A\u627E\u5230 id=${oldId} \u7684\u53EF\u68C0\u7D22\u8BB0\u5FC6` };
-        if (matches.length > 1) return { ok: false, code: "E_AMBIGUOUS_ID", message: `oldId=${oldId} \u5339\u914D\u5230 ${matches.length} \u6761\uFF0C\u8BF7\u63D0\u4F9B\u66F4\u7CBE\u786E\u7684 id` };
+        if (matches.length === 0) return { ok: false, code: "E_OLD_NOT_FOUND", message: `\u672A\u627E\u5230 id=${oldId} \u7684\u53EF\u6AA2\u7D22\u8A18\u61B6` };
+        if (matches.length > 1) return { ok: false, code: "E_AMBIGUOUS_ID", message: `oldId=${oldId} \u5339\u914D\u5230 ${matches.length} \u689D\uFF0C\u8ACB\u63D0\u4F9B\u66F4\u7CBE\u78BA\u7684 id` };
         const oldTarget = matches[0];
         const now = Date.now();
         const sessionId = executionSessionId2(exec);
@@ -5629,7 +5629,7 @@ function buildMemorySupersedeTool({ fs, sandboxPolicy }) {
         }
         await appendJsonl(fs, brainPath2(projectPath, "timeline.jsonl"), {
           id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-          title: "\u66FF\u6362\u8BB0\u5FC6[" + oldTarget.type + "\u2192" + newEntry.type + "]\uFF1A" + newEntry.title + (reason ? "\uFF08" + reason + "\uFF09" : ""),
+          title: "\u66FF\u63DB\u8A18\u61B6[" + oldTarget.type + "\u2192" + newEntry.type + "]\uFF1A" + newEntry.title + (reason ? "\uFF08" + reason + "\uFF09" : ""),
           eventType: "memory_supersede",
           occurredAt: now,
           detail: "oldId=" + oldTarget.id + " newId=" + newEntry.id + (reason ? " reason=" + reason : "")
@@ -5658,13 +5658,13 @@ function emitPreviewChanged3(exec, projectPath) {
 function buildTodoAddTool({ fs, sandboxPolicy }) {
   return defineTool3({
     name: "project_todo_add",
-    description: "dsh-project-brain: \u4E3A\u5F53\u524D\u9879\u76EE\u6DFB\u52A0\u4E00\u6761\u5F00\u53D1\u5F85\u529E\uFF08\u5199\u5165 .project-brain/todo.jsonl\uFF09\u3002\u89C4\u5212\u51FA\u4E0B\u4E00\u6B65\u4EFB\u52A1\u3001\u6216\u7528\u6237\u63D0\u51FA\u65B0\u9700\u6C42\u65F6\u8C03\u7528\uFF1B\u5B8C\u6210\u65F6\u7528 project_todo_done \u5173\u95ED\u3002",
+    description: "dsh-project-brain: \u70BA\u7576\u524D\u5C08\u6848\u65B0\u589E\u4E00\u689D\u958B\u767C\u5F85\u8FA6\uFF08\u5BEB\u5165 .project-brain/todo.jsonl\uFF09\u3002\u898F\u5283\u51FA\u4E0B\u4E00\u6B65\u4EFB\u52D9\u3001\u6216\u4F7F\u7528\u8005\u63D0\u51FA\u65B0\u9700\u6C42\u6642\u547C\u53EB\uFF1B\u5B8C\u6210\u6642\u7528 project_todo_done \u95DC\u9589\u3002",
     parameters: {
-      title: { type: "string", description: "\u5F85\u529E\u6807\u9898\uFF08\u4E00\u53E5\u8BDD\uFF09" },
-      description: { type: "string", description: "\u8BE6\u60C5\uFF08\u53EF\u9009\uFF09" },
-      priority: { type: "string", description: "\u4F18\u5148\u7EA7\uFF1Aurgent | high | medium\uFF08\u9ED8\u8BA4\uFF09 | low" },
-      relatedFiles: { type: "array", items: { type: "string" }, description: "\u76F8\u5173\u6587\u4EF6\uFF08\u53EF\u9009\uFF09" },
-      path: { type: "string", description: "\u9879\u76EE\u6839\u8DEF\u5F84\uFF08\u9ED8\u8BA4\u4ECE session cwd \u63A8\u65AD\uFF1B\u4E0D\u4F20\u4F1A\u7528\u5F53\u524D\u5DE5\u4F5C\u533A\uFF09" }
+      title: { type: "string", description: "\u5F85\u8FA6\u6A19\u984C\uFF08\u4E00\u53E5\u8A71\uFF09" },
+      description: { type: "string", description: "\u8A73\u60C5\uFF08\u53EF\u9078\uFF09" },
+      priority: { type: "string", description: "\u512A\u5148\u9806\u5E8F\uFF1Aurgent | high | medium\uFF08\u9810\u8A2D\uFF09 | low" },
+      relatedFiles: { type: "array", items: { type: "string" }, description: "\u76F8\u95DC\u6A94\u6848\uFF08\u53EF\u9078\uFF09" },
+      path: { type: "string", description: "\u5C08\u6848\u6839\u8DEF\u5F91\uFF08\u9810\u8A2D\u5F9E session cwd \u63A8\u65B7\uFF1B\u4E0D\u50B3\u6703\u7528\u7576\u524D\u5DE5\u4F5C\u5340\uFF09" }
     },
     output: {
       schema: {
@@ -5678,7 +5678,7 @@ function buildTodoAddTool({ fs, sandboxPolicy }) {
       render: (_args, value) => {
         if (value.ok) {
           const d = value.data || {};
-          return [{ type: "text", text: `dsh-project-brain: todo added [${d.priority}] ${d.title} (${d.id})\uFF0C\u6D3B\u8DC3\u5F85\u529E ${d.activeCount}` }];
+          return [{ type: "text", text: `dsh-project-brain: todo added [${d.priority}] ${d.title} (${d.id})\uFF0C\u6D3B\u8E8D\u5F85\u8FA6 ${d.activeCount}` }];
         }
         return [{ type: "text", text: `dsh-project-brain: todo add FAILED - ${value && value.code}: ${value && value.message}` }];
       }
@@ -5695,7 +5695,7 @@ function buildTodoAddTool({ fs, sandboxPolicy }) {
         if (!wrote) return { ok: false, code: "E_WRITE_FAILED", message: "failed to write todo.jsonl" };
         await appendJsonl(fs, brainPath2(projectPath, "timeline.jsonl"), {
           id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-          title: "\u65B0\u589E\u5F85\u529E\uFF1A" + entry.title,
+          title: "\u65B0\u589E\u5F85\u8FA6\uFF1A" + entry.title,
           eventType: "todo",
           occurredAt: now
         });
@@ -5711,11 +5711,11 @@ function buildTodoAddTool({ fs, sandboxPolicy }) {
 function buildTodoListTool({ fs, sandboxPolicy }) {
   return defineTool3({
     name: "project_todo_list",
-    description: "dsh-project-brain: \u8BFB\u53D6\u5F53\u524D\u9879\u76EE\u5F85\u529E\u5217\u8868\uFF08\u9ED8\u8BA4\u6D3B\u8DC3\u9879\uFF0C\u6309\u4F18\u5148\u7EA7\u6392\u5E8F\uFF09\u3002\u6062\u590D\u5F00\u53D1\u4E0A\u4E0B\u6587\u3001\u786E\u5B9A\u4E0B\u4E00\u6B65\u65F6\u8C03\u7528\u3002",
+    description: "dsh-project-brain: \u8B80\u53D6\u7576\u524D\u5C08\u6848\u5F85\u8FA6\u5217\u8868\uFF08\u9810\u8A2D\u6D3B\u8E8D\u9805\uFF0C\u6309\u512A\u5148\u9806\u5E8F\u6392\u5E8F\uFF09\u3002\u6062\u5FA9\u958B\u767C\u4E0A\u4E0B\u6587\u3001\u78BA\u5B9A\u4E0B\u4E00\u6B65\u6642\u547C\u53EB\u3002",
     parameters: {
-      status: { type: "string", description: "\u8FC7\u6EE4\u72B6\u6001\uFF08\u53EF\u9009\uFF09\uFF1Apending | in_progress | blocked | done | cancelled | all\uFF08\u9ED8\u8BA4\u6D3B\u8DC3\u9879\uFF09" },
-      limit: { type: "number", description: "\u8FD4\u56DE\u6761\u6570\u4E0A\u9650\uFF0C\u9ED8\u8BA4 20" },
-      path: { type: "string", description: "\u9879\u76EE\u6839\u8DEF\u5F84\uFF08\u9ED8\u8BA4\u4ECE session cwd \u63A8\u65AD\uFF09" }
+      status: { type: "string", description: "\u904E\u6FFE\u72C0\u614B\uFF08\u53EF\u9078\uFF09\uFF1Apending | in_progress | blocked | done | cancelled | all\uFF08\u9810\u8A2D\u6D3B\u8E8D\u9805\uFF09" },
+      limit: { type: "number", description: "\u8FD4\u56DE\u689D\u6578\u4E0A\u9650\uFF0C\u9810\u8A2D 20" },
+      path: { type: "string", description: "\u5C08\u6848\u6839\u8DEF\u5F91\uFF08\u9810\u8A2D\u5F9E session cwd \u63A8\u65B7\uFF09" }
     },
     output: {
       schema: {
@@ -5771,11 +5771,11 @@ function buildTodoListTool({ fs, sandboxPolicy }) {
 function buildTodoDoneTool({ fs, sandboxPolicy }) {
   return defineTool3({
     name: "project_todo_done",
-    description: "dsh-project-brain: \u5173\u95ED\u4E00\u6761\u5F85\u529E\uFF08status -> done\uFF0C\u5199 timeline \u4E8B\u4EF6\uFF09\u3002\u6309 todo id\uFF08\u652F\u6301\u524D\u7F00\uFF09\u6216\u6807\u9898\u7CBE\u786E\u5339\u914D\u3002",
+    description: "dsh-project-brain: \u95DC\u9589\u4E00\u689D\u5F85\u8FA6\uFF08status -> done\uFF0C\u5BEB timeline \u4E8B\u4EF6\uFF09\u3002\u6309 todo id\uFF08\u652F\u63F4\u5B57\u9996\uFF09\u6216\u6A19\u984C\u7CBE\u78BA\u5339\u914D\u3002",
     parameters: {
-      id: { type: "string", description: "todo id \u6216\u5176\u524D\u7F00\uFF08\u4E0E title \u4E8C\u9009\u4E00\uFF09" },
-      title: { type: "string", description: "todo \u6807\u9898\u7CBE\u786E\u5339\u914D\uFF08\u4E0E id \u4E8C\u9009\u4E00\uFF09" },
-      path: { type: "string", description: "\u9879\u76EE\u6839\u8DEF\u5F84\uFF08\u9ED8\u8BA4\u4ECE session cwd \u63A8\u65AD\uFF09" }
+      id: { type: "string", description: "todo id \u6216\u5176\u5B57\u9996\uFF08\u8207 title \u4E8C\u9078\u4E00\uFF09" },
+      title: { type: "string", description: "todo \u6A19\u984C\u7CBE\u78BA\u5339\u914D\uFF08\u8207 id \u4E8C\u9078\u4E00\uFF09" },
+      path: { type: "string", description: "\u5C08\u6848\u6839\u8DEF\u5F91\uFF08\u9810\u8A2D\u5F9E session cwd \u63A8\u65B7\uFF09" }
     },
     output: {
       schema: {
@@ -5789,7 +5789,7 @@ function buildTodoDoneTool({ fs, sandboxPolicy }) {
       render: (_args, value) => {
         if (value.ok) {
           const d = value.data || {};
-          return [{ type: "text", text: `dsh-project-brain: todo done \u2713 ${d.title}\uFF0C\u5269\u4F59\u6D3B\u8DC3 ${d.activeCount}` }];
+          return [{ type: "text", text: `dsh-project-brain: todo done \u2713 ${d.title}\uFF0C\u5269\u9918\u6D3B\u8E8D ${d.activeCount}` }];
         }
         return [{ type: "text", text: `dsh-project-brain: todo done FAILED - ${value && value.code}: ${value && value.message}` }];
       }
@@ -5798,12 +5798,12 @@ function buildTodoDoneTool({ fs, sandboxPolicy }) {
       try {
         const projectPath = resolveProjectPath(args, exec, sandboxPolicy);
         const ref = args && (args.id || args.title) || "";
-        if (!ref) return { ok: false, code: "E_NO_REF", message: "id \u6216 title \u5FC5\u586B\u4E00\u9879" };
+        if (!ref) return { ok: false, code: "E_NO_REF", message: "id \u6216 title \u5FC5\u586B\u4E00\u9805" };
         const todoPath = brainPath2(projectPath, "todo.jsonl");
         const todos = await readJsonl(fs, todoPath);
         const target = findTodo(todos, ref);
         if (!target) {
-          return { ok: false, code: "E_NOT_FOUND", message: "\u672A\u627E\u5230\u5339\u914D\u7684\u6D3B\u8DC3\u5F85\u529E\uFF1A" + ref };
+          return { ok: false, code: "E_NOT_FOUND", message: "\u672A\u627E\u5230\u5339\u914D\u7684\u6D3B\u8E8D\u5F85\u8FA6\uFF1A" + ref };
         }
         const now = Date.now();
         for (const t of todos) {
@@ -5816,7 +5816,7 @@ function buildTodoDoneTool({ fs, sandboxPolicy }) {
         if (!wrote) return { ok: false, code: "E_WRITE_FAILED", message: "failed to rewrite todo.jsonl" };
         await appendJsonl(fs, brainPath2(projectPath, "timeline.jsonl"), {
           id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-          title: "\u5B8C\u6210\u5F85\u529E\uFF1A" + target.title,
+          title: "\u5B8C\u6210\u5F85\u8FA6\uFF1A" + target.title,
           eventType: "todo",
           occurredAt: now
         });
@@ -5852,33 +5852,33 @@ var baseOutputSchema2 = {
 function buildTodoUpdateTool({ fs, sandboxPolicy }) {
   return defineTool4({
     name: "project_todo_update",
-    description: "dsh-project-brain: \u66F4\u65B0\u4E00\u6761\u5F85\u529E\uFF08\u6309 id \u6216 title \u5339\u914D\uFF09\u3002\u53EF\u6539 status\uFF08pending/in_progress/blocked/done/cancelled\uFF09\u3001title\u3001description\u3001priority\uFF08low/medium/high/urgent\uFF09\u3002\u5B8C\u6210\u540E\u5199 timeline \u4E8B\u4EF6\u5E76\u89E6\u53D1 preview \u5237\u65B0\u3002",
+    description: "dsh-project-brain: \u66F4\u65B0\u4E00\u689D\u5F85\u8FA6\uFF08\u6309 id \u6216 title \u5339\u914D\uFF09\u3002\u53EF\u6539 status\uFF08pending/in_progress/blocked/done/cancelled\uFF09\u3001title\u3001description\u3001priority\uFF08low/medium/high/urgent\uFF09\u3002\u5B8C\u6210\u5F8C\u5BEB timeline \u4E8B\u4EF6\u4E26\u89F8\u767C preview \u91CD\u65B0\u6574\u7406\u3002",
     parameters: {
-      id: { type: "string", description: "todo id \u6216\u5176\u524D\u7F00\uFF08\u4E0E title \u4E8C\u9009\u4E00\uFF09" },
-      title: { type: "string", description: "todo \u6807\u9898\u7CBE\u786E\u5339\u914D\uFF08\u4E0E id \u4E8C\u9009\u4E00\uFF09" },
-      status: { type: "string", description: "\u65B0\u72B6\u6001\uFF1A" + TODO_STATUSES.join(" | ") },
-      newTitle: { type: "string", description: "\u65B0\u6807\u9898\uFF08\u53EF\u9009\uFF09" },
-      description: { type: "string", description: "\u65B0\u63CF\u8FF0\uFF08\u53EF\u9009\uFF09" },
-      priority: { type: "string", description: "\u65B0\u4F18\u5148\u7EA7\uFF1A" + TODO_PRIORITIES.join(" | ") },
-      path: { type: "string", description: "\u9879\u76EE\u6839\u8DEF\u5F84\uFF08\u9ED8\u8BA4\u4ECE session cwd \u63A8\u65AD\uFF09" }
+      id: { type: "string", description: "todo id \u6216\u5176\u5B57\u9996\uFF08\u8207 title \u4E8C\u9078\u4E00\uFF09" },
+      title: { type: "string", description: "todo \u6A19\u984C\u7CBE\u78BA\u5339\u914D\uFF08\u8207 id \u4E8C\u9078\u4E00\uFF09" },
+      status: { type: "string", description: "\u65B0\u72C0\u614B\uFF1A" + TODO_STATUSES.join(" | ") },
+      newTitle: { type: "string", description: "\u65B0\u6A19\u984C\uFF08\u53EF\u9078\uFF09" },
+      description: { type: "string", description: "\u65B0\u63CF\u8FF0\uFF08\u53EF\u9078\uFF09" },
+      priority: { type: "string", description: "\u65B0\u512A\u5148\u9806\u5E8F\uFF1A" + TODO_PRIORITIES.join(" | ") },
+      path: { type: "string", description: "\u5C08\u6848\u6839\u8DEF\u5F91\uFF08\u9810\u8A2D\u5F9E session cwd \u63A8\u65B7\uFF09" }
     },
     output: { schema: baseOutputSchema2, render: (_args, value) => renderTodoUpdate(value) },
     async execute(args, exec) {
       try {
         const projectPath = resolveProjectPath(args, exec, sandboxPolicy);
         const ref = args && (args.id || args.title) || "";
-        if (!ref) return { ok: false, data: { error: { code: "E_NO_REF", message: "id \u6216 title \u5FC5\u586B\u4E00\u9879" } } };
+        if (!ref) return { ok: false, data: { error: { code: "E_NO_REF", message: "id \u6216 title \u5FC5\u586B\u4E00\u9805" } } };
         const todoPath = brainPath2(projectPath, "todo.jsonl");
         const todos = await readJsonl(fs, todoPath);
         const target = findTodo(todos, ref);
-        if (!target) return { ok: false, data: { error: { code: "E_NOT_FOUND", message: "\u672A\u627E\u5230\u5339\u914D\u7684\u6D3B\u8DC3\u5F85\u529E\uFF1A" + ref } } };
+        if (!target) return { ok: false, data: { error: { code: "E_NOT_FOUND", message: "\u672A\u627E\u5230\u5339\u914D\u7684\u6D3B\u8E8D\u5F85\u8FA6\uFF1A" + ref } } };
         const now = Date.now();
         let changed = [];
         for (const t of todos) {
           if (t.id !== target.id) continue;
           if (args.status != null) {
             const ns = normalizeStatus(args.status);
-            if (!ns) return { ok: false, data: { error: { code: "E_INVALID_STATUS", message: "status \u5FC5\u987B\u662F " + TODO_STATUSES.join("/") } } };
+            if (!ns) return { ok: false, data: { error: { code: "E_INVALID_STATUS", message: "status \u5FC5\u9808\u662F " + TODO_STATUSES.join("/") } } };
             if (t.status !== ns) {
               t.status = ns;
               changed.push("status=" + ns);
@@ -5886,7 +5886,7 @@ function buildTodoUpdateTool({ fs, sandboxPolicy }) {
           }
           if (args.priority != null) {
             const np = normalizePriority(args.priority);
-            if (!np) return { ok: false, data: { error: { code: "E_INVALID_PRIORITY", message: "priority \u5FC5\u987B\u662F " + TODO_PRIORITIES.join("/") } } };
+            if (!np) return { ok: false, data: { error: { code: "E_INVALID_PRIORITY", message: "priority \u5FC5\u9808\u662F " + TODO_PRIORITIES.join("/") } } };
             if (t.priority !== np) {
               t.priority = np;
               changed.push("priority=" + np);
@@ -5906,7 +5906,7 @@ function buildTodoUpdateTool({ fs, sandboxPolicy }) {
         if (!wrote) return { ok: false, data: { error: { code: "E_WRITE_FAILED", message: "failed to rewrite todo.jsonl" } } };
         await appendJsonl(fs, brainPath2(projectPath, "timeline.jsonl"), {
           id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-          title: "\u66F4\u65B0\u5F85\u529E[" + target.id + "]\uFF1A" + target.title + (changed.length ? "\uFF08" + changed.join(",") + "\uFF09" : ""),
+          title: "\u66F4\u65B0\u5F85\u8FA6[" + target.id + "]\uFF1A" + target.title + (changed.length ? "\uFF08" + changed.join(",") + "\uFF09" : ""),
           eventType: "todo_update",
           occurredAt: now
         });
@@ -5944,7 +5944,7 @@ function truncateSummaryToTokens(text, maxTokens) {
   if (estimateTokens(raw) <= maxTokens) return raw;
   const parts = raw.split(/(?<=[。！？.!?])\s*/).filter(Boolean);
   let acc = "";
-  const suffix = "\uFF08\u6458\u8981\u5DF2\u622A\u65AD\uFF09";
+  const suffix = "\uFF08\u6458\u8981\u5DF2\u622A\u65B7\uFF09";
   for (const part of parts) {
     const next = acc + part;
     if (estimateTokens(next + suffix) > maxTokens) break;
@@ -6062,7 +6062,7 @@ function recentWorkAgeLabel(at, now) {
   if (!at) return "";
   const days = ageDays(at, now);
   if (days <= 0) return "\u4ECA\u5929";
-  if (days > RECENT_WORK_STALE_DAYS) return days + " \u5929\u524D\uFF0C\u53EF\u80FD\u5DF2\u8FC7\u65F6";
+  if (days > RECENT_WORK_STALE_DAYS) return days + " \u5929\u524D\uFF0C\u53EF\u80FD\u5DF2\u904E\u6642";
   return days + " \u5929\u524D";
 }
 function recentWorkFrom(brain, now) {
@@ -6080,7 +6080,7 @@ function recentWorkFrom(brain, now) {
   const inProgress = stuckTodos(brain.todos).filter((t) => t.status === "in_progress");
   if (inProgress.length) {
     return {
-      recentWork: inProgress.map((t) => "\u8FDB\u884C\u4E2D " + t.title).join("\uFF1B"),
+      recentWork: inProgress.map((t) => "\u9032\u884C\u4E2D " + t.title).join("\uFF1B"),
       recentWorkSource: "todo",
       recentWorkAt: 0,
       recentWorkStale: false
@@ -6090,23 +6090,23 @@ function recentWorkFrom(brain, now) {
 }
 function briefingMarkdown({ stale, purpose, startHere: files, recentWork, recentWorkAt, now }) {
   const lines = [];
-  lines.push("### \u8FD9\u662F\u4EC0\u4E48");
-  lines.push(purpose || "\uFF08\u6682\u65E0\u9879\u76EE\u5B9A\u4F4D\uFF0C\u91CD\u626B\u53EF\u7531\u67B6\u6784\u5206\u6790\u8865\u5168\uFF09");
+  lines.push("### \u9019\u662F\u4EC0\u9EBC");
+  lines.push(purpose || "\uFF08\u66AB\u7121\u5C08\u6848\u5B9A\u4F4D\uFF0C\u91CD\u6383\u53EF\u7531\u67B6\u69CB\u5206\u6790\u88DC\u5168\uFF09");
   lines.push("");
-  lines.push("### \u6700\u8FD1\u505A\u4EC0\u4E48");
+  lines.push("### \u6700\u8FD1\u505A\u4EC0\u9EBC");
   if (recentWork) {
     const age = recentWorkAgeLabel(recentWorkAt, now);
     lines.push(recentWork.replace(/\n+/g, " ") + (age ? "\uFF08" + age + "\uFF09" : ""));
   } else {
-    lines.push("\uFF08\u6682\u65E0\u4F1A\u8BDD\u6458\u8981\uFF09");
+    lines.push("\uFF08\u66AB\u7121\u6703\u8A71\u6458\u8981\uFF09");
   }
   lines.push("");
-  lines.push("### \u4ECE\u54EA\u6539");
-  if (stale) lines.push("\u67B6\u6784\u53EF\u80FD\u8FC7\u671F\uFF0C\u5173\u952E\u6587\u4EF6\u6309\u626B\u63CF\u5165\u53E3\u964D\u7EA7\u3002");
+  lines.push("### \u5F9E\u54EA\u6539");
+  if (stale) lines.push("\u67B6\u69CB\u53EF\u80FD\u904E\u671F\uFF0C\u95DC\u9375\u6A94\u6848\u6309\u6383\u63CF\u5165\u53E3\u964D\u7D1A\u3002");
   if (files.length) {
     for (const f of files) lines.push("- " + f);
   } else {
-    lines.push("- \uFF08\u6682\u65E0\u5165\u53E3\uFF09");
+    lines.push("- \uFF08\u66AB\u7121\u5165\u53E3\uFF09");
   }
   return lines.join("\n");
 }
@@ -6164,15 +6164,15 @@ function buildInjectionContext(brain) {
   }
   const stuck = Array.isArray(briefing.stuck) ? briefing.stuck : [];
   if (stuck.length > 0) {
-    lines.push("### \u6D3B\u8DC3\u5F85\u529E");
+    lines.push("### \u6D3B\u8E8D\u5F85\u8FA6");
     for (const todo of stuck) {
-      const status = todo.status === "in_progress" ? "\u8FDB\u884C\u4E2D" : todo.status === "blocked" ? "\u963B\u585E" : "\u5F85\u529E";
+      const status = todo.status === "in_progress" ? "\u9032\u884C\u4E2D" : todo.status === "blocked" ? "\u963B\u585E" : "\u5F85\u8FA6";
       lines.push("- [" + status + "] " + todo.title);
     }
     lines.push("");
   }
   if (memories.length > 0) {
-    lines.push("### Core \u8BB0\u5FC6");
+    lines.push("### Core \u8A18\u61B6");
     for (const m of memories) {
       const tag = m.type ? "[" + m.type + "] " : "";
       lines.push("- " + tag + m.title);
@@ -6182,11 +6182,11 @@ function buildInjectionContext(brain) {
     }
     lines.push("");
   }
-  lines.push("### \u9879\u76EE\u8BB0\u5FC6\u7EA6\u5B9A");
-  lines.push("- \u53EA\u5BF9\u8DE8\u4F1A\u8BDD\u4ECD\u4E3A\u771F\u7684\u51B3\u7B56\u3001\u7EA6\u675F\u3001\u67B6\u6784\u4E8B\u5B9E\u6216\u6559\u8BAD\u8C03\u7528 `project_memory_add`\uFF1B\u6807\u9898\u5199\u6210\u7AD9\u7ACB\u4E8B\u5B9E\u53E5\uFF0C\u4E0D\u8981\u5199\u6210 v1.2.0 patch / \u9A8C\u6536\u6E05\u5355\u3002");
-  lines.push("- \u5DE5\u5177\u53EF\u80FD\u62D2\u7EDD\uFF0C\u4E0D\u8981\u628A changelog / \u672C\u6B21\u6539\u4E86\u54EA\u4E9B\u6587\u4EF6\u518D\u5199\u4E00\u904D\u3002\u6B63\u6587\u4FDD\u6301 2\u20134 \u53E5\u3002");
-  lines.push("- \u8FDB\u884C\u4E2D\u7684\u5DE5\u4F5C\u7528 `project_todo_add` / `project_todo_update` / `project_todo_done` \u8DDF\u8E2A\uFF0C\u7EED\u63A5\u4F9D\u8D56 TODO\uFF0C\u800C\u4E0D\u662F\u628A\u4F1A\u8BDD\u6D41\u6C34\u8D26\u585E\u8FDB\u8BB0\u5FC6\u3002");
-  lines.push("- \u9879\u76EE\u7ED3\u6784\u660E\u663E\u53D8\u5316\u540E\u8C03\u7528 `project_rescan`\uFF1B\u9700\u8981\u7406\u89E3\u6700\u8FD1\u4EE3\u7801\u53D8\u5316\u65F6\u8C03\u7528 `project_diff`\uFF08\u9ED8\u8BA4 dry-run\uFF09\u3002");
+  lines.push("### \u5C08\u6848\u8A18\u61B6\u7D04\u5B9A");
+  lines.push("- \u53EA\u5C0D\u8DE8\u6703\u8A71\u4ECD\u70BA\u771F\u7684\u6C7A\u7B56\u3001\u7D04\u675F\u3001\u67B6\u69CB\u4E8B\u5BE6\u6216\u6559\u8A13\u547C\u53EB `project_memory_add`\uFF1B\u6A19\u984C\u5BEB\u6210\u7AD9\u7ACB\u4E8B\u5BE6\u53E5\uFF0C\u4E0D\u8981\u5BEB\u6210 v1.2.0 patch / \u9A57\u6536\u6E05\u55AE\u3002");
+  lines.push("- \u5DE5\u5177\u53EF\u80FD\u62D2\u7D55\uFF0C\u4E0D\u8981\u628A changelog / \u672C\u6B21\u6539\u4E86\u54EA\u4E9B\u6A94\u6848\u518D\u5BEB\u4E00\u904D\u3002\u6B63\u6587\u4FDD\u6301 2\u20134 \u53E5\u3002");
+  lines.push("- \u9032\u884C\u4E2D\u7684\u5DE5\u4F5C\u7528 `project_todo_add` / `project_todo_update` / `project_todo_done` \u8DDF\u8E64\uFF0C\u7E8C\u63A5\u4F9D\u8CF4 TODO\uFF0C\u800C\u4E0D\u662F\u628A\u6703\u8A71\u6D41\u6C34\u8CEC\u585E\u9032\u8A18\u61B6\u3002");
+  lines.push("- \u5C08\u6848\u7D50\u69CB\u660E\u986F\u8B8A\u5316\u5F8C\u547C\u53EB `project_rescan`\uFF1B\u9700\u8981\u7406\u89E3\u6700\u8FD1\u7A0B\u5F0F\u78BC\u8B8A\u5316\u6642\u547C\u53EB `project_diff`\uFF08\u9810\u8A2D dry-run\uFF09\u3002");
   return lines.join("\n");
 }
 
@@ -6194,9 +6194,9 @@ function buildInjectionContext(brain) {
 function buildContinueTool({ fs, sandboxPolicy }) {
   return defineTool5({
     name: "project_continue",
-    description: "dsh-project-brain: \u6062\u590D\u5F53\u524D\u9879\u76EE\u7684\u5F00\u53D1\u4E0A\u4E0B\u6587\uFF08\u7528\u6237\u8BF4\u300C\u7EE7\u7EED\u4E0A\u6B21\u7684\u5F00\u53D1\u300D\u65F6\u8C03\u7528\uFF09\u3002\u8FD4\u56DE\u9879\u76EE\u6982\u8981\u3001\u5168\u90E8 Core \u8BB0\u5FC6\u3001\u4E0A\u6B21\u4F1A\u8BDD\u6458\u8981\u3001\u6D3B\u8DC3\u5F85\u529E\u4E0E\u5EFA\u8BAE\u4E0B\u4E00\u6B65\uFF0C\u636E\u6B64\u53EF\u76F4\u63A5\u7EED\u63A5\u5F00\u53D1\uFF0C\u65E0\u9700\u7528\u6237\u91CD\u65B0\u63CF\u8FF0\u9879\u76EE\u3002",
+    description: "dsh-project-brain: \u6062\u5FA9\u7576\u524D\u5C08\u6848\u7684\u958B\u767C\u4E0A\u4E0B\u6587\uFF08\u4F7F\u7528\u8005\u8AAA\u300C\u7E7C\u7E8C\u4E0A\u6B21\u7684\u958B\u767C\u300D\u6642\u547C\u53EB\uFF09\u3002\u8FD4\u56DE\u5C08\u6848\u6982\u8981\u3001\u5168\u90E8 Core \u8A18\u61B6\u3001\u4E0A\u6B21\u6703\u8A71\u6458\u8981\u3001\u6D3B\u8E8D\u5F85\u8FA6\u8207\u5EFA\u8B70\u4E0B\u4E00\u6B65\uFF0C\u64DA\u6B64\u53EF\u76F4\u63A5\u7E8C\u63A5\u958B\u767C\uFF0C\u7121\u9700\u4F7F\u7528\u8005\u91CD\u65B0\u63CF\u8FF0\u5C08\u6848\u3002",
     parameters: {
-      path: { type: "string", description: "\u9879\u76EE\u6839\u8DEF\u5F84\uFF08\u7EDD\u5BF9\u8DEF\u5F84\uFF09\uFF0C\u9ED8\u8BA4 sandboxPolicy.workspaceRoot" }
+      path: { type: "string", description: "\u5C08\u6848\u6839\u8DEF\u5F91\uFF08\u7D55\u5C0D\u8DEF\u5F91\uFF09\uFF0C\u9810\u8A2D sandboxPolicy.workspaceRoot" }
     },
     output: {
       schema: {
@@ -6241,7 +6241,7 @@ function buildContinueTool({ fs, sandboxPolicy }) {
           return {
             ok: false,
             code: "E_NOT_INITIALIZED",
-            message: "\u8BE5\u9879\u76EE\u8FD8\u6CA1\u6709 .project-brain/project.json\uFF0C\u8BF7\u5148\u8C03\u7528 project_init"
+            message: "\u8A72\u5C08\u6848\u9084\u6C92\u6709 .project-brain/project.json\uFF0C\u8ACB\u5148\u547C\u53EB project_init"
           };
         }
         return { ok: true, data };
@@ -6287,8 +6287,8 @@ function buildLocalFallback(evidence) {
     const top = t.inProgress[0];
     const relatedMem = pickRelatedMem(top, memories);
     return {
-      title: "\u7EE7\u7EED\u63A8\u8FDB\uFF1A" + truncate(top.title, 60),
-      reason: relatedMem ? "\u4E0A\u6B21\u4E2D\u65AD\u5728 \u201C" + truncate(relatedMem.title, 30) + "\u201D \u76F8\u5173\u5DE5\u4F5C" : "\u4F60\u6B63\u5728\u5904\u7406\u8FD9\u6761\u4EFB\u52A1\uFF08in_progress\uFF09",
+      title: "\u7E7C\u7E8C\u63A8\u9032\uFF1A" + truncate(top.title, 60),
+      reason: relatedMem ? "\u4E0A\u6B21\u4E2D\u65B7\u5728 \u201C" + truncate(relatedMem.title, 30) + "\u201D \u76F8\u95DC\u5DE5\u4F5C" : "\u4F60\u6B63\u5728\u8655\u7406\u9019\u689D\u4EFB\u52D9\uFF08in_progress\uFF09",
       confidence: 0.85,
       suggestedTodoId: top.id || null,
       suggestedMemoryIds: relatedMem ? [relatedMem.id] : [],
@@ -6300,8 +6300,8 @@ function buildLocalFallback(evidence) {
     const top = sorted[0];
     const relatedMem = pickRelatedMem(top, memories);
     return {
-      title: "\u5EFA\u8BAE\u5F00\u59CB\uFF1A" + truncate(top.title, 60),
-      reason: relatedMem ? "\u4E0E\u5DF2\u8BB0\u5F55\u7684 \u201C" + truncate(relatedMem.title, 30) + "\u201D \u51B3\u7B56/\u6559\u8BAD\u76F8\u5173" : "\u8FD9\u662F\u5F53\u524D\u6700\u9AD8\u4F18\u5148\u7EA7\u5F85\u529E\uFF08" + (top.priority || "medium") + "\uFF09",
+      title: "\u5EFA\u8B70\u958B\u59CB\uFF1A" + truncate(top.title, 60),
+      reason: relatedMem ? "\u8207\u5DF2\u8A18\u9304\u7684 \u201C" + truncate(relatedMem.title, 30) + "\u201D \u6C7A\u7B56/\u6559\u8A13\u76F8\u95DC" : "\u9019\u662F\u7576\u524D\u6700\u9AD8\u512A\u5148\u9806\u5E8F\u5F85\u8FA6\uFF08" + (top.priority || "medium") + "\uFF09",
       confidence: 0.7,
       suggestedTodoId: top.id || null,
       suggestedMemoryIds: relatedMem ? [relatedMem.id] : [],
@@ -6310,8 +6310,8 @@ function buildLocalFallback(evidence) {
   }
   if (t.blocked.length > 0) {
     return {
-      title: "\u89E3\u51B3\u963B\u585E\uFF1A" + truncate(t.blocked[0].title, 60),
-      reason: "\u6709 " + t.blocked.length + " \u4E2A\u4EFB\u52A1\u88AB\u963B\u585E\uFF0C\u5148\u89E3\u51B3\u963B\u585E\u53EF\u89E3\u9501\u540E\u7EED\u5DE5\u4F5C",
+      title: "\u89E3\u6C7A\u963B\u585E\uFF1A" + truncate(t.blocked[0].title, 60),
+      reason: "\u6709 " + t.blocked.length + " \u500B\u4EFB\u52D9\u88AB\u963B\u585E\uFF0C\u5148\u89E3\u6C7A\u963B\u585E\u53EF\u89E3\u9396\u5F8C\u7E8C\u5DE5\u4F5C",
       confidence: 0.5,
       suggestedTodoId: t.blocked[0].id || null,
       suggestedMemoryIds: [],
@@ -6325,8 +6325,8 @@ function buildLocalFallback(evidence) {
     });
     if (recents.length > 0) {
       return {
-        title: "\u56DE\u987E\u8FD1\u671F\u8BB0\u5FC6\uFF1A" + truncate(recents[0].title, 60),
-        reason: daysSinceLastSession != null && daysSinceLastSession > 0 ? "\u8DDD\u4E0A\u6B21 Session " + daysSinceLastSession + " \u5929\uFF0C\u5148\u56DE\u987E\u8FD1\u671F\u9879\u76EE\u77E5\u8BC6" : "\u6700\u8FD1\u8BB0\u5F55\u7684\u9879\u76EE\u51B3\u7B56\u53EF\u4F5C\u4E3A\u4E0B\u4E00\u6B65\u8D77\u70B9",
+        title: "\u56DE\u9867\u8FD1\u671F\u8A18\u61B6\uFF1A" + truncate(recents[0].title, 60),
+        reason: daysSinceLastSession != null && daysSinceLastSession > 0 ? "\u8DDD\u4E0A\u6B21 Session " + daysSinceLastSession + " \u5929\uFF0C\u5148\u56DE\u9867\u8FD1\u671F\u5C08\u6848\u77E5\u8B58" : "\u6700\u8FD1\u8A18\u9304\u7684\u5C08\u6848\u6C7A\u7B56\u53EF\u4F5C\u70BA\u4E0B\u4E00\u6B65\u8D77\u9EDE",
         confidence: 0.45,
         suggestedTodoId: null,
         suggestedMemoryIds: [recents[0].id],
@@ -6336,8 +6336,8 @@ function buildLocalFallback(evidence) {
   }
   if (recentEvents.length > 0) {
     return {
-      title: "\u56DE\u987E\u4E0A\u6B21\u6D3B\u52A8\uFF1A" + truncate(recentEvents.title, 60),
-      reason: "\u9879\u76EE\u65E0\u6D3B\u8DC3\u4EFB\u52A1\uFF0C\u53EF\u4ECE\u6700\u8FD1\u6D3B\u52A8\u5165\u624B",
+      title: "\u56DE\u9867\u4E0A\u6B21\u6D3B\u52D5\uFF1A" + truncate(recentEvents.title, 60),
+      reason: "\u5C08\u6848\u7121\u6D3B\u8E8D\u4EFB\u52D9\uFF0C\u53EF\u5F9E\u6700\u8FD1\u6D3B\u52D5\u5165\u624B",
       confidence: 0.3,
       suggestedTodoId: null,
       suggestedMemoryIds: [],
@@ -6345,8 +6345,8 @@ function buildLocalFallback(evidence) {
     };
   }
   return {
-    title: project ? "\u89C4\u5212\u4E0B\u4E00\u6B65" : "\u521D\u59CB\u5316\u9879\u76EE\u8111",
-    reason: project ? "\u6682\u65E0\u5F85\u529E\u548C\u8FD1\u671F\u8BB0\u5FC6\uFF0C\u5EFA\u8BAE\u7528 project_todo_add \u89C4\u5212\u4E0B\u4E00\u6B65" : "\u9879\u76EE\u8111\u8FD8\u672A\u521D\u59CB\u5316\uFF0C\u8C03\u7528 project_init \u5F00\u59CB",
+    title: project ? "\u898F\u5283\u4E0B\u4E00\u6B65" : "\u521D\u59CB\u5316\u5C08\u6848\u8166",
+    reason: project ? "\u66AB\u7121\u5F85\u8FA6\u548C\u8FD1\u671F\u8A18\u61B6\uFF0C\u5EFA\u8B70\u7528 project_todo_add \u898F\u5283\u4E0B\u4E00\u6B65" : "\u5C08\u6848\u8166\u9084\u672A\u521D\u59CB\u5316\uFF0C\u547C\u53EB project_init \u958B\u59CB",
     confidence: 0.2,
     suggestedTodoId: null,
     suggestedMemoryIds: [],
@@ -6389,17 +6389,17 @@ function buildSuggestPrompt(evidence) {
     architectureSummary: evidence.architecture && evidence.architecture.summary ? truncate(evidence.architecture.summary, 400) : null
   };
   return [
-    "\u4F60\u662F dsh-project-brain \u7684\u300C\u667A\u80FD\u7EED\u63A5\u300D\u52A9\u624B\u3002Session \u5F00\u59CB\u65F6\u7ED9\u7528\u6237 1-2 \u53E5\u8BDD + \u4E00\u6761\u300C\u7406\u7531\u300D\uFF0C\u8BA9\u4ED6\u4E0D\u9700\u8981\u91CD\u65B0\u63CF\u8FF0\u9879\u76EE\u5C31\u77E5\u9053\u4ECA\u5929\u80FD\u505A\u4EC0\u4E48\u3002",
-    "\u6839\u636E\u4E0B\u9762\u63D0\u4F9B\u7684\u9879\u76EE\u72B6\u6001\uFF08\u6D3B\u8DC3 TODO / \u8BB0\u5FC6 / \u65F6\u95F4\u7EBF / \u67B6\u6784\u6982\u51B5\uFF09\u5224\u65AD\uFF1A\u4ECA\u5929\u6700\u503C\u5F97\u63A8\u8FDB\u7684\u4E00\u4EF6\u4E8B\u662F\u4EC0\u4E48\uFF1F\u7406\u7531\u662F\u4EC0\u4E48\uFF1F",
-    "\u89C4\u5219\uFF1A",
-    "1) title \u5FC5\u987B\u7B80\u6D01\uFF08\u2264 30 \u5B57\uFF09\uFF0C\u662F\u52A8\u8BCD\u5F00\u5934\uFF08\u300C\u7EE7\u7EED X\u300D\u300C\u5EFA\u8BAE\u5F00\u59CB X\u300D\u300C\u56DE\u987E X\u300D\u300C\u89E3\u51B3 X\u300D\u300C\u89C4\u5212 X\u300D\uFF09\uFF1B",
-    "3) reason \u5FC5\u987B\u6709\u4F9D\u636E\uFF1A\u5F15\u7528\u5177\u4F53\u7684 TODO id\u3001\u8BB0\u5FC6 title\u3001\u6216\u8005\u65F6\u95F4\u7EBF\u4E8B\u4EF6\uFF1B",
-    "4) suggestedTodoId \u5FC5\u987B\u586B 1 \u4E2A\uFF08\u6700\u76F8\u5173\u7684\u90A3\u4E2A active todo\uFF09\uFF0CsuggestedMemoryIds \u586B 1-3 \u4E2A\u6700\u76F8\u5173\u7684\u8BB0\u5FC6\uFF1B",
-    "5) confidence 0~1\uFF1A\u8FDB\u884C\u4E2D\u4EFB\u52A1 \u22650.8\uFF0C\u6700\u9AD8\u7EA7 pending 0.5-0.8\uFF0C\u8BB0\u5FC6\u63A8\u65AD 0.3-0.5\uFF0C\u7EAF\u7A7A\u767D \u22640.3\uFF1B",
-    "6) \u4E0D\u5141\u8BB8\u7F16\u9020\u4FE1\u606F\uFF1B\u53EA\u80FD\u57FA\u4E8E\u63D0\u4F9B\u7684 evidence\uFF1B\u5982\u679C\u5B8C\u5168\u6CA1\u6570\u636E\uFF0Ctitle \u5199\u300C\u521D\u59CB\u5316\u9879\u76EE\u8111\u300D\u6216\u300C\u89C4\u5212\u4E0B\u4E00\u6B65\u300D\uFF1B",
-    "7) \u8F93\u51FA\u4E25\u683C JSON \u5BF9\u8C61\uFF0C\u4E0D\u8981 Markdown\u3002",
-    "\u683C\u5F0F\uFF1A" + JSON.stringify({ title: "\u52A8\u8BCD + \u5185\u5BB9", reason: "\u4F9D\u636E + \u4E0A\u4E0B\u6587", confidence: 0.7, suggestedTodoId: "todo id \u6216 null", suggestedMemoryIds: ["memory id"] }),
-    "\u8BC1\u636E\uFF1A" + JSON.stringify(payload)
+    "\u4F60\u662F dsh-project-brain \u7684\u300C\u667A\u6167\u7E8C\u63A5\u300D\u52A9\u624B\u3002Session \u958B\u59CB\u6642\u7D66\u4F7F\u7528\u8005 1-2 \u53E5\u8A71 + \u4E00\u689D\u300C\u7406\u7531\u300D\uFF0C\u8B93\u4ED6\u4E0D\u9700\u8981\u91CD\u65B0\u63CF\u8FF0\u5C08\u6848\u5C31\u77E5\u9053\u4ECA\u5929\u80FD\u505A\u4EC0\u9EBC\u3002",
+    "\u6839\u64DA\u4E0B\u9762\u63D0\u4F9B\u7684\u5C08\u6848\u72C0\u614B\uFF08\u6D3B\u8E8D TODO / \u8A18\u61B6 / \u6642\u9593\u7DDA / \u67B6\u69CB\u6982\u6CC1\uFF09\u5224\u65B7\uFF1A\u4ECA\u5929\u6700\u503C\u5F97\u63A8\u9032\u7684\u4E00\u4EF6\u4E8B\u662F\u4EC0\u9EBC\uFF1F\u7406\u7531\u662F\u4EC0\u9EBC\uFF1F",
+    "\u898F\u5247\uFF1A",
+    "1) title \u5FC5\u9808\u7C21\u6F54\uFF08\u2264 30 \u5B57\uFF09\uFF0C\u662F\u52D5\u8A5E\u958B\u982D\uFF08\u300C\u7E7C\u7E8C X\u300D\u300C\u5EFA\u8B70\u958B\u59CB X\u300D\u300C\u56DE\u9867 X\u300D\u300C\u89E3\u6C7A X\u300D\u300C\u898F\u5283 X\u300D\uFF09\uFF1B",
+    "3) reason \u5FC5\u9808\u6709\u4F9D\u64DA\uFF1A\u5F15\u7528\u5177\u9AD4\u7684 TODO id\u3001\u8A18\u61B6 title\u3001\u6216\u8005\u6642\u9593\u7DDA\u4E8B\u4EF6\uFF1B",
+    "4) suggestedTodoId \u5FC5\u9808\u586B 1 \u500B\uFF08\u6700\u76F8\u95DC\u7684\u90A3\u500B active todo\uFF09\uFF0CsuggestedMemoryIds \u586B 1-3 \u500B\u6700\u76F8\u95DC\u7684\u8A18\u61B6\uFF1B",
+    "5) confidence 0~1\uFF1A\u9032\u884C\u4E2D\u4EFB\u52D9 \u22650.8\uFF0C\u6700\u9AD8\u968E pending 0.5-0.8\uFF0C\u8A18\u61B6\u63A8\u65B7 0.3-0.5\uFF0C\u7D14\u7A7A\u767D \u22640.3\uFF1B",
+    "6) \u4E0D\u5141\u8A31\u7DE8\u9020\u8CC7\u8A0A\uFF1B\u53EA\u80FD\u57FA\u65BC\u63D0\u4F9B\u7684 evidence\uFF1B\u5982\u679C\u5B8C\u5168\u6C92\u8CC7\u6599\uFF0Ctitle \u5BEB\u300C\u521D\u59CB\u5316\u5C08\u6848\u8166\u300D\u6216\u300C\u898F\u5283\u4E0B\u4E00\u6B65\u300D\uFF1B",
+    "7) \u8F38\u51FA\u56B4\u683C JSON \u7269\u4EF6\uFF0C\u4E0D\u8981 Markdown\u3002",
+    "\u683C\u5F0F\uFF1A" + JSON.stringify({ title: "\u52D5\u8A5E + \u5167\u5BB9", reason: "\u4F9D\u64DA + \u4E0A\u4E0B\u6587", confidence: 0.7, suggestedTodoId: "todo id \u6216 null", suggestedMemoryIds: ["memory id"] }),
+    "\u8B49\u64DA\uFF1A" + JSON.stringify(payload)
   ].join("\n");
 }
 function compactTodo(t) {
@@ -6496,7 +6496,7 @@ async function tryLlmSuggestion({ llm, route, sessionId, brain, temperature }) {
       system: "You are the dsh-project-brain 'smart continue' advisor. Output strict JSON only. Never invent TODOs, memories or files that were not provided as evidence.",
       maxTokens: 400,
       purpose: "project-suggest-next",
-      // v0.4.17：deterministic 输出，让同一项目下不同 session 拿到的建议尽量一致
+      // v0.4.17：deterministic 輸出，讓同一專案下不同 session 拿到的建議儘量一致
       temperature: typeof temperature === "number" ? temperature : 0
     });
   } catch (error) {
@@ -6505,7 +6505,7 @@ async function tryLlmSuggestion({ llm, route, sessionId, brain, temperature }) {
   const parsed = parseSuggestJson(text);
   if (!parsed) return { ok: false, error: "INVALID_JSON", message: "LLM \u8FD4\u56DE\u975E JSON" };
   const normalized = normalizeSuggestion(parsed);
-  if (!normalized) return { ok: false, error: "INVALID_SCHEMA", message: "LLM JSON \u7F3A\u5C11\u5FC5\u8981\u5B57\u6BB5" };
+  if (!normalized) return { ok: false, error: "INVALID_SCHEMA", message: "LLM JSON \u7F3A\u5C11\u5FC5\u8981\u6B04\u4F4D" };
   return { ok: true, data: { suggestion: normalized, evidence: summarizeEvidence(evidence), source: "llm" } };
 }
 function summarizeEvidence(evidence) {
@@ -6523,10 +6523,10 @@ function summarizeEvidence(evidence) {
 function buildSuggestTool({ fs, sandboxPolicy, getLlm }) {
   return defineTool6({
     name: "project_suggest_next",
-    description: "dsh-project-brain: \u667A\u80FD\u7EED\u63A5\u3002Session \u5F00\u59CB\u65F6\u7ED9\u7528\u6237\u4E00\u53E5\u300C\u4ECA\u5929\u53EF\u80FD\u60F3\u63A8\u8FDB\u4EC0\u4E48\u300D+ \u4F9D\u636E\uFF0C\u7ED3\u5408\u6D3B\u8DC3 TODO / \u8FD1\u671F\u8BB0\u5FC6 / \u6700\u8FD1\u6D3B\u52A8 / \u67B6\u6784\u6982\u89C8\u7EFC\u5408\u63A8\u65AD\u3002\u9ED8\u8BA4\u8D70\u672C\u5730\u89C4\u5219\uFF08in_progress > \u6700\u9AD8\u4F18\u5148\u7EA7 pending > \u963B\u585E > \u8BB0\u5FC6\uFF09\uFF0C\u82E5 DSH \u5F53\u524D Session \u6709\u53EF\u7528 LLM route\uFF0C\u4F1A\u81EA\u52A8\u8C03\u6A21\u578B\u5347\u7EA7\u5EFA\u8BAE\u8D28\u91CF\uFF1B\u5931\u8D25\u65F6\u964D\u7EA7\u5230\u672C\u5730\u3002\u9002\u7528\u4E8E\u300C\u4ECA\u5929\u7EE7\u7EED\u4EC0\u4E48 / \u63A5\u4E0B\u6765\u505A\u4EC0\u4E48\u300D\u7B49\u573A\u666F\u3002",
+    description: "dsh-project-brain: \u667A\u6167\u7E8C\u63A5\u3002Session \u958B\u59CB\u6642\u7D66\u4F7F\u7528\u8005\u4E00\u53E5\u300C\u4ECA\u5929\u53EF\u80FD\u60F3\u63A8\u9032\u4EC0\u9EBC\u300D+ \u4F9D\u64DA\uFF0C\u7D50\u5408\u6D3B\u8E8D TODO / \u8FD1\u671F\u8A18\u61B6 / \u6700\u8FD1\u6D3B\u52D5 / \u67B6\u69CB\u6982\u89BD\u7D9C\u5408\u63A8\u65B7\u3002\u9810\u8A2D\u8D70\u672C\u5730\u898F\u5247\uFF08in_progress > \u6700\u9AD8\u512A\u5148\u9806\u5E8F pending > \u963B\u585E > \u8A18\u61B6\uFF09\uFF0C\u82E5 DSH \u7576\u524D Session \u6709\u53EF\u7528 LLM route\uFF0C\u6703\u81EA\u52D5\u8ABF\u6A21\u578B\u5347\u7D1A\u5EFA\u8B70\u8CEA\u91CF\uFF1B\u5931\u6557\u6642\u964D\u7D1A\u5230\u672C\u5730\u3002\u9069\u7528\u65BC\u300C\u4ECA\u5929\u7E7C\u7E8C\u4EC0\u9EBC / \u63A5\u4E0B\u4F86\u505A\u4EC0\u9EBC\u300D\u7B49\u5834\u666F\u3002",
     parameters: {
-      path: { type: "string", description: "\u9879\u76EE\u6839\u8DEF\u5F84\uFF08\u53EF\u9009\uFF1B\u9ED8\u8BA4\u4ECE\u5F53\u524D DSH Session \u7684 workspace \u81EA\u52A8\u89E3\u6790\uFF09" },
-      useLLM: { type: "boolean", description: "\u662F\u5426\u5C1D\u8BD5\u8C03 LLM\uFF08\u9ED8\u8BA4 true\uFF1B\u8BBE false \u5F3A\u5236\u8D70\u672C\u5730\u89C4\u5219\uFF09" }
+      path: { type: "string", description: "\u5C08\u6848\u6839\u8DEF\u5F91\uFF08\u53EF\u9078\uFF1B\u9810\u8A2D\u5F9E\u7576\u524D DSH Session \u7684 workspace \u81EA\u52D5\u89E3\u6790\uFF09" },
+      useLLM: { type: "boolean", description: "\u662F\u5426\u5617\u8A66\u8ABF LLM\uFF08\u9810\u8A2D true\uFF1B\u8A2D false \u5F37\u5236\u8D70\u672C\u5730\u898F\u5247\uFF09" }
     },
     output: { schema: baseOutputSchema3, render: (_args, value) => renderSuggest(value) },
     async execute(args, exec) {
@@ -6534,12 +6534,12 @@ function buildSuggestTool({ fs, sandboxPolicy, getLlm }) {
       try {
         const projectPath = resolveProjectPath(args, exec, sandboxPolicy);
         if (projectPath === ".") {
-          return { ok: false, data: { error: { code: "E_NO_PATH", message: "\u65E0\u6CD5\u4ECE\u5F53\u524D Session \u89E3\u6790 workspace \u8DEF\u5F84" } } };
+          return { ok: false, data: { error: { code: "E_NO_PATH", message: "\u7121\u6CD5\u5F9E\u7576\u524D Session \u89E3\u6790 workspace \u8DEF\u5F91" } } };
         }
         await ensureHousekeepOnRead(fs, projectPath);
         const brain = await readBrain(fs, projectPath);
         if (!brain.project || brain.project.__error) {
-          return { ok: false, data: { error: { code: "E_NOT_INITIALIZED", message: "\u9879\u76EE\u8FD8\u672A\u521D\u59CB\u5316 .project-brain/project.json\uFF0C\u8BF7\u5148\u8C03\u7528 project_init" } } };
+          return { ok: false, data: { error: { code: "E_NOT_INITIALIZED", message: "\u5C08\u6848\u9084\u672A\u521D\u59CB\u5316 .project-brain/project.json\uFF0C\u8ACB\u5148\u547C\u53EB project_init" } } };
         }
         try {
           const archPath = projectPath.replace(/[\\/]+$/, "") + "/.project-brain/architecture.json";
@@ -6592,7 +6592,7 @@ function renderSuggest(value) {
     const d = value.data || {};
     const s = d.suggestion || {};
     const lines = [{ type: "text", text: `dsh-project-brain: suggest (${d.source || "?"})` }];
-    lines.push({ type: "text", text: `  ${s.title || "(\u65E0\u6807\u9898)"}` });
+    lines.push({ type: "text", text: `  ${s.title || "(\u7121\u6A19\u984C)"}` });
     if (s.reason) lines.push({ type: "text", text: `  reason: ${s.reason}` });
     if (s.confidence != null) lines.push({ type: "text", text: `  confidence: ${(s.confidence * 100).toFixed(0)}%` });
     if (s.suggestedTodoId) lines.push({ type: "text", text: `  todo: ${s.suggestedTodoId}` });
@@ -7014,9 +7014,9 @@ var baseOutputSchema4 = {
 function buildStatusTool({ fs, sandboxPolicy, getMemoryConfig }) {
   return defineTool7({
     name: "project_status",
-    description: "dsh-project-brain: \u8FD4\u56DE\u5F53\u524D\u9879\u76EE\u7684\u5FEB\u901F\u72B6\u6001\u5FEB\u7167\uFF08\u9879\u76EE\u5143\u4FE1\u606F + \u5404\u7C7B\u578B Memory \u8BA1\u6570 + TODO \u7EDF\u8BA1 + \u6700\u8FD1\u6D3B\u52A8 + \u662F\u5426\u521D\u59CB\u5316\uFF09\u3002\u6BD4 project_continue \u66F4\u8F7B\u3001\u4E0D\u9700\u8981\u6392\u5E8F\u7B97\u6CD5\u3002",
+    description: "dsh-project-brain: \u8FD4\u56DE\u7576\u524D\u5C08\u6848\u7684\u5FEB\u901F\u72C0\u614B\u5FEB\u7167\uFF08\u5C08\u6848\u5143\u8CC7\u8A0A + \u5404\u578B\u5225 Memory \u8A08\u6578 + TODO \u7D71\u8A08 + \u6700\u8FD1\u6D3B\u52D5 + \u662F\u5426\u521D\u59CB\u5316\uFF09\u3002\u6BD4 project_continue \u66F4\u8F15\u3001\u4E0D\u9700\u8981\u6392\u5E8F\u6F14\u7B97\u6CD5\u3002",
     parameters: {
-      path: { type: "string", description: "\u9879\u76EE\u6839\u8DEF\u5F84\uFF08\u7EDD\u5BF9\u8DEF\u5F84\uFF09\uFF0C\u9ED8\u8BA4\u4ECE session cwd \u63A8\u65AD" }
+      path: { type: "string", description: "\u5C08\u6848\u6839\u8DEF\u5F91\uFF08\u7D55\u5C0D\u8DEF\u5F91\uFF09\uFF0C\u9810\u8A2D\u5F9E session cwd \u63A8\u65B7" }
     },
     output: { schema: baseOutputSchema4, render: (_args, value) => renderStatus(value) },
     async execute(args, exec) {
@@ -7026,7 +7026,7 @@ function buildStatusTool({ fs, sandboxPolicy, getMemoryConfig }) {
         const brain = await readBrain(fs, projectPath);
         const p = brain && brain.project;
         if (!p || p.__error) {
-          return { ok: false, data: { error: { code: "E_NOT_INITIALIZED", message: "\u8BE5\u9879\u76EE\u5C1A\u672A\u521D\u59CB\u5316\uFF0C\u8BF7\u5148\u8C03\u7528 project_init", projectPath }, projectPath } };
+          return { ok: false, data: { error: { code: "E_NOT_INITIALIZED", message: "\u8A72\u5C08\u6848\u5C1A\u672A\u521D\u59CB\u5316\uFF0C\u8ACB\u5148\u547C\u53EB project_init", projectPath }, projectPath } };
         }
         const tStats = todoStats(brain.todos);
         const visibleMemories = activeMemories(brain.memories);
@@ -7334,25 +7334,25 @@ function scoreEntry(entry, tokens, fields) {
 }
 function buildRagPrompt(question, sources, projectInfo) {
   const parts = [];
-  parts.push("\u4F60\u662F dsh-project-brain \u52A9\u624B\u3002\u7528\u6237\u95EE\u4E86\u4E00\u4E2A\u5173\u4E8E\u9879\u76EE\u7684\u95EE\u9898\uFF0C\u8BF7\u4EC5\u57FA\u4E8E\u4E0B\u9762\u63D0\u4F9B\u7684 sources \u56DE\u7B54\uFF0C\u4E0D\u8981\u7F16\u9020\u4FE1\u606F\u3002");
+  parts.push("\u4F60\u662F dsh-project-brain \u52A9\u624B\u3002\u4F7F\u7528\u8005\u554F\u4E86\u4E00\u500B\u95DC\u65BC\u5C08\u6848\u7684\u554F\u984C\uFF0C\u8ACB\u50C5\u57FA\u65BC\u4E0B\u9762\u63D0\u4F9B\u7684 sources \u56DE\u7B54\uFF0C\u4E0D\u8981\u7DE8\u9020\u8CC7\u8A0A\u3002");
   parts.push("");
   if (projectInfo) {
-    parts.push("\u3010\u9879\u76EE\u6982\u51B5\u3011");
-    parts.push("- \u540D\u79F0: " + (projectInfo.name || "(\u672A\u547D\u540D)"));
-    if (projectInfo.type) parts.push("- \u7C7B\u578B: " + projectInfo.type);
+    parts.push("\u3010\u5C08\u6848\u6982\u6CC1\u3011");
+    parts.push("- \u540D\u7A31: " + (projectInfo.name || "(\u672A\u547D\u540D)"));
+    if (projectInfo.type) parts.push("- \u578B\u5225: " + projectInfo.type);
     parts.push("");
   }
-  parts.push("\u3010\u76F8\u5173 Memory / TODO / Timeline\uFF08Top sources\uFF09\u3011");
+  parts.push("\u3010\u76F8\u95DC Memory / TODO / Timeline\uFF08Top sources\uFF09\u3011");
   sources.forEach((s, i) => {
     const tag = s.kind + " + " + (s.type || s.status || s.eventType || "");
     parts.push(`[${i + 1}] (${tag}) ${s.title}`);
     if (s.snippet) parts.push("    " + s.snippet);
     parts.push("");
   });
-  parts.push("\u3010\u7528\u6237\u95EE\u9898\u3011");
+  parts.push("\u3010\u4F7F\u7528\u8005\u554F\u984C\u3011");
   parts.push(question);
   parts.push("");
-  parts.push("\u8BF7\u7528\u7B80\u6D01\u7684\u4E2D\u6587\u56DE\u7B54\uFF083-5 \u53E5\u8BDD\uFF09\uFF0C\u5E76\u5728\u672B\u5C3E\u5217\u51FA\u5F15\u7528\u7684\u6765\u6E90\u7F16\u53F7 [1][2]...\u3002\u5982\u679C sources \u65E0\u6CD5\u56DE\u7B54\uFF0C\u76F4\u63A5\u8BF4\u300E\u4FE1\u606F\u4E0D\u8DB3\u300F\u3002");
+  parts.push("\u8ACB\u7528\u7C21\u6F54\u7684\u4E2D\u6587\u56DE\u7B54\uFF083-5 \u53E5\u8A71\uFF09\uFF0C\u4E26\u5728\u672B\u5C3E\u5217\u51FA\u5F15\u7528\u7684\u4F86\u6E90\u7DE8\u865F [1][2]...\u3002\u5982\u679C sources \u7121\u6CD5\u56DE\u7B54\uFF0C\u76F4\u63A5\u8AAA\u300E\u8CC7\u8A0A\u4E0D\u8DB3\u300F\u3002");
   return parts.join("\n");
 }
 function executionRoute4(exec) {
@@ -7369,7 +7369,7 @@ async function synthesizeAnswer({ llm, route, sessionId, question, sources, proj
   const prompt = buildRagPrompt(question, sources, projectInfo);
   try {
     const text = await streamLlmText(llm, route, prompt, sessionId, 3e4, {
-      system: "\u4F60\u662F dsh-project-brain \u52A9\u624B\uFF0C\u4EC5\u57FA\u4E8E\u63D0\u4F9B\u7684 sources \u56DE\u7B54\uFF0C\u4E0D\u8981\u7F16\u9020\u4FE1\u606F\u3002",
+      system: "\u4F60\u662F dsh-project-brain \u52A9\u624B\uFF0C\u50C5\u57FA\u65BC\u63D0\u4F9B\u7684 sources \u56DE\u7B54\uFF0C\u4E0D\u8981\u7DE8\u9020\u8CC7\u8A0A\u3002",
       maxTokens: 800,
       purpose: "project-brain-ask"
     });
@@ -7381,13 +7381,13 @@ async function synthesizeAnswer({ llm, route, sessionId, question, sources, proj
 function buildAskTool({ fs, sandboxPolicy, getMemoryConfig, resolveEmbeddingCredential, getLlm }) {
   return defineTool8({
     name: "project_ask",
-    description: "dsh-project-brain: \u81EA\u7136\u8BED\u8A00\u67E5\u8BE2\u9879\u76EE\u8111\u3002\u9ED8\u8BA4 BM25 + \u91CD\u8981\u5EA6/\u65F6\u6548\uFF08\u542B dormant\uFF09\uFF1B\u5411\u91CF\u82E5\u5DF2\u914D\u7F6E\u53EA\u4F5C\u4E3A\u52A0\u5206\u3002 \u8FD4\u56DE Top-K sources + \u9879\u76EE\u6982\u89C8\u3002useLLM=true \u65F6\u989D\u5916\u8C03 LLM \u5408\u6210\u7B54\u6848\uFF08RAG \u98CE\u683C\uFF09\u3002\u53EF\u7528\u4E8E\u56DE\u7B54\u300C\u4E3A\u4EC0\u4E48\u8FD9\u4E48\u8BBE\u8BA1 / \u4E4B\u524D\u8E29\u8FC7\u4EC0\u4E48\u5751 / \u6700\u8FD1\u6539\u4E86\u4EC0\u4E48\u300D\u7B49\u95EE\u9898\u3002",
+    description: "dsh-project-brain: \u81EA\u7136\u8A9E\u8A00\u67E5\u8A62\u5C08\u6848\u8166\u3002\u9810\u8A2D BM25 + \u91CD\u8981\u5EA6/\u6642\u6548\uFF08\u542B dormant\uFF09\uFF1B\u5411\u91CF\u82E5\u5DF2\u914D\u7F6E\u53EA\u4F5C\u70BA\u52A0\u5206\u3002 \u8FD4\u56DE Top-K sources + \u5C08\u6848\u6982\u89BD\u3002useLLM=true \u6642\u984D\u5916\u8ABF LLM \u5408\u6210\u7B54\u6848\uFF08RAG \u98A8\u683C\uFF09\u3002\u53EF\u7528\u65BC\u56DE\u7B54\u300C\u70BA\u4EC0\u9EBC\u9019\u9EBC\u8A2D\u8A08 / \u4E4B\u524D\u8E29\u904E\u4EC0\u9EBC\u5751 / \u6700\u8FD1\u6539\u4E86\u4EC0\u9EBC\u300D\u7B49\u554F\u984C\u3002",
     parameters: {
-      question: { type: "string", description: "\u81EA\u7136\u8BED\u8A00\u95EE\u9898\uFF08\u5FC5\u586B\uFF09" },
-      topK: { type: "number", description: "\u8FD4\u56DE\u6761\u76EE\u6570\u4E0A\u9650\uFF0C\u9ED8\u8BA4 5" },
-      useLLM: { type: "boolean", description: "\u662F\u5426\u8C03 LLM \u5408\u6210\u7B54\u6848\uFF08\u9ED8\u8BA4 false\uFF0C\u7EAF\u89C4\u5219\u8FD4\u56DE sources\uFF09" },
-      includeArchived: { type: "boolean", description: "\u662F\u5426\u68C0\u7D22 archived/superseded\uFF0C\u9ED8\u8BA4 false" },
-      path: { type: "string", description: "\u9879\u76EE\u6839\u8DEF\u5F84\uFF08\u9ED8\u8BA4\u4ECE session cwd \u63A8\u65AD\uFF09" }
+      question: { type: "string", description: "\u81EA\u7136\u8A9E\u8A00\u554F\u984C\uFF08\u5FC5\u586B\uFF09" },
+      topK: { type: "number", description: "\u8FD4\u56DE\u689D\u76EE\u6578\u4E0A\u9650\uFF0C\u9810\u8A2D 5" },
+      useLLM: { type: "boolean", description: "\u662F\u5426\u8ABF LLM \u5408\u6210\u7B54\u6848\uFF08\u9810\u8A2D false\uFF0C\u7D14\u898F\u5247\u8FD4\u56DE sources\uFF09" },
+      includeArchived: { type: "boolean", description: "\u662F\u5426\u6AA2\u7D22 archived/superseded\uFF0C\u9810\u8A2D false" },
+      path: { type: "string", description: "\u5C08\u6848\u6839\u8DEF\u5F91\uFF08\u9810\u8A2D\u5F9E session cwd \u63A8\u65B7\uFF09" }
     },
     output: { schema: baseOutputSchema5, render: (_args, value) => renderAsk(value) },
     async execute(args, exec) {
@@ -7420,7 +7420,7 @@ function buildAskTool({ fs, sandboxPolicy, getMemoryConfig, resolveEmbeddingCred
         };
         if (vectorState.requested) {
           if (!memoryConfig.embeddingBaseURL || !memoryConfig.embeddingModel) {
-            vectorState.fallbackReason = { code: "EMBEDDING_NOT_CONFIGURED", message: "\u5411\u91CF\u68C0\u7D22\u5DF2\u542F\u7528\uFF0C\u4F46 endpoint \u6216 model \u672A\u914D\u7F6E" };
+            vectorState.fallbackReason = { code: "EMBEDDING_NOT_CONFIGURED", message: "\u5411\u91CF\u6AA2\u7D22\u5DF2\u555F\u7528\uFF0C\u4F46 endpoint \u6216 model \u672A\u914D\u7F6E" };
           } else {
             const indexState = await ensureEmbeddingIndex({
               fs,
@@ -7443,7 +7443,7 @@ function buildAskTool({ fs, sandboxPolicy, getMemoryConfig, resolveEmbeddingCred
                 queryVector = null;
                 vectorState.fallbackReason = {
                   code: "EMBEDDING_DIMENSION_MISMATCH",
-                  message: "\u67E5\u8BE2\u5411\u91CF\u7EF4\u5EA6\u4E0E\u7D22\u5F15\u4E0D\u4E00\u81F4\uFF0C\u8BF7\u68C0\u67E5\u6A21\u578B\u914D\u7F6E\u6216\u5220\u9664\u6D3E\u751F\u7F13\u5B58\u540E\u91CD\u8BD5"
+                  message: "\u67E5\u8A62\u5411\u91CF\u7DAD\u5EA6\u8207\u7D22\u5F15\u4E0D\u4E00\u81F4\uFF0C\u8ACB\u6AA2\u67E5\u6A21\u578B\u914D\u7F6E\u6216\u522A\u9664\u6D3E\u751F\u5FEB\u53D6\u5F8C\u91CD\u8A66"
                 };
               } else {
                 vectorState.used = vectors.size > 0;
@@ -7567,7 +7567,7 @@ function buildAskTool({ fs, sandboxPolicy, getMemoryConfig, resolveEmbeddingCred
               requested: useLLM,
               error: llmError
             },
-            hint: sources.length === 0 ? "\u6CA1\u6709\u5339\u914D\u6761\u76EE\u3002\u53EF\u8003\u8651\u653E\u5BBD\u5173\u952E\u8BCD\uFF0C\u6216\u5148\u8C03\u7528 project_init / project_memory_add \u5F55\u5165\u66F4\u591A\u4E0A\u4E0B\u6587\u3002" : null
+            hint: sources.length === 0 ? "\u6C92\u6709\u5339\u914D\u689D\u76EE\u3002\u53EF\u8003\u616E\u653E\u5BEC\u95DC\u9375\u8A5E\uFF0C\u6216\u5148\u547C\u53EB project_init / project_memory_add \u9304\u5165\u66F4\u591A\u4E0A\u4E0B\u6587\u3002" : null
           }
         };
         try {
@@ -7620,9 +7620,9 @@ init_brain_files();
 init_write_lock();
 var DAY_MS2 = 864e5;
 var VACUUM_DEFAULTS = Object.freeze({
-  // 归档多久之后才允许搬走
+  // 歸檔多久之後才允許搬走
   memoryRetainDays: 90,
-  // 即使全都超期，也至少留这么多条归档在主文件里
+  // 即使全都超期，也至少留這麼多條歸檔在主檔案裡
   memoryMinRetained: 200,
   timelineMaxEvents: 2e3,
   timelineRetainDays: 180
@@ -7768,11 +7768,11 @@ var baseOutputSchema6 = {
 function buildDreamTool({ fs, sandboxPolicy, getMemoryConfig }) {
   return defineTool9({
     name: "project_dream",
-    description: "dsh-project-brain: \u6574\u7406\u8BB0\u5FC6\uFF08\u5F52\u6863 changelog \u4F53\u88C1\u3001\u8D85\u989D Core \u964D\u4E3A dormant\u3001\u62A5\u544A\u6807\u9898\u76F8\u4F3C\u5EFA\u8BAE\uFF09\u3002\u9ED8\u8BA4 dryRun=true\uFF1BdryRun=false \u65F6\u53EA\u5E94\u7528\u5F52\u6863\u4E0E\u4F11\u7720\uFF0C\u7EDD\u4E0D\u56E0\u6807\u9898\u76F8\u4F3C\u5220\u9664\u3002mode=full \u989D\u5916\u505A\u4E00\u6B21 vacuum\uFF1A\u628A\u8D85\u671F\u7684\u5F52\u6863\u8BB0\u5FC6\u4E0E\u65E7\u65F6\u95F4\u7EBF\u642C\u5230 .project-brain/archive/\uFF0C\u4E3B\u6587\u4EF6\u53D8\u5C0F\u4F46\u6570\u636E\u4ECD\u53EF\u627E\u56DE\uFF1B\u6D3B\u8DC3\u8BB0\u5FC6\u3001\u7F6E\u9876\u3001\u8BC1\u636E\u94FE\u5F15\u7528\u4E0E\u7B2C\u4E00\u5C4F\u4F9D\u8D56\u7684\u951A\u70B9\u90FD\u4E0D\u4F1A\u88AB\u642C\u8D70\u3002",
+    description: "dsh-project-brain: \u6574\u7406\u8A18\u61B6\uFF08\u6B78\u6A94 changelog \u9AD4\u88C1\u3001\u8D85\u984D Core \u964D\u70BA dormant\u3001\u5831\u544A\u6A19\u984C\u76F8\u4F3C\u5EFA\u8B70\uFF09\u3002\u9810\u8A2D dryRun=true\uFF1BdryRun=false \u6642\u53EA\u61C9\u7528\u6B78\u6A94\u8207\u4F11\u7720\uFF0C\u7D55\u4E0D\u56E0\u6A19\u984C\u76F8\u4F3C\u522A\u9664\u3002mode=full \u984D\u5916\u505A\u4E00\u6B21 vacuum\uFF1A\u628A\u8D85\u671F\u7684\u6B78\u6A94\u8A18\u61B6\u8207\u820A\u6642\u9593\u7DDA\u642C\u5230 .project-brain/archive/\uFF0C\u4E3B\u6A94\u6848\u8B8A\u5C0F\u4F46\u8CC7\u6599\u4ECD\u53EF\u627E\u56DE\uFF1B\u6D3B\u8E8D\u8A18\u61B6\u3001\u7F6E\u9802\u3001\u8B49\u64DA\u93C8\u5F15\u7528\u8207\u7B2C\u4E00\u5C4F\u4F9D\u8CF4\u7684\u9328\u9EDE\u90FD\u4E0D\u6703\u88AB\u642C\u8D70\u3002",
     parameters: {
-      mode: { type: "string", description: "light\uFF08\u9ED8\u8BA4\uFF0C\u53EA\u6574\u7406\u72B6\u6001\uFF09\u6216 full\uFF08\u989D\u5916 vacuum \u4E3B\u6587\u4EF6\uFF09" },
-      dryRun: { type: "boolean", description: "\u53EA\u8FD4\u56DE\u8BA1\u5212\uFF08\u9ED8\u8BA4 true\uFF09" },
-      path: { type: "string", description: "\u9879\u76EE\u6839\u8DEF\u5F84\uFF08\u9ED8\u8BA4\u4ECE session cwd \u63A8\u65AD\uFF09" }
+      mode: { type: "string", description: "light\uFF08\u9810\u8A2D\uFF0C\u53EA\u6574\u7406\u72C0\u614B\uFF09\u6216 full\uFF08\u984D\u5916 vacuum \u4E3B\u6A94\u6848\uFF09" },
+      dryRun: { type: "boolean", description: "\u53EA\u8FD4\u56DE\u8A08\u5283\uFF08\u9810\u8A2D true\uFF09" },
+      path: { type: "string", description: "\u5C08\u6848\u6839\u8DEF\u5F91\uFF08\u9810\u8A2D\u5F9E session cwd \u63A8\u65B7\uFF09" }
     },
     output: { schema: baseOutputSchema6, render: (_args, value) => renderDream(value) },
     async execute(args, exec) {
@@ -7781,7 +7781,7 @@ function buildDreamTool({ fs, sandboxPolicy, getMemoryConfig }) {
         const mode = args && args.mode || "light";
         const dryRun = args && args.dryRun !== false;
         if (mode !== "light" && mode !== "full") {
-          return { ok: true, data: { mode, plannedActions: [], note: "mode \u4EC5\u652F\u6301 light / full\uFF08" + mode + " \u672A\u5B9E\u73B0\uFF09" } };
+          return { ok: true, data: { mode, plannedActions: [], note: "mode \u50C5\u652F\u63F4 light / full\uFF08" + mode + " \u672A\u5BE6\u73FE\uFF09" } };
         }
         const memories = await readJsonl(fs, brainPath2(projectPath, "memory.jsonl"));
         const now = Date.now();
@@ -7809,7 +7809,7 @@ function buildDreamTool({ fs, sandboxPolicy, getMemoryConfig }) {
                 vacuumCandidates: vacuumPlanned ? vacuumPlanned.plan.totalEvicted : 0,
                 estimatedMs: 0
               },
-              note: mode === "full" ? "dryRun=true\uFF0C\u672A\u5199\u6587\u4EF6\uFF1Bcommit \u4F1A\u5E94\u7528 archive_rule / evict_to_dormant\uFF0C\u5E76\u628A\u8D85\u671F\u6B7B\u884C\u642C\u5230 archive/\u3002" : "dryRun=true\uFF0C\u672A\u5199\u6587\u4EF6\uFF1Bcommit \u53EA\u5E94\u7528 archive_rule / evict_to_dormant\uFF0C\u4E0D\u4F1A Jaccard \u5220\u9664\u3002"
+              note: mode === "full" ? "dryRun=true\uFF0C\u672A\u5BEB\u6A94\u6848\uFF1Bcommit \u6703\u61C9\u7528 archive_rule / evict_to_dormant\uFF0C\u4E26\u628A\u8D85\u671F\u6B7B\u884C\u642C\u5230 archive/\u3002" : "dryRun=true\uFF0C\u672A\u5BEB\u6A94\u6848\uFF1Bcommit \u53EA\u61C9\u7528 archive_rule / evict_to_dormant\uFF0C\u4E0D\u6703 Jaccard \u522A\u9664\u3002"
             }
           };
         }
@@ -7824,7 +7824,7 @@ function buildDreamTool({ fs, sandboxPolicy, getMemoryConfig }) {
         if (mode === "full") {
           vacuum = await vacuumBrain({ fs, projectPath, config: memoryConfig, now, dryRun: false });
           if (!vacuum.ok) {
-            return { ok: false, data: { error: { code: vacuum.code || "E_VACUUM_FAILED", message: "vacuum \u672A\u80FD\u5B8C\u6210\uFF0C\u4E3B\u6587\u4EF6\u4FDD\u6301\u539F\u6837" } } };
+            return { ok: false, data: { error: { code: vacuum.code || "E_VACUUM_FAILED", message: "vacuum \u672A\u80FD\u5B8C\u6210\uFF0C\u4E3B\u6A94\u6848\u4FDD\u6301\u539F\u6A23" } } };
           }
         }
         try {
@@ -7833,7 +7833,7 @@ function buildDreamTool({ fs, sandboxPolicy, getMemoryConfig }) {
           }
         } catch (e) {
         }
-        const vacuumNote = vacuum && vacuum.changed ? " vacuum \u642C\u8D70 " + vacuum.plan.totalEvicted + " \u884C\u5230 archive/\u3002" : mode === "full" ? " \u6CA1\u6709\u8D85\u671F\u7684\u6B7B\u884C\u9700\u8981\u642C\u8D70\u3002" : "";
+        const vacuumNote = vacuum && vacuum.changed ? " vacuum \u642C\u8D70 " + vacuum.plan.totalEvicted + " \u884C\u5230 archive/\u3002" : mode === "full" ? " \u6C92\u6709\u8D85\u671F\u7684\u6B7B\u884C\u9700\u8981\u642C\u8D70\u3002" : "";
         return {
           ok: true,
           data: {
@@ -7857,7 +7857,7 @@ function buildDreamTool({ fs, sandboxPolicy, getMemoryConfig }) {
               vacuumCandidates: vacuum ? vacuum.plan.totalEvicted : 0,
               estimatedMs: Date.now() - now
             },
-            note: (persisted.changed ? "housekeep \u5DF2\u5199 memory.jsonl\uFF1B\u76F8\u4F3C\u6807\u9898\u4EC5\u4F5C\u4E3A suggest_supersede\u3002" : "housekeep \u65E0\u53D8\u5316\uFF0C\u672A\u5199\u6587\u4EF6\u3002") + vacuumNote
+            note: (persisted.changed ? "housekeep \u5DF2\u5BEB memory.jsonl\uFF1B\u76F8\u4F3C\u6A19\u984C\u50C5\u4F5C\u70BA suggest_supersede\u3002" : "housekeep \u7121\u8B8A\u5316\uFF0C\u672A\u5BEB\u6A94\u6848\u3002") + vacuumNote
           }
         };
       } catch (e) {
@@ -8342,7 +8342,7 @@ async function detectChanges({ projectPath, since = "1 day ago" }) {
       files: [],
       stat: "",
       commits: [],
-      error: "cannot read current commit " + head.commit + "\uFF08commit object \u53EF\u80FD\u5728 .pack \u4E2D\uFF0C\u9700 pack \u652F\u6301\uFF0C\u6216 git repack -d \u89E3\u5F00 loose object\uFF09"
+      error: "cannot read current commit " + head.commit + "\uFF08commit object \u53EF\u80FD\u5728 .pack \u4E2D\uFF0C\u9700 pack \u652F\u63F4\uFF0C\u6216 git repack -d \u89E3\u958B loose object\uFF09"
     };
   }
   const curFiles = collectTreeFiles(gitDir, curCommit.tree);
@@ -8383,9 +8383,9 @@ async function detectChanges({ projectPath, since = "1 day ago" }) {
   }
   return {
     files: files.map((f) => f.path),
-    // 简化为路径数组（兼容 v0.4.1 smoke）
+    // 簡化為路徑陣列（相容 v0.4.1 smoke）
     changes: files,
-    // 详细 change 列表（new field）
+    // 詳細 change 列表（new field）
     stat: files.length === 0 ? "" : ` ${files.filter((f) => f.type === "added").length} files added, ${files.filter((f) => f.type === "modified").length} modified, ${files.filter((f) => f.type === "deleted").length} deleted`,
     commits,
     since: "commit+" + sinceN,
@@ -8395,34 +8395,34 @@ async function detectChanges({ projectPath, since = "1 day ago" }) {
 function buildDiffPrompt({ changes, projectPath, maxChars = 4e3 }) {
   const fileList = (changes.changes || changes.files || []).map(
     (f) => typeof f === "string" ? `  - ${f}` : `  - [${f.type}] ${f.path}`
-  ).join("\n") || "  (\u65E0\u6587\u4EF6\u53D8\u66F4)";
-  const commitList = (changes.commits || []).map((c) => `  - ${c}`).join("\n") || "  (\u65E0 commit \u8BB0\u5F55)";
-  const prompt = `\u4F60\u662F\u4E00\u4E2A\u9879\u76EE\u67B6\u6784\u5206\u6790\u5E08\u3002\u8BF7\u57FA\u4E8E\u4EE5\u4E0B git diff \u4FE1\u606F\uFF0C\u8F93\u51FA JSON \u683C\u5F0F\u7684\u67B6\u6784\u53D8\u66F4\u5206\u6790\u3002
+  ).join("\n") || "  (\u7121\u6A94\u6848\u8B8A\u66F4)";
+  const commitList = (changes.commits || []).map((c) => `  - ${c}`).join("\n") || "  (\u7121 commit \u8A18\u9304)";
+  const prompt = `\u4F60\u662F\u4E00\u500B\u5C08\u6848\u67B6\u69CB\u5206\u6790\u5E2B\u3002\u8ACB\u57FA\u65BC\u4EE5\u4E0B git diff \u8CC7\u8A0A\uFF0C\u8F38\u51FA JSON \u683C\u5F0F\u7684\u67B6\u69CB\u8B8A\u66F4\u5206\u6790\u3002
 
-\u9879\u76EE\u8DEF\u5F84: ${projectPath}
-\u626B\u63CF\u65F6\u95F4\u7A97\u53E3: since=${changes.since || "commit+1"}
+\u5C08\u6848\u8DEF\u5F91: ${projectPath}
+\u6383\u63CF\u6642\u9593\u8996\u7A97: since=${changes.since || "commit+1"}
 
-\u53D8\u66F4\u6587\u4EF6:
+\u8B8A\u66F4\u6A94\u6848:
 ${fileList}
 
 \u6700\u8FD1 commit:
 ${commitList}
 
-\u53D8\u66F4\u7EDF\u8BA1:
-${changes.stat ? changes.stat : "(\u65E0\u7EDF\u8BA1)"}
+\u8B8A\u66F4\u7D71\u8A08:
+${changes.stat ? changes.stat : "(\u7121\u7D71\u8A08)"}
 
-\u8BF7\u8F93\u51FA JSON\uFF08\u4E0D\u8981 markdown code block\uFF0C\u4E0D\u8981\u5176\u4ED6\u6587\u5B57\uFF09\uFF1A
+\u8ACB\u8F38\u51FA JSON\uFF08\u4E0D\u8981 markdown code block\uFF0C\u4E0D\u8981\u5176\u4ED6\u6587\u5B57\uFF09\uFF1A
 {
-  "changes": [{"file": "\u76F8\u5BF9\u8DEF\u5F84", "type": "added|modified|deleted", "summary": "\u4E00\u53E5\u8BDD\u63CF\u8FF0"}],
+  "changes": [{"file": "\u76F8\u5C0D\u8DEF\u5F91", "type": "added|modified|deleted", "summary": "\u4E00\u53E5\u8A71\u63CF\u8FF0"}],
   "architectureMemory": {
-    "title": "\u67B6\u6784\u53D8\u66F4\u4E00\u53E5\u8BDD\u6807\u9898\uFF08<=50 \u5B57\uFF09",
-    "content": "what + why\uFF08200-400 \u5B57\uFF0C\u8BF4\u660E\u67B6\u6784\u5C42\u9762\u7684\u53D8\u5316\uFF09"
+    "title": "\u67B6\u69CB\u8B8A\u66F4\u4E00\u53E5\u8A71\u6A19\u984C\uFF08<=50 \u5B57\uFF09",
+    "content": "what + why\uFF08200-400 \u5B57\uFF0C\u8AAA\u660E\u67B6\u69CB\u5C64\u9762\u7684\u8B8A\u5316\uFF09"
   }
 }
 
 \u8981\u6C42\uFF1A
-- \u5173\u6CE8\u67B6\u6784\u5C42\u9762\u53D8\u5316\uFF08\u65B0\u6A21\u5757\u3001\u65B0\u4F9D\u8D56\u3001\u65B0\u6A21\u5F0F\uFF09\uFF0C\u4E0D\u8981\u9010\u6587\u4EF6\u63CF\u8FF0
-- \u5982\u679C\u53EA\u662F\u6587\u6863\u4FEE\u6539\u6216\u6742\u9879\u53D8\u66F4\uFF0CarchitectureMemory.title \u5199 "\u975E\u67B6\u6784\u53D8\u66F4\uFF08\u6742\u9879\uFF09"
+- \u95DC\u6CE8\u67B6\u69CB\u5C64\u9762\u8B8A\u5316\uFF08\u65B0\u6A21\u7D44\u3001\u65B0\u4F9D\u8CF4\u3001\u65B0\u6A21\u5F0F\uFF09\uFF0C\u4E0D\u8981\u9010\u6A94\u6848\u63CF\u8FF0
+- \u5982\u679C\u53EA\u662F\u6587\u4EF6\u4FEE\u6539\u6216\u96DC\u9805\u8B8A\u66F4\uFF0CarchitectureMemory.title \u5BEB "\u975E\u67B6\u69CB\u8B8A\u66F4\uFF08\u96DC\u9805\uFF09"
 - content \u7528\u4E2D\u6587`;
   return prompt.slice(0, maxChars);
 }
@@ -8430,21 +8430,21 @@ ${changes.stat ? changes.stat : "(\u65E0\u7EDF\u8BA1)"}
 // src/host/integrations/llm.js
 var MOCK_RESPONSE_TEXT = JSON.stringify({
   changes: [
-    { file: "src/auth/login.ts", type: "modified", summary: "\u8BA4\u8BC1\u903B\u8F91\u8C03\u6574" },
+    { file: "src/auth/login.ts", type: "modified", summary: "\u8A8D\u8B49\u908F\u8F2F\u8ABF\u6574" },
     { file: "src/auth/oauth.ts", type: "added", summary: "\u65B0\u589E OAuth2 \u63A5\u5165" }
   ],
   architectureMemory: {
-    title: "\u67B6\u6784\u53D8\u66F4\uFF1A\u4ECE session \u8BA4\u8BC1\u8FC1\u79FB\u5230 OAuth2",
-    content: "\u672C\u6B21\u91CD\u6784\u5C06 auth \u6A21\u5757\u4ECE session-based \u8BA4\u8BC1\u8FC1\u79FB\u5230 OAuth2\uFF0C\u65B0\u589E oauth.ts \u6A21\u5757\u5C01\u88C5 OAuth2 client\uFF0C\u5904\u7406 token \u5237\u65B0 + \u56DE\u8C03\u8DEF\u7531\u3002"
+    title: "\u67B6\u69CB\u8B8A\u66F4\uFF1A\u5F9E session \u8A8D\u8B49\u9077\u79FB\u5230 OAuth2",
+    content: "\u672C\u6B21\u91CD\u69CB\u5C07 auth \u6A21\u7D44\u5F9E session-based \u8A8D\u8B49\u9077\u79FB\u5230 OAuth2\uFF0C\u65B0\u589E oauth.ts \u6A21\u7D44\u5C01\u88DD OAuth2 client\uFF0C\u8655\u7406 token \u91CD\u65B0\u6574\u7406 + \u56DE\u64A5\u8DEF\u7531\u3002"
   },
   commit: "git@HEAD",
-  note: "[MOCK_LLM] DSH llm service \u4E0D\u53EF\u7528\u6216\u672A\u914D\u7F6E API key\uFF0C\u8FD4\u56DE mock \u6570\u636E\u3002\u8BF7\u914D\u7F6E llmApiUrl/llmApiKey/llmModel \u53C2\u6570\u6216 DSH_LLM_API_URL/KEY/MODEL env\u3002"
+  note: "[MOCK_LLM] DSH llm service \u4E0D\u53EF\u7528\u6216\u672A\u914D\u7F6E API key\uFF0C\u8FD4\u56DE mock \u8CC7\u6599\u3002\u8ACB\u914D\u7F6E llmApiUrl/llmApiKey/llmModel \u5F15\u6578\u6216 DSH_LLM_API_URL/KEY/MODEL env\u3002"
 });
 async function mockFetchLLM({ prompt }) {
   const preview = prompt.slice(0, 200).replace(/"/g, '\\"');
   return MOCK_RESPONSE_TEXT.replace(
-    '"[MOCK_LLM] DSH llm service \u4E0D\u53EF\u7528\u6216\u672A\u914D\u7F6E API key\uFF0C\u8FD4\u56DE mock \u6570\u636E\u3002\u8BF7\u914D\u7F6E llmApiUrl/llmApiKey/llmModel \u53C2\u6570\u6216 DSH_LLM_API_URL/KEY/MODEL env\u3002"',
-    `"[MOCK_LLM] \u7528\u6237 prompt \u524D 200 \u5B57: ${preview}\u3002\u8BF7\u914D\u7F6E llmApiUrl/llmApiKey/llmModel \u53C2\u6570\u6216 DSH_LLM_API_URL/KEY/MODEL env\u3002"`
+    '"[MOCK_LLM] DSH llm service \u4E0D\u53EF\u7528\u6216\u672A\u914D\u7F6E API key\uFF0C\u8FD4\u56DE mock \u8CC7\u6599\u3002\u8ACB\u914D\u7F6E llmApiUrl/llmApiKey/llmModel \u5F15\u6578\u6216 DSH_LLM_API_URL/KEY/MODEL env\u3002"',
+    `"[MOCK_LLM] \u4F7F\u7528\u8005 prompt \u524D 200 \u5B57: ${preview}\u3002\u8ACB\u914D\u7F6E llmApiUrl/llmApiKey/llmModel \u5F15\u6578\u6216 DSH_LLM_API_URL/KEY/MODEL env\u3002"`
   );
 }
 function detectProtocol(apiUrl) {
@@ -8534,10 +8534,10 @@ function parseLLMArchitectureResponse(text) {
   return {
     changes: [],
     architectureMemory: {
-      title: "\u67B6\u6784\u53D8\u66F4\uFF08\u672A\u7ED3\u6784\u5316\uFF09",
+      title: "\u67B6\u69CB\u8B8A\u66F4\uFF08\u672A\u7D50\u69CB\u5316\uFF09",
       content: text.slice(0, 1e3)
     },
-    note: "[parse-fallback] LLM \u8F93\u51FA\u975E JSON\uFF0C\u5DF2\u5305\u6210 fallback"
+    note: "[parse-fallback] LLM \u8F38\u51FA\u975E JSON\uFF0C\u5DF2\u5305\u6210 fallback"
   };
 }
 
@@ -8545,15 +8545,15 @@ function parseLLMArchitectureResponse(text) {
 function buildDiffTool({ fs, sandboxPolicy }) {
   return defineTool10({
     name: "project_diff",
-    description: "dsh-project-brain: \u8BFB\u53D6 git diff \u5E76\u7528 LLM \u5206\u6790\u67B6\u6784\u53D8\u5316\u3002 dryRun \u9ED8\u8BA4 true\uFF08\u53EA\u626B\u63CF\u4E0D\u5199\u8BB0\u5FC6\uFF09\uFF1BdryRun=false \u65F6\u4EC5\u771F\u5B9E LLM \u8F93\u51FA\u53EF\u7ECF admit \u5199\u5165 architecture \u8BB0\u5FC6\u3002 mock / fallback \u7981\u6B62\u5199\u5165\u3002",
+    description: "dsh-project-brain: \u8B80\u53D6 git diff \u4E26\u7528 LLM \u5206\u6790\u67B6\u69CB\u8B8A\u5316\u3002 dryRun \u9810\u8A2D true\uFF08\u53EA\u6383\u63CF\u4E0D\u5BEB\u8A18\u61B6\uFF09\uFF1BdryRun=false \u6642\u50C5\u771F\u5BE6 LLM \u8F38\u51FA\u53EF\u7D93 admit \u5BEB\u5165 architecture \u8A18\u61B6\u3002 mock / fallback \u7981\u6B62\u5BEB\u5165\u3002",
     parameters: {
-      path: { type: "string", description: "\u9879\u76EE\u6839\u8DEF\u5F84\uFF08\u7EDD\u5BF9\u8DEF\u5F84\uFF0C\u5FC5\u4F20\uFF09" },
-      since: { type: "string", description: "git diff \u7A97\u53E3\uFF08commit \u6570\uFF0C\u9ED8\u8BA4 1\uFF09" },
-      maxTokens: { type: "number", description: "LLM \u8F93\u51FA token \u9884\u7B97\uFF08\u9ED8\u8BA4 2000\uFF09" },
-      dryRun: { type: "boolean", description: "\u53EA\u626B\u63CF\u4E0D\u5199 memory\uFF08\u9ED8\u8BA4 true\uFF09" },
-      llmApiUrl: { type: "string", description: "LLM API endpoint\uFF08\u53EF\u9009\uFF09" },
-      llmApiKey: { type: "string", description: "LLM API key\uFF08\u53EF\u9009\uFF09" },
-      llmModel: { type: "string", description: "LLM \u6A21\u578B\u540D\uFF08\u9ED8\u8BA4 gpt-4o-mini\uFF09" }
+      path: { type: "string", description: "\u5C08\u6848\u6839\u8DEF\u5F91\uFF08\u7D55\u5C0D\u8DEF\u5F91\uFF0C\u5FC5\u50B3\uFF09" },
+      since: { type: "string", description: "git diff \u8996\u7A97\uFF08commit \u6578\uFF0C\u9810\u8A2D 1\uFF09" },
+      maxTokens: { type: "number", description: "LLM \u8F38\u51FA token \u9810\u7B97\uFF08\u9810\u8A2D 2000\uFF09" },
+      dryRun: { type: "boolean", description: "\u53EA\u6383\u63CF\u4E0D\u5BEB memory\uFF08\u9810\u8A2D true\uFF09" },
+      llmApiUrl: { type: "string", description: "LLM API endpoint\uFF08\u53EF\u9078\uFF09" },
+      llmApiKey: { type: "string", description: "LLM API key\uFF08\u53EF\u9078\uFF09" },
+      llmModel: { type: "string", description: "LLM \u6A21\u578B\u540D\uFF08\u9810\u8A2D gpt-4o-mini\uFF09" }
     },
     output: {
       schema: {
@@ -8582,7 +8582,7 @@ function buildDiffTool({ fs, sandboxPolicy }) {
           return { ok: false, code: "E_DIFF_SCAN_FAILED", message: changes.error };
         }
         if (!changes.files.length && !changes.changes.length) {
-          return { ok: true, data: { changes, llmSkipped: "no changes detected", note: "\u65E0\u4EE3\u7801\u53D8\u66F4\uFF0C\u65E0\u9700\u8C03 LLM", dryRun } };
+          return { ok: true, data: { changes, llmSkipped: "no changes detected", note: "\u7121\u7A0B\u5F0F\u78BC\u8B8A\u66F4\uFF0C\u7121\u9700\u8ABF LLM", dryRun } };
         }
         const prompt = buildDiffPrompt({ changes, projectPath });
         const rawText = await callLLMWithFallback({
@@ -8598,7 +8598,7 @@ function buildDiffTool({ fs, sandboxPolicy }) {
           return {
             ok: false,
             code: "E_ADMIT_MOCK_FORBIDDEN",
-            message: "mock / fallback LLM \u8F93\u51FA\u7981\u6B62\u5199\u5165 memory.jsonl",
+            message: "mock / fallback LLM \u8F38\u51FA\u7981\u6B62\u5BEB\u5165 memory.jsonl",
             data: {
               changes: {
                 files: changes.files || [],
@@ -8642,7 +8642,7 @@ function buildDiffTool({ fs, sandboxPolicy }) {
           if (admitted.action === "insert") {
             await appendJsonl(fs, brainPath2(projectPath, "timeline.jsonl"), {
               id: "evt-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-              title: "project_diff \u5B8C\u6210\uFF08" + (parsed.changes ? parsed.changes.length : 0) + " \u6587\u4EF6\u53D8\u5316\uFF09",
+              title: "project_diff \u5B8C\u6210\uFF08" + (parsed.changes ? parsed.changes.length : 0) + " \u6A94\u6848\u8B8A\u5316\uFF09",
               eventType: "diff",
               occurredAt: Date.now(),
               detail: "since=" + since + " files=" + (changes.files ? changes.files.length : 0)
@@ -8682,8 +8682,8 @@ function renderDiff(value) {
     const files = d.changes.files || [];
     const commits = d.changes.commits || [];
     const detailed = d.changes.changes || [];
-    lines.push({ type: "text", text: "  \u53D8\u66F4\u6587\u4EF6: " + files.length + " \u4E2A / commits: " + commits.length + " \u6761 / detailed: " + detailed.length + " \u6761" });
-    if (d.changes.since) lines.push({ type: "text", text: "  \u65F6\u95F4\u7A97\u53E3: " + d.changes.since });
+    lines.push({ type: "text", text: "  \u8B8A\u66F4\u6A94\u6848: " + files.length + " \u500B / commits: " + commits.length + " \u689D / detailed: " + detailed.length + " \u689D" });
+    if (d.changes.since) lines.push({ type: "text", text: "  \u6642\u9593\u8996\u7A97: " + d.changes.since });
   }
   if (d.architectureMemory && d.architectureMemory.title) {
     lines.push({ type: "text", text: "  \u2713 architecture memory: " + d.architectureMemory.title });
@@ -8694,7 +8694,7 @@ function renderDiff(value) {
     }
   }
   if (d.note) lines.push({ type: "text", text: "  note: " + d.note });
-  if (d.dryRun) lines.push({ type: "text", text: "  dryRun=true\uFF0C\u672A\u5199 memory" });
+  if (d.dryRun) lines.push({ type: "text", text: "  dryRun=true\uFF0C\u672A\u5BEB memory" });
   return lines;
 }
 
@@ -8725,23 +8725,23 @@ function emitPreviewChanged5(exec, projectPath) {
 function buildProjectExportTool({ fs, sandboxPolicy, pluginVersion }) {
   return defineTool11({
     name: "project_export",
-    description: "dsh-project-brain: \u628A\u5F53\u524D\u9879\u76EE\u7684 .project-brain/ \u6253\u6210 zip bundle\uFF08\u542B manifest.json + checksum\uFF09\u3002\u7528\u4E8E\u8DE8\u673A\u5668\u540C\u6B65\uFF1A\u5728\u6E90\u673A\u5668\u8C03\u7528 \u2192 \u628A bundle \u6587\u4EF6\u4F20\u5230\u76EE\u6807\u673A\u5668 \u2192 \u5728\u76EE\u6807\u673A\u5668\u8C03 project_import \u8FD8\u539F\u3002\u4F1A\u5907\u4EFD timeline + cache\uFF1B\u82E5\u4E0D\u9700\u8981 cache \u53EF\u4F20 includeCache=false \u7F29\u4F53\u79EF\u3002",
+    description: "dsh-project-brain: \u628A\u7576\u524D\u5C08\u6848\u7684 .project-brain/ \u6253\u6210 zip bundle\uFF08\u542B manifest.json + checksum\uFF09\u3002\u7528\u65BC\u8DE8\u6A5F\u5668\u540C\u6B65\uFF1A\u5728\u6E90\u6A5F\u5668\u547C\u53EB \u2192 \u628A bundle \u6A94\u6848\u50B3\u5230\u76EE\u6A19\u6A5F\u5668 \u2192 \u5728\u76EE\u6A19\u6A5F\u5668\u8ABF project_import \u9084\u539F\u3002\u6703\u5099\u4EFD timeline + cache\uFF1B\u82E5\u4E0D\u9700\u8981 cache \u53EF\u50B3 includeCache=false \u7E2E\u9AD4\u7A4D\u3002",
     parameters: {
-      path: { type: "string", description: "\u9879\u76EE\u6839\u8DEF\u5F84\uFF08\u9ED8\u8BA4\u4ECE session cwd \u63A8\u65AD\uFF09" },
-      outputPath: { type: "string", description: "bundle \u8F93\u51FA\u7EDD\u5BF9\u8DEF\u5F84\uFF08\u53EF\u9009\uFF1B\u9ED8\u8BA4 <projectRoot>/dist-backups/dsh-brain-<name>-<ts>.zip\uFF09" },
-      includeCache: { type: "boolean", description: "\u662F\u5426\u5305\u542B cache/ \u76EE\u5F55\uFF08\u9ED8\u8BA4 true\uFF09" }
+      path: { type: "string", description: "\u5C08\u6848\u6839\u8DEF\u5F91\uFF08\u9810\u8A2D\u5F9E session cwd \u63A8\u65B7\uFF09" },
+      outputPath: { type: "string", description: "bundle \u8F38\u51FA\u7D55\u5C0D\u8DEF\u5F91\uFF08\u53EF\u9078\uFF1B\u9810\u8A2D <projectRoot>/dist-backups/dsh-brain-<name>-<ts>.zip\uFF09" },
+      includeCache: { type: "boolean", description: "\u662F\u5426\u5305\u542B cache/ \u76EE\u9304\uFF08\u9810\u8A2D true\uFF09" }
     },
     output: { schema: baseOutputSchema7, render: renderExport },
     async execute(args, exec) {
       try {
         const projectPath = resolveProjectPath(args, exec, sandboxPolicy);
         if (projectPath === ".") {
-          return { ok: false, code: "E_NO_PATH", message: "\u65E0\u6CD5\u89E3\u6790\u9879\u76EE\u8DEF\u5F84\uFF08\u8BF7\u663E\u5F0F\u4F20 path\uFF09" };
+          return { ok: false, code: "E_NO_PATH", message: "\u7121\u6CD5\u89E3\u6790\u5C08\u6848\u8DEF\u5F91\uFF08\u8ACB\u986F\u5F0F\u50B3 path\uFF09" };
         }
         const includeCache = !!(args && args.includeCache !== false);
         const projectMeta = await readJson(fs, brainPath2(projectPath, "project.json"));
         if (!projectMeta || projectMeta.__error) {
-          return { ok: false, code: "E_BRAIN_NOT_FOUND", message: "\u9879\u76EE\u672A\u521D\u59CB\u5316\uFF0C\u8BF7\u5148\u8C03\u7528 project_init" };
+          return { ok: false, code: "E_BRAIN_NOT_FOUND", message: "\u5C08\u6848\u672A\u521D\u59CB\u5316\uFF0C\u8ACB\u5148\u547C\u53EB project_init" };
         }
         let outputPath = args && args.outputPath;
         if (!outputPath) {
@@ -8759,7 +8759,7 @@ function buildProjectExportTool({ fs, sandboxPolicy, pluginVersion }) {
           const now = Date.now();
           const event = {
             id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-            title: "\u5BFC\u51FA bundle\uFF1A" + path3.basename(outputPath),
+            title: "\u532F\u51FA bundle\uFF1A" + path3.basename(outputPath),
             eventType: "export",
             occurredAt: now,
             payload: {
@@ -8789,7 +8789,7 @@ function buildProjectExportTool({ fs, sandboxPolicy, pluginVersion }) {
               exportedAt: written.manifest.exportedAt,
               sourceProject: written.manifest.sourceProject
             },
-            message: "\u5BFC\u51FA\u6210\u529F\u3002\u4E0B\u4E00\u6B65\uFF1A\u628A bundle \u6587\u4EF6\u4F20\u5230\u76EE\u6807\u673A\u5668\uFF0C\u8C03\u7528 project_import \u8FD8\u539F\u3002"
+            message: "\u532F\u51FA\u6210\u529F\u3002\u4E0B\u4E00\u6B65\uFF1A\u628A bundle \u6A94\u6848\u50B3\u5230\u76EE\u6A19\u6A5F\u5668\uFF0C\u547C\u53EB project_import \u9084\u539F\u3002"
           }
         };
       } catch (e) {
@@ -8849,19 +8849,19 @@ function emitPreviewChanged6(exec, projectPath) {
 function buildProjectImportTool({ fs, sandboxPolicy }) {
   return defineTool12({
     name: "project_import",
-    description: "dsh-project-brain: \u4ECE bundle zip \u8FD8\u539F .project-brain/\u3002**\u4E24\u6B65\u673A\u5236**\uFF1A\u5148 dryRun=true \u770B\u9884\u89C8\uFF0C\u628A\u8FD4\u56DE\u7684 confirmToken \u4F20\u7ED9 dryRun=false \u624D\u5B9E\u9645\u5199\u5165\uFF1B5 \u5206\u949F\u5185\u5FC5\u987B\u5B8C\u6210\u3002\u5BFC\u5165\u4F1A\u5907\u4EFD\u5F53\u524D\u8111 \u2192 \u89E3\u538B \u2192 \u6539\u5199 rootPath \u2192 \u89E6\u53D1 rescan\u3002\u5931\u8D25\u56DE\u6EDA\u53EF\u8C03 project_rollback_backup\u3002",
+    description: "dsh-project-brain: \u5F9E bundle zip \u9084\u539F .project-brain/\u3002**\u5169\u6B65\u6A5F\u5236**\uFF1A\u5148 dryRun=true \u770B\u9810\u89BD\uFF0C\u628A\u8FD4\u56DE\u7684 confirmToken \u50B3\u7D66 dryRun=false \u624D\u5BE6\u969B\u5BEB\u5165\uFF1B5 \u5206\u9418\u5167\u5FC5\u9808\u5B8C\u6210\u3002\u532F\u5165\u6703\u5099\u4EFD\u7576\u524D\u8166 \u2192 \u89E3\u58D3 \u2192 \u6539\u5BEB rootPath \u2192 \u89F8\u767C rescan\u3002\u5931\u6557\u56DE\u6EFE\u53EF\u8ABF project_rollback_backup\u3002",
     parameters: {
-      path: { type: "string", description: "\u76EE\u7684\u5730\u9879\u76EE\u6839\u8DEF\u5F84\uFF08\u9ED8\u8BA4\u4ECE session cwd \u63A8\u65AD\uFF09" },
-      bundlePath: { type: "string", description: "bundle zip \u6587\u4EF6\u7EDD\u5BF9\u8DEF\u5F84\uFF08\u5FC5\u586B\uFF09" },
-      dryRun: { type: "boolean", description: "true=\u4EC5\u9884\u89C8\uFF0Cfalse=\u5B9E\u9645\u5199\u5165\uFF08\u9ED8\u8BA4 false\uFF09" },
-      confirmToken: { type: "string", description: "dryRun \u8FD4\u56DE\u7684 token\uFF1BdryRun=false \u65F6\u5FC5\u586B" }
+      path: { type: "string", description: "\u76EE\u7684\u5730\u5C08\u6848\u6839\u8DEF\u5F91\uFF08\u9810\u8A2D\u5F9E session cwd \u63A8\u65B7\uFF09" },
+      bundlePath: { type: "string", description: "bundle zip \u6A94\u6848\u7D55\u5C0D\u8DEF\u5F91\uFF08\u5FC5\u586B\uFF09" },
+      dryRun: { type: "boolean", description: "true=\u50C5\u9810\u89BD\uFF0Cfalse=\u5BE6\u969B\u5BEB\u5165\uFF08\u9810\u8A2D false\uFF09" },
+      confirmToken: { type: "string", description: "dryRun \u8FD4\u56DE\u7684 token\uFF1BdryRun=false \u6642\u5FC5\u586B" }
     },
     output: { schema: baseOutputSchema8, render: renderImport },
     async execute(args, exec) {
       try {
         const projectPath = resolveProjectPath(args, exec, sandboxPolicy);
         if (projectPath === ".") {
-          return { ok: false, code: "E_NO_PATH", message: "\u65E0\u6CD5\u89E3\u6790\u9879\u76EE\u8DEF\u5F84\uFF08\u8BF7\u663E\u5F0F\u4F20 path\uFF09" };
+          return { ok: false, code: "E_NO_PATH", message: "\u7121\u6CD5\u89E3\u6790\u5C08\u6848\u8DEF\u5F91\uFF08\u8ACB\u986F\u5F0F\u50B3 path\uFF09" };
         }
         const bundlePath = args && args.bundlePath;
         if (!bundlePath) {
@@ -8870,7 +8870,7 @@ function buildProjectImportTool({ fs, sandboxPolicy }) {
         try {
           await fsp3.access(bundlePath);
         } catch (e) {
-          return { ok: false, code: "E_BUNDLE_NOT_FOUND", message: "bundle \u6587\u4EF6\u4E0D\u5B58\u5728\uFF1A" + bundlePath };
+          return { ok: false, code: "E_BUNDLE_NOT_FOUND", message: "bundle \u6A94\u6848\u4E0D\u5B58\u5728\uFF1A" + bundlePath };
         }
         const isDryRun = !!(args && args.dryRun);
         const tokenStore = getTokenStore();
@@ -8916,20 +8916,20 @@ function buildProjectImportTool({ fs, sandboxPolicy }) {
                 rootPathRewrite: preview.rootPathRewrite
               },
               confirmToken,
-              warning: preview.currentBrain.exists ? "\u5BFC\u5165\u5C06\u8986\u76D6\u5F53\u524D\u8111\uFF0C\u65E7\u8111\u4F1A\u81EA\u52A8\u5907\u4EFD\u5230 " + preview.backupWillCreateAt : "\u8FD9\u662F\u8BE5\u9879\u76EE\u9996\u6B21\u5BFC\u5165\uFF0C\u65E0\u5907\u4EFD\u53EF\u5EFA\u3002"
+              warning: preview.currentBrain.exists ? "\u532F\u5165\u5C07\u8986\u84CB\u7576\u524D\u8166\uFF0C\u820A\u8166\u6703\u81EA\u52D5\u5099\u4EFD\u5230 " + preview.backupWillCreateAt : "\u9019\u662F\u8A72\u5C08\u6848\u9996\u6B21\u532F\u5165\uFF0C\u7121\u5099\u4EFD\u53EF\u5EFA\u3002"
             }
           };
         }
         const token = args && args.confirmToken;
         if (!token) {
-          return { ok: false, code: "E_CONFIRM_TOKEN_REQUIRED", message: "dryRun=false \u5FC5\u987B\u4F20 confirmToken\uFF08\u5148 dryRun=true \u62FF\u5230 token\uFF09" };
+          return { ok: false, code: "E_CONFIRM_TOKEN_REQUIRED", message: "dryRun=false \u5FC5\u9808\u50B3 confirmToken\uFF08\u5148 dryRun=true \u62FF\u5230 token\uFF09" };
         }
         const payload = tokenStore.consume(token, { kind: "import" });
         if (!payload) {
-          return { ok: false, code: "E_CONFIRM_TOKEN_MISMATCH", message: "confirmToken \u65E0\u6548\u3001\u5DF2\u8FC7\u671F\u6216\u7C7B\u578B\u4E0D\u5339\u914D\uFF08\u8BF7\u91CD\u65B0 dryRun\uFF09" };
+          return { ok: false, code: "E_CONFIRM_TOKEN_MISMATCH", message: "confirmToken \u7121\u6548\u3001\u5DF2\u904E\u671F\u6216\u578B\u5225\u4E0D\u5339\u914D\uFF08\u8ACB\u91CD\u65B0 dryRun\uFF09" };
         }
         if (payload.bundlePath !== bundlePath || payload.destProjectPath !== projectPath) {
-          return { ok: false, code: "E_CONFIRM_TOKEN_MISMATCH", message: "confirmToken \u4E0E\u5F53\u524D\u53C2\u6570\u4E0D\u5339\u914D\uFF08\u8BF7\u91CD\u65B0 dryRun\uFF09" };
+          return { ok: false, code: "E_CONFIRM_TOKEN_MISMATCH", message: "confirmToken \u8207\u7576\u524D\u5F15\u6578\u4E0D\u5339\u914D\uFF08\u8ACB\u91CD\u65B0 dryRun\uFF09" };
         }
         let applied;
         try {
@@ -8937,7 +8937,7 @@ function buildProjectImportTool({ fs, sandboxPolicy }) {
             bundlePath,
             destProjectPath: projectPath,
             triggerRescan: false
-            // 由调用方调度
+            // 由呼叫方排程
           });
         } catch (e) {
           return {
@@ -8950,7 +8950,7 @@ function buildProjectImportTool({ fs, sandboxPolicy }) {
           const now = Date.now();
           const event = {
             id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-            title: applied.backupPath ? "\u5BFC\u5165 bundle\uFF08\u5DF2\u5907\u4EFD\u65E7\u8111\u5230 " + path4.basename(applied.backupPath) + "\uFF09" : "\u5BFC\u5165 bundle\uFF08\u9996\u6B21\uFF09",
+            title: applied.backupPath ? "\u532F\u5165 bundle\uFF08\u5DF2\u5099\u4EFD\u820A\u8166\u5230 " + path4.basename(applied.backupPath) + "\uFF09" : "\u532F\u5165 bundle\uFF08\u9996\u6B21\uFF09",
             eventType: "import",
             occurredAt: now,
             payload: {
@@ -8970,10 +8970,10 @@ function buildProjectImportTool({ fs, sandboxPolicy }) {
             bundlePath,
             backupPath: applied.backupPath,
             rescanTriggered: false,
-            // 留给 RPC 层调度
+            // 留給 RPC 層排程
             fileCount: applied.fileCount,
             sourceManifest: applied.sourceManifest,
-            warning: "\u8111\u6570\u636E\u5DF2\u5199\u5165\u3002\u5EFA\u8BAE\u624B\u52A8\u8C03 project_rescan \u5237\u65B0\u67B6\u6784\u4E0E\u7EDF\u8BA1\uFF1B\u82E5\u9700\u6062\u590D\u65E7\u8111\uFF0C\u53EF\u8C03 project_rollback_backup\u3002"
+            warning: "\u8166\u8CC7\u6599\u5DF2\u5BEB\u5165\u3002\u5EFA\u8B70\u624B\u52D5\u8ABF project_rescan \u91CD\u65B0\u6574\u7406\u67B6\u69CB\u8207\u7D71\u8A08\uFF1B\u82E5\u9700\u6062\u5FA9\u820A\u8166\uFF0C\u53EF\u8ABF project_rollback_backup\u3002"
           }
         };
       } catch (e) {
@@ -8998,17 +8998,17 @@ function renderImport(_args, value) {
         { type: "text", text: "dsh-project-brain: import PREVIEW" },
         { type: "text", text: "  bundle: " + d.bundlePath },
         { type: "text", text: "  source: " + (d.manifest && d.manifest.sourceProject && d.manifest.sourceProject.rootPath) },
-        { type: "text", text: "  current brain: " + (impact.currentBrainExists ? `${impact.currentMemories} mem / ${impact.currentTodos} todo / ${impact.currentTimeline} timeline` : "(\u65E0)") },
+        { type: "text", text: "  current brain: " + (impact.currentBrainExists ? `${impact.currentMemories} mem / ${impact.currentTodos} todo / ${impact.currentTimeline} timeline` : "(\u7121)") },
         { type: "text", text: `  incoming: ${impact.incomingMemories} mem / ${impact.incomingTodos} todo / ${impact.incomingTimeline} timeline` },
-        { type: "text", text: "  backup will create: " + (impact.backupWillCreateAt || "(\u65E0\u8111\uFF0C\u65E0\u9700\u5907\u4EFD)") },
+        { type: "text", text: "  backup will create: " + (impact.backupWillCreateAt || "(\u7121\u8166\uFF0C\u7121\u9700\u5099\u4EFD)") },
         { type: "text", text: "  rootPath rewrite: " + (impact.rootPathRewrite && impact.rootPathRewrite.from) + " \u2192 " + (impact.rootPathRewrite && impact.rootPathRewrite.to) },
-        { type: "text", text: "  confirmToken: " + d.confirmToken + " (5 \u5206\u949F\u5185\u4F20\u7ED9 dryRun=false \u624D\u4F1A\u771F\u6B63\u6267\u884C)" }
+        { type: "text", text: "  confirmToken: " + d.confirmToken + " (5 \u5206\u9418\u5167\u50B3\u7D66 dryRun=false \u624D\u6703\u771F\u6B63\u57F7\u884C)" }
       ];
     }
     if (d.mode === "applied") {
       return [
         { type: "text", text: "dsh-project-brain: import APPLIED" },
-        { type: "text", text: "  backup: " + (d.backupPath || "(\u65E0)") },
+        { type: "text", text: "  backup: " + (d.backupPath || "(\u7121)") },
         { type: "text", text: "  files restored: " + d.fileCount },
         { type: "text", text: "  " + (d.warning || "") }
       ];
@@ -9033,18 +9033,18 @@ var baseOutputSchema9 = {
 function buildCleanupBackupsTool({ fs, sandboxPolicy }) {
   return defineTool13({
     name: "project_cleanup_backups",
-    description: "dsh-project-brain: \u6E05\u7406 .project-brain.backup-<ts>/ \u5907\u4EFD\u76EE\u5F55\u3002\u4E24\u4E2A\u7B56\u7565\u540C\u65F6\u751F\u6548\uFF1A\u4FDD\u7559\u6700\u8FD1 N \u4E2A\uFF08\u9ED8\u8BA4 3\uFF09+ \u5220\u9664\u8D85\u8FC7 X \u6BEB\u79D2\u7684\uFF08\u9ED8\u8BA4 30 \u5929\uFF09\u3002\u5EFA\u8BAE\u5728\u6BCF\u6B21\u5BFC\u5165/\u56DE\u6EDA\u540E\u8C03\u4E00\u6B21\uFF0C\u907F\u514D\u5907\u4EFD\u65E0\u9650\u5806\u79EF\u3002",
+    description: "dsh-project-brain: \u6E05\u7406 .project-brain.backup-<ts>/ \u5099\u4EFD\u76EE\u9304\u3002\u5169\u500B\u7B56\u7565\u540C\u6642\u751F\u6548\uFF1A\u4FDD\u7559\u6700\u8FD1 N \u500B\uFF08\u9810\u8A2D 3\uFF09+ \u522A\u9664\u8D85\u904E X \u6BEB\u79D2\u7684\uFF08\u9810\u8A2D 30 \u5929\uFF09\u3002\u5EFA\u8B70\u5728\u6BCF\u6B21\u532F\u5165/\u56DE\u6EFE\u5F8C\u8ABF\u4E00\u6B21\uFF0C\u907F\u514D\u5099\u4EFD\u7121\u9650\u5806\u7A4D\u3002",
     parameters: {
-      path: { type: "string", description: "\u9879\u76EE\u6839\u8DEF\u5F84\uFF08\u9ED8\u8BA4\u4ECE session cwd \u63A8\u65AD\uFF09" },
-      keepLast: { type: "number", description: "\u4FDD\u7559\u6700\u8FD1\u51E0\u4E2A\uFF08\u9ED8\u8BA4 3\uFF09" },
-      olderThanMs: { type: "number", description: "\u5220\u9664\u8D85\u8FC7\u591A\u5C11\u6BEB\u79D2\u7684\uFF08\u9ED8\u8BA4 30 \u5929 = 2592000000\uFF09" }
+      path: { type: "string", description: "\u5C08\u6848\u6839\u8DEF\u5F91\uFF08\u9810\u8A2D\u5F9E session cwd \u63A8\u65B7\uFF09" },
+      keepLast: { type: "number", description: "\u4FDD\u7559\u6700\u8FD1\u5E7E\u500B\uFF08\u9810\u8A2D 3\uFF09" },
+      olderThanMs: { type: "number", description: "\u522A\u9664\u8D85\u904E\u591A\u5C11\u6BEB\u79D2\u7684\uFF08\u9810\u8A2D 30 \u5929 = 2592000000\uFF09" }
     },
     output: { schema: baseOutputSchema9, render: renderCleanup },
     async execute(args, exec) {
       try {
         const projectPath = resolveProjectPath(args, exec, sandboxPolicy);
         if (projectPath === ".") {
-          return { ok: false, code: "E_NO_PATH", message: "\u65E0\u6CD5\u89E3\u6790\u9879\u76EE\u8DEF\u5F84\uFF08\u8BF7\u663E\u5F0F\u4F20 path\uFF09" };
+          return { ok: false, code: "E_NO_PATH", message: "\u7121\u6CD5\u89E3\u6790\u5C08\u6848\u8DEF\u5F91\uFF08\u8ACB\u986F\u5F0F\u50B3 path\uFF09" };
         }
         const all = await listBackups({ projectPath });
         const result = await cleanupBackups({
@@ -9061,7 +9061,7 @@ function buildCleanupBackupsTool({ fs, sandboxPolicy }) {
             deletedCount: result.deleted.length,
             kept: result.kept,
             keptCount: result.kept.length,
-            message: `\u6E05\u7406\u5B8C\u6210\uFF1A\u5220\u9664 ${result.deleted.length} \u4E2A\uFF0C\u4FDD\u7559 ${result.kept.length} \u4E2A\u3002`
+            message: `\u6E05\u7406\u5B8C\u6210\uFF1A\u522A\u9664 ${result.deleted.length} \u500B\uFF0C\u4FDD\u7559 ${result.kept.length} \u500B\u3002`
           }
         };
       } catch (e) {
@@ -9123,19 +9123,19 @@ function emitPreviewChanged7(exec, projectPath) {
 function buildRollbackBackupTool({ fs, sandboxPolicy }) {
   return defineTool14({
     name: "project_rollback_backup",
-    description: "dsh-project-brain: \u628A\u5F53\u524D\u8111\u56DE\u6EDA\u5230\u6307\u5B9A\u7684 .project-brain.backup-<ts>/ \u5907\u4EFD\u3002**\u4E24\u6B65\u673A\u5236**\uFF1A\u5148 dryRun=true \u62FF confirmToken\uFF0C\u518D dryRun=false + token \u771F\u6B63\u6267\u884C\u3002\u56DE\u6EDA\u524D\u4F1A\u5148\u628A\u5F53\u524D\u8111\u518D\u5907\u4EFD\u4E00\u6B21\uFF08\u5F62\u6210\u5B8C\u6574\u5386\u53F2\u94FE\uFF09\uFF0C\u65E0\u9700\u4F20 bundle \u6587\u4EF6\u3002",
+    description: "dsh-project-brain: \u628A\u7576\u524D\u8166\u56DE\u6EFE\u5230\u6307\u5B9A\u7684 .project-brain.backup-<ts>/ \u5099\u4EFD\u3002**\u5169\u6B65\u6A5F\u5236**\uFF1A\u5148 dryRun=true \u62FF confirmToken\uFF0C\u518D dryRun=false + token \u771F\u6B63\u57F7\u884C\u3002\u56DE\u6EFE\u524D\u6703\u5148\u628A\u7576\u524D\u8166\u518D\u5099\u4EFD\u4E00\u6B21\uFF08\u5F62\u6210\u5B8C\u6574\u6B77\u53F2\u93C8\uFF09\uFF0C\u7121\u9700\u50B3 bundle \u6A94\u6848\u3002",
     parameters: {
-      path: { type: "string", description: "\u9879\u76EE\u6839\u8DEF\u5F84\uFF08\u9ED8\u8BA4\u4ECE session cwd \u63A8\u65AD\uFF09" },
-      backupTimestamp: { type: "string", description: "\u5907\u4EFD\u65F6\u95F4\u6233\uFF0C\u683C\u5F0F yyyymmdd-hhmmss-mmm\uFF08\u5982 20260915-143022-345\uFF1B\u65E7\u5907\u4EFD hhmm-mmm \u4ECD\u53EF\u7528\uFF09" },
-      dryRun: { type: "boolean", description: "true=\u4EC5\u9884\u89C8\uFF08\u9ED8\u8BA4 false\uFF09" },
-      confirmToken: { type: "string", description: "dryRun \u8FD4\u56DE\u7684 token\uFF1BdryRun=false \u65F6\u5FC5\u586B" }
+      path: { type: "string", description: "\u5C08\u6848\u6839\u8DEF\u5F91\uFF08\u9810\u8A2D\u5F9E session cwd \u63A8\u65B7\uFF09" },
+      backupTimestamp: { type: "string", description: "\u5099\u4EFD\u6642\u9593\u6233\uFF0C\u683C\u5F0F yyyymmdd-hhmmss-mmm\uFF08\u5982 20260915-143022-345\uFF1B\u820A\u5099\u4EFD hhmm-mmm \u4ECD\u53EF\u7528\uFF09" },
+      dryRun: { type: "boolean", description: "true=\u50C5\u9810\u89BD\uFF08\u9810\u8A2D false\uFF09" },
+      confirmToken: { type: "string", description: "dryRun \u8FD4\u56DE\u7684 token\uFF1BdryRun=false \u6642\u5FC5\u586B" }
     },
     output: { schema: baseOutputSchema10, render: renderRollback },
     async execute(args, exec) {
       try {
         const projectPath = resolveProjectPath(args, exec, sandboxPolicy);
         if (projectPath === ".") {
-          return { ok: false, code: "E_NO_PATH", message: "\u65E0\u6CD5\u89E3\u6790\u9879\u76EE\u8DEF\u5F84\uFF08\u8BF7\u663E\u5F0F\u4F20 path\uFF09" };
+          return { ok: false, code: "E_NO_PATH", message: "\u7121\u6CD5\u89E3\u6790\u5C08\u6848\u8DEF\u5F91\uFF08\u8ACB\u986F\u5F0F\u50B3 path\uFF09" };
         }
         const backupTimestamp = args && args.backupTimestamp;
         if (!backupTimestamp) {
@@ -9167,20 +9167,20 @@ function buildRollbackBackupTool({ fs, sandboxPolicy }) {
               currentBrain: preview.currentBrain,
               willBackupCurrentTo: preview.willBackupCurrentTo,
               confirmToken,
-              warning: preview.currentBrain && preview.currentBrain.exists ? "\u56DE\u6EDA\u524D\u4F1A\u5148\u628A\u5F53\u524D\u8111\u5907\u4EFD\u5230 " + preview.willBackupCurrentTo + "\uFF0C\u53EF\u7EE7\u7EED\u56DE\u6EDA\u3002" : "\u5F53\u524D\u8111\u4E0D\u5B58\u5728\uFF0C\u56DE\u6EDA\u540E\u4F1A\u6210\u4E3A\u5F53\u524D\u8111\u3002"
+              warning: preview.currentBrain && preview.currentBrain.exists ? "\u56DE\u6EFE\u524D\u6703\u5148\u628A\u7576\u524D\u8166\u5099\u4EFD\u5230 " + preview.willBackupCurrentTo + "\uFF0C\u53EF\u7E7C\u7E8C\u56DE\u6EFE\u3002" : "\u7576\u524D\u8166\u4E0D\u5B58\u5728\uFF0C\u56DE\u6EFE\u5F8C\u6703\u6210\u70BA\u7576\u524D\u8166\u3002"
             }
           };
         }
         const token = args && args.confirmToken;
         if (!token) {
-          return { ok: false, code: "E_CONFIRM_TOKEN_REQUIRED", message: "dryRun=false \u5FC5\u987B\u4F20 confirmToken\uFF08\u5148 dryRun=true \u62FF\u5230 token\uFF09" };
+          return { ok: false, code: "E_CONFIRM_TOKEN_REQUIRED", message: "dryRun=false \u5FC5\u9808\u50B3 confirmToken\uFF08\u5148 dryRun=true \u62FF\u5230 token\uFF09" };
         }
         const payload = tokenStore.consume(token, { kind: "rollback" });
         if (!payload) {
-          return { ok: false, code: "E_CONFIRM_TOKEN_MISMATCH", message: "confirmToken \u65E0\u6548\u3001\u5DF2\u8FC7\u671F\u6216\u7C7B\u578B\u4E0D\u5339\u914D\uFF08\u8BF7\u91CD\u65B0 dryRun\uFF09" };
+          return { ok: false, code: "E_CONFIRM_TOKEN_MISMATCH", message: "confirmToken \u7121\u6548\u3001\u5DF2\u904E\u671F\u6216\u578B\u5225\u4E0D\u5339\u914D\uFF08\u8ACB\u91CD\u65B0 dryRun\uFF09" };
         }
         if (payload.projectPath !== projectPath || payload.backupTimestamp !== backupTimestamp) {
-          return { ok: false, code: "E_CONFIRM_TOKEN_MISMATCH", message: "confirmToken \u4E0E\u5F53\u524D\u53C2\u6570\u4E0D\u5339\u914D\uFF08\u8BF7\u91CD\u65B0 dryRun\uFF09" };
+          return { ok: false, code: "E_CONFIRM_TOKEN_MISMATCH", message: "confirmToken \u8207\u7576\u524D\u5F15\u6578\u4E0D\u5339\u914D\uFF08\u8ACB\u91CD\u65B0 dryRun\uFF09" };
         }
         let applied;
         try {
@@ -9196,7 +9196,7 @@ function buildRollbackBackupTool({ fs, sandboxPolicy }) {
           const now = Date.now();
           const event = {
             id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-            title: "\u56DE\u6EDA\u5230\u5907\u4EFD " + backupTimestamp,
+            title: "\u56DE\u6EFE\u5230\u5099\u4EFD " + backupTimestamp,
             eventType: "rollback",
             occurredAt: now,
             payload: {
@@ -9216,7 +9216,7 @@ function buildRollbackBackupTool({ fs, sandboxPolicy }) {
             restoredFrom: applied.restoredFrom,
             preRollbackBackupPath: applied.preRollbackBackupPath,
             rescanTriggered: false,
-            warning: "\u56DE\u6EDA\u5B8C\u6210\u3002\u5EFA\u8BAE\u624B\u52A8\u8C03 project_rescan \u5237\u65B0\u67B6\u6784\u4E0E\u7EDF\u8BA1\u3002"
+            warning: "\u56DE\u6EFE\u5B8C\u6210\u3002\u5EFA\u8B70\u624B\u52D5\u8ABF project_rescan \u91CD\u65B0\u6574\u7406\u67B6\u69CB\u8207\u7D71\u8A08\u3002"
           }
         };
       } catch (e) {
@@ -9241,16 +9241,16 @@ function renderRollback(_args, value) {
       return [
         { type: "text", text: "dsh-project-brain: rollback PREVIEW" },
         { type: "text", text: `  source backup: ${sb.backupName} (${sb.sizeBytes} bytes, ${sb.memCount} mem / ${sb.todoCount} todo / ${sb.timelineCount} timeline)` },
-        { type: "text", text: `  current brain: ${cb.exists ? `${cb.memCount} mem / ${cb.todoCount} todo / ${cb.timelineCount} timeline` : "(\u65E0)"}` },
-        { type: "text", text: "  pre-rollback backup: " + (d.willBackupCurrentTo || "(\u65E0\u9700)") },
-        { type: "text", text: "  confirmToken: " + d.confirmToken + " (5 \u5206\u949F\u5185\u4F20\u7ED9 dryRun=false)" }
+        { type: "text", text: `  current brain: ${cb.exists ? `${cb.memCount} mem / ${cb.todoCount} todo / ${cb.timelineCount} timeline` : "(\u7121)"}` },
+        { type: "text", text: "  pre-rollback backup: " + (d.willBackupCurrentTo || "(\u7121\u9700)") },
+        { type: "text", text: "  confirmToken: " + d.confirmToken + " (5 \u5206\u9418\u5167\u50B3\u7D66 dryRun=false)" }
       ];
     }
     if (d.mode === "applied") {
       return [
         { type: "text", text: "dsh-project-brain: rollback APPLIED" },
         { type: "text", text: "  restored from: " + d.restoredFrom },
-        { type: "text", text: "  pre-rollback backup: " + (d.preRollbackBackupPath || "(\u65E0)") },
+        { type: "text", text: "  pre-rollback backup: " + (d.preRollbackBackupPath || "(\u7121)") },
         { type: "text", text: "  " + (d.warning || "") }
       ];
     }
@@ -9267,8 +9267,8 @@ var FILE_SHOW = 5;
 var THIN_AFTER = 40;
 var KEEP_RECENT = 20;
 var DETAIL_MAX_CHARS = 900;
-var NO_SUMMARY_LABEL = "\u4EE3\u7801\u6709\u53D8\u66F4\uFF08\u65E0\u6458\u8981\uFF09";
-var INIT_LABEL = "\u9879\u76EE\u521D\u59CB\u5316";
+var NO_SUMMARY_LABEL = "\u7A0B\u5F0F\u78BC\u6709\u8B8A\u66F4\uFF08\u7121\u6458\u8981\uFF09";
+var INIT_LABEL = "\u5C08\u6848\u521D\u59CB\u5316";
 function qualifiedSummary2(text) {
   const summary = String(text || "").trim();
   if (!summary) return "";
@@ -9287,7 +9287,7 @@ function firstSentence(text) {
   const first = (parts[0] || masked).trim();
   return first.replace(/\u0001(\d+)\u0001/g, (_, i) => versions[Number(i)] || "");
 }
-var PATCH_TONE = /(?:\bpatch\b|\bhotfix\b|\brelease[-\s]?(?:fix|notes)?\b|\bfix(?:es|ed)?\b|修复|补丁|发版|验收|改动说明|变更说明)/i;
+var PATCH_TONE = /(?:\bpatch\b|\bhotfix\b|\brelease[-\s]?(?:fix|notes)?\b|\bfix(?:es|ed)?\b|修復|補丁|發版|驗收|改動說明|變更說明)/i;
 function isVersionLedTitle(text) {
   const t = String(text || "").trim();
   const m = t.match(/^v?\d+(?:\.\d+)+\b(.*)$/i);
@@ -9402,14 +9402,14 @@ function parseTodoId(event) {
 function isTodoDone(event) {
   if (event && event.todoStatus === "done") return true;
   if (/status=done/.test(String(event && event.detail || ""))) return true;
-  return /^完成待办/.test(String(event && event.title || ""));
+  return /^完成待辦/.test(String(event && event.title || ""));
 }
 function displayTitle(event) {
   let title = String(event && event.title || "").trim();
-  title = title.replace(/^新增记忆\[[^\]]+\]：/, "");
-  title = title.replace(/^新增待办(?:\[[^\]]+\])?：/, "");
-  title = title.replace(/^完成待办(?:\[[^\]]+\])?：/, "");
-  title = title.replace(/^更新待办\[[^\]]+\]：/, "");
+  title = title.replace(/^新增記憶\[[^\]]+\]：/, "");
+  title = title.replace(/^新增待辦(?:\[[^\]]+\])?：/, "");
+  title = title.replace(/^完成待辦(?:\[[^\]]+\])?：/, "");
+  title = title.replace(/^更新待辦\[[^\]]+\]：/, "");
   return title.trim();
 }
 function sessionKey(event) {
@@ -9722,19 +9722,19 @@ function deriveFallbackPhase(p) {
   const ts = p && (p.updatedAt || p.lastScannedAt) || now;
   const ageMs2 = now - ts;
   if (ageMs2 < 6e4) {
-    return { title: "Project Brain \u5DF2\u5C31\u7EEA", progress: { done: 1, total: 1 } };
+    return { title: "Project Brain \u5DF2\u5C31\u7DD2", progress: { done: 1, total: 1 } };
   }
   if (ageMs2 < 24 * 36e5) {
-    return { title: "\u4ECA\u65E5\u6D3B\u8DC3", progress: { done: 1, total: 2 } };
+    return { title: "\u4ECA\u65E5\u6D3B\u8E8D", progress: { done: 1, total: 2 } };
   }
-  return { title: "\u7EF4\u62A4\u4E2D", progress: { done: 1, total: 3 } };
+  return { title: "\u7DAD\u8B77\u4E2D", progress: { done: 1, total: 3 } };
 }
 function derivePhase(p, todos) {
   const active = todos.filter((t) => t && t.status !== "cancelled");
   if (active.length === 0) return deriveFallbackPhase(p);
   const done = active.filter((t) => t.status === "done").length;
   const inProgress = active.filter((t) => t.status === "in_progress");
-  const title = inProgress.length > 0 ? "\u8FDB\u884C\u4E2D\uFF1A" + inProgress[0].title : "\u5F85\u529E " + (active.length - done) + " \u9879";
+  const title = inProgress.length > 0 ? "\u9032\u884C\u4E2D\uFF1A" + inProgress[0].title : "\u5F85\u8FA6 " + (active.length - done) + " \u9805";
   return { title, progress: { done, total: active.length } };
 }
 function buildSidebarPreview(projectPath) {
@@ -9777,7 +9777,7 @@ function buildSidebarPreview(projectPath) {
       phase: derivePhase(p, todos),
       recentActivity: activity.length > 0 ? activity : p.lastScannedAt ? [{
         id: "scan",
-        title: "\u5B8C\u6210 project_init \u626B\u63CF",
+        title: "\u5B8C\u6210 project_init \u6383\u63CF",
         occurredAt: p.lastScannedAt,
         eventType: "init"
       }] : [],
@@ -9865,10 +9865,10 @@ async function buildWorkspacePreview(fs, workspaceRoot) {
   const inProgress = todosAll.filter((t) => t && t.status === "in_progress");
   const activeForPhase = todosAll.filter((t) => t && t.status !== "cancelled");
   const phase = activeForPhase.length > 0 ? {
-    title: inProgress.length > 0 ? "\u8FDB\u884C\u4E2D\uFF1A" + inProgress[0].title : "\u5F85\u529E " + stats.pendingTodos + " \u9879",
+    title: inProgress.length > 0 ? "\u9032\u884C\u4E2D\uFF1A" + inProgress[0].title : "\u5F85\u8FA6 " + stats.pendingTodos + " \u9805",
     progress: { done: stats.completedTodos, total: activeForPhase.length }
   } : {
-    title: "\u5DF2\u626B\u63CF\uFF08" + (p.entrypoints ? p.entrypoints.length : 0) + " \u4E2A\u5165\u53E3\uFF09",
+    title: "\u5DF2\u6383\u63CF\uFF08" + (p.entrypoints ? p.entrypoints.length : 0) + " \u500B\u5165\u53E3\uFF09",
     progress: { done: 1, total: 1 }
   };
   const todosActive = activeTodos(todosAll);
@@ -9896,7 +9896,7 @@ async function buildWorkspacePreview(fs, workspaceRoot) {
     phase,
     recentActivity: recentActivity.length > 0 ? recentActivity : p.lastScannedAt ? [{
       id: "scan",
-      title: "\u5B8C\u6210 project_init \u626B\u63CF",
+      title: "\u5B8C\u6210 project_init \u6383\u63CF",
       occurredAt: p.lastScannedAt,
       eventType: "init"
     }] : [],
@@ -9907,7 +9907,7 @@ async function buildWorkspacePreview(fs, workspaceRoot) {
       if (ac !== bc) return ac - bc;
       return (b.importance || 0) - (a.importance || 0);
     }).slice(0, 50),
-    // 归档不是删除：页面要能看到它们才谈得上「恢复」。
+    // 歸檔不是刪除：頁面要能看到它們才談得上「恢復」。
     memoriesArchived: (Array.isArray(memoriesAll) ? memoriesAll : []).filter((m) => m && (m.status === "archived" || m.status === "superseded")).slice().sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0)).slice(0, 50),
     todos,
     timelineAll: timeline.slice(0, 50),
@@ -9936,17 +9936,17 @@ async function probeEmbedding({ config, resolveCredential, fetchImpl, signal } =
   const endpoint = cfg.embeddingBaseURL ? embeddingEndpoint(cfg.embeddingBaseURL) : "";
   const model = cfg.embeddingModel || "";
   if (!cfg.vectorEnabled) {
-    return fail("EMBEDDING_DISABLED", "\u5411\u91CF\u68C0\u7D22\u672A\u542F\u7528\uFF0C\u6253\u5F00\u5F00\u5173\u540E\u518D\u6D4B", { endpoint, model });
+    return fail("EMBEDDING_DISABLED", "\u5411\u91CF\u6AA2\u7D22\u672A\u555F\u7528\uFF0C\u958B\u555F\u958B\u95DC\u5F8C\u518D\u6E2C", { endpoint, model });
   }
   if (!cfg.embeddingBaseURL || !cfg.embeddingModel) {
-    return fail("EMBEDDING_NOT_CONFIGURED", "\u9700\u8981\u540C\u65F6\u586B\u5199 Embedding \u5730\u5740\u548C\u6A21\u578B\u540D", { endpoint, model });
+    return fail("EMBEDDING_NOT_CONFIGURED", "\u9700\u8981\u540C\u6642\u586B\u5BEB Embedding \u5730\u5740\u548C\u6A21\u578B\u540D", { endpoint, model });
   }
   let apiKey = null;
   if (cfg.embeddingApiKeyEnv) {
     apiKey = await resolveEmbeddingApiKey(cfg.embeddingApiKeyEnv, resolveCredential);
     if (!apiKey) {
       const shown = isEmbeddingEnvRef(cfg.embeddingApiKeyEnv) ? cfg.embeddingApiKeyEnv : redactSecret(cfg.embeddingApiKeyEnv);
-      return fail("EMBEDDING_CREDENTIAL_MISSING", isEmbeddingEnvRef(cfg.embeddingApiKeyEnv) ? "\u672C\u673A\u6CA1\u6709\u73AF\u5883\u53D8\u91CF " + shown + "\u3002\u8BF7\u5728\u7CFB\u7EDF\u6216\u7528\u6237\u73AF\u5883\u53D8\u91CF\u4E2D\u914D\u7F6E\u540C\u540D\u9879\u5E76\u5B8C\u5168\u91CD\u542F DSH Desktop\uFF0C\u6216\u6539\u4E3A\u76F4\u63A5\u586B\u5199 API Key\u3002" : "\u672A\u89E3\u6790\u5230\u5BC6\u94A5\uFF0C\u8BF7\u76F4\u63A5\u586B\u5199 API Key\u3002", {
+      return fail("EMBEDDING_CREDENTIAL_MISSING", isEmbeddingEnvRef(cfg.embeddingApiKeyEnv) ? "\u672C\u6A5F\u6C92\u6709\u74B0\u5883\u8B8A\u6578 " + shown + "\u3002\u8ACB\u5728\u7CFB\u7D71\u6216\u4F7F\u7528\u8005\u74B0\u5883\u8B8A\u6578\u4E2D\u914D\u7F6E\u540C\u540D\u9805\u4E26\u5B8C\u5168\u91CD\u555F DSH Desktop\uFF0C\u6216\u6539\u70BA\u76F4\u63A5\u586B\u5BEB API Key\u3002" : "\u672A\u89E3\u6790\u5230\u91D1\u9470\uFF0C\u8ACB\u76F4\u63A5\u586B\u5BEB API Key\u3002", {
         endpoint,
         model,
         envName: isEmbeddingEnvRef(cfg.embeddingApiKeyEnv) ? cfg.embeddingApiKeyEnv : void 0
@@ -9967,11 +9967,11 @@ async function probeEmbedding({ config, resolveCredential, fetchImpl, signal } =
     if (cfg.embeddingDimensions && dimensions !== cfg.embeddingDimensions) {
       return fail(
         "EMBEDDING_DIMENSION_MISMATCH",
-        "\u8FD4\u56DE\u7EF4\u5EA6 " + dimensions + " \u4E0E\u914D\u7F6E " + cfg.embeddingDimensions + " \u4E0D\u4E00\u81F4",
+        "\u8FD4\u56DE\u7DAD\u5EA6 " + dimensions + " \u8207\u914D\u7F6E " + cfg.embeddingDimensions + " \u4E0D\u4E00\u81F4",
         Object.assign({}, details, { expected: cfg.embeddingDimensions })
       );
     }
-    return ok("\u5411\u91CF\u8FDE\u901A\uFF0C\u7EF4\u5EA6 " + dimensions, details);
+    return ok("\u5411\u91CF\u9023\u901A\uFF0C\u7DAD\u5EA6 " + dimensions, details);
   } catch (error) {
     return fail(
       error && error.code || "EMBEDDING_FAILED",
@@ -9982,10 +9982,10 @@ async function probeEmbedding({ config, resolveCredential, fetchImpl, signal } =
 }
 async function probeSessionLlm({ llm, route, sessionId, timeoutMs } = {}) {
   if (!llm || typeof llm.stream !== "function") {
-    return fail("LLM_SERVICE_UNAVAILABLE", "DSH \u672A\u628A\u6A21\u578B\u670D\u52A1\u66B4\u9732\u7ED9\u9879\u76EE\u8111", {});
+    return fail("LLM_SERVICE_UNAVAILABLE", "DSH \u672A\u628A\u6A21\u578B\u670D\u52D9\u66B4\u9732\u7D66\u5C08\u6848\u8166", {});
   }
   if (!route || !route.provider || !route.model) {
-    return fail("LLM_SESSION_ROUTE_UNAVAILABLE", "\u5F53\u524D\u4F1A\u8BDD\u8FD8\u6CA1\u6709\u6A21\u578B\u8DEF\u7531\uFF0C\u5148\u53D1\u4E00\u6761\u6D88\u606F\u540E\u518D\u6D4B", {});
+    return fail("LLM_SESSION_ROUTE_UNAVAILABLE", "\u7576\u524D\u6703\u8A71\u9084\u6C92\u6709\u6A21\u578B\u8DEF\u7531\uFF0C\u5148\u767C\u4E00\u689D\u8A0A\u606F\u5F8C\u518D\u6E2C", {});
   }
   const started = Date.now();
   const detailsBase = { provider: route.provider, model: route.model };
@@ -10003,7 +10003,7 @@ async function probeSessionLlm({ llm, route, sessionId, timeoutMs } = {}) {
         temperature: 0
       }
     );
-    return ok("LLM \u8FDE\u901A " + route.provider + "/" + route.model, Object.assign({}, detailsBase, {
+    return ok("LLM \u9023\u901A " + route.provider + "/" + route.model, Object.assign({}, detailsBase, {
       latencyMs: Date.now() - started,
       sample: String(text || "").slice(0, 80)
     }));
@@ -10169,7 +10169,7 @@ function getGitHistory({ projectPath, limit = 50, branch = null } = {}) {
       firstParent,
       extraParents,
       isMerge: extraParents.length > 0,
-      // 文件变更（基于 tree diff）
+      // 檔案變更（基於 tree diff）
       filesChanged: diff.files,
       filesChangedTotal: diff.totalFiles,
       filesAdded: diff.added,
@@ -10282,7 +10282,7 @@ function getWorkTreeChanges({ projectPath, maxFiles = 50 } = {}) {
     if (!fallback) {
       return {
         available: false,
-        error: "HEAD tree \u4E0D\u53EF\u8BFB\uFF08pack \u89E3\u6790\u9650\u5236\uFF09\uFF0C\u65E0\u6CD5\u53EF\u9760\u68C0\u6D4B\u5DE5\u4F5C\u6811\u53D8\u66F4"
+        error: "HEAD tree \u4E0D\u53EF\u8B80\uFF08pack \u89E3\u6790\u9650\u5236\uFF09\uFF0C\u7121\u6CD5\u53EF\u9760\u6AA2\u6E2C\u5DE5\u4F5C\u6A39\u8B8A\u66F4"
       };
     }
     headTreeFiles = fallback.files;
@@ -10340,7 +10340,7 @@ function shapeImportPreviewData(preview, bundlePath, confirmToken) {
   const sourceProjectRoot = str(sourceProject.rootPath || sourceProject.name);
   const rootPathFrom = str(rewrite.from);
   const rootPathTo = str(rewrite.to);
-  const warning = currentExists ? "\u5BFC\u5165\u5C06\u8986\u76D6\u5F53\u524D\u8111\uFF0C\u65E7\u8111\u4F1A\u81EA\u52A8\u5907\u4EFD\u5230 " + (backupWillCreateAt || "\u672C\u5730\u5907\u4EFD\u76EE\u5F55") : "\u8FD9\u662F\u8BE5\u9879\u76EE\u9996\u6B21\u5BFC\u5165\uFF0C\u65E0\u65E7\u8111\u53EF\u5907\u4EFD\u3002";
+  const warning = currentExists ? "\u532F\u5165\u5C07\u8986\u84CB\u7576\u524D\u8166\uFF0C\u820A\u8166\u6703\u81EA\u52D5\u5099\u4EFD\u5230 " + (backupWillCreateAt || "\u672C\u5730\u5099\u4EFD\u76EE\u9304") : "\u9019\u662F\u8A72\u5C08\u6848\u9996\u6B21\u532F\u5165\uFF0C\u7121\u820A\u8166\u53EF\u5099\u4EFD\u3002";
   const impact = {
     currentBrainExists: currentExists,
     currentProjectId: str(current.projectId),
@@ -10389,7 +10389,7 @@ function shapeRollbackPreviewData(preview, backupTimestamp, confirmToken) {
   const current = preview && preview.currentBrain || {};
   const currentExists = !!current.exists;
   const willBackupCurrentTo = str(preview && preview.willBackupCurrentTo);
-  const warning = currentExists ? "\u56DE\u6EDA\u524D\u4F1A\u5148\u628A\u5F53\u524D\u8111\u5907\u4EFD\u5230 " + (willBackupCurrentTo || "\u672C\u5730\u5907\u4EFD\u76EE\u5F55") + "\uFF0C\u53EF\u7EE7\u7EED\u56DE\u6EDA\u3002" : "\u5F53\u524D\u8111\u4E0D\u5B58\u5728\uFF0C\u56DE\u6EDA\u540E\u4F1A\u6210\u4E3A\u5F53\u524D\u8111\u3002";
+  const warning = currentExists ? "\u56DE\u6EFE\u524D\u6703\u5148\u628A\u7576\u524D\u8166\u5099\u4EFD\u5230 " + (willBackupCurrentTo || "\u672C\u5730\u5099\u4EFD\u76EE\u9304") + "\uFF0C\u53EF\u7E7C\u7E8C\u56DE\u6EFE\u3002" : "\u7576\u524D\u8166\u4E0D\u5B58\u5728\uFF0C\u56DE\u6EFE\u5F8C\u6703\u6210\u70BA\u7576\u524D\u8166\u3002";
   return {
     mode: "preview",
     confirmToken: str(confirmToken),
@@ -10435,8 +10435,8 @@ function findMemoryById(rows, idPrefix, { includeArchived = false } = {}) {
   if (!needle) return fail2("E_NO_ID", "id \u5FC5\u586B");
   const pool = (rows || []).filter((m) => m && m.id && (includeArchived || isRetrievableMemory(m)));
   const matches = pool.filter((m) => m.id === needle || m.id.indexOf(needle) === 0);
-  if (matches.length === 0) return fail2("E_NOT_FOUND", "\u672A\u627E\u5230 id=" + needle + " \u7684\u8BB0\u5FC6");
-  if (matches.length > 1) return fail2("E_AMBIGUOUS_ID", "id=" + needle + " \u5339\u914D\u5230 " + matches.length + " \u6761\uFF0C\u8BF7\u63D0\u4F9B\u66F4\u7CBE\u786E\u7684 id");
+  if (matches.length === 0) return fail2("E_NOT_FOUND", "\u672A\u627E\u5230 id=" + needle + " \u7684\u8A18\u61B6");
+  if (matches.length > 1) return fail2("E_AMBIGUOUS_ID", "id=" + needle + " \u5339\u914D\u5230 " + matches.length + " \u689D\uFF0C\u8ACB\u63D0\u4F9B\u66F4\u7CBE\u78BA\u7684 id");
   return { ok: true, entry: matches[0] };
 }
 function normalizeTags(value, previous) {
@@ -10457,32 +10457,32 @@ function applyMemoryEdit(rows, { id, patch = {}, now = Date.now(), limits } = {}
   const next = Object.assign({}, target);
   if (patch.title !== void 0) {
     const title = String(patch.title).trim();
-    if (!title) return fail2("E_NO_TITLE", "\u6807\u9898\u4E0D\u80FD\u4E3A\u7A7A");
+    if (!title) return fail2("E_NO_TITLE", "\u6A19\u984C\u4E0D\u80FD\u70BA\u7A7A");
     next.title = title.slice(0, MAX_EDITED_TITLE_CHARS);
   }
   if (patch.content !== void 0) {
     const content = String(patch.content).trim();
     if (content.length < MIN_EDITED_CONTENT_CHARS) {
-      return fail2("E_CONTENT_TOO_SHORT", "\u6B63\u6587\u81F3\u5C11 " + MIN_EDITED_CONTENT_CHARS + " \u4E2A\u5B57\u7B26");
+      return fail2("E_CONTENT_TOO_SHORT", "\u6B63\u6587\u81F3\u5C11 " + MIN_EDITED_CONTENT_CHARS + " \u500B\u5B57\u5143");
     }
     next.content = content.slice(0, MAX_EDITED_CONTENT_CHARS);
   }
   if (patch.type !== void 0) {
     const type = normalizeMemoryType(patch.type);
-    if (!type) return fail2("E_INVALID_TYPE", "\u8BB0\u5FC6\u7C7B\u578B\u4E0D\u5408\u6CD5");
+    if (!type) return fail2("E_INVALID_TYPE", "\u8A18\u61B6\u578B\u5225\u4E0D\u5408\u6CD5");
     next.type = type;
   }
   if (patch.importance !== void 0) {
     const importance = Number(patch.importance);
     if (!Number.isFinite(importance) || importance < 0 || importance > 1) {
-      return fail2("E_INVALID_IMPORTANCE", "\u91CD\u8981\u6027\u5FC5\u987B\u662F 0~1 \u4E4B\u95F4\u7684\u6570\u5B57");
+      return fail2("E_INVALID_IMPORTANCE", "\u91CD\u8981\u6027\u5FC5\u9808\u662F 0~1 \u4E4B\u9593\u7684\u6578\u5B57");
     }
     next.importance = Math.round(importance * 100) / 100;
   }
   if (patch.status !== void 0) {
     const status = String(patch.status).trim();
     if (EDITABLE_STATUSES.indexOf(status) < 0) {
-      return fail2("E_INVALID_STATUS", "\u72B6\u6001\u53EA\u80FD\u662F " + EDITABLE_STATUSES.join(" / "));
+      return fail2("E_INVALID_STATUS", "\u72C0\u614B\u53EA\u80FD\u662F " + EDITABLE_STATUSES.join(" / "));
     }
     next.status = status;
   }
@@ -10492,7 +10492,7 @@ function applyMemoryEdit(rows, { id, patch = {}, now = Date.now(), limits } = {}
       const cap = maxPinnedCount(limits);
       const current = pinnedMemories(rows).filter((m) => m.id !== target.id).length;
       if (current >= cap) {
-        return fail2("E_PIN_LIMIT", "\u7F6E\u9876\u6700\u591A " + cap + " \u6761\uFF0C\u8BF7\u5148\u53D6\u6D88\u5176\u4ED6\u7F6E\u9876");
+        return fail2("E_PIN_LIMIT", "\u7F6E\u9802\u6700\u591A " + cap + " \u689D\uFF0C\u8ACB\u5148\u53D6\u6D88\u5176\u4ED6\u7F6E\u9802");
       }
     }
     if (pinned) next.pinned = true;
@@ -10743,7 +10743,7 @@ function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tools, logg
             });
             return rpcOk({ probe: Object.assign({ target: "llm" }, probe) });
           }
-          return rpcError("bad-request", "\u672A\u77E5\u63A2\u6D4B\u76EE\u6807\uFF0C\u5E94\u4E3A embedding \u6216 llm", { target: target || null });
+          return rpcError("bad-request", "\u672A\u77E5\u63A2\u6E2C\u76EE\u6A19\uFF0C\u61C9\u70BA embedding \u6216 llm", { target: target || null });
         }
         if (action === "get") {
           return rpcOk({
@@ -10754,13 +10754,13 @@ function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tools, logg
         }
         const patch = payload && payload.patch && typeof payload.patch === "object" ? payload.patch : null;
         if (!patch || Object.keys(patch).length === 0) {
-          return rpcError("EMPTY_PATCH", "\u6CA1\u6709\u53EF\u4FDD\u5B58\u7684\u5B57\u6BB5", {});
+          return rpcError("EMPTY_PATCH", "\u6C92\u6709\u53EF\u5132\u5B58\u7684\u6B04\u4F4D", {});
         }
         if (!updateSettings || typeof updateSettings !== "function") {
-          return rpcError("SETTINGS_UNAVAILABLE", "\u5F53\u524D\u8FD0\u884C\u65F6 settings \u670D\u52A1\u4E0D\u53EF\u7528\uFF0C\u914D\u7F6E\u4E3A\u53EA\u8BFB", { writable: false });
+          return rpcError("SETTINGS_UNAVAILABLE", "\u7576\u524D\u57F7\u884C\u6642 settings \u670D\u52D9\u4E0D\u53EF\u7528\uFF0C\u914D\u7F6E\u70BA\u53EA\u8B80", { writable: false });
         }
         if (!writable) {
-          return rpcError("SETTINGS_READONLY", "settings provider \u53EA\u8BFB\uFF0C\u65E0\u6CD5\u4FDD\u5B58", { writable: false });
+          return rpcError("SETTINGS_READONLY", "settings provider \u53EA\u8B80\uFF0C\u7121\u6CD5\u5132\u5B58", { writable: false });
         }
         try {
           const next = await updateSettings(patch);
@@ -10780,7 +10780,7 @@ function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tools, logg
       if (!projectPath) {
         return rpcError(
           "WORKSPACE_NOT_FOUND",
-          "\u65E0\u6CD5\u4ECE\u5F53\u524D Session \u89E3\u6790 workspace \u8DEF\u5F84",
+          "\u7121\u6CD5\u5F9E\u7576\u524D Session \u89E3\u6790 workspace \u8DEF\u5F91",
           { sessionId: payload && payload.sessionId ? payload.sessionId : null }
         );
       }
@@ -10804,7 +10804,7 @@ function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tools, logg
           const error = result && result.data && result.data.error;
           return rpcError(
             error && error.code || "INIT_FAILED",
-            error && error.message || "\u9879\u76EE\u5927\u8111\u521D\u59CB\u5316\u5931\u8D25",
+            error && error.message || "\u5C08\u6848\u5927\u8166\u521D\u59CB\u5316\u5931\u6557",
             { projectPath }
           );
         }
@@ -10842,7 +10842,7 @@ function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tools, logg
           const error = toolResult && toolResult.data && toolResult.data.error;
           return rpcError(
             error && error.code || "SUGGEST_FAILED",
-            error && error.message || "\u667A\u80FD\u7EED\u63A5\u5931\u8D25",
+            error && error.message || "\u667A\u6167\u7E8C\u63A5\u5931\u6557",
             { endpoint, projectPath: trustedPath }
           );
         }
@@ -10902,7 +10902,7 @@ function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tools, logg
             const error = result2 && result2.data && result2.data.error;
             return rpcError(
               error && error.code || "RESCAN_FAILED",
-              error && error.message || "\u91CD\u65B0\u626B\u63CF\u5931\u8D25",
+              error && error.message || "\u91CD\u65B0\u6383\u63CF\u5931\u6557",
               { action, projectPath }
             );
           }
@@ -10918,7 +10918,7 @@ function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tools, logg
         }
         const definition = toolActions[action];
         if (!definition) {
-          return rpcError("ACTION_NOT_ALLOWED", "\u4E0D\u652F\u6301\u7684 Project Brain \u64CD\u4F5C\uFF1A" + action, { action });
+          return rpcError("ACTION_NOT_ALLOWED", "\u4E0D\u652F\u63F4\u7684 Project Brain \u64CD\u4F5C\uFF1A" + action, { action });
         }
         if (!tools || typeof tools.execute !== "function") {
           return rpcError("TOOLS_UNAVAILABLE", "DSH tools service unavailable", { action });
@@ -10940,7 +10940,7 @@ function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tools, logg
           const nested = result && result.data && result.data.error;
           return rpcError(
             nested && nested.code || result && result.code || "ACTION_FAILED",
-            nested && nested.message || result && result.message || "\u64CD\u4F5C\u6267\u884C\u5931\u8D25",
+            nested && nested.message || result && result.message || "\u64CD\u4F5C\u57F7\u884C\u5931\u6557",
             { action, tool: definition.name }
           );
         }
@@ -10989,7 +10989,7 @@ function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tools, logg
             const now = Date.now();
             await appendJsonl2(fs, brainPath3(projectPath, "timeline.jsonl"), {
               id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-              title: "\u5BFC\u51FA bundle\uFF1A" + written.bundleName,
+              title: "\u532F\u51FA bundle\uFF1A" + written.bundleName,
               eventType: "export",
               occurredAt: now,
               payload: {
@@ -11050,15 +11050,15 @@ function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tools, logg
         const bundlePath = payload && typeof payload.bundlePath === "string" ? payload.bundlePath : "";
         const confirmToken = payload && typeof payload.confirmToken === "string" ? payload.confirmToken : "";
         if (!bundlePath) return rpcError("bad-request", "bundlePath \u5FC5\u586B", {});
-        if (!confirmToken) return rpcError("bad-request", "confirmToken \u5FC5\u586B\uFF08\u5148\u8C03 import.preview \u62FF token\uFF09", {});
+        if (!confirmToken) return rpcError("bad-request", "confirmToken \u5FC5\u586B\uFF08\u5148\u8ABF import.preview \u62FF token\uFF09", {});
         try {
           const { getTokenStore: getTokenStore2 } = await Promise.resolve().then(() => (init_confirm_tokens(), confirm_tokens_exports));
           const tokenPayload = getTokenStore2().consume(confirmToken, { kind: "import" });
           if (!tokenPayload) {
-            return rpcError("bad-request", "confirmToken \u65E0\u6548\u3001\u5DF2\u8FC7\u671F\u6216\u7C7B\u578B\u4E0D\u5339\u914D\uFF08\u8BF7\u91CD\u65B0\u9884\u89C8\uFF09", {});
+            return rpcError("bad-request", "confirmToken \u7121\u6548\u3001\u5DF2\u904E\u671F\u6216\u578B\u5225\u4E0D\u5339\u914D\uFF08\u8ACB\u91CD\u65B0\u9810\u89BD\uFF09", {});
           }
           if (tokenPayload.bundlePath !== bundlePath || tokenPayload.destProjectPath !== projectPath) {
-            return rpcError("bad-request", "confirmToken \u4E0E\u5F53\u524D\u53C2\u6570\u4E0D\u5339\u914D\uFF08\u8BF7\u91CD\u65B0\u9884\u89C8\uFF09", {});
+            return rpcError("bad-request", "confirmToken \u8207\u7576\u524D\u5F15\u6578\u4E0D\u5339\u914D\uFF08\u8ACB\u91CD\u65B0\u9810\u89BD\uFF09", {});
           }
           const { applyBundle: applyBundle2 } = await Promise.resolve().then(() => (init_bundle(), bundle_exports));
           const applied = await applyBundle2({ bundlePath, destProjectPath: projectPath, triggerRescan: false });
@@ -11067,7 +11067,7 @@ function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tools, logg
             const now = Date.now();
             await appendJsonl2(fs, brainPath3(projectPath, "timeline.jsonl"), {
               id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-              title: applied.backupPath ? "\u5BFC\u5165 bundle\uFF08\u5DF2\u5907\u4EFD\u65E7\u8111\u5230 " + path6.basename(applied.backupPath) + "\uFF09" : "\u5BFC\u5165 bundle\uFF08\u9996\u6B21\uFF09",
+              title: applied.backupPath ? "\u532F\u5165 bundle\uFF08\u5DF2\u5099\u4EFD\u820A\u8166\u5230 " + path6.basename(applied.backupPath) + "\uFF09" : "\u532F\u5165 bundle\uFF08\u9996\u6B21\uFF09",
               eventType: "import",
               occurredAt: now,
               payload: {
@@ -11149,15 +11149,15 @@ function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tools, logg
         const ts = payload && typeof payload.backupTimestamp === "string" ? payload.backupTimestamp : "";
         const confirmToken = payload && typeof payload.confirmToken === "string" ? payload.confirmToken : "";
         if (!ts) return rpcError("bad-request", "backupTimestamp \u5FC5\u586B", {});
-        if (!confirmToken) return rpcError("bad-request", "confirmToken \u5FC5\u586B\uFF08\u5148\u8C03 backup.rollback.preview \u62FF token\uFF09", {});
+        if (!confirmToken) return rpcError("bad-request", "confirmToken \u5FC5\u586B\uFF08\u5148\u8ABF backup.rollback.preview \u62FF token\uFF09", {});
         try {
           const { getTokenStore: getTokenStore2 } = await Promise.resolve().then(() => (init_confirm_tokens(), confirm_tokens_exports));
           const tokenPayload = getTokenStore2().consume(confirmToken, { kind: "rollback" });
           if (!tokenPayload) {
-            return rpcError("bad-request", "confirmToken \u65E0\u6548\u3001\u5DF2\u8FC7\u671F\u6216\u7C7B\u578B\u4E0D\u5339\u914D\uFF08\u8BF7\u91CD\u65B0\u9009\u62E9\uFF09", {});
+            return rpcError("bad-request", "confirmToken \u7121\u6548\u3001\u5DF2\u904E\u671F\u6216\u578B\u5225\u4E0D\u5339\u914D\uFF08\u8ACB\u91CD\u65B0\u9078\u64C7\uFF09", {});
           }
           if (tokenPayload.projectPath !== projectPath || tokenPayload.backupTimestamp !== ts) {
-            return rpcError("bad-request", "confirmToken \u4E0E\u5F53\u524D\u53C2\u6570\u4E0D\u5339\u914D\uFF08\u8BF7\u91CD\u65B0\u9009\u62E9\uFF09", {});
+            return rpcError("bad-request", "confirmToken \u8207\u7576\u524D\u5F15\u6578\u4E0D\u5339\u914D\uFF08\u8ACB\u91CD\u65B0\u9078\u64C7\uFF09", {});
           }
           const { applyRollback: applyRollback2 } = await Promise.resolve().then(() => (init_backup(), backup_exports));
           const applied = await applyRollback2({ projectPath, backupTimestamp: ts, triggerRescan: false });
@@ -11166,7 +11166,7 @@ function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tools, logg
             const now = Date.now();
             await appendJsonl2(fs, brainPath3(projectPath, "timeline.jsonl"), {
               id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-              title: "\u56DE\u6EDA\u5230\u5907\u4EFD " + ts,
+              title: "\u56DE\u6EFE\u5230\u5099\u4EFD " + ts,
               eventType: "rollback",
               occurredAt: now,
               payload: {
@@ -11201,7 +11201,7 @@ function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tools, logg
         if (!folderPath) return rpcError("BAD_REQUEST", "folderPath \u5FC5\u586B", {});
         try {
           if (!/^([A-Za-z]:[\\/]|\/)/.test(folderPath) || folderPath.includes("..")) {
-            return rpcError("BAD_REQUEST", "folderPath \u5FC5\u987B\u662F\u7EDD\u5BF9\u8DEF\u5F84\u4E14\u4E0D\u542B ..", { folderPath });
+            return rpcError("BAD_REQUEST", "folderPath \u5FC5\u9808\u662F\u7D55\u5C0D\u8DEF\u5F91\u4E14\u4E0D\u542B ..", { folderPath });
           }
           let shellModule = null;
           let opened = false;
@@ -11211,7 +11211,7 @@ function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tools, logg
               const r = await shell.openPath(folderPath);
               opened = r === "" || r === void 0 || r === null;
               if (!opened) {
-                return rpcError("OPEN_FAILED", "shell.openPath \u8FD4\u56DE\u9519\u8BEF\uFF1A" + String(r), { folderPath });
+                return rpcError("OPEN_FAILED", "shell.openPath \u8FD4\u56DE\u932F\u8AA4\uFF1A" + String(r), { folderPath });
               }
               return rpcOk({ opened: true, folderPath });
             }
@@ -11235,7 +11235,7 @@ function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tools, logg
             spawn(cmd, [folderPath], { detached: true, stdio: "ignore" }).unref();
             return rpcOk({ opened: true, folderPath, method: cmd });
           } catch (e) {
-            return rpcError("OPEN_FAILED", "\u65E0\u6CD5\u6253\u5F00\u6587\u4EF6\u5939\uFF1A" + String(e && e.message || e), { folderPath });
+            return rpcError("OPEN_FAILED", "\u7121\u6CD5\u958B\u555F\u8CC7\u6599\u593E\uFF1A" + String(e && e.message || e), { folderPath });
           }
         } catch (e) {
           return rpcError("OPEN_FAILED", String(e && e.message || e), { folderPath });
@@ -11253,11 +11253,11 @@ function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tools, logg
           } catch (e) {
           }
           if (!dialog || typeof dialog.showOpenDialog !== "function") {
-            return rpcError("directory-picker-unavailable", "\u7CFB\u7EDF\u6587\u4EF6\u9009\u62E9\u5668\u4E0D\u53EF\u7528\uFF0C\u8BF7\u7C98\u8D34 zip \u7684\u5B8C\u6574\u8DEF\u5F84", {});
+            return rpcError("directory-picker-unavailable", "\u7CFB\u7D71\u6A94\u6848\u9078\u64C7\u5668\u4E0D\u53EF\u7528\uFF0C\u8ACB\u8CBC\u4E0A zip \u7684\u5B8C\u6574\u8DEF\u5F91", {});
           }
           const win = BrowserWindow && typeof BrowserWindow.getFocusedWindow === "function" && BrowserWindow.getFocusedWindow() || BrowserWindow && typeof BrowserWindow.getAllWindows === "function" && (BrowserWindow.getAllWindows()[0] || null) || void 0;
           const picked = await dialog.showOpenDialog(win || void 0, {
-            title: "\u9009\u62E9 Project Brain bundle",
+            title: "\u9078\u64C7 Project Brain bundle",
             properties: ["openFile"],
             filters: [
               { name: "Brain bundle", extensions: ["zip"] },
@@ -11269,7 +11269,7 @@ function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tools, logg
           }
           return rpcOk({ canceled: false, bundlePath: picked.filePaths[0] });
         } catch (e) {
-          return rpcError("directory-picker-unavailable", "\u65E0\u6CD5\u6253\u5F00\u6587\u4EF6\u9009\u62E9\u5668\uFF1A" + String(e && e.message || e), {});
+          return rpcError("directory-picker-unavailable", "\u7121\u6CD5\u958B\u555F\u6A94\u6848\u9078\u64C7\u5668\uFF1A" + String(e && e.message || e), {});
         }
       }
       return rpcError("METHOD_NOT_FOUND", "\u672A\u77E5 Project Brain RPC \u65B9\u6CD5\uFF1A" + endpoint, { endpoint });
@@ -11279,18 +11279,18 @@ function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tools, logg
   return true;
 }
 var MEMORY_TIMELINE_EVENTS = {
-  edit: { eventType: "memory_edit", verb: "\u7F16\u8F91\u8BB0\u5FC6" },
-  archived: { eventType: "memory_archive", verb: "\u5F52\u6863\u8BB0\u5FC6" },
-  active: { eventType: "memory_restore", verb: "\u6062\u590D\u8BB0\u5FC6" },
-  dormant: { eventType: "memory_archive", verb: "\u4F11\u7720\u8BB0\u5FC6" },
-  delete: { eventType: "memory_delete", verb: "\u6C38\u4E45\u5220\u9664\u8BB0\u5FC6" }
+  edit: { eventType: "memory_edit", verb: "\u7DE8\u8F2F\u8A18\u61B6" },
+  archived: { eventType: "memory_archive", verb: "\u6B78\u6A94\u8A18\u61B6" },
+  active: { eventType: "memory_restore", verb: "\u6062\u5FA9\u8A18\u61B6" },
+  dormant: { eventType: "memory_archive", verb: "\u4F11\u7720\u8A18\u61B6" },
+  delete: { eventType: "memory_delete", verb: "\u6C38\u4E45\u522A\u9664\u8A18\u61B6" }
 };
 async function handleMemoryMutation(args) {
   const { endpoint, projectPath, fs, ctx, getMemoryConfig } = args;
   const id = typeof args.payload.id === "string" ? args.payload.id.trim() : "";
   if (!id) return rpcError("bad-request", "id \u5FC5\u586B", { endpoint });
   const result = await withWriteLock(brainTxKey(projectPath, "memory.jsonl"), () => mutateMemoryFile(args, id));
-  if (!result.ok) return rpcError(result.code || "internal", result.message || "\u8BB0\u5FC6\u64CD\u4F5C\u5931\u8D25", { endpoint, id });
+  if (!result.ok) return rpcError(result.code || "internal", result.message || "\u8A18\u61B6\u64CD\u4F5C\u5931\u6557", { endpoint, id });
   const { outcome, changed, now, timelineKey } = result;
   if (changed) {
     const meta = MEMORY_TIMELINE_EVENTS[timelineKey] || MEMORY_TIMELINE_EVENTS.edit;
@@ -11328,7 +11328,7 @@ async function mutateMemoryFile({ endpoint, payload, projectPath, fs }, id) {
   try {
     rows = await readJsonl(fs, memoryFile);
   } catch (e) {
-    return { ok: false, code: "internal", message: "\u8BFB\u53D6 memory.jsonl \u5931\u8D25\uFF1A" + String(e && e.message || e) };
+    return { ok: false, code: "internal", message: "\u8B80\u53D6 memory.jsonl \u5931\u6557\uFF1A" + String(e && e.message || e) };
   }
   const now = Date.now();
   let outcome;
@@ -11348,7 +11348,7 @@ async function mutateMemoryFile({ endpoint, payload, projectPath, fs }, id) {
     timelineKey = status;
   } else {
     if (payload.confirm !== true) {
-      return { ok: false, code: "bad-request", message: "\u6C38\u4E45\u5220\u9664\u9700\u8981 confirm=true" };
+      return { ok: false, code: "bad-request", message: "\u6C38\u4E45\u522A\u9664\u9700\u8981 confirm=true" };
     }
     outcome = applyMemoryDelete(rows, { id });
     timelineKey = "delete";
@@ -11356,7 +11356,7 @@ async function mutateMemoryFile({ endpoint, payload, projectPath, fs }, id) {
   if (!outcome.ok) return { ok: false, code: outcome.code || "internal", message: outcome.message };
   if (outcome.changed === false) return { ok: true, outcome, changed: false, now, timelineKey };
   const wrote = await writeJsonl(fs, memoryFile, outcome.rows);
-  if (!wrote) return { ok: false, code: "internal", message: "\u5199\u5165 memory.jsonl \u5931\u8D25" };
+  if (!wrote) return { ok: false, code: "internal", message: "\u5BEB\u5165 memory.jsonl \u5931\u6557" };
   return { ok: true, outcome, changed: true, now, timelineKey };
 }
 async function attachRescanAndPreview({ result, projectPath, fs, sandboxPolicy, architectureRuntime, getMemoryConfig }) {
@@ -11557,7 +11557,7 @@ function setupInjector(ctx, fs, sandboxPolicy) {
       const section = {
         name: "project-brain-context",
         order: 100,
-        // harness=-100, persona=0, tool guidance=100-199; 我们放在工具指引区间内
+        // harness=-100, persona=0, tool guidance=100-199; 我們放在工具指引區間內
         text: (context) => {
           try {
             const projectPath = resolveContextProject(context, sessions);
@@ -11576,7 +11576,7 @@ function setupInjector(ctx, fs, sandboxPolicy) {
         } catch (e) {
         }
       }
-      logger("info", "injector: systemPrompt section registered (v0.3.1: text \u5B57\u6BB5\u4FEE\u590D)");
+      logger("info", "injector: systemPrompt section registered (v0.3.1: text \u6B04\u4F4D\u4FEE\u5FA9)");
     } catch (e) {
       logger("warn", "injector: section registration failed: " + String(e && e.message || e));
     }
@@ -11841,23 +11841,23 @@ function evidenceMatchesTranscript(evidence, transcript) {
 }
 function sessionMemoryPrompt(transcript, maxItems, diffEvidence) {
   const parts = [
-    "\u4ECE\u4E0B\u9762\u7684\u8F6F\u4EF6\u5F00\u53D1 Session \u4E2D\u63D0\u53D6\u503C\u5F97\u8DE8\u4F1A\u8BDD\u957F\u671F\u4FDD\u5B58\u7684\u9879\u76EE\u77E5\u8BC6\uFF0C\u5E76\u603B\u7ED3\u672C\u6B21\u4F1A\u8BDD\u505A\u4E86\u4EC0\u4E48\u3002",
-    "\u53EA\u4FDD\u7559\u6709\u660E\u786E\u8BC1\u636E\u7684\u67B6\u6784\u51B3\u7B56\u3001\u7A33\u5B9A\u9700\u6C42\u3001Bug \u6839\u56E0\u4E0E\u4FEE\u590D\u3001\u53EF\u590D\u7528\u6559\u8BAD\u3001\u957F\u671F\u95EE\u9898\u6216\u91CD\u8981\u9879\u76EE\u80CC\u666F\u3002",
-    "\u7528\u6237\u660E\u786E\u8868\u8FBE\u7684\u957F\u671F\u534F\u4F5C\u53E3\u5F84\u4E0E\u5DE5\u4F5C\u504F\u597D\uFF08\u8F93\u51FA\u7ED3\u6784\u3001\u6C89\u6DC0\u76EE\u6807\u3001\u8BED\u6C14\u8981\u6C42\u7B49\uFF09\u7528 type=preference \u8BB0\u4E0B\u6765\uFF0C\u5B83\u548C\u6280\u672F\u4E8B\u5B9E\u540C\u6837\u91CD\u8981\u3002",
-    "\u6BCF\u6761\u8BB0\u5FC6\u5FC5\u987B\u80FD\u8131\u79BB\u672C\u6B21\u5BF9\u8BDD\u72EC\u7ACB\u9605\u8BFB\uFF1A\u6B63\u6587\u91CC\u4E0D\u5141\u8BB8\u51FA\u73B0\u300C\u8FD9\u4E2A / \u90A3\u4E2A / \u4E0A\u9762\u8BF4\u7684 / \u8FD9\u6837 / this / that\u300D\u8FD9\u7C7B\u6307\u4EE3\u8BCD\uFF0C\u4E00\u5F8B\u66FF\u6362\u6210\u5B83\u771F\u6B63\u6307\u7684\u4E1C\u897F\u3002",
-    "\u5FFD\u7565\u5BD2\u6684\u3001\u4E34\u65F6\u6B65\u9AA4\u3001\u547D\u4EE4\u8F93\u51FA\u3001\u672A\u786E\u8BA4\u731C\u6D4B\u3001\u4E2A\u4EBA\u4FE1\u606F\u3001\u51ED\u636E\uFF1B\u6CA1\u6709\u7A33\u5B9A\u77E5\u8BC6\u65F6 memories \u8FD4\u56DE\u7A7A\u6570\u7EC4\u3002",
-    "summary \u7528 1\u20133 \u53E5\u8BDD\u5199\u672C\u6B21\u505A\u6210\u4E86\u4EC0\u4E48\u91CD\u8981\u7684\u4EE5\u53CA\u4E3A\u4EC0\u4E48\uFF0C\u4F5C\u4E3A\u4E0B\u4E00\u4E2A Session \u7684\u7EED\u63A5\u4E0A\u4E0B\u6587\uFF0C\u4E0D\u7F16\u9020\u3002\u7981\u6B62\u5199\u6210\u300C\u6539\u4E86 N \u4E2A\u6587\u4EF6\u300D\u3001\u9A8C\u6536\u6E05\u5355\u6216 changelog\u3002",
-    `\u6700\u591A ${maxItems} \u6761\u8BB0\u5FC6\u3002\u53EA\u8F93\u51FA\u4E25\u683C JSON \u5BF9\u8C61\uFF0C\u4E0D\u8981 Markdown\u3002`,
-    "\u6BCF\u6761\u8BB0\u5FC6\u5FC5\u987B\u5E26 evidence\uFF1A\u539F\u6587\u4E2D\u80FD\u76F4\u63A5\u9A8C\u8BC1\u8BE5\u8BB0\u5FC6\u7684\u8FDE\u7EED\u7247\u6BB5\uFF08\u5EFA\u8BAE 8-60 \u5B57\uFF09\uFF0C\u7528\u4E8E grounding \u6821\u9A8C\u3002",
-    "\u5982\u679C\u67D0\u6761\u8BB0\u5FC6\u65E0\u6CD5\u5728\u539F\u6587\u4E2D\u627E\u5230\u5BF9\u5E94\u8BC1\u636E\uFF0C\u8BF7\u964D\u4F4E confidence \u6216\u4E0D\u8F93\u51FA\u3002",
-    "durable=true \u4EC5\u5F53\u8BE5\u4E8B\u5B9E\u53BB\u6389\u65E5\u671F/\u7248\u672C\u53F7\u540E\u4ECD\u4E3A\u771F\uFF1Bchangelog\u3001\u672C\u6B21\u6539\u4E86\u54EA\u4E9B\u6587\u4EF6\u3001\u4F1A\u8BDD\u6D41\u6C34\u8D26\u5FC5\u987B durable=false\u3002",
-    "title \u5199\u6210\u7AD9\u7ACB\u4E8B\u5B9E\u53E5\uFF08\u4F8B\u5982\u300C\u8DEF\u5F84\u4EE5 session cwd \u4E3A\u51C6\u300D\uFF09\uFF0C\u4E0D\u8981\u5199\u6210 v1.2.0 patch \u6216\u9A8C\u6536\u6E05\u5355\u3002content \u7528 2\u20134 \u53E5\u628A what+why \u5199\u5B8C\u3002",
-    "\u683C\u5F0F\uFF1A" + JSON.stringify({ summary: "\u672C\u6B21\u4F1A\u8BDD\u603B\u7ED3\uFF082-4 \u53E5\u8BDD\uFF09", memories: [{ type: "decision|requirement|architecture|bug|lesson|preference", title: "\u7B80\u6D01\u6807\u9898", content: "\u81EA\u5305\u542B\u7684\u4E8B\u5B9E\u4E0E\u7406\u7531", evidence: "\u539F\u6587\u7247\u6BB5\uFF088-60 \u5B57\uFF09", durable: true, importance: 0.8, confidence: 0.9, relatedFiles: ["\u76F8\u5BF9\u8DEF\u5F84"], tags: ["\u6807\u7B7E"], supersedes: null }] })
+    "\u5F9E\u4E0B\u9762\u7684\u8EDF\u9AD4\u958B\u767C Session \u4E2D\u63D0\u53D6\u503C\u5F97\u8DE8\u6703\u8A71\u9577\u671F\u5132\u5B58\u7684\u5C08\u6848\u77E5\u8B58\uFF0C\u4E26\u7E3D\u7D50\u672C\u6B21\u6703\u8A71\u505A\u4E86\u4EC0\u9EBC\u3002",
+    "\u53EA\u4FDD\u7559\u6709\u660E\u78BA\u8B49\u64DA\u7684\u67B6\u69CB\u6C7A\u7B56\u3001\u7A69\u5B9A\u9700\u6C42\u3001Bug \u6839\u56E0\u8207\u4FEE\u5FA9\u3001\u53EF\u8907\u7528\u6559\u8A13\u3001\u9577\u671F\u554F\u984C\u6216\u91CD\u8981\u5C08\u6848\u80CC\u666F\u3002",
+    "\u4F7F\u7528\u8005\u660E\u78BA\u8868\u9054\u7684\u9577\u671F\u5354\u4F5C\u53E3\u5F91\u8207\u5DE5\u4F5C\u504F\u597D\uFF08\u8F38\u51FA\u7D50\u69CB\u3001\u6C89\u6FB1\u76EE\u6A19\u3001\u8A9E\u6C23\u8981\u6C42\u7B49\uFF09\u7528 type=preference \u8A18\u4E0B\u4F86\uFF0C\u5B83\u548C\u6280\u8853\u4E8B\u5BE6\u540C\u6A23\u91CD\u8981\u3002",
+    "\u6BCF\u689D\u8A18\u61B6\u5FC5\u9808\u80FD\u812B\u96E2\u672C\u6B21\u5C0D\u8A71\u7368\u7ACB\u95B1\u8B80\uFF1A\u6B63\u6587\u88E1\u4E0D\u5141\u8A31\u51FA\u73FE\u300C\u9019\u500B / \u90A3\u500B / \u4E0A\u9762\u8AAA\u7684 / \u9019\u6A23 / this / that\u300D\u9019\u985E\u6307\u4EE3\u8A5E\uFF0C\u4E00\u5F8B\u66FF\u63DB\u6210\u5B83\u771F\u6B63\u6307\u7684\u6771\u897F\u3002",
+    "\u5FFD\u7565\u5BD2\u6684\u3001\u81E8\u6642\u6B65\u9A5F\u3001\u547D\u4EE4\u8F38\u51FA\u3001\u672A\u78BA\u8A8D\u731C\u6E2C\u3001\u500B\u4EBA\u8CC7\u8A0A\u3001\u6191\u64DA\uFF1B\u6C92\u6709\u7A69\u5B9A\u77E5\u8B58\u6642 memories \u8FD4\u56DE\u7A7A\u9663\u5217\u3002",
+    "summary \u7528 1\u20133 \u53E5\u8A71\u5BEB\u672C\u6B21\u505A\u6210\u4E86\u4EC0\u9EBC\u91CD\u8981\u7684\u4EE5\u53CA\u70BA\u4EC0\u9EBC\uFF0C\u4F5C\u70BA\u4E0B\u4E00\u500B Session \u7684\u7E8C\u63A5\u4E0A\u4E0B\u6587\uFF0C\u4E0D\u7DE8\u9020\u3002\u7981\u6B62\u5BEB\u6210\u300C\u6539\u4E86 N \u500B\u6A94\u6848\u300D\u3001\u9A57\u6536\u6E05\u55AE\u6216 changelog\u3002",
+    `\u6700\u591A ${maxItems} \u689D\u8A18\u61B6\u3002\u53EA\u8F38\u51FA\u56B4\u683C JSON \u7269\u4EF6\uFF0C\u4E0D\u8981 Markdown\u3002`,
+    "\u6BCF\u689D\u8A18\u61B6\u5FC5\u9808\u5E36 evidence\uFF1A\u539F\u6587\u4E2D\u80FD\u76F4\u63A5\u9A57\u8B49\u8A72\u8A18\u61B6\u7684\u9023\u7E8C\u7247\u6BB5\uFF08\u5EFA\u8B70 8-60 \u5B57\uFF09\uFF0C\u7528\u65BC grounding \u6821\u9A57\u3002",
+    "\u5982\u679C\u67D0\u689D\u8A18\u61B6\u7121\u6CD5\u5728\u539F\u6587\u4E2D\u627E\u5230\u5C0D\u61C9\u8B49\u64DA\uFF0C\u8ACB\u964D\u4F4E confidence \u6216\u4E0D\u8F38\u51FA\u3002",
+    "durable=true \u50C5\u7576\u8A72\u4E8B\u5BE6\u53BB\u6389\u65E5\u671F/\u7248\u672C\u865F\u5F8C\u4ECD\u70BA\u771F\uFF1Bchangelog\u3001\u672C\u6B21\u6539\u4E86\u54EA\u4E9B\u6A94\u6848\u3001\u6703\u8A71\u6D41\u6C34\u8CEC\u5FC5\u9808 durable=false\u3002",
+    "title \u5BEB\u6210\u7AD9\u7ACB\u4E8B\u5BE6\u53E5\uFF08\u4F8B\u5982\u300C\u8DEF\u5F91\u4EE5 session cwd \u70BA\u6E96\u300D\uFF09\uFF0C\u4E0D\u8981\u5BEB\u6210 v1.2.0 patch \u6216\u9A57\u6536\u6E05\u55AE\u3002content \u7528 2\u20134 \u53E5\u628A what+why \u5BEB\u5B8C\u3002",
+    "\u683C\u5F0F\uFF1A" + JSON.stringify({ summary: "\u672C\u6B21\u6703\u8A71\u7E3D\u7D50\uFF082-4 \u53E5\u8A71\uFF09", memories: [{ type: "decision|requirement|architecture|bug|lesson|preference", title: "\u7C21\u6F54\u6A19\u984C", content: "\u81EA\u5305\u542B\u7684\u4E8B\u5BE6\u8207\u7406\u7531", evidence: "\u539F\u6587\u7247\u6BB5\uFF088-60 \u5B57\uFF09", durable: true, importance: 0.8, confidence: 0.9, relatedFiles: ["\u76F8\u5C0D\u8DEF\u5F91"], tags: ["\u6A19\u7C64"], supersedes: null }] })
   ];
   if (diffEvidence && String(diffEvidence).trim()) {
-    parts.push("\u3010git diff \u53C2\u8003\u8BC1\u636E\uFF08\u4EC5\u8F85\u52A9\u6838\u5BF9\u6587\u4EF6\u7EA7\u4E8B\u5B9E\uFF0C\u4E0D\u8981\u9010\u6761\u590D\u8FF0\u4E3A\u8BB0\u5FC6\uFF09\u3011\n" + String(diffEvidence).trim());
+    parts.push("\u3010git diff \u53C3\u8003\u8B49\u64DA\uFF08\u50C5\u8F14\u52A9\u6838\u5C0D\u6A94\u6848\u7D1A\u4E8B\u5BE6\uFF0C\u4E0D\u8981\u9010\u689D\u8907\u8FF0\u70BA\u8A18\u61B6\uFF09\u3011\n" + String(diffEvidence).trim());
   }
-  parts.push("Session \u5BF9\u8BDD\uFF1A\n" + transcript);
+  parts.push("Session \u5C0D\u8A71\uFF1A\n" + transcript);
   return parts.join("\n");
 }
 async function extractSessionMemories({ session, llm, route, sessionId, existingMemories = [], config = {}, now = Date.now(), diffEvidence = "" } = {}) {
@@ -12006,7 +12006,7 @@ async function summarizeOne({ fs, projectPath, sessionId, session, llm, route, c
   const duplicateChange = Boolean(fingerprint2 && (brain.memories || []).some(
     (m) => m && m.source && m.source.kind === "session_summary" && m.source.fingerprint === fingerprint2
   ));
-  const diffEvidence = changedFiles.length ? "\u6539\u52A8\u6587\u4EF6\uFF1A\n" + changedFiles.map((f) => "- " + f).join("\n") + (diff.stat ? "\n\nstat:\n" + diff.stat : "") : "";
+  const diffEvidence = changedFiles.length ? "\u6539\u52D5\u6A94\u6848\uFF1A\n" + changedFiles.map((f) => "- " + f).join("\n") + (diff.stat ? "\n\nstat:\n" + diff.stat : "") : "";
   const now = Date.now();
   const writes = [];
   let semantic = { status: "not_requested", memories: [], summary: "" };
@@ -12061,13 +12061,13 @@ async function summarizeOne({ fs, projectPath, sessionId, session, llm, route, c
   const summary = summaryRejected ? "" : rawSummary;
   const timelineEntry = {
     id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-    title: "Session \u6458\u8981\u5B8C\u6210" + (changedFiles.length > 0 ? "\uFF08" + changedFiles.length + " \u6587\u4EF6\u53D8\u66F4\uFF0C" + admittedIds.length + " \u6761\u8BED\u4E49\u8BB0\u5FC6\uFF09" : "\uFF08" + admittedIds.length + " \u6761\u8BED\u4E49\u8BB0\u5FC6\uFF09"),
+    title: "Session \u6458\u8981\u5B8C\u6210" + (changedFiles.length > 0 ? "\uFF08" + changedFiles.length + " \u6A94\u6848\u8B8A\u66F4\uFF0C" + admittedIds.length + " \u689D\u8A9E\u7FA9\u8A18\u61B6\uFF09" : "\uFF08" + admittedIds.length + " \u689D\u8A9E\u7FA9\u8A18\u61B6\uFF09"),
     eventType: "session_summary",
     occurredAt: now,
     detail: "sessionId=" + (sessionId || "?") + " changedFiles=" + changedFiles.length + " semanticMemories=" + admittedIds.length + " semanticStatus=" + semantic.status + (changedFiles.length ? " files=" + changedFiles.slice(0, 20).join(",") : ""),
     sessionId: sessionId || null,
     summary,
-    // 下一次摘要靠它判断「这段之后又聊了多少」，缺了就只能整段重摘。
+    // 下一次摘要靠它判斷「這段之後又聊了多少」，缺了就只能整段重摘。
     messageCount,
     files: changedFiles.slice(0, 20),
     changes: changeEntries.slice(0, 20),
@@ -12200,7 +12200,7 @@ function setupSummarizer(ctx, fs, sandboxPolicy, runtime = {}) {
   };
   const idleMs = resolveIdleSummaryMs(runtime);
   const scheduler = createIdleSummaryScheduler((job) => runSummary(job, "idle"), idleMs);
-  log("info", "summarizer: subscribed to session/flush + session/disposed\uFF08\u7A7A\u95F2 " + Math.round(idleMs / 1e3) + "s \u89E6\u53D1\u6458\u8981\uFF09");
+  log("info", "summarizer: subscribed to session/flush + session/disposed\uFF08\u7A7A\u9592 " + Math.round(idleMs / 1e3) + "s \u89F8\u767C\u6458\u8981\uFF09");
   const flushSeen = /* @__PURE__ */ new Set();
   ctx.on("session/flush", (incoming) => {
     try {
@@ -12215,7 +12215,7 @@ function setupSummarizer(ctx, fs, sandboxPolicy, runtime = {}) {
       }
       if (!flushSeen.has("ok:" + projectPath)) {
         flushSeen.add("ok:" + projectPath);
-        log("info", "summarizer: session/flush \u94FE\u8DEF\u5DF2\u901A\uFF0Ccwd=" + projectPath + " messages=" + countSessionMessages(session) + "\uFF08\u7A7A\u95F2\u540E\u5C06\u6458\u8981\uFF09");
+        log("info", "summarizer: session/flush \u93C8\u8DEF\u5DF2\u901A\uFF0Ccwd=" + projectPath + " messages=" + countSessionMessages(session) + "\uFF08\u7A7A\u9592\u5F8C\u5C07\u6458\u8981\uFF09");
       }
       scheduler.schedule({ projectPath, session, sessionId });
     } catch (e) {
@@ -12238,7 +12238,7 @@ function setupSummarizer(ctx, fs, sandboxPolicy, runtime = {}) {
   function runSummary({ projectPath, session, sessionId }, trigger) {
     try {
       if (!projectPath) return;
-      log("info", `summarizer: ${trigger} \u89E6\u53D1\uFF0Ccwd=${projectPath}`);
+      log("info", `summarizer: ${trigger} \u89F8\u767C\uFF0Ccwd=${projectPath}`);
       const work = summarizeOne({
         fs,
         projectPath,
@@ -12309,19 +12309,19 @@ function setupSummarizer(ctx, fs, sandboxPolicy, runtime = {}) {
 // src/host/realtime-memory.js
 init_brain_files();
 var STRONG_SIGNAL_PATTERNS = [
-  /(?:记住|记一下|备忘|别忘了|长期记住)\s*[:：]?\s*([^。\n]{4,200})/,
-  /以后\s*([^。\n]{2,80})\s*(?:要|请|一定)?\s*(?:做|处理|记得|注意)/,
+  /(?:記住|記一下|備忘|別忘了|長期記住)\s*[:：]?\s*([^。\n]{4,200})/,
+  /以後\s*([^。\n]{2,80})\s*(?:要|請|一定)?\s*(?:做|處理|記得|注意)/,
   /(?:remember|note that|don't forget|never forget|long-term remember)\s*[:：]?\s*([^.\n]{4,200})/i,
   /\b(always|never)\s+([a-z][^.\n]{4,150})/i
 ];
 var WEAK_SIGNAL_PATTERNS = [
-  /(?:以后都|以后请|以后记得|下次记得|下次注意|约定|规则是|从今往后|今后)\s*[:：,，]?\s*([^。\n]{4,150})/,
-  /(?:记住这个|注意这个|留意一下|请注意)\s*[:：,，]?\s*([^。\n]{4,150})/,
+  /(?:以後都|以後請|以後記得|下次記得|下次注意|約定|規則是|從今往後|今後)\s*[:：,，]?\s*([^。\n]{4,150})/,
+  /(?:記住這個|注意這個|留意一下|請注意)\s*[:：,，]?\s*([^。\n]{4,150})/,
   /\b(going forward|from now on|henceforth|note this|bear in mind|keep in mind)\b\s*[:：,，]?\s*([^.]{4,150})/i,
   /\b(let'?s (?:always|never))\b\s+([^.]{4,150})/i
 ];
 var NEGATIVE_CONTEXTS = [
-  /\b(?:eslint|prettier|type:|noqa|tsconfig|build\s*error|报错|编译|运行)\b/i,
+  /\b(?:eslint|prettier|type:|noqa|tsconfig|build\s*error|報錯|編譯|執行)\b/i,
   /\b(?:commit|push|pr|merge|git|分支)\b/i
 ];
 function cleanRememberContent(text) {
@@ -12329,7 +12329,7 @@ function cleanRememberContent(text) {
 }
 function rememberTitle(content) {
   const t = cleanRememberContent(content);
-  if (!t) return "\u7528\u6237\u8BB0\u4F4F\u7684\u957F\u671F\u7EA6\u675F";
+  if (!t) return "\u4F7F\u7528\u8005\u8A18\u4F4F\u7684\u9577\u671F\u7D04\u675F";
   return t.length > 40 ? t.slice(0, 40) + "\u2026" : t;
 }
 function detectSignal(messageText) {
@@ -12379,7 +12379,7 @@ var CONTEXT_HEAD_MESSAGES = 4;
 var CONTEXT_TAIL_MESSAGES = 10;
 var CONTEXT_MAX_CHARS = 7e3;
 var CONTEXT_PER_MESSAGE_CHARS = 1200;
-var CONTEXT_GAP_MARK = "\uFF08\u2026\u2026\u4E2D\u95F4\u7701\u7565\u82E5\u5E72\u8F6E\u2026\u2026\uFF09";
+var CONTEXT_GAP_MARK = "\uFF08\u2026\u2026\u4E2D\u9593\u7701\u7565\u82E5\u5E72\u8F2A\u2026\u2026\uFF09";
 var REFINE_TIMEOUT_MS = 2e4;
 var SUPERSEDE_JACCARD = 0.72;
 var REFINE_TYPES = /* @__PURE__ */ new Set(["preference", "decision", "requirement", "architecture", "bug", "lesson"]);
@@ -12405,34 +12405,34 @@ function contextWindow(session) {
 }
 function refinePrompt(triggerText, transcript) {
   return [
-    "\u7528\u6237\u5728\u5BF9\u8BDD\u91CC\u660E\u786E\u8981\u6C42\u300C\u8BB0\u4F4F\u300D\u67D0\u4EF6\u4E8B\u3002\u628A\u5B83\u6574\u7406\u6210\u4E00\u6761\u80FD\u8131\u79BB\u672C\u6B21\u5BF9\u8BDD\u72EC\u7ACB\u9605\u8BFB\u7684\u957F\u671F\u8BB0\u5FC6\u3002",
+    "\u4F7F\u7528\u8005\u5728\u5C0D\u8A71\u88E1\u660E\u78BA\u8981\u6C42\u300C\u8A18\u4F4F\u300D\u67D0\u4EF6\u4E8B\u3002\u628A\u5B83\u6574\u7406\u6210\u4E00\u689D\u80FD\u812B\u96E2\u672C\u6B21\u5C0D\u8A71\u7368\u7ACB\u95B1\u8B80\u7684\u9577\u671F\u8A18\u61B6\u3002",
     "",
-    "\u7528\u6237\u539F\u8BDD\uFF08\u89E6\u53D1\u8BED\uFF09\uFF1A",
+    "\u4F7F\u7528\u8005\u539F\u8A71\uFF08\u89F8\u767C\u8A9E\uFF09\uFF1A",
     triggerText,
     "",
-    "\u5BF9\u8BDD\u4E0A\u4E0B\u6587\uFF08\u6309\u65F6\u95F4\u5148\u540E\u6392\u5217\uFF1B\u82E5\u51FA\u73B0\u7701\u7565\u6807\u8BB0\uFF0C\u8BF4\u660E\u4E2D\u95F4\u8F6E\u6B21\u672A\u63D0\u4F9B\uFF0C\u4F46\u9996\u5C3E\u90FD\u5728\uFF09\uFF1A",
-    transcript || "\uFF08\u65E0\u4E0A\u4E0B\u6587\uFF09",
+    "\u5C0D\u8A71\u4E0A\u4E0B\u6587\uFF08\u6309\u6642\u9593\u5148\u5F8C\u6392\u5217\uFF1B\u82E5\u51FA\u73FE\u7701\u7565\u6A19\u8A18\uFF0C\u8AAA\u660E\u4E2D\u9593\u8F2A\u6B21\u672A\u63D0\u4F9B\uFF0C\u4F46\u9996\u5C3E\u90FD\u5728\uFF09\uFF1A",
+    transcript || "\uFF08\u7121\u4E0A\u4E0B\u6587\uFF09",
     "",
     "\u8981\u6C42\uFF1A",
-    "1. \u6D88\u89E3\u5168\u90E8\u6307\u4EE3\u3002\u6B63\u6587\u91CC\u4E0D\u5141\u8BB8\u51FA\u73B0\u300C\u8FD9\u4E2A / \u90A3\u4E2A / \u4E0A\u9762\u8BF4\u7684 / \u8FD9\u6837 / this / that\u300D\uFF0C\u4E00\u5F8B\u66FF\u6362\u6210\u4E0A\u4E0B\u6587\u91CC\u5B83\u771F\u6B63\u6307\u7684\u4E1C\u897F\uFF08\u76EE\u6807\u3001\u53E3\u5F84\u3001\u6280\u672F\u9009\u578B\u3001\u6587\u4EF6\u540D\u7B49\uFF09\u3002",
-    "2. \u6B63\u6587\u5199 what + why\uFF1A\u7528\u6237\u8981\u6C42\u7684\u662F\u4EC0\u4E48\u3001\u9002\u7528\u8303\u56F4\u548C\u539F\u56E0\uFF0C2\u20134 \u53E5\uFF0C\u81EA\u5305\u542B\u3002",
-    "3. \u7528\u6237\u8BF4\u300C\u8FD9\u4E2A\u5BF9\u8BDD\u7684\u7B2C\u4E00\u53E5\u300D\u300C\u6700\u5F00\u59CB\u8BF4\u7684\u300D\u65F6\uFF0C\u6307\u7684\u5C31\u662F\u4E0A\u9762\u4E0A\u4E0B\u6587\u91CC\u6700\u65E9\u90A3\u6761 USER \u6D88\u606F\uFF1B\u8BF4\u300C\u521A\u624D\u8BF4\u7684\u300D\u5219\u6307\u6700\u540E\u51E0\u6761\u3002\u6309\u8FD9\u4E2A\u7406\u89E3\u53BB\u53D6\u5185\u5BB9\u3002",
-    "4. \u53EA\u6709\u4E0A\u4E0B\u6587\u91CC\u786E\u5B9E\u6CA1\u6709\u53EF\u5BF9\u5E94\u7684\u5185\u5BB9\u65F6\uFF0Cresolved \u624D\u8FD4\u56DE false\u3002\u4E0D\u8981\u56E0\u4E3A\u4E0D\u786E\u5B9A\u5C31\u653E\u5F03\uFF0C\u4E5F\u4E0D\u8981\u7F16\u9020\u3002",
-    "5. title \u5199\u6210\u7AD9\u7ACB\u4E8B\u5B9E\u53E5\uFF0C\u4E0D\u8981\u5199\u6210\u300C\u8BB0\u4F4F XXX\u300D\u300C\u7528\u6237\u8981\u6C42 XXX\u300D\u3002",
-    "6. type\uFF1A\u5BF9\u534F\u4F5C\u65B9\u5F0F\u3001\u8F93\u51FA\u7ED3\u6784\u3001\u957F\u671F\u53E3\u5F84\u7684\u8981\u6C42\u7528 preference\uFF1B\u6280\u672F\u9009\u578B\u7528 decision\uFF1B\u5176\u4F59\u6309\u8BED\u4E49\u9009\u3002",
+    "1. \u6D88\u89E3\u5168\u90E8\u6307\u4EE3\u3002\u6B63\u6587\u88E1\u4E0D\u5141\u8A31\u51FA\u73FE\u300C\u9019\u500B / \u90A3\u500B / \u4E0A\u9762\u8AAA\u7684 / \u9019\u6A23 / this / that\u300D\uFF0C\u4E00\u5F8B\u66FF\u63DB\u6210\u4E0A\u4E0B\u6587\u88E1\u5B83\u771F\u6B63\u6307\u7684\u6771\u897F\uFF08\u76EE\u6A19\u3001\u53E3\u5F91\u3001\u6280\u8853\u9078\u578B\u3001\u6A94\u540D\u7B49\uFF09\u3002",
+    "2. \u6B63\u6587\u5BEB what + why\uFF1A\u4F7F\u7528\u8005\u8981\u6C42\u7684\u662F\u4EC0\u9EBC\u3001\u9069\u7528\u7BC4\u570D\u548C\u539F\u56E0\uFF0C2\u20134 \u53E5\uFF0C\u81EA\u5305\u542B\u3002",
+    "3. \u4F7F\u7528\u8005\u8AAA\u300C\u9019\u500B\u5C0D\u8A71\u7684\u7B2C\u4E00\u53E5\u300D\u300C\u6700\u958B\u59CB\u8AAA\u7684\u300D\u6642\uFF0C\u6307\u7684\u5C31\u662F\u4E0A\u9762\u4E0A\u4E0B\u6587\u88E1\u6700\u65E9\u90A3\u689D USER \u8A0A\u606F\uFF1B\u8AAA\u300C\u525B\u624D\u8AAA\u7684\u300D\u5247\u6307\u6700\u5F8C\u5E7E\u689D\u3002\u6309\u9019\u500B\u7406\u89E3\u53BB\u53D6\u5167\u5BB9\u3002",
+    "4. \u53EA\u6709\u4E0A\u4E0B\u6587\u88E1\u78BA\u5BE6\u6C92\u6709\u53EF\u5C0D\u61C9\u7684\u5167\u5BB9\u6642\uFF0Cresolved \u624D\u8FD4\u56DE false\u3002\u4E0D\u8981\u56E0\u70BA\u4E0D\u78BA\u5B9A\u5C31\u653E\u68C4\uFF0C\u4E5F\u4E0D\u8981\u7DE8\u9020\u3002",
+    "5. title \u5BEB\u6210\u7AD9\u7ACB\u4E8B\u5BE6\u53E5\uFF0C\u4E0D\u8981\u5BEB\u6210\u300C\u8A18\u4F4F XXX\u300D\u300C\u4F7F\u7528\u8005\u8981\u6C42 XXX\u300D\u3002",
+    "6. type\uFF1A\u5C0D\u5354\u4F5C\u65B9\u5F0F\u3001\u8F38\u51FA\u7D50\u69CB\u3001\u9577\u671F\u53E3\u5F91\u7684\u8981\u6C42\u7528 preference\uFF1B\u6280\u8853\u9078\u578B\u7528 decision\uFF1B\u5176\u9918\u6309\u8A9E\u7FA9\u9078\u3002",
     "",
-    "\u8F93\u51FA\u683C\u5F0F\uFF08\u4E25\u683C\u9075\u5B88\uFF09\uFF1A\u7B2C\u4E00\u4E2A\u5B57\u7B26\u5FC5\u987B\u662F {\uFF0C\u6700\u540E\u4E00\u4E2A\u5B57\u7B26\u5FC5\u987B\u662F }\u3002",
-    "\u4E0D\u8981\u5199\u4EFB\u4F55\u89E3\u91CA\u3001\u524D\u8A00\u3001\u7ED3\u8BED\uFF0C\u4E0D\u8981\u7528 Markdown \u4EE3\u7801\u5757\u5305\u88F9\u3002",
-    JSON.stringify({ resolved: true, type: "preference", title: "\u7AD9\u7ACB\u4E8B\u5B9E\u53E5", content: "\u81EA\u5305\u542B\u7684 what + why", importance: 0.8 })
+    "\u8F38\u51FA\u683C\u5F0F\uFF08\u56B4\u683C\u9075\u5B88\uFF09\uFF1A\u7B2C\u4E00\u500B\u5B57\u5143\u5FC5\u9808\u662F {\uFF0C\u6700\u5F8C\u4E00\u500B\u5B57\u5143\u5FC5\u9808\u662F }\u3002",
+    "\u4E0D\u8981\u5BEB\u4EFB\u4F55\u89E3\u91CB\u3001\u524D\u8A00\u3001\u7D50\u8A9E\uFF0C\u4E0D\u8981\u7528 Markdown \u7A0B\u5F0F\u78BC\u584A\u5305\u88F9\u3002",
+    JSON.stringify({ resolved: true, type: "preference", title: "\u7AD9\u7ACB\u4E8B\u5BE6\u53E5", content: "\u81EA\u5305\u542B\u7684 what + why", importance: 0.8 })
   ].join("\n");
 }
 function repairPrompt(rawText) {
   return [
-    "\u4E0B\u9762\u8FD9\u6BB5\u8F93\u51FA\u672C\u5E94\u662F\u4E25\u683C JSON\uFF0C\u4F46\u65E0\u6CD5\u89E3\u6790\u3002\u8BF7\u539F\u6837\u63D0\u53D6\u5176\u4E2D\u7684\u4FE1\u606F\uFF0C\u91CD\u65B0\u8F93\u51FA\u4E3A\u5408\u6CD5 JSON\u3002",
-    "\u7B2C\u4E00\u4E2A\u5B57\u7B26\u5FC5\u987B\u662F {\uFF0C\u6700\u540E\u4E00\u4E2A\u5B57\u7B26\u5FC5\u987B\u662F }\uFF0C\u4E0D\u8981\u4EFB\u4F55\u89E3\u91CA\u6216\u4EE3\u7801\u5757\u6807\u8BB0\u3002",
-    "\u5B57\u6BB5\uFF1A" + JSON.stringify({ resolved: true, type: "preference", title: "", content: "", importance: 0.8 }),
+    "\u4E0B\u9762\u9019\u6BB5\u8F38\u51FA\u672C\u61C9\u662F\u56B4\u683C JSON\uFF0C\u4F46\u7121\u6CD5\u89E3\u6790\u3002\u8ACB\u539F\u6A23\u63D0\u53D6\u5176\u4E2D\u7684\u8CC7\u8A0A\uFF0C\u91CD\u65B0\u8F38\u51FA\u70BA\u5408\u6CD5 JSON\u3002",
+    "\u7B2C\u4E00\u500B\u5B57\u5143\u5FC5\u9808\u662F {\uFF0C\u6700\u5F8C\u4E00\u500B\u5B57\u5143\u5FC5\u9808\u662F }\uFF0C\u4E0D\u8981\u4EFB\u4F55\u89E3\u91CB\u6216\u7A0B\u5F0F\u78BC\u584A\u6A19\u8A18\u3002",
+    "\u6B04\u4F4D\uFF1A" + JSON.stringify({ resolved: true, type: "preference", title: "", content: "", importance: 0.8 }),
     "",
-    "\u539F\u59CB\u8F93\u51FA\uFF1A",
+    "\u539F\u59CB\u8F38\u51FA\uFF1A",
     String(rawText || "").slice(0, 2e3)
   ].join("\n");
 }
@@ -12468,7 +12468,7 @@ async function refineSignal({ llm, route, sessionId, signal, transcript, timeout
     return {
       status: "unresolved",
       candidate: null,
-      sample: "\u6A21\u578B\u5224\u5B9A\u65E0\u6CD5\u6D88\u89E3\uFF1B\u4E0A\u4E0B\u6587\u7A97\u53E3 " + String(transcript || "").length + " \u5B57\u7B26"
+      sample: "\u6A21\u578B\u5224\u5B9A\u7121\u6CD5\u6D88\u89E3\uFF1B\u4E0A\u4E0B\u6587\u8996\u7A97 " + String(transcript || "").length + " \u5B57\u5143"
     };
   }
   const type = normalizeMemoryType(parsed.type);
@@ -12507,16 +12507,16 @@ function fallbackCandidate(signal) {
   };
 }
 var REJECT_REASON_TEXT = {
-  unresolved_reference: "\u6CA1\u80FD\u4ECE\u4E0A\u4E0B\u6587\u91CC\u8BA4\u51FA\u300C\u8FD9\u4E2A / \u90A3\u4E2A\u300D\u6307\u7684\u662F\u4EC0\u4E48",
-  needs_context: "\u7F3A\u5C11\u53EF\u7528\u7684\u4E0A\u4E0B\u6587\uFF0C\u65E0\u6CD5\u6574\u7406\u6210\u81EA\u5305\u542B\u7684\u8BB0\u5FC6"
+  unresolved_reference: "\u6C92\u80FD\u5F9E\u4E0A\u4E0B\u6587\u88E1\u8A8D\u51FA\u300C\u9019\u500B / \u90A3\u500B\u300D\u6307\u7684\u662F\u4EC0\u9EBC",
+  needs_context: "\u7F3A\u5C11\u53EF\u7528\u7684\u4E0A\u4E0B\u6587\uFF0C\u7121\u6CD5\u6574\u7406\u6210\u81EA\u5305\u542B\u7684\u8A18\u61B6"
 };
 var REFINE_STATUS_TEXT = {
-  llm_unavailable: "\u5F53\u524D Session \u8FD8\u6CA1\u6709\u53EF\u590D\u7528\u7684\u6A21\u578B\u8DEF\u7531\uFF0C\u5148\u5B8C\u6210\u4E00\u6B21\u6B63\u5E38\u5BF9\u8BDD\u518D\u8BD5",
-  refine_failed: "\u6574\u7406\u8BB0\u5FC6\u65F6\u6A21\u578B\u8C03\u7528\u5931\u8D25\uFF08\u8D85\u65F6\u6216\u4E2D\u65AD\uFF09",
-  refine_unparseable: "\u6A21\u578B\u4E24\u6B21\u90FD\u6CA1\u6309\u8981\u6C42\u8FD4\u56DE JSON",
-  refine_invalid: "\u6A21\u578B\u8FD4\u56DE\u7684\u5185\u5BB9\u4E0D\u5B8C\u6574\uFF0C\u7F3A\u5C11\u6807\u9898\u6216\u6B63\u6587"
+  llm_unavailable: "\u7576\u524D Session \u9084\u6C92\u6709\u53EF\u8907\u7528\u7684\u6A21\u578B\u8DEF\u7531\uFF0C\u5148\u5B8C\u6210\u4E00\u6B21\u6B63\u5E38\u5C0D\u8A71\u518D\u8A66",
+  refine_failed: "\u6574\u7406\u8A18\u61B6\u6642\u6A21\u578B\u547C\u53EB\u5931\u6557\uFF08\u8D85\u6642\u6216\u4E2D\u65B7\uFF09",
+  refine_unparseable: "\u6A21\u578B\u5169\u6B21\u90FD\u6C92\u6309\u8981\u6C42\u8FD4\u56DE JSON",
+  refine_invalid: "\u6A21\u578B\u8FD4\u56DE\u7684\u5167\u5BB9\u4E0D\u5B8C\u6574\uFF0C\u7F3A\u5C11\u6A19\u984C\u6216\u6B63\u6587"
 };
-var REJECT_NEXT_STEP = "\u53EF\u4EE5\u8865\u4E00\u53E5\u66F4\u5177\u4F53\u7684\u8BF4\u6CD5\uFF0C\u6216\u7B49\u672C\u6B21\u4F1A\u8BDD\u7ED3\u675F\u540E\u81EA\u52A8\u5F52\u7EB3\u3002";
+var REJECT_NEXT_STEP = "\u53EF\u4EE5\u88DC\u4E00\u53E5\u66F4\u5177\u9AD4\u7684\u8AAA\u6CD5\uFF0C\u6216\u7B49\u672C\u6B21\u6703\u8A71\u7D50\u675F\u5F8C\u81EA\u52D5\u6B78\u7D0D\u3002";
 async function noteRejection({ fs, projectPath, sessionId, signal, reason, refineStatus, sample }) {
   const now = Date.now();
   const trigger = String(signal.fullText || signal.content || "").slice(0, 120);
@@ -12524,14 +12524,14 @@ async function noteRejection({ fs, projectPath, sessionId, signal, reason, refin
   try {
     await appendJsonl(fs, brainPath2(projectPath, "timeline.jsonl"), {
       id: makeId("evt", now),
-      title: "\u672A\u8BB0\u4F4F\uFF1A" + trigger,
+      title: "\u672A\u8A18\u4F4F\uFF1A" + trigger,
       eventType: "memory_rejected",
       occurredAt: now,
       sessionId: sessionId || null,
       detail: why + "\u3002" + REJECT_NEXT_STEP,
       rejectReason: reason,
       refineStatus: refineStatus || null,
-      // 模型到底返回了什么，排查时比任何描述都有用。
+      // 模型到底返回了什麼，排查時比任何描述都有用。
       ...sample ? { sample } : {}
     });
   } catch (e) {
@@ -12662,8 +12662,8 @@ async function handleOne({ fs, projectPath, sessionId, signal, session, llm, rou
         ...prior ? { supersedes: prior.id } : {}
       }
     },
-    // 强信号是用户点名要记的，准入没得商量；弱信号是从语气里推断的，走常规通道，
-    // 但内容已经由上面那次提炼产出，不再重复问一遍模型。
+    // 強訊號是使用者點名要記的，准入沒得商量；弱訊號是從語氣裡推斷的，走常規通道，
+    // 但內容已經由上面那次提煉產出，不再重複問一遍模型。
     channel: weak ? "automatic" : "user_explicit",
     ...weak ? { llmConfirm: { admit: true, type: candidate.type } } : {},
     now: Date.now()

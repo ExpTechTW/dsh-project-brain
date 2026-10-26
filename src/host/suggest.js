@@ -1,23 +1,23 @@
-// suggest.js - v0.4.15 智能续接（project_suggest_next）
+// suggest.js - v0.4.15 智慧續接（project_suggest_next）
 //
-// 核心目标：Session 开始时给用户 1-2 句"今天可能想推进什么"，让跨 session 续接不需要用户重新描述项目。
-// 数据源：
-//   - 高重要性 + 近期记忆（decision / architecture / requirement / bug / lesson）
-//   - 进行中的 TODO（in_progress > pending > 阻塞）
-//   - 最近活动时间线（特别是上次 session 的最后一个事件）
-//   - 项目概述（project.description / techStack）
-//   - 可选：架构报告（architecture.overview.purpose / layers / components）
+// 核心目標：Session 開始時給使用者 1-2 句"今天可能想推進什麼"，讓跨 session 續接不需要使用者重新描述專案。
+// 資料來源：
+//   - 高重要性 + 近期記憶（decision / architecture / requirement / bug / lesson）
+//   - 進行中的 TODO（in_progress > pending > 阻塞）
+//   - 最近活動時間線（特別是上次 session 的最後一個事件）
+//   - 專案概述（project.description / techStack）
+//   - 可選：架構報告（architecture.overview.purpose / layers / components）
 //
-// LLM 调用（可选）：
-//   - 复用当前 DSH Session 的 LLM（与 architecture / session-extractor / project_diff 共用 streamLlmText）
-//   - prompt：给 LLM 一个结构化输入，要求 JSON 输出
-//   - 失败 / 不可用：返回 buildLocalFallback（纯规则推荐）
+// LLM 呼叫（可選）：
+//   - 複用當前 DSH Session 的 LLM（與 architecture / session-extractor / project_diff 共用 streamLlmText）
+//   - prompt：給 LLM 一個結構化輸入，要求 JSON 輸出
+//   - 失敗 / 不可用：返回 buildLocalFallback（純規則推薦）
 //
-// 强约束：纯函数 + 不依赖 DSH runtime（便于 smoke 离线测试）。
+// 強約束：純函式 + 不依賴 DSH runtime（便於 smoke 離線測試）。
 
 import { recentTimeline, activeTodos, topMemories, isCoreMemory } from "./store/brain-logic.js";
 
-// ──  收集证据（纯函数，input brain 数据） ──
+// ──  收集證據（純函式，input brain 資料） ──
 
 function buildEvidence(brain, now) {
   const nowMs = typeof now === "number" ? now : Date.now();
@@ -27,15 +27,15 @@ function buildEvidence(brain, now) {
   const timeline = (brain && brain.timeline) || [];
   const architecture = brain && brain.architecture;
 
-  // 活跃 TODO（in_progress 优先）
+  // 活躍 TODO（in_progress 優先）
   const inProgress = todos.filter((t) => t && t.status === "in_progress");
   const pending = todos.filter((t) => t && t.status === "pending");
   const blocked = todos.filter((t) => t && t.status === "blocked");
 
-  // Top-5 记忆（按 brain-logic 的 importance*0.5 + recency*0.3 算法）
+  // Top-5 記憶（按 brain-logic 的 importance*0.5 + recency*0.3 演算法）
   const topMem = topMemories(memories, 5, nowMs);
 
-  // 最近活动时间线（取最近 3 条）
+  // 最近活動時間線（取最近 3 條）
   const recentEvents = recentTimeline(timeline, 3);
 
   // 距上次 session 摘要多久
@@ -57,20 +57,20 @@ function buildEvidence(brain, now) {
   };
 }
 
-// ──  本地 fallback 推荐（不调 LLM） ──
+// ──  本地 fallback 推薦（不調 LLM） ──
 
 function buildLocalFallback(evidence) {
   const { project, memories, activeTodos: t, recentEvents, daysSinceLastSession } = evidence;
 
-  // 优先级 1：进行中的任务
+  // 優先順序 1：進行中的任務
   if (t.inProgress.length > 0) {
     const top = t.inProgress[0];
     const relatedMem = pickRelatedMem(top, memories);
     return {
-      title: "继续推进：" + truncate(top.title, 60),
+      title: "繼續推進：" + truncate(top.title, 60),
       reason: relatedMem
-        ? "上次中断在 “" + truncate(relatedMem.title, 30) + "” 相关工作"
-        : "你正在处理这条任务（in_progress）",
+        ? "上次中斷在 “" + truncate(relatedMem.title, 30) + "” 相關工作"
+        : "你正在處理這條任務（in_progress）",
       confidence: 0.85,
       suggestedTodoId: top.id || null,
       suggestedMemoryIds: relatedMem ? [relatedMem.id] : [],
@@ -78,16 +78,16 @@ function buildLocalFallback(evidence) {
     };
   }
 
-  // 优先级 2：最高优先级 pending TODO
+  // 優先順序 2：最高優先順序 pending TODO
   if (t.pending.length > 0) {
     const sorted = sortTodosByPriority(t.pending);
     const top = sorted[0];
     const relatedMem = pickRelatedMem(top, memories);
     return {
-      title: "建议开始：" + truncate(top.title, 60),
+      title: "建議開始：" + truncate(top.title, 60),
       reason: relatedMem
-        ? "与已记录的 “" + truncate(relatedMem.title, 30) + "” 决策/教训相关"
-        : "这是当前最高优先级待办（" + (top.priority || "medium") + "）",
+        ? "與已記錄的 “" + truncate(relatedMem.title, 30) + "” 決策/教訓相關"
+        : "這是當前最高優先順序待辦（" + (top.priority || "medium") + "）",
       confidence: 0.7,
       suggestedTodoId: top.id || null,
       suggestedMemoryIds: relatedMem ? [relatedMem.id] : [],
@@ -95,11 +95,11 @@ function buildLocalFallback(evidence) {
     };
   }
 
-  // 优先级 3：被阻塞的任务
+  // 優先順序 3：被阻塞的任務
   if (t.blocked.length > 0) {
     return {
-      title: "解决阻塞：" + truncate(t.blocked[0].title, 60),
-      reason: "有 " + t.blocked.length + " 个任务被阻塞，先解决阻塞可解锁后续工作",
+      title: "解決阻塞：" + truncate(t.blocked[0].title, 60),
+      reason: "有 " + t.blocked.length + " 個任務被阻塞，先解決阻塞可解鎖後續工作",
       confidence: 0.5,
       suggestedTodoId: t.blocked[0].id || null,
       suggestedMemoryIds: [],
@@ -107,7 +107,7 @@ function buildLocalFallback(evidence) {
     };
   }
 
-  // 优先级 4：基于记忆的推断
+  // 優先順序 4：基於記憶的推斷
   if (memories.length > 0) {
     const recents = memories.filter((m) => {
       const age = (evidence.now - (m.updatedAt || m.createdAt || 0)) / 86_400_000;
@@ -115,10 +115,10 @@ function buildLocalFallback(evidence) {
     });
     if (recents.length > 0) {
       return {
-        title: "回顾近期记忆：" + truncate(recents[0].title, 60),
+        title: "回顧近期記憶：" + truncate(recents[0].title, 60),
         reason: daysSinceLastSession != null && daysSinceLastSession > 0
-          ? "距上次 Session " + daysSinceLastSession + " 天，先回顾近期项目知识"
-          : "最近记录的项目决策可作为下一步起点",
+          ? "距上次 Session " + daysSinceLastSession + " 天，先回顧近期專案知識"
+          : "最近記錄的專案決策可作為下一步起點",
         confidence: 0.45,
         suggestedTodoId: null,
         suggestedMemoryIds: [recents[0].id],
@@ -127,11 +127,11 @@ function buildLocalFallback(evidence) {
     }
   }
 
-  // 优先级 5：无任何数据
+  // 優先順序 5：無任何資料
   if (recentEvents.length > 0) {
     return {
-      title: "回顾上次活动：" + truncate(recentEvents.title, 60),
-      reason: "项目无活跃任务，可从最近活动入手",
+      title: "回顧上次活動：" + truncate(recentEvents.title, 60),
+      reason: "專案無活躍任務，可從最近活動入手",
       confidence: 0.3,
       suggestedTodoId: null,
       suggestedMemoryIds: [],
@@ -140,10 +140,10 @@ function buildLocalFallback(evidence) {
   }
 
   return {
-    title: project ? "规划下一步" : "初始化项目脑",
+    title: project ? "規劃下一步" : "初始化專案腦",
     reason: project
-      ? "暂无待办和近期记忆，建议用 project_todo_add 规划下一步"
-      : "项目脑还未初始化，调用 project_init 开始",
+      ? "暫無待辦和近期記憶，建議用 project_todo_add 規劃下一步"
+      : "專案腦還未初始化，呼叫 project_init 開始",
     confidence: 0.2,
     suggestedTodoId: null,
     suggestedMemoryIds: [],
@@ -162,7 +162,7 @@ function sortTodosByPriority(todos) {
 
 function pickRelatedMem(todo, memories) {
   if (!todo || memories.length === 0) return null;
-  // 优先找 relatedFiles / tags 重叠的记忆
+  // 優先找 relatedFiles / tags 重疊的記憶
   const todoFiles = new Set((todo.relatedFiles || []).map(String));
   const todoTags = new Set((todo.tags || []).map(String));
   for (const m of memories) {
@@ -170,7 +170,7 @@ function pickRelatedMem(todo, memories) {
     const tagOverlap = (m.tags || []).some((t) => todoTags.has(t));
     if (overlap || tagOverlap) return m;
   }
-  // 退化：最近一条同类型记忆
+  // 退化：最近一條同類型記憶
   return memories[0] || null;
 }
 
@@ -198,17 +198,17 @@ function buildSuggestPrompt(evidence) {
       : null,
   };
   return [
-    "你是 dsh-project-brain 的「智能续接」助手。Session 开始时给用户 1-2 句话 + 一条「理由」，让他不需要重新描述项目就知道今天能做什么。",
-    "根据下面提供的项目状态（活跃 TODO / 记忆 / 时间线 / 架构概况）判断：今天最值得推进的一件事是什么？理由是什么？",
-    "规则：",
-    "1) title 必须简洁（≤ 30 字），是动词开头（「继续 X」「建议开始 X」「回顾 X」「解决 X」「规划 X」）；",
-    "3) reason 必须有依据：引用具体的 TODO id、记忆 title、或者时间线事件；",
-    "4) suggestedTodoId 必须填 1 个（最相关的那个 active todo），suggestedMemoryIds 填 1-3 个最相关的记忆；",
-    "5) confidence 0~1：进行中任务 ≥0.8，最高级 pending 0.5-0.8，记忆推断 0.3-0.5，纯空白 ≤0.3；",
-    "6) 不允许编造信息；只能基于提供的 evidence；如果完全没数据，title 写「初始化项目脑」或「规划下一步」；",
-    "7) 输出严格 JSON 对象，不要 Markdown。",
-    "格式：" + JSON.stringify({ title: "动词 + 内容", reason: "依据 + 上下文", confidence: 0.7, suggestedTodoId: "todo id 或 null", suggestedMemoryIds: ["memory id"] }),
-    "证据：" + JSON.stringify(payload),
+    "你是 dsh-project-brain 的「智慧續接」助手。Session 開始時給使用者 1-2 句話 + 一條「理由」，讓他不需要重新描述專案就知道今天能做什麼。",
+    "根據下面提供的專案狀態（活躍 TODO / 記憶 / 時間線 / 架構概況）判斷：今天最值得推進的一件事是什麼？理由是什麼？",
+    "規則：",
+    "1) title 必須簡潔（≤ 30 字），是動詞開頭（「繼續 X」「建議開始 X」「回顧 X」「解決 X」「規劃 X」）；",
+    "3) reason 必須有依據：引用具體的 TODO id、記憶 title、或者時間線事件；",
+    "4) suggestedTodoId 必須填 1 個（最相關的那個 active todo），suggestedMemoryIds 填 1-3 個最相關的記憶；",
+    "5) confidence 0~1：進行中任務 ≥0.8，最高階 pending 0.5-0.8，記憶推斷 0.3-0.5，純空白 ≤0.3；",
+    "6) 不允許編造資訊；只能基於提供的 evidence；如果完全沒資料，title 寫「初始化專案腦」或「規劃下一步」；",
+    "7) 輸出嚴格 JSON 物件，不要 Markdown。",
+    "格式：" + JSON.stringify({ title: "動詞 + 內容", reason: "依據 + 上下文", confidence: 0.7, suggestedTodoId: "todo id 或 null", suggestedMemoryIds: ["memory id"] }),
+    "證據：" + JSON.stringify(payload),
   ].join("\n");
 }
 
@@ -219,7 +219,7 @@ function compactMem(m) {
   return { id: m.id, type: m.type, title: truncate(m.title, 80), importance: m.importance, tags: (m.tags || []).slice(0, 3) };
 }
 
-// ──  解析 LLM 输出（与 analyzer.js 共享的 JSON 容错） ──
+// ──  解析 LLM 輸出（與 analyzer.js 共享的 JSON 容錯） ──
 
 function parseSuggestJson(value) {
   const text = String(value || "").trim();
@@ -227,13 +227,13 @@ function parseSuggestJson(value) {
   const candidates = [];
   // 1) 原始
   candidates.push(text);
-  // 2) 去 ```json 围栏
+  // 2) 去 ```json 圍欄
   candidates.push(text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/i, "").trim());
-  // 3) 找首个 { 到末尾最后一个 } 的 balanced 子串
+  // 3) 找首個 { 到末尾最後一個 } 的 balanced 子串
   const first = text.indexOf("{");
   const last = text.lastIndexOf("}");
   if (first >= 0 && last > first) candidates.push(text.slice(first, last + 1));
-  // 4) 清理尾逗号（防止 LLM 输出 {"foo":"a",}）
+  // 4) 清理尾逗號（防止 LLM 輸出 {"foo":"a",}）
   const stripTrailing = (s) => s.replace(/,\s*([}\]])/g, "$1");
   for (const c of candidates) {
     if (!c) continue;
@@ -262,9 +262,9 @@ function normalizeSuggestion(parsed) {
   };
 }
 
-// ──  公开 API ──
+// ──  公開 API ──
 
-// buildLocalSuggestion 不调 LLM，只走规则（供 RPC fallback / build-time embed）
+// buildLocalSuggestion 不調 LLM，只走規則（供 RPC fallback / build-time embed）
 export function buildLocalSuggestion(brain, now) {
   const evidence = buildEvidence(brain, now);
   const local = buildLocalFallback(evidence);
@@ -287,8 +287,8 @@ export function buildLocalSuggestion(brain, now) {
   };
 }
 
-// buildLlmSuggestion 给 caller 用的低阶 helper：返回 { text, attempt }，让上层 streamLlmText 调用
-//   实际在 tools/suggest.js 包装，避免 host 模块直接依赖 llm service 接口
+// buildLlmSuggestion 給 caller 用的低階 helper：返回 { text, attempt }，讓上層 streamLlmText 呼叫
+//   實際在 tools/suggest.js 包裝，避免 host 模組直接依賴 llm service 介面
 export function buildSuggestPromptForLlm(brain, now) {
   const evidence = buildEvidence(brain, now);
   return { prompt: buildSuggestPrompt(evidence), evidence };
@@ -296,7 +296,7 @@ export function buildSuggestPromptForLlm(brain, now) {
 
 export { parseSuggestJson, normalizeSuggestion, buildEvidence, buildLocalFallback };
 
-// 给 smoke test / build embed 用的纯数据组装（不依赖 llm service）
+// 給 smoke test / build embed 用的純資料組裝（不依賴 llm service）
 export function buildSuggestionData(brain, now) {
   return buildLocalSuggestion(brain, now);
 }

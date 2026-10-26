@@ -1,13 +1,13 @@
-// smoke-session-refresh.mjs — 会话摘要全链路
+// smoke-session-refresh.mjs — 會話摘要全鏈路
 //
-// 用真实 setupSummarizer + 伪 ctx，覆盖：
-//   A) session/disposed + 只改普通源码 → 写 session_summary + 轻扫；**不得**跑 full 架构
-//   B) 新增源码文件 → 结构变化 → 跑 full 架构 → architectureStale=false
-//   C) full 架构失败 → markArchitectureStale 兜底写 architectureStale=true
-//   D) 主路径 session/flush：事件往往只有 id，cwd 在 live session 上；
-//      空闲未满不摘要，持续 flush 把闹钟往后推，安静够久才写 session_summary
+// 用真實 setupSummarizer + 偽 ctx，覆蓋：
+//   A) session/disposed + 只改普通原始碼 → 寫 session_summary + 輕掃；**不得**跑 full 架構
+//   B) 新增原始碼檔案 → 結構變化 → 跑 full 架構 → architectureStale=false
+//   C) full 架構失敗 → markArchitectureStale 兜底寫 architectureStale=true
+//   D) 主路徑 session/flush：事件往往只有 id，cwd 在 live session 上；
+//      空閒未滿不摘要，持續 flush 把鬧鐘往後推，安靜夠久才寫 session_summary
 //
-// 同时校验 session_summary.files 是真实路径（不是 init detail 里的文件计数）。
+// 同時校驗 session_summary.files 是真實路徑（不是 init detail 裡的檔案計數）。
 
 import assert from "node:assert/strict";
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, existsSync, utimesSync, rmSync } from "node:fs";
@@ -29,7 +29,7 @@ const fsAdapter = {
   async resolve(p, opts) { return opts && opts.cwd ? join(opts.cwd, p) : p; },
   async readText(target) { return readFileSync(target, "utf8"); },
   async writeText(target, content) {
-    // fs 适配层的契约是「失败抛错」（brain-files.writeText 只 catch 异常），桩必须照做
+    // fs 適配層的契約是「失敗拋錯」（brain-files.writeText 只 catch 異常），樁必須照做
     if (blockArchitectureWrite && String(target).endsWith("architecture.json")) {
       throw new Error("EACCES: simulated architecture.json write failure");
     }
@@ -64,8 +64,8 @@ write("src/host/thing.js", "module.exports = 1;\n");
 const init = await scanAndWrite(fsAdapter, null, { path: root }, "project_init", {});
 assert.equal(init.ok, true, JSON.stringify(init));
 
-// fixture 文件的「出生时间」就是刚刚，没法改。所以窗口锚点必须取在 fixture 建好之后，
-// 这样已有文件才算「窗口前就存在」（modified），本轮新建的才算 added。
+// fixture 檔案的「出生時間」就是剛剛，沒法改。所以視窗錨點必須取在 fixture 建好之後，
+// 這樣已有檔案才算「視窗前就存在」（modified），本輪新建的才算 added。
 const FIXTURE_DONE_AT = Date.now();
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -84,14 +84,14 @@ const setWindowAnchor = () => {
   writeFileSync(join(brainDir, "project.json"), JSON.stringify(p), "utf8");
 };
 
-// LLM 桩：产出一条 durable 记忆 + 一句人话摘要
+// LLM 樁：產出一條 durable 記憶 + 一句人話摘要
 const llmResponse = JSON.stringify({
-  summary: "把注入上下文收敛成一份 briefing，避免每轮重复介绍项目。",
+  summary: "把注入上下文收斂成一份 briefing，避免每輪重複介紹專案。",
   memories: [{
     type: "decision",
-    title: "注入统一走 briefing 组装",
-    content: "人第一屏与 Agent 注入共用同一个组装函数，避免两套文案各写各的。",
-    evidence: "统一 briefing",
+    title: "注入統一走 briefing 組裝",
+    content: "人第一屏與 Agent 注入共用同一個組裝函式，避免兩套文案各寫各的。",
+    evidence: "統一 briefing",
     durable: true,
     importance: 0.8,
     confidence: 0.9,
@@ -113,14 +113,14 @@ function makeSession(id) {
     requestContext() { return { provider: "stub", model: "stub-model" }; },
     deriveMessages() {
       return [
-        { role: "user", content: [{ type: "text", text: "统一 briefing，把注入和第一屏合成一份。" }] },
-        { role: "assistant", content: [{ type: "text", text: "已完成，原因是两套文案会漂移。" }] },
+        { role: "user", content: [{ type: "text", text: "統一 briefing，把注入和第一屏合成一份。" }] },
+        { role: "assistant", content: [{ type: "text", text: "已完成，原因是兩套文案會漂移。" }] },
       ];
     },
   };
 }
 
-// 真实 setupSummarizer + 伪 ctx（DSH 侧就是这样注册和触发的）
+// 真實 setupSummarizer + 偽 ctx（DSH 側就是這樣註冊和觸發的）
 async function disposeSession(id) {
   let handler = null;
   const pending = [];
@@ -134,12 +134,12 @@ async function disposeSession(id) {
     getLlm: () => llm,
     getMemoryConfig: () => ({}),
   });
-  assert.ok(handler, "summarizer 必须订阅 session/disposed");
+  assert.ok(handler, "summarizer 必須訂閱 session/disposed");
   handler(makeSession(id));
   await Promise.all(pending);
 }
 
-// ── 场景 A：只改普通源码 → 轻扫，不跑 full 架构 ──
+// ── 場景 A：只改普通原始碼 → 輕掃，不跑 full 架構 ──
 writeFileSync(join(brainDir, "architecture.json"), JSON.stringify(SENTINEL), "utf8");
 pastAll();
 setWindowAnchor();
@@ -150,17 +150,17 @@ await disposeSession("sess-a");
 
 const summaryOf = (sid) => timeline().find((e) => e.eventType === "session_summary" && e.sessionId === sid);
 const evA = summaryOf("sess-a");
-assert.ok(evA, "关会话必须写 session_summary");
-// 轻扫会在摘要之后再追加一条 rescan，所以摘要不一定是最后一条
-assert.ok(timeline().some((e) => e.eventType === "rescan" && e.architectureMode === "light"), "改源码应触发轻扫");
-assert.match(evA.summary, /briefing/, "人话摘要应写入 timeline：" + JSON.stringify(evA.summary));
-assert.ok(evA.files.includes("src/host/thing.js"), "改动文件应进 files：" + JSON.stringify(evA.files));
-assert.ok(!evA.files.some((f) => /^\d+$/.test(f)), "files 里不能出现文件计数");
-assert.ok(!evA.files.includes("src/index.js"), "窗口外的文件不该被算进来");
+assert.ok(evA, "關會話必須寫 session_summary");
+// 輕掃會在摘要之後再追加一條 rescan，所以摘要不一定是最後一條
+assert.ok(timeline().some((e) => e.eventType === "rescan" && e.architectureMode === "light"), "改原始碼應觸發輕掃");
+assert.match(evA.summary, /briefing/, "人話摘要應寫入 timeline：" + JSON.stringify(evA.summary));
+assert.ok(evA.files.includes("src/host/thing.js"), "改動檔案應進 files：" + JSON.stringify(evA.files));
+assert.ok(!evA.files.some((f) => /^\d+$/.test(f)), "files 裡不能出現檔案計數");
+assert.ok(!evA.files.includes("src/index.js"), "視窗外的檔案不該被算進來");
 assert.ok(evA.changes.some((c) => c.path === "src/host/thing.js" && c.type === "modified"));
-assert.equal(readArchitecture().version, "sentinel", "改普通源码不得触发 full 架构");
+assert.equal(readArchitecture().version, "sentinel", "改普通原始碼不得觸發 full 架構");
 
-// ── 场景 B：新增源码文件 → 结构变化 → 跑 full 架构 ──
+// ── 場景 B：新增原始碼檔案 → 結構變化 → 跑 full 架構 ──
 pastAll();
 setWindowAnchor();
 await sleep(60);
@@ -169,11 +169,11 @@ write("src/host/new-module.js", "module.exports = 'new';\n", Date.now());
 await disposeSession("sess-b");
 
 const archB = readArchitecture();
-assert.notEqual(archB.version, "sentinel", "新增源码文件必须触发 full 架构重分析");
-assert.ok(archB.stats && typeof archB.stats.modules === "number", "应产出真实架构：" + JSON.stringify(Object.keys(archB)));
-assert.equal(readProject().architectureStale, false, "full 成功后必须清除过期标记");
+assert.notEqual(archB.version, "sentinel", "新增原始碼檔案必須觸發 full 架構重分析");
+assert.ok(archB.stats && typeof archB.stats.modules === "number", "應產出真實架構：" + JSON.stringify(Object.keys(archB)));
+assert.equal(readProject().architectureStale, false, "full 成功後必須清除過期標記");
 
-// ── 场景 C：full 架构写失败 → 必须显式置过期 ──
+// ── 場景 C：full 架構寫失敗 → 必須顯式置過期 ──
 writeFileSync(join(brainDir, "architecture.json"), JSON.stringify(SENTINEL), "utf8");
 pastAll();
 setWindowAnchor();
@@ -184,15 +184,15 @@ blockArchitectureWrite = true;
 await disposeSession("sess-c");
 
 blockArchitectureWrite = false;
-assert.equal(readProject().architectureStale, true, "full 失败必须置 architectureStale=true，不能拿旧泳道当真理");
-assert.equal(readArchitecture().version, "sentinel", "失败时不得破坏已有 architecture.json");
+assert.equal(readProject().architectureStale, true, "full 失敗必須置 architectureStale=true，不能拿舊泳道當真理");
+assert.equal(readArchitecture().version, "sentinel", "失敗時不得破壞已有 architecture.json");
 
-// 同一会话没有新增消息（增量 < 4）→ 不再写第二条摘要
+// 同一會話沒有新增訊息（增量 < 4）→ 不再寫第二條摘要
 const before = timeline().length;
 await disposeSession("sess-c");
-assert.equal(timeline().length, before, "消息没有增长时不应写第二条摘要");
+assert.equal(timeline().length, before, "訊息沒有增長時不應寫第二條摘要");
 
-// ── 场景 D：主路径 session/flush。载荷只有 id，cwd / 转写在 live session 上 ──
+// ── 場景 D：主路徑 session/flush。載荷只有 id，cwd / 轉寫在 live session 上 ──
 async function flushIdle(id) {
   const pending = [];
   const handlers = {};
@@ -209,21 +209,21 @@ async function flushIdle(id) {
     getLlm: () => llm,
     getMemoryConfig: () => ({ sessionIdleSummaryMs: idleMs }),
   });
-  assert.ok(handlers["session/flush"], "summarizer 必须订阅 session/flush");
-  assert.ok(handlers["session/disposed"], "disposed 仍要订阅，发了就立刻摘");
-  assert.equal(summaryOf(id), undefined, "flush 之前没有摘要");
+  assert.ok(handlers["session/flush"], "summarizer 必須訂閱 session/flush");
+  assert.ok(handlers["session/disposed"], "disposed 仍要訂閱，發了就立刻摘");
+  assert.equal(summaryOf(id), undefined, "flush 之前沒有摘要");
   handlers["session/flush"]({ id });
   await sleep(60);
-  assert.equal(summaryOf(id), undefined, "空闲未满不写摘要");
+  assert.equal(summaryOf(id), undefined, "空閒未滿不寫摘要");
   handlers["session/flush"]({ id });
   await sleep(60);
-  assert.equal(summaryOf(id), undefined, "持续 flush 会把闹钟往后推");
+  assert.equal(summaryOf(id), undefined, "持續 flush 會把鬧鐘往後推");
   await sleep(idleMs + 80);
   await Promise.all(pending);
   const ev = summaryOf(id);
-  assert.ok(ev, "空闲满后必须写 session_summary");
+  assert.ok(ev, "空閒滿後必須寫 session_summary");
   assert.equal(ev.sessionId, id);
-  assert.equal(ev.messageCount, 2, "摘要记下当时覆盖到的消息数");
+  assert.equal(ev.messageCount, 2, "摘要記下當時覆蓋到的訊息數");
 }
 await flushIdle("sess-flush");
 

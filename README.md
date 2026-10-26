@@ -1,8 +1,8 @@
 # dsh-project-brain
 
-**English** · [简体中文](./README.zh-CN.md)
+**English** · [繁體中文](./README.zh-TW.md)
 
-[![Version](https://img.shields.io/badge/version-1.4.0-blue)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.4.1-blue)](./CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D22.19-339933)](./package.json)
 [![Status](https://img.shields.io/badge/status-stable-success)](./RELEASE_CHECKLIST.md)
@@ -11,14 +11,14 @@
 
 Instead of making every new conversation rediscover the repository, dsh-project-brain stores structured knowledge inside the project itself and keeps getting more useful as the project evolves.
 
-> Current release: `1.4.0` — the release that makes project memory actually usable: deictic references are resolved before a memory is stored, memories can be edited / pinned / archived / deleted from the dashboard, concurrent writes no longer silently drop rows, and Core has configurable capacity with pinning. Data format stays backward-compatible with v1.3.x.
+> Current release: `1.4.1` — a fork-side compatibility + localization release: it declares peer ranges for DSH `0.2.1-rc.3` so it loads on the current host without a `compatibility.json` exemption, and every Chinese string, comment and doc has been converted to Traditional Chinese (Taiwan terminology). No behavioral change.
 
-**v1.3.1 新特性**：📦 **导入导出 / 备份恢复**
-- Dashboard 顶部新增 **💾 备份 / 📥 恢复 / ↶ 回滚** 三个按钮（与项目名 + techStack chip 同一行）
-- 一键把整个项目脑打成 zip（含 timeline + cache + manifest + sha256 校验）→ 跨机器传文件 → 在另一台机器一键还原
-- 导入前自动预览影响清单（即将覆盖的脑 / 旧脑备份路径 / rootPath 改写）；主按钮文案「覆盖并恢复」明确提醒
-- 每次导入/回滚前自动备份当前脑到 `.project-brain.backup-<ts>/`；可随时回滚到任一历史备份
-- 4 个新 Tool：`project_export` / `project_import` / `project_rollback_backup` / `project_cleanup_backups`
+**v1.3.1 新特性**：📦 **匯入匯出 / 備份恢復**
+- Dashboard 頂部新增 **💾 備份 / 📥 恢復 / ↶ 回滾** 三個按鈕（與專案名 + techStack chip 同一行）
+- 一鍵把整個專案腦打成 zip（含 timeline + cache + manifest + sha256 校驗）→ 跨機器傳檔案 → 在另一臺機器一鍵還原
+- 匯入前自動預覽影響清單（即將覆蓋的腦 / 舊腦備份路徑 / rootPath 改寫）；主按鈕文案「覆蓋並恢復」明確提醒
+- 每次匯入/回滾前自動備份當前腦到 `.project-brain.backup-<ts>/`；可隨時回滾到任一歷史備份
+- 4 個新 Tool：`project_export` / `project_import` / `project_rollback_backup` / `project_cleanup_backups`
 
 [GitHub release](https://github.com/yj-liuzepeng/dsh-project-brain/releases/tag/v1.3.1) · [DSH community showcase](https://github.com/deepseek-ai/deepseek-harness/discussions/5121) · [MyDSH listing](https://mydsh.dev/plugin?repo=yj-liuzepeng%2Fdsh-project-brain)
 
@@ -257,7 +257,7 @@ The automated suite covers runtime workspace resolution, cross-workspace isolati
 
 ## Documentation
 
-- [中文说明](./README.zh-CN.md)
+- [中文說明](./README.zh-TW.md)
 - [Installation](./INSTALL.md)
 - [Release checklist](./RELEASE_CHECKLIST.md)
 - [Changelog](./CHANGELOG.md)

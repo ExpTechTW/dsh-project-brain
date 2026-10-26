@@ -1,11 +1,11 @@
-// smoke-import-export.mjs — 端到端 smoke：导出 → 跨项目模拟 → 导入 → 回滚 → 清理
+// smoke-import-export.mjs — 端到端 smoke：匯出 → 跨專案模擬 → 匯入 → 回滾 → 清理
 //
-// 场景：模拟「公司脑 → 家里脑」完整流程
-//   1. 在临时项目 A 初始化脑（带几条 memory/todo/timeline）
+// 場景：模擬「公司腦 → 家裡腦」完整流程
+//   1. 在臨時專案 A 初始化腦（帶幾條 memory/todo/timeline）
 //   2. export → bundle.zip
-//   3. 在临时项目 B 导入 bundle → 验证记忆/todo/timeline 完整恢复
-//   4. 改写项目 B 脑（加几条新记忆）→ 备份 → 回滚 → 验证还原
-//   5. cleanup → 验证保留 N 个
+//   3. 在臨時專案 B 匯入 bundle → 驗證記憶/todo/timeline 完整恢復
+//   4. 改寫專案 B 腦（加幾條新記憶）→ 備份 → 回滾 → 驗證還原
+//   5. cleanup → 驗證保留 N 個
 
 import { promises as fsp } from "node:fs";
 import { existsSync } from "node:fs";
@@ -18,7 +18,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const SRC_ROOT = join(__dirname, "..", "src");
 const fileUrl = (relPath) => pathToFileURL(join(SRC_ROOT, relPath)).href;
 
-// 动态 import（Windows 上需要 file:// URL）
+// 動態 import（Windows 上需要 file:// URL）
 const {
   buildBundleBuffer,
   parseBundle,
@@ -214,7 +214,7 @@ console.log("\n=== AC-4: previewBundle dry-run does not modify files ===");
   check("preview: rootPathRewrite.from present", preview.rootPathRewrite.from && preview.rootPathRewrite.from.includes("src"));
   check("preview: rootPathRewrite.to=destPath", preview.rootPathRewrite.to === destPath);
 
-  // 验证：未修改任何文件
+  // 驗證：未修改任何檔案
   const beforeMems = await readJsonl(join(destPath, ".project-brain/memory.jsonl"));
   check("preview did NOT change brain", beforeMems.length === 5);
 
@@ -304,10 +304,10 @@ console.log("\n=== AC-9/10/11: backup create + list + rollback ===");
   const r2 = await createBackup({ projectPath });
   check("backup r2 created", existsSync(r2.backupPath));
 
-  // 现在直接回滚到 r2 来测：先恢复脑（不要立即再 backup）
+  // 現在直接回滾到 r2 來測：先恢復腦（不要立即再 backup）
   // r2 = 4 mem, r1 = 3 mem
   await mkBrain(projectPath, { memCount: 5, todoCount: 0, timelineCount: 0 });
-  // 不立即 backup → 当前脑=5 mems
+  // 不立即 backup → 當前腦=5 mems
   check("current brain exists before rollback", existsSync(join(projectPath, ".project-brain")));
 
   // Rollback preview to r1 (oldest, 3 mems)
@@ -364,9 +364,9 @@ console.log("\n=== AC-12: bundle excludes excluded files ===");
   await fsp.rm(projectPath, { recursive: true, force: true });
 }
 
-console.log("\n=== AC-13: tools.execute unwrap 兼容 (RPC executeTool contract) ===");
-// 验证 RPC executeTool 的 unwrap 逻辑兼容两种 tools.execute 返回格式
-// （这条防止 v1.3.1 实测中发现的 bug：bundlePath 被吞掉导致 Toast 显示「未拿到文件名」）
+console.log("\n=== AC-13: tools.execute unwrap 相容 (RPC executeTool contract) ===");
+// 驗證 RPC executeTool 的 unwrap 邏輯相容兩種 tools.execute 返回格式
+// （這條防止 v1.3.1 實測中發現的 bug：bundlePath 被吞掉導致 Toast 顯示「未拿到檔名」）
 {
   function unwrap(result) {
     if (!result) return {};
@@ -375,24 +375,24 @@ console.log("\n=== AC-13: tools.execute unwrap 兼容 (RPC executeTool contract)
     if (result && typeof result === "object" && !("ok" in result)) return result;
     return {};
   }
-  // 格式 A：标准 { ok: true, data: {...} }
+  // 格式 A：標準 { ok: true, data: {...} }
   const a = unwrap({ ok: true, data: { bundlePath: "/x/y.zip", bundleName: "y.zip", defaultDirPath: "/x" } });
   check("unwrap A: bundlePath present", a.bundlePath === "/x/y.zip");
   check("unwrap A: defaultDirPath present", a.defaultDirPath === "/x");
-  // 格式 B：直接返回 data（部分 DSH 版本行为）
+  // 格式 B：直接返回 data（部分 DSH 版本行為）
   const b = unwrap({ bundlePath: "/a/b.zip", bundleName: "b.zip" });
   check("unwrap B: bundlePath present", b.bundlePath === "/a/b.zip");
   check("unwrap B: bundleName present", b.bundleName === "b.zip");
-  // 失败格式
+  // 失敗格式
   const e = unwrap({ ok: false, code: "E_X", message: "fail" });
   check("unwrap error: error=true", e.error === true);
   check("unwrap error: code kept", e.code === "E_X");
-  // 边缘：result 是 null
+  // 邊緣：result 是 null
   const n = unwrap(null);
   check("unwrap null: empty object", typeof n === "object" && Object.keys(n).length === 0);
 }
 
-console.log("\n=== AC-14: unwrapToolResult peels nested {ok,data} (RPC 实装会再包一层) ===");
+console.log("\n=== AC-14: unwrapToolResult peels nested {ok,data} (RPC 實裝會再包一層) ===");
 {
   const { unwrapToolResult } = await import(fileUrl("host/transfer/tool-result.js"));
   const nested = unwrapToolResult({

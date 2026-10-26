@@ -1,25 +1,25 @@
 // 跨 Session smoke test（v0.3.12）
 //
-// 模拟完整生命周期：
-//   1. 准备 fixture 项目（package.json + 2 src/*.js）
+// 模擬完整生命週期：
+//   1. 準備 fixture 專案（package.json + 2 src/*.js）
 //   2. 跑 scanner → 生成 .project-brain/project.json + init timeline
-//   3. project_memory_add（决策/教训）
+//   3. project_memory_add（決策/教訓）
 //   4. project_todo_add / project_todo_list
-//   5. 模拟 session/disposed → setupSummarizer 写 change memory + session_summary 事件
-//   6. 模拟 agent/session-start → setupInjector 读 project.jsonl 注入 context
-//   7. 验证：
-//      - project.json 正确生成
+//   5. 模擬 session/disposed → setupSummarizer 寫 change memory + session_summary 事件
+//   6. 模擬 agent/session-start → setupInjector 讀 project.jsonl 注入 context
+//   7. 驗證：
+//      - project.json 正確生成
 //      - memory.jsonl 含 init/decision/lesson/change/session_summary
-//      - todo.jsonl 含 todo + session_start 列出来了
-//      - injector 输出 markdown 含 briefing 四段 + Core 记忆 + 活跃待办标题
+//      - todo.jsonl 含 todo + session_start 列出來了
+//      - injector 輸出 markdown 含 briefing 四段 + Core 記憶 + 活躍待辦標題
 //
-// 退出码：0 = PASS，1 = FAIL
+// 退出碼：0 = PASS，1 = FAIL
 
 import { mkdtempSync, writeFileSync, mkdirSync, readFileSync, existsSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-// 1. 准备 fixture 项目
+// 1. 準備 fixture 專案
 const TMP = mkdtempSync(join(tmpdir(), "dsh-pb-session-"));
 const PKG_DIR = join(TMP, "my-app");
 mkdirSync(join(PKG_DIR, "src"), { recursive: true });
@@ -31,7 +31,7 @@ writeFileSync(join(PKG_DIR, "src", "index.js"), "const app = require('express')(
 writeFileSync(join(PKG_DIR, "src", "routes.js"), "module.exports = function (app) { app.get('/', (req, res) => res.send('hi')); };\n", "utf8");
 mkdirSync(join(PKG_DIR, ".project-brain"), { recursive: true });
 
-// 初始化 git 仓库（summarizer 需要 git diff 才能写 change memory）
+// 初始化 git 倉庫（summarizer 需要 git diff 才能寫 change memory）
 import { spawnSync } from "node:child_process";
 try {
   spawnSync("git", ["init", "--quiet"], { cwd: PKG_DIR });
@@ -40,7 +40,7 @@ try {
   // baseline commit
   spawnSync("git", ["add", "-A"], { cwd: PKG_DIR });
   spawnSync("git", ["commit", "--quiet", "-m", "init"], { cwd: PKG_DIR });
-  // 再加一个新文件作为"上次 session 之后"的变更 → HEAD~1 对比会有 diff
+  // 再加一個新檔案作為"上次 session 之後"的變更 → HEAD~1 對比會有 diff
   writeFileSync(join(PKG_DIR, "src", "utils.js"), "module.exports = { greet: () => 'hi' };\n", "utf8");
   spawnSync("git", ["add", "-A"], { cwd: PKG_DIR });
   spawnSync("git", ["commit", "--quiet", "-m", "add utils"], { cwd: PKG_DIR });
@@ -122,12 +122,12 @@ console.log("languages:", scan.languages);
 console.log("techStack:", scan.techStack);
 console.log("entrypoints:", scan.entrypoints);
 console.log("fileCount:", scan.fileCount);
-check("scanner 识别 javascript 语言", scan.languages.javascript === 2 || scan.languages.javascript > 0);
-check("scanner 识别 express 技术栈", scan.techStack.backend && /express/i.test(String(scan.techStack.backend)));
-check("scanner entrypoints 字段存在（数组）", Array.isArray(scan.entrypoints));
+check("scanner 識別 javascript 語言", scan.languages.javascript === 2 || scan.languages.javascript > 0);
+check("scanner 識別 express 技術棧", scan.techStack.backend && /express/i.test(String(scan.techStack.backend)));
+check("scanner entrypoints 欄位存在（陣列）", Array.isArray(scan.entrypoints));
 check("scanner fileCount 包含 src/*.js", scan.fileCount >= 2);
 
-// 写 project.json
+// 寫 project.json
 const projectId = "test-" + Date.now().toString(36);
 const projectJson = {
   id: projectId,
@@ -142,13 +142,13 @@ const projectJson = {
   lastScannedAt: Date.now(),
 };
 writeFileSync(join(PKG_DIR, ".project-brain", "project.json"), JSON.stringify(projectJson, null, 2), "utf8");
-check("project.json 写入成功", existsSync(join(PKG_DIR, ".project-brain", "project.json")));
+check("project.json 寫入成功", existsSync(join(PKG_DIR, ".project-brain", "project.json")));
 
-// 写 init timeline
+// 寫 init timeline
 writeFileSync(join(PKG_DIR, ".project-brain", "timeline.jsonl"),
   JSON.stringify({
     id: "evt-init-1",
-    title: "完成 project_init 扫描",
+    title: "完成 project_init 掃描",
     eventType: "init",
     occurredAt: Date.now(),
     detail: "files=" + scan.fileCount,
@@ -156,65 +156,65 @@ writeFileSync(join(PKG_DIR, ".project-brain", "timeline.jsonl"),
   "utf8",
 );
 
-// ─── Step 3: project_memory_add（直接用 brain-files + brain-logic，避开 dsh-tools） ───
+// ─── Step 3: project_memory_add（直接用 brain-files + brain-logic，避開 dsh-tools） ───
 console.log("\n=== Step 3: memory_add ===");
 const { brainPath, appendJsonl } = await import("../src/host/store/brain-files.js");
 const { makeMemoryEntry } = await import("../src/host/store/brain-logic.js");
 
 const now = Date.now();
-const mem1 = makeMemoryEntry({ type: "decision", title: "采用 Express 框架", content: "选择 Express 因为生态最成熟", importance: 0.8, relatedFiles: ["package.json"] }, now);
-const mem2 = makeMemoryEntry({ type: "lesson", title: "DSH host bundle 不会自动热重载", content: "改 host 代码必须重启 DSH", importance: 0.85 }, now + 1);
+const mem1 = makeMemoryEntry({ type: "decision", title: "採用 Express 框架", content: "選擇 Express 因為生態最成熟", importance: 0.8, relatedFiles: ["package.json"] }, now);
+const mem2 = makeMemoryEntry({ type: "lesson", title: "DSH host bundle 不會自動熱過載", content: "改 host 程式碼必須重啟 DSH", importance: 0.85 }, now + 1);
 await appendJsonl(fsAdapter, brainPath(PKG_DIR, "memory.jsonl"), mem1);
 await appendJsonl(fsAdapter, brainPath(PKG_DIR, "memory.jsonl"), mem2);
 
 const memFile = readFileSync(join(PKG_DIR, ".project-brain", "memory.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l));
-check("memory.jsonl 写入 2 条", memFile.length === 2);
+check("memory.jsonl 寫入 2 條", memFile.length === 2);
 check("mem1 type = decision", memFile[0].type === "decision");
 check("mem1.importance = 0.8", memFile[0].importance === 0.8);
 
 // ─── Step 4: project_todo_add ───
 console.log("\n=== Step 4: todo_add ===");
 const { makeTodoEntry } = await import("../src/host/store/brain-logic.js");
-const todo1 = makeTodoEntry({ title: "实现用户注册 API", description: "POST /api/register", priority: "high", relatedFiles: ["src/routes.js"] }, now);
-const todo2 = makeTodoEntry({ title: "添加单元测试", priority: "medium" }, now + 1);
+const todo1 = makeTodoEntry({ title: "實現使用者註冊 API", description: "POST /api/register", priority: "high", relatedFiles: ["src/routes.js"] }, now);
+const todo2 = makeTodoEntry({ title: "新增單元測試", priority: "medium" }, now + 1);
 await appendJsonl(fsAdapter, brainPath(PKG_DIR, "todo.jsonl"), todo1);
 await appendJsonl(fsAdapter, brainPath(PKG_DIR, "todo.jsonl"), todo2);
 const todoFile = readFileSync(join(PKG_DIR, ".project-brain", "todo.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l));
-check("todo.jsonl 写入 2 条", todoFile.length === 2);
+check("todo.jsonl 寫入 2 條", todoFile.length === 2);
 check("todo1 priority = high", todoFile[0].priority === "high");
 check("todo1 status = pending", todoFile[0].status === "pending");
 
-// ─── Step 5: 模拟 session/disposed → summarizer ───
+// ─── Step 5: 模擬 session/disposed → summarizer ───
 console.log("\n=== Step 5: summarizer ===");
 const { setupSummarizer } = await import("../src/host/summarizer.js");
 const { setupInjector } = await import("../src/host/injector.js");
 
-// 先注册 summarizer（订阅 session/disposed）
+// 先註冊 summarizer（訂閱 session/disposed）
 setupSummarizer(ctx, fsAdapter, sandboxPolicy);
 
-// 模拟 session 离开
+// 模擬 session 離開
 ctx.emit("session/disposed", {
   id: "session-test-1",
   meta: { cwd: PKG_DIR, id: "session-test-1" },
 });
 
-// 给 summarizer 异步时间（git diff + 写文件 + emit preview.changed）
+// 給 summarizer 非同步時間（git diff + 寫檔案 + emit preview.changed）
 await new Promise((r) => setTimeout(r, 1000));
 
 const memAfterSummary = readFileSync(join(PKG_DIR, ".project-brain", "memory.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l));
 const tlAfterSummary = readFileSync(join(PKG_DIR, ".project-brain", "timeline.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l));
-check("summarizer 后 memory.jsonl 不含 change 类型", !memAfterSummary.some((m) => m.type === "change"));
-check("summarizer 后 timeline.jsonl 含 session_summary", tlAfterSummary.some((e) => e.eventType === "session_summary"));
+check("summarizer 後 memory.jsonl 不含 change 型別", !memAfterSummary.some((m) => m.type === "change"));
+check("summarizer 後 timeline.jsonl 含 session_summary", tlAfterSummary.some((e) => e.eventType === "session_summary"));
 console.log("  (memory rows:", memAfterSummary.length, ", timeline entries:", tlAfterSummary.length, ")");
 
 // ─── Step 6: agent/session-start → injector 注入 ───
 console.log("\n=== Step 6: injector ===");
-// 模拟 systemPrompt service（injector 注册的 section render 需要）
+// 模擬 systemPrompt service（injector 註冊的 section render 需要）
 const sections = [];
 const systemPromptMock = {
   section: (s) => { sections.push(s); return () => {}; },
 };
-// 替换 ctx.get 让 systemPrompt service 可用（保留 shell）
+// 替換 ctx.get 讓 systemPrompt service 可用（保留 shell）
 ctx.get = (name) => {
   if (name === "systemPrompt") return systemPromptMock;
   if (name === "shell") return shellService;
@@ -222,29 +222,29 @@ ctx.get = (name) => {
   return undefined;
 };
 
-// 先 setupInjector（注册 section + 订阅 agent/session-start）
+// 先 setupInjector（註冊 section + 訂閱 agent/session-start）
 setupInjector(ctx, fsAdapter, sandboxPolicy);
-// 等注册完成
+// 等註冊完成
 await new Promise((r) => setTimeout(r, 50));
 const ourSection = sections.find((s) => s.name === "project-brain-context");
-check("systemPrompt section 注册成功", !!ourSection);
+check("systemPrompt section 註冊成功", !!ourSection);
 
-// 然后 emit session-start（injector handler 才会被调到 + refreshCache）
+// 然後 emit session-start（injector handler 才會被調到 + refreshCache）
 ctx.emit("agent/session-start", {
   agent: { session: { meta: { cwd: PKG_DIR }, cwd: PKG_DIR, header: { cwd: PKG_DIR } } },
 });
 await new Promise((r) => setTimeout(r, 300));  // 等 refreshCache (async read file)
 
-// 调 render
+// 調 render
 if (ourSection) {
   const md = typeof ourSection.text === "function" ? ourSection.text({}) : ourSection.text;
   console.log("\n--- injected context ---\n" + md + "\n---");
   check("injected context 包含 'Project Brain'", /## Project Brain/.test(md));
-  check("injected context 包含项目介绍", /### 这是什么/.test(md) && !/### 这是什么\s*\nmy-app/.test(md));
-  check("injected context 包含 briefing 标题", /### 最近做什么/.test(md) && /### 这是什么/.test(md));
-  check("injected context 包含 decision memory '采用 Express'", /采用 Express/.test(md));
+  check("injected context 包含專案介紹", /### 這是什麼/.test(md) && !/### 這是什麼\s*\nmy-app/.test(md));
+  check("injected context 包含 briefing 標題", /### 最近做什麼/.test(md) && /### 這是什麼/.test(md));
+  check("injected context 包含 decision memory '採用 Express'", /採用 Express/.test(md));
   check("injected context 包含 lesson memory 'DSH host bundle'", /DSH host bundle/.test(md));
-  check("injected briefing 不把 pending TODO 当最近做什么", /### 最近做什么/.test(md) && !/### 最近做什么[\s\S]*实现用户注册/.test((md.split("### 从哪改")[0] || md)));
+  check("injected briefing 不把 pending TODO 當最近做什麼", /### 最近做什麼/.test(md) && !/### 最近做什麼[\s\S]*實現使用者註冊/.test((md.split("### 從哪改")[0] || md)));
 }
 
 // ─── Step 7: build-time embed（build.js loadProjectData）───

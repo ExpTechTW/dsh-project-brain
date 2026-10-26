@@ -1,12 +1,12 @@
-// session-window.js — 「本次会话改了什么」的变更窗口
+// session-window.js — 「本次會話改了什麼」的變更視窗
 //
-// 旧实现用 detectChanges({ since: "1" })（HEAD vs HEAD~1），等于把上一个 commit
-// 当成本次会话的成果：没提交就什么都收不到，别人刚提交过就会被算到自己头上。
+// 舊實現用 detectChanges({ since: "1" })（HEAD vs HEAD~1），等於把上一個 commit
+// 當成本次會話的成果：沒提交就什麼都收不到，別人剛提交過就會被算到自己頭上。
 //
-// 这里改成时间窗口：
-//   1) 工作树里 mtime 落在 (sinceMs, now] 的文件（未提交的改动也算，非 git 项目同样可用）
-//   2) git 仓库里 committer 时间落在窗口内的 commit，逐个与 first parent 做 tree diff
-// 两路合并去重。读不到 git 不算错误，降级为纯工作树。
+// 這裡改成時間視窗：
+//   1) 工作樹裡 mtime 落在 (sinceMs, now] 的檔案（未提交的改動也算，非 git 專案同樣可用）
+//   2) git 倉庫裡 committer 時間落在視窗內的 commit，逐個與 first parent 做 tree diff
+// 兩路合併去重。讀不到 git 不算錯誤，降級為純工作樹。
 
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
@@ -17,7 +17,7 @@ const MAX_WINDOW_MS = 14 * 86_400_000;
 const MAX_COMMITS = 30;
 const DEFAULT_MAX_FILES = 40;
 
-// 会话窗口起点：上次 session_summary > 上次扫描 > 建脑时间 > 24 小时前，且最长只回看 14 天。
+// 會話視窗起點：上次 session_summary > 上次掃描 > 建腦時間 > 24 小時前，且最長只回看 14 天。
 export function sessionWindowStart(brain, now = Date.now()) {
   const timeline = Array.isArray(brain && brain.timeline) ? brain.timeline : [];
   let last = 0;
@@ -64,7 +64,7 @@ function worktreeChangedSince(projectPath, sinceMs, now) {
     try { stat = statSync(full); } catch (e) { return; }
     const mtime = stat.mtimeMs;
     if (!(mtime > sinceMs && mtime <= now + 1000)) return;
-    // 没有 git 时，「窗口内才出生」是判断新增文件的唯一线索；有 git 时以 HEAD tree 为准。
+    // 沒有 git 時，「視窗內才出生」是判斷新增檔案的唯一線索；有 git 時以 HEAD tree 為準。
     const birth = Number(stat.birthtimeMs) || 0;
     out.push({ path: rel, born: Boolean(birth) && birth > sinceMs && birth <= now + 1000 });
   });
@@ -108,7 +108,7 @@ export function detectSessionChanges({ projectPath, sinceMs, now = Date.now(), m
     const p = String(path || "").replace(/\\/g, "/");
     if (!p) return;
     const prev = byPath.get(p);
-    // added 比 modified 更有信息量（结构变化），removed 优先级最高
+    // added 比 modified 更有資訊量（結構變化），removed 優先順序最高
     if (!prev || type === "removed" || (type === "added" && prev !== "removed")) byPath.set(p, type);
   };
 

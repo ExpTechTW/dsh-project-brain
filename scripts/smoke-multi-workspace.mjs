@@ -1,16 +1,16 @@
-// smoke-multi-workspace.mjs - 跨 workspace 隔离实测（v0.3.13 / P0.8 第二波）
+// smoke-multi-workspace.mjs - 跨 workspace 隔離實測（v0.3.13 / P0.8 第二波）
 //
-// 验证 path-resolver + brain-files + build-time embed 三个层面在多个 workspace 之间互不串台。
-// 不依赖 dsh-tools runtime（只 import brain-files / brain-logic / path-resolver / build.js）。
+// 驗證 path-resolver + brain-files + build-time embed 三個層面在多個 workspace 之間互不串臺。
+// 不依賴 dsh-tools runtime（只 import brain-files / brain-logic / path-resolver / build.js）。
 //
-// 覆盖：
-//   1) resolveProjectPath 显式 args.path 隔离
-//   2) resolveProjectPath session cwd 隔离
-//   3) resolveProjectPath DSH Desktop 安装路径过滤（v0.3.8 修复点）
-//   4) 写入隔离：todo.jsonl A vs B（brain-files + makeTodoEntry）
-//   5) build-time embed 隔离：loadProjectData(A) vs loadProjectData(B)
+// 覆蓋：
+//   1) resolveProjectPath 顯式 args.path 隔離
+//   2) resolveProjectPath session cwd 隔離
+//   3) resolveProjectPath DSH Desktop 安裝路徑過濾（v0.3.8 修復點）
+//   4) 寫入隔離：todo.jsonl A vs B（brain-files + makeTodoEntry）
+//   5) build-time embed 隔離：loadProjectData(A) vs loadProjectData(B)
 //
-// 退出码：0 = PASS，1 = FAIL
+// 退出碼：0 = PASS，1 = FAIL
 
 import { mkdtempSync, writeFileSync, mkdirSync, readFileSync, existsSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -35,7 +35,7 @@ function makeFixture(dir, pkg) {
 makeFixture(PROJ_A, { name: "app-express", dependencies: { express: "^4.18.0" }, techStack: { backend: "Express" }, languages: { javascript: 3 } });
 makeFixture(PROJ_B, { name: "app-python", dependencies: {}, techStack: { backend: "FastAPI" }, languages: { python: 5 } });
 
-// node fs adapter（与 src 内使用面一致）
+// node fs adapter（與 src 內使用面一致）
 import * as nodefs from "node:fs";
 const fsAdapter = {
   resolve: async (p, opts) => (opts && opts.cwd ? join(opts.cwd, p) : p),
@@ -56,8 +56,8 @@ let pass = 0;
 let fail = 0;
 const check = (name, ok) => { if (ok) { console.log(`  [PASS] ${name}`); pass++; } else { console.log(`  [FAIL] ${name}`); fail++; } };
 
-// ─── 1) resolveProjectPath 显式 path 隔离 ───
-console.log("\n=== 1: resolveProjectPath 显式 path ===");
+// ─── 1) resolveProjectPath 顯式 path 隔離 ───
+console.log("\n=== 1: resolveProjectPath 顯式 path ===");
 const { resolveProjectPath } = await import("../src/host/store/path-resolver.js");
 const noSession = { session: null, ctx: null, sessionId: null };
 const spA = { workspaceRoot: PROJ_A };
@@ -65,34 +65,34 @@ const spB = { workspaceRoot: PROJ_B };
 
 check("args.path=A → A", resolveProjectPath({ path: PROJ_A }, noSession, spA) === PROJ_A);
 check("args.path=B → B", resolveProjectPath({ path: PROJ_B }, noSession, spB) === PROJ_B);
-check("args.path=A 不受 sp=B 干扰", resolveProjectPath({ path: PROJ_A }, noSession, spB) === PROJ_A);
-check("args.path=B 不受 sp=A 干扰", resolveProjectPath({ path: PROJ_B }, noSession, spA) === PROJ_B);
+check("args.path=A 不受 sp=B 干擾", resolveProjectPath({ path: PROJ_A }, noSession, spB) === PROJ_A);
+check("args.path=B 不受 sp=A 干擾", resolveProjectPath({ path: PROJ_B }, noSession, spA) === PROJ_B);
 
-// ─── 2) resolveProjectPath session cwd 隔离 ───
+// ─── 2) resolveProjectPath session cwd 隔離 ───
 console.log("\n=== 2: resolveProjectPath session cwd ===");
 const execA = { session: { cwd: PROJ_A }, ctx: null, sessionId: "sess-a" };
 const execB = { session: { cwd: PROJ_B }, ctx: null, sessionId: "sess-b" };
 check("session.cwd=A → A", resolveProjectPath({}, execA, spA) === PROJ_A);
 check("session.cwd=B → B", resolveProjectPath({}, execB, spB) === PROJ_B);
-check("session.cwd=A 优先于 sp=B", resolveProjectPath({}, execA, spB) === PROJ_A);
-check("session.cwd=B 优先于 sp=A", resolveProjectPath({}, execB, spA) === PROJ_B);
+check("session.cwd=A 優先於 sp=B", resolveProjectPath({}, execA, spB) === PROJ_A);
+check("session.cwd=B 優先於 sp=A", resolveProjectPath({}, execB, spA) === PROJ_B);
 
-// ─── 3) DSH Desktop 安装路径过滤 ───
-console.log("\n=== 3: DSH Desktop 安装路径过滤 ===");
+// ─── 3) DSH Desktop 安裝路徑過濾 ───
+console.log("\n=== 3: DSH Desktop 安裝路徑過濾 ===");
 const dshInstall = "C:\\Users\\tester\\AppData\\Local\\Programs\\DSH Desktop";
 const spDsh = { workspaceRoot: dshInstall };
-check("DSH Desktop workspaceRoot 被过滤 → 返回 '.'", resolveProjectPath({}, noSession, spDsh) === ".");
-check("DSH Desktop + 显式 path=A → 仍返回 A", resolveProjectPath({ path: PROJ_A }, noSession, spDsh) === PROJ_A);
-// Mac 风格
+check("DSH Desktop workspaceRoot 被過濾 → 返回 '.'", resolveProjectPath({}, noSession, spDsh) === ".");
+check("DSH Desktop + 顯式 path=A → 仍返回 A", resolveProjectPath({ path: PROJ_A }, noSession, spDsh) === PROJ_A);
+// Mac 風格
 const spDshMac = { workspaceRoot: "/Applications/DSH Desktop.app/Contents/Resources" };
-check("Mac DSH Desktop 路径被过滤 → '.'", resolveProjectPath({}, noSession, spDshMac) === ".");
+check("Mac DSH Desktop 路徑被過濾 → '.'", resolveProjectPath({}, noSession, spDshMac) === ".");
 
-// ─── 4) 写入隔离（todo.jsonl）───
-console.log("\n=== 4: 写入隔离（todo.jsonl A vs B）===");
+// ─── 4) 寫入隔離（todo.jsonl）───
+console.log("\n=== 4: 寫入隔離（todo.jsonl A vs B）===");
 const { brainPath, appendJsonl, readJsonl } = await import("../src/host/store/brain-files.js");
-check("拒绝缺失 workspace 的写入路径", (() => { try { brainPath(".", "memory.jsonl"); return false; } catch (e) { return e.code === "E_UNSAFE_PROJECT_PATH"; } })());
-check("拒绝文件路径逃逸 .project-brain", (() => { try { brainPath(PROJ_A, "../outside.json"); return false; } catch (e) { return e.code === "E_UNSAFE_BRAIN_FILE"; } })());
-check("允许受控 embedding 缓存子目录", brainPath(PROJ_A, "cache/embeddings.jsonl").endsWith("/.project-brain/cache/embeddings.jsonl"));
+check("拒絕缺失 workspace 的寫入路徑", (() => { try { brainPath(".", "memory.jsonl"); return false; } catch (e) { return e.code === "E_UNSAFE_PROJECT_PATH"; } })());
+check("拒絕檔案路徑逃逸 .project-brain", (() => { try { brainPath(PROJ_A, "../outside.json"); return false; } catch (e) { return e.code === "E_UNSAFE_BRAIN_FILE"; } })());
+check("允許受控 embedding 快取子目錄", brainPath(PROJ_A, "cache/embeddings.jsonl").endsWith("/.project-brain/cache/embeddings.jsonl"));
 const { makeTodoEntry } = await import("../src/host/store/brain-logic.js");
 
 const now = Date.now();
@@ -102,28 +102,28 @@ await appendJsonl(fsAdapter, brainPath(PROJ_B, "todo.jsonl"), makeTodoEntry({ ti
 
 const todosA = await readJsonl(fsAdapter, brainPath(PROJ_A, "todo.jsonl"));
 const todosB = await readJsonl(fsAdapter, brainPath(PROJ_B, "todo.jsonl"));
-check("A 有 2 条 todo", todosA.length === 2);
-check("B 有 1 条 todo", todosB.length === 1);
+check("A 有 2 條 todo", todosA.length === 2);
+check("B 有 1 條 todo", todosB.length === 1);
 check("A 不含 B 的 todo", todosA.every((t) => t.title.startsWith("A-")));
 check("B 不含 A 的 todo", todosB.every((t) => t.title.startsWith("B-")));
-check("A 的 todo 文件存在", existsSync(brainPath(PROJ_A, "todo.jsonl")));
-check("B 的 todo 文件存在（各自独立文件）", existsSync(brainPath(PROJ_B, "todo.jsonl")));
+check("A 的 todo 檔案存在", existsSync(brainPath(PROJ_A, "todo.jsonl")));
+check("B 的 todo 檔案存在（各自獨立檔案）", existsSync(brainPath(PROJ_B, "todo.jsonl")));
 
-// ─── 5) build-time embed 隔离 ───
-console.log("\n=== 5: build-time embed 隔离（loadProjectData）===");
+// ─── 5) build-time embed 隔離 ───
+console.log("\n=== 5: build-time embed 隔離（loadProjectData）===");
 const { loadProjectData } = await import("../build.js");
 const previewA = loadProjectData(PROJ_A);
 const previewB = loadProjectData(PROJ_B);
 
 check("A preview.name = app-express", previewA.project && previewA.project.name === "app-express");
 check("B preview.name = app-python", previewB.project && previewB.project.name === "app-python");
-check("A preview.todos 只有 A（2 条）", previewA.todos.length === 2 && previewA.todos.every((t) => t.title.startsWith("A-")));
-check("B preview.todos 只有 B（1 条）", previewB.todos.length === 1 && previewB.todos.every((t) => t.title.startsWith("B-")));
+check("A preview.todos 只有 A（2 條）", previewA.todos.length === 2 && previewA.todos.every((t) => t.title.startsWith("A-")));
+check("B preview.todos 只有 B（1 條）", previewB.todos.length === 1 && previewB.todos.every((t) => t.title.startsWith("B-")));
 check("A preview.stats.pendingTodos = 2", previewA.stats.pendingTodos === 2);
 check("B preview.stats.pendingTodos = 1", previewB.stats.pendingTodos === 1);
 
-// ─── 6) memory 隔离（额外验证）───
-console.log("\n=== 6: memory 隔离 ===");
+// ─── 6) memory 隔離（額外驗證）───
+console.log("\n=== 6: memory 隔離 ===");
 const { makeMemoryEntry } = await import("../src/host/store/brain-logic.js");
 await appendJsonl(fsAdapter, brainPath(PROJ_A, "memory.jsonl"), makeMemoryEntry({ type: "decision", title: "A 用 Express", importance: 0.7 }, now));
 await appendJsonl(fsAdapter, brainPath(PROJ_B, "memory.jsonl"), makeMemoryEntry({ type: "decision", title: "B 用 FastAPI", importance: 0.7 }, now));

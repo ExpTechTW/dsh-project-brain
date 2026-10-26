@@ -1,9 +1,9 @@
-// unwrap tools.execute / Connection RPC 的多层 { ok, data } 包装
+// unwrap tools.execute / Connection RPC 的多層 { ok, data } 包裝
 //
-// 实测过两种宿主行为：
+// 實測過兩種宿主行為：
 //   A) tools.execute 直接返回 tool.execute() 的 { ok:true, data:{ bundlePath } }
-//   B) DSH 再包一层 { ok:true, data: <A> }
-// 只剥一层时 Client 会拿到 { ok:true, data:{ bundlePath } }，toast 就变成「未拿到文件名」。
+//   B) DSH 再包一層 { ok:true, data: <A> }
+// 只剝一層時 Client 會拿到 { ok:true, data:{ bundlePath } }，toast 就變成「未拿到檔名」。
 
 export function unwrapToolResult(result) {
   if (!result || typeof result !== "object") return {};
@@ -29,9 +29,9 @@ export function unwrapToolResult(result) {
 }
 
 /**
- * 从 Connection RPC 回包里捞工具字段。
- * DSH 实测：Quick Action 能读到的是 value.result.data.*（tools.execute 原样）。
- * 拍扁成 value.result.bundlePath 会被 schema 丢掉，Client 就只剩「未拿到文件名」。
+ * 從 Connection RPC 回包裡撈工具欄位。
+ * DSH 實測：Quick Action 能讀到的是 value.result.data.*（tools.execute 原樣）。
+ * 拍扁成 value.result.bundlePath 會被 schema 丟掉，Client 就只剩「未拿到檔名」。
  */
 export function pickRpcToolData(resp) {
   if (!resp || typeof resp !== "object") return {};

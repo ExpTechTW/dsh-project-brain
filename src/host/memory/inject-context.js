@@ -19,19 +19,19 @@ export function buildInjectionContext(brain) {
     lines.push("");
   }
 
-  // 活跃待办单独成段：续接靠 TODO，不能只在「记忆约定」里空口叮嘱，也不能混进「最近做什么」。
+  // 活躍待辦單獨成段：續接靠 TODO，不能只在「記憶約定」裡空口叮囑，也不能混進「最近做什麼」。
   const stuck = Array.isArray(briefing.stuck) ? briefing.stuck : [];
   if (stuck.length > 0) {
-    lines.push("### 活跃待办");
+    lines.push("### 活躍待辦");
     for (const todo of stuck) {
-      const status = todo.status === "in_progress" ? "进行中" : (todo.status === "blocked" ? "阻塞" : "待办");
+      const status = todo.status === "in_progress" ? "進行中" : (todo.status === "blocked" ? "阻塞" : "待辦");
       lines.push("- [" + status + "] " + todo.title);
     }
     lines.push("");
   }
 
   if (memories.length > 0) {
-    lines.push("### Core 记忆");
+    lines.push("### Core 記憶");
     for (const m of memories) {
       const tag = m.type ? "[" + m.type + "] " : "";
       lines.push("- " + tag + m.title);
@@ -42,11 +42,11 @@ export function buildInjectionContext(brain) {
     lines.push("");
   }
 
-  lines.push("### 项目记忆约定");
-  lines.push("- 只对跨会话仍为真的决策、约束、架构事实或教训调用 `project_memory_add`；标题写成站立事实句，不要写成 v1.2.0 patch / 验收清单。");
-  lines.push("- 工具可能拒绝，不要把 changelog / 本次改了哪些文件再写一遍。正文保持 2–4 句。");
-  lines.push("- 进行中的工作用 `project_todo_add` / `project_todo_update` / `project_todo_done` 跟踪，续接依赖 TODO，而不是把会话流水账塞进记忆。");
-  lines.push("- 项目结构明显变化后调用 `project_rescan`；需要理解最近代码变化时调用 `project_diff`（默认 dry-run）。");
+  lines.push("### 專案記憶約定");
+  lines.push("- 只對跨會話仍為真的決策、約束、架構事實或教訓呼叫 `project_memory_add`；標題寫成站立事實句，不要寫成 v1.2.0 patch / 驗收清單。");
+  lines.push("- 工具可能拒絕，不要把 changelog / 本次改了哪些檔案再寫一遍。正文保持 2–4 句。");
+  lines.push("- 進行中的工作用 `project_todo_add` / `project_todo_update` / `project_todo_done` 跟蹤，續接依賴 TODO，而不是把會話流水賬塞進記憶。");
+  lines.push("- 專案結構明顯變化後呼叫 `project_rescan`；需要理解最近程式碼變化時呼叫 `project_diff`（預設 dry-run）。");
 
   return lines.join("\n");
 }

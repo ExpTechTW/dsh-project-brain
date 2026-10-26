@@ -1,4 +1,4 @@
-// test auto-rebuild 模拟
+// test auto-rebuild 模擬
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";

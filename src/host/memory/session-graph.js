@@ -4,8 +4,8 @@ const FILE_SHOW = 5;
 const THIN_AFTER = 40;
 const KEEP_RECENT = 20;
 const DETAIL_MAX_CHARS = 900;
-const NO_SUMMARY_LABEL = "代码有变更（无摘要）";
-const INIT_LABEL = "项目初始化";
+const NO_SUMMARY_LABEL = "程式碼有變更（無摘要）";
+const INIT_LABEL = "專案初始化";
 
 function qualifiedSummary(text) {
   const summary = String(text || "").trim();
@@ -27,15 +27,15 @@ function firstSentence(text) {
   return first.replace(/\u0001(\d+)\u0001/g, (_, i) => versions[Number(i)] || "");
 }
 
-// 以版本号开头 **且** 是补丁/发布语气的标题才算「不值得成为主干节点」。
-// 只看开头是不是数字会误杀「2.0 版本规划」「3.2 数据层重构」这类正常标题。
-const PATCH_TONE = /(?:\bpatch\b|\bhotfix\b|\brelease[-\s]?(?:fix|notes)?\b|\bfix(?:es|ed)?\b|修复|补丁|发版|验收|改动说明|变更说明)/i;
+// 以版本號開頭 **且** 是補丁/釋出語氣的標題才算「不值得成為主幹節點」。
+// 只看開頭是不是數字會誤殺「2.0 版本規劃」「3.2 資料層重構」這類正常標題。
+const PATCH_TONE = /(?:\bpatch\b|\bhotfix\b|\brelease[-\s]?(?:fix|notes)?\b|\bfix(?:es|ed)?\b|修復|補丁|發版|驗收|改動說明|變更說明)/i;
 function isVersionLedTitle(text) {
   const t = String(text || "").trim();
   const m = t.match(/^v?\d+(?:\.\d+)+\b(.*)$/i);
   if (!m) return false;
   const rest = String(m[1] || "").trim();
-  // 「v0.4.13」后面什么都没有，等于没信息量，同样不进主干
+  // 「v0.4.13」後面什麼都沒有，等於沒資訊量，同樣不進主幹
   if (!rest) return true;
   return PATCH_TONE.test(rest);
 }
@@ -61,29 +61,29 @@ function normalizeText(text) {
   return String(text || "").replace(/\s+/g, " ").trim();
 }
 
-// 节点展开区是纯文本，不渲染 markdown。记忆正文常带 ## / ** / ` / 列表 / 链接，
-// 原样丢出来既难读又像坏掉了，这里统一剥成人话。
+// 節點展開區是純文本，不渲染 markdown。記憶正文常帶 ## / ** / ` / 列表 / 連結，
+// 原樣丟出來既難讀又像壞掉了，這裡統一剝成人話。
 function stripMarkdown(text) {
   let out = String(text || "");
-  out = out.replace(/```[\s\S]*?```/g, " ");           // 代码块
-  out = out.replace(/^\s{0,3}#{1,6}\s+/gm, "");         // 标题
+  out = out.replace(/```[\s\S]*?```/g, " ");           // 程式碼塊
+  out = out.replace(/^\s{0,3}#{1,6}\s+/gm, "");         // 標題
   out = out.replace(/^\s{0,3}>\s?/gm, "");              // 引用
-  out = out.replace(/^\s{0,3}(?:[-*+]|\d+[.)])\s+/gm, ""); // 列表项
-  out = out.replace(/^\s{0,3}(?:[-*_]\s*){3,}$/gm, " ");   // 分割线
-  out = out.replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1");   // 图片
-  out = out.replace(/\[([^\]]+)\]\([^)]*\)/g, "$1");    // 链接
-  out = out.replace(/`+([^`]*)`+/g, "$1");              // 行内代码
+  out = out.replace(/^\s{0,3}(?:[-*+]|\d+[.)])\s+/gm, ""); // 列表項
+  out = out.replace(/^\s{0,3}(?:[-*_]\s*){3,}$/gm, " ");   // 分割線
+  out = out.replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1");   // 圖片
+  out = out.replace(/\[([^\]]+)\]\([^)]*\)/g, "$1");    // 連結
+  out = out.replace(/`+([^`]*)`+/g, "$1");              // 行內程式碼
   out = out.replace(/\*\*([^*]+)\*\*/g, "$1");          // 加粗
-  out = out.replace(/(?<![\w*])\*([^*\n]+)\*(?!\w)/g, "$1"); // 斜体
+  out = out.replace(/(?<![\w*])\*([^*\n]+)\*(?!\w)/g, "$1"); // 斜體
   out = out.replace(/(?<![\w_])__([^_]+)__(?![\w_])/g, "$1");
-  out = out.replace(/~~([^~]+)~~/g, "$1");              // 删除线
+  out = out.replace(/~~([^~]+)~~/g, "$1");              // 刪除線
   return normalizeText(out);
 }
 
 function clipDetail(text, limit) {
   const raw = normalizeText(text);
   if (raw.length <= limit) return raw;
-  // 优先在句末断开，断不了再硬切；无论哪种都显式给省略号，不要装作说完了
+  // 優先在句末斷開，斷不了再硬切；無論哪種都顯式給省略號，不要裝作說完了
   const head = raw.slice(0, limit);
   const lastStop = Math.max(
     head.lastIndexOf("。"), head.lastIndexOf("！"), head.lastIndexOf("？"),
@@ -155,15 +155,15 @@ function parseTodoId(event) {
 function isTodoDone(event) {
   if (event && event.todoStatus === "done") return true;
   if (/status=done/.test(String((event && event.detail) || ""))) return true;
-  return /^完成待办/.test(String((event && event.title) || ""));
+  return /^完成待辦/.test(String((event && event.title) || ""));
 }
 
 function displayTitle(event) {
   let title = String((event && event.title) || "").trim();
-  title = title.replace(/^新增记忆\[[^\]]+\]：/, "");
-  title = title.replace(/^新增待办(?:\[[^\]]+\])?：/, "");
-  title = title.replace(/^完成待办(?:\[[^\]]+\])?：/, "");
-  title = title.replace(/^更新待办\[[^\]]+\]：/, "");
+  title = title.replace(/^新增記憶\[[^\]]+\]：/, "");
+  title = title.replace(/^新增待辦(?:\[[^\]]+\])?：/, "");
+  title = title.replace(/^完成待辦(?:\[[^\]]+\])?：/, "");
+  title = title.replace(/^更新待辦\[[^\]]+\]：/, "");
   return title.trim();
 }
 
@@ -178,9 +178,9 @@ function sessionKey(event) {
   return "";
 }
 
-// init/rescan 的 detail 写的是 `files=1975`（文件**数量**），summarizer 写的才是
-// `files=src/a.js,src/b.js`（文件列表）。同一个 key 两种含义，必须靠形态区分，
-// 否则计数会被当成文件名画到节点上。
+// init/rescan 的 detail 寫的是 `files=1975`（檔案**數量**），summarizer 寫的才是
+// `files=src/a.js,src/b.js`（檔案列表）。同一個 key 兩種含義，必須靠形態區分，
+// 否則計數會被當成檔名畫到節點上。
 function looksLikePath(token) {
   const t = String(token || "").trim();
   if (!t || /^\d+$/.test(t)) return false;
@@ -254,7 +254,7 @@ export function buildSessionGraph(brain) {
       const id = parseTodoId(event);
       if (id) {
         g.todoIds.add(id);
-        // 「开 → 关」才是因果。把 done 事件也算成起点，会在重复标记完成时连出假边。
+        // 「開 → 關」才是因果。把 done 事件也算成起點，會在重複標記完成時連出假邊。
         if (isTodoDone(event)) g.todoDone.add(id);
         else g.todoOpened.add(id);
       }
@@ -268,7 +268,7 @@ export function buildSessionGraph(brain) {
         g.titles.push(memTitle);
       }
     }
-    // 「未记住」要原样带进节点标题：用户需要看到的就是那句没记成的原话。
+    // 「未記住」要原樣帶進節點標題：使用者需要看到的就是那句沒記成的原話。
     if (event.eventType === "memory_rejected") {
       const rejectedTitle = displayTitle(event);
       if (rejectedTitle) g.titles.push(rejectedTitle);
@@ -299,7 +299,7 @@ export function buildSessionGraph(brain) {
       if (content) g.details.push({ title: String(m.title || ""), content, occurredAt: at });
     }
     if (at && (!g.occurredAt || at < g.occurredAt)) g.occurredAt = at;
-    // 排序统一用「桶内最后一次活动」，否则纯记忆桶按最早时间排、timeline 桶按最晚时间排，先后会错。
+    // 排序統一用「桶內最後一次活動」，否則純記憶桶按最早時間排、timeline 桶按最晚時間排，先後會錯。
     if (at > (g.latestAt || 0)) g.latestAt = at;
   }
 
@@ -310,7 +310,7 @@ export function buildSessionGraph(brain) {
     const summary = g.summaries.length ? g.summaries[0].text : "";
     const hasFiles = g.files.length > 0;
     const hasTodo = g.todoIds.size > 0;
-    // init 是主干的起点锚：它确实发生过，且是「这条开发线从哪开始」的答案。
+    // init 是主幹的起點錨：它確實發生過，且是「這條開發線從哪開始」的答案。
     const trunkOk = Boolean(summary || hasFiles || hasTodo || g.hasMemory || g.sessionId === "init");
     if (!trunkOk) {
       collapsedEmptyCount += 1;
@@ -360,7 +360,7 @@ export function buildSessionGraph(brain) {
 
   const byId = new Map(trunk.map((n) => [n.id, n]));
 
-  // TODO 闭环：某个 todo 在 a 打开、在之后的 b 关闭。用倒排索引代替全对遍历。
+  // TODO 閉環：某個 todo 在 a 開啟、在之後的 b 關閉。用倒排索引代替全對遍歷。
   const doneAt = new Map();
   trunk.forEach((node, index) => {
     for (const todoId of node._todoDone) {
@@ -376,7 +376,7 @@ export function buildSessionGraph(brain) {
     }
   });
 
-  // 架构重扫：只与紧邻的上一个主干节点比对（spec §8.2），不跨节点连远边。
+  // 架構重掃：只與緊鄰的上一個主幹節點比對（spec §8.2），不跨節點連遠邊。
   for (let i = 1; i < trunk.length; i++) {
     const prev = trunk[i - 1];
     const cur = trunk[i];
@@ -417,9 +417,9 @@ export function buildSessionGraph(brain) {
     n.important = Boolean(n.important || evidenceEnds.has(n.id));
   }
 
-  // 抽稀：只在节点确实过多时生效，且永远保底显示最近 KEEP_RECENT 个。
-  // 旧实现会把所有 important=false 的节点一次性藏光，历史上只有记忆没有摘要的项目
-  // 默认视图会几乎空白，反而更像"断开"。
+  // 抽稀：只在節點確實過多時生效，且永遠保底顯示最近 KEEP_RECENT 個。
+  // 舊實現會把所有 important=false 的節點一次性藏光，歷史上只有記憶沒有摘要的專案
+  // 預設檢視會幾乎空白，反而更像"斷開"。
   let hiddenCount = 0;
   if (trunk.length > THIN_AFTER) {
     const keepFrom = Math.max(0, trunk.length - KEEP_RECENT);

@@ -4,7 +4,7 @@
 //   node brain-memory.mjs timeline <workspace> add <title> <eventType>
 //   node brain-memory.mjs memory <workspace> add <type> <title> <content>
 //   node brain-memory.mjs list <workspace> [timeline|memory]
-// 数据格式（每行一个 JSON）：
+// 資料格式（每行一個 JSON）：
 //   timeline: { id, title, eventType, occurredAt, detail? }
 //   memory:   { id, type, title, content, importance, createdAt }
 

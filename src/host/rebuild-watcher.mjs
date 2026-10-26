@@ -1,18 +1,18 @@
-// rebuild-watcher.mjs - v0.3.17 独立 watcher 子进程
+// rebuild-watcher.mjs - v0.3.17 獨立 watcher 子程序
 //
-// 目的：脱离 Cordis 抽象，用纯 Node.js fs.watch + setInterval 监听 .project-brain/ 变化，
-//      触发 build.js 重 build lib/client.js + lib/index.js。
+// 目的：脫離 Cordis 抽象，用純 Node.js fs.watch + setInterval 監聽 .project-brain/ 變化，
+//      觸發 build.js 重 build lib/client.js + lib/index.js。
 //
-// 由 src/host/rebuild.js 通过 child_process.spawn 启动。
-// 写 log 到 .project-brain/.dsh-project-brain-watcher.log（绕过 ctx.logger，DSH Desktop 可观测）。
+// 由 src/host/rebuild.js 通過 child_process.spawn 啟動。
+// 寫 log 到 .project-brain/.dsh-project-brain-watcher.log（繞過 ctx.logger，DSH Desktop 可觀測）。
 //
-// 设计要点：
-// 1. node:fs.watch + 2 秒兜底轮询（Windows 上 fs.watch 对追加写入不可靠，对覆盖写入可靠；dream.js 用 writeJsonl 是覆盖写入）
-// 2. 启动时扫所有已知 workspace（~/.dsh/storages/workspace.json）的 .project-brain/，
-//    之后 fs.watch 自动检测新 workspace 创建的 .project-brain/ 目录
-// 3. build 用 child_process.execFileSync 同步跑（避免 watcher 子进程被 build 抢占）
-// 4. 防 rebuild 风暴：1 秒 debounce
-// 5. SIGINT/SIGTERM 优雅退出
+// 設計要點：
+// 1. node:fs.watch + 2 秒兜底輪詢（Windows 上 fs.watch 對追加寫入不可靠，對覆蓋寫入可靠；dream.js 用 writeJsonl 是覆蓋寫入）
+// 2. 啟動時掃所有已知 workspace（~/.dsh/storages/workspace.json）的 .project-brain/，
+//    之後 fs.watch 自動檢測新 workspace 建立的 .project-brain/ 目錄
+// 3. build 用 child_process.execFileSync 同步跑（避免 watcher 子程序被 build 搶佔）
+// 4. 防 rebuild 風暴：1 秒 debounce
+// 5. SIGINT/SIGTERM 優雅退出
 
 import { watch, statSync, existsSync, readFileSync, appendFileSync, mkdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -35,8 +35,8 @@ const POLL_INTERVAL_MS = 2000;
 const REBUILD_DEBOUNCE_MS = 1000;
 const LOG_FILE = join(PLUGIN_DIR, ".project-brain", ".dsh-project-brain-watcher.log");
 
-// argv 解析：rebuild.js spawn watcher 时会传 --workspace=<path1> --workspace=<path2> ...
-//   避免子进程依赖 USERPROFILE / workspace.json 解析（DSH 子进程环境变量可能为空）
+// argv 解析：rebuild.js spawn watcher 時會傳 --workspace=<path1> --workspace=<path2> ...
+//   避免子程序依賴 USERPROFILE / workspace.json 解析（DSH 子程序環境變數可能為空）
 function parseWorkspacesFromArgv() {
   const out = [];
   for (const a of process.argv.slice(2)) {
@@ -48,12 +48,12 @@ function parseWorkspacesFromArgv() {
   return out;
 }
 
-// ─── 日志 ───
+// ─── 日誌 ───
 function log(level, msg) {
   const ts = new Date().toISOString();
   const line = "[" + ts + "] [" + level + "] " + msg + "\n";
   try {
-    // 同步追加写 log 文件（不依赖 cordis logger）
+    // 同步追加寫 log 檔案（不依賴 cordis logger）
     const dir = dirname(LOG_FILE);
     if (!existsSync(dir)) {
       try { mkdirSync(dir, { recursive: true }); } catch (e) {}
@@ -62,11 +62,11 @@ function log(level, msg) {
   } catch (e) {
     try { process.stderr.write("[watcher-fallback] " + line); } catch (e2) {}
   }
-  // 也输出到 stderr，DSH Desktop 调试时方便看
+  // 也輸出到 stderr，DSH Desktop 除錯時方便看
   try { (level === "error" ? process.stderr : process.stdout).write(line); } catch (e) {}
 }
 
-// ─── 解析 workspace 路径（扫 ~/.dsh/storages/workspace.json）───
+// ─── 解析 workspace 路徑（掃 ~/.dsh/storages/workspace.json）───
 function readDSHWorkspaces() {
   // Windows: %USERPROFILE%\.dsh\storages\workspace.json
   // Mac/Linux: ~/.dsh/storages/workspace.json
@@ -84,7 +84,7 @@ function readDSHWorkspaces() {
     for (const w of list) {
       const p = w && (w.path || (w.rootPath));
       if (typeof p === "string" && p.trim()) {
-        // 过滤 DSH Desktop 安装路径
+        // 過濾 DSH Desktop 安裝路徑
         if (/[\\/]Programs[\\/]DSH Desktop$/i.test(p)) continue;
         if (/[\\/]DSH Desktop\.app/.test(p)) continue;
         paths.push(p);
@@ -97,11 +97,11 @@ function readDSHWorkspaces() {
   }
 }
 
-// ─── 监测 .project-brain/ 变化 ───
-const watchedDirs = new Set();      // 已注册的 fs.watch handle
+// ─── 監測 .project-brain/ 變化 ───
+const watchedDirs = new Set();      // 已註冊的 fs.watch handle
 let lastMtimeSnapshot = new Map();  // path -> mtimeMs
 let rebuildTimer = null;           // debounce timer
-let rebuildCount = 0;              // 累计 rebuild 次数
+let rebuildCount = 0;              // 累計 rebuild 次數
 let startTime = Date.now();
 
 function statMtimeMs(p) {
@@ -150,7 +150,7 @@ function runBuild() {
   }
 }
 
-// fs.watch 回调（事件驱动）
+// fs.watch 回撥（事件驅動）
 function watchDir(dir) {
   if (watchedDirs.has(dir)) return;
   watchedDirs.add(dir);
@@ -162,11 +162,11 @@ function watchDir(dir) {
     lastMtimeSnapshot.set(p, statMtimeMs(p));
   }
 
-  // fs.watch 监听整个 .project-brain/ 目录（recursive: true 在 Windows 上有限制，这里不用）
+  // fs.watch 監聽整個 .project-brain/ 目錄（recursive: true 在 Windows 上有限制，這裡不用）
   try {
     const watcher = watch(dir, { persistent: true }, (eventType, filename) => {
       if (!filename) return;
-      // 只关心我们关心的 4 个文件
+      // 只關心我們關心的 4 個檔案
       if (!WATCH_FILES.includes(filename)) return;
       const p = join(dir, filename);
       const cur = statMtimeMs(p);
@@ -185,13 +185,13 @@ function watchDir(dir) {
 }
 
 function unwatchDir(dir) {
-  // fs.watch 没有官方 close API 在 event callback 里直接拿 handle；这里是 best-effort
-  // watchedDirs Set 用于追踪，新一轮 scanUnseenWorkspaces 会跳过已有的
+  // fs.watch 沒有官方 close API 在 event callback 裡直接拿 handle；這裡是 best-effort
+  // watchedDirs Set 用於追蹤，新一輪 scanUnseenWorkspaces 會跳過已有的
   watchedDirs.delete(dir);
   log("info", "unwatched dir: " + dir);
 }
 
-// ─── 兜底：每 2 秒轮询所有 watch 文件的 mtime ───
+// ─── 兜底：每 2 秒輪詢所有 watch 檔案的 mtime ───
 let lastPollSnapshot = new Map();
 function pollLoop() {
   for (const dir of watchedDirs) {
@@ -208,7 +208,7 @@ function pollLoop() {
   }
 }
 
-// ─── 周期扫描：发现新增 workspace 自动 watch ───
+// ─── 週期掃描：發現新增 workspace 自動 watch ───
 function scanUnseenWorkspaces() {
   const wsPaths = readDSHWorkspaces();
   for (const p of wsPaths) {
@@ -219,7 +219,7 @@ function scanUnseenWorkspaces() {
   }
 }
 
-// ─── 启动 ───
+// ─── 啟動 ───
 function main() {
   log("info", "=== dsh-project-brain rebuild-watcher v0.3.17 starting ===");
   log("info", "PLUGIN_DIR = " + PLUGIN_DIR);
@@ -229,7 +229,7 @@ function main() {
   log("info", "node version = " + process.version);
   log("info", "argv = " + JSON.stringify(process.argv.slice(2)));
 
-  // 0. argv 优先：spawn 时显式传入 --workspace=<path>（最稳，避免依赖 USERPROFILE / workspace.json）
+  // 0. argv 優先：spawn 時顯式傳入 --workspace=<path>（最穩，避免依賴 USERPROFILE / workspace.json）
   const argvWs = parseWorkspacesFromArgv();
   if (argvWs.length > 0) {
     log("info", "workspaces from argv: " + argvWs.length + " (skip workspace.json scan)");
@@ -240,25 +240,25 @@ function main() {
     }
   }
 
-  // 1. fallback：扫描已知 workspace（DSH storages）
+  // 1. fallback：掃描已知 workspace（DSH storages）
   if (watchedDirs.size === 0) {
     log("info", "no workspaces from argv, falling back to workspace.json scan");
     scanUnseenWorkspaces();
   }
 
-  // 2. 启动兜底轮询（2 秒一次）
+  // 2. 啟動兜底輪詢（2 秒一次）
   setInterval(pollLoop, POLL_INTERVAL_MS);
   log("info", "fallback polling started (" + POLL_INTERVAL_MS + "ms interval)");
 
-  // 3. 周期扫描新 workspace（30 秒一次）
+  // 3. 週期掃描新 workspace（30 秒一次）
   setInterval(scanUnseenWorkspaces, 30000);
   log("info", "workspace scan loop started (30s interval)");
 
-  // 4. 立即触发一次 rebuild（确保 watcher 启动后第一次 sidebar 刷新）
+  // 4. 立即觸發一次 rebuild（確保 watcher 啟動後第一次 sidebar 重新整理）
   log("info", "initial rebuild trigger (after 3s grace period)");
   setTimeout(() => triggerRebuild("watcher startup"), 3000);
 
-  // 5. 优雅退出
+  // 5. 優雅退出
   process.on("SIGINT", () => {
     log("info", "SIGINT received, exiting...");
     process.exit(0);

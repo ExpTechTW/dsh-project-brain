@@ -2,20 +2,20 @@
 Date: 2026-09-21
 
 ## Intent
-第一屏给「自己隔天回来接着干」看懂项目、看见最近在做什么。不要再塞入口路径和「为什么」独立行。
+第一屏給「自己隔天回來接著幹」看懂專案、看見最近在做什麼。不要再塞入口路徑和「為什麼」獨立行。
 
 ## Constraints
-- 打开 Tab 不再调 LLM；purpose 复用 `architecture.overview.purpose`。
-- 人第一屏与 Agent 字段同源；Agent 仍保留「从哪改」。
-- Durable Core 不推翻；挤占时先截 recentWork。
-- changelog 体裁 summary 不当「最近做什么」。
+- 開啟 Tab 不再調 LLM；purpose 複用 `architecture.overview.purpose`。
+- 人第一屏與 Agent 欄位同源；Agent 仍保留「從哪改」。
+- Durable Core 不推翻；擠佔時先截 recentWork。
+- changelog 體裁 summary 不當「最近做什麼」。
 
 ## Key decisions
-- Decision: 人第一屏只留「这是什么」「最近做什么」。Reason: 四句标签失败、内容错位。Alternative considered: 修文案仍保留四句。
-- Decision: 「这是什么」只用 LLM purpose（否则 description / 项目名）。Reason: `名字 · CI · Monorepo` 不是项目定义。Alternative considered: 每次打开再调 LLM。
-- Decision: 「最近做什么」= 上次合格 session_summary；否则仅 `in_progress` 待办并加「进行中」前缀。pending-only 不当近况。Reason: 已完成/排队待办不是最近工作。Alternative considered: 退回任何活跃 TODO。
-- Decision: 「从哪改」只进注入，且丢掉 npm script 入口。Reason: 人第一屏不靠它动手；Agent 仍需要文件锚点。Alternative considered: 人屏也留、或注入也删。
+- Decision: 人第一屏只留「這是什麼」「最近做什麼」。Reason: 四句標籤失敗、內容錯位。Alternative considered: 修文案仍保留四句。
+- Decision: 「這是什麼」只用 LLM purpose（否則 description / 專案名）。Reason: `名字 · CI · Monorepo` 不是專案定義。Alternative considered: 每次開啟再調 LLM。
+- Decision: 「最近做什麼」= 上次合格 session_summary；否則僅 `in_progress` 待辦並加「進行中」字首。pending-only 不當近況。Reason: 已完成/排隊待辦不是最近工作。Alternative considered: 退回任何活躍 TODO。
+- Decision: 「從哪改」只進注入，且丟掉 npm script 入口。Reason: 人第一屏不靠它動手；Agent 仍需要檔案錨點。Alternative considered: 人屏也留、或注入也刪。
 
 ## Out of scope
-- 为 briefing 新增独立 LLM 调用。
-- 手动钉里程碑。
+- 為 briefing 新增獨立 LLM 呼叫。
+- 手動釘里程碑。

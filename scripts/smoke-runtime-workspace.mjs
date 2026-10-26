@@ -105,9 +105,9 @@ assert.equal(initialized.value.preview.architecture.nodes.length > 0, true);
 
 const missing = await rpcHandler("preview", { sessionId: "session-missing" });
 assert.equal(missing.ok, false);
-// v1.1.x-fix: host 端把不在 DSH schemastery 白名单的 code 降级到 "internal"，
-//   原 code 进 details.originalCode。这样 Connection RPC schema 校验通过，错误对象能
-//   真正回传到 client（而不是被 .catch 当 throw 兜底）。
+// v1.1.x-fix: host 端把不在 DSH schemastery 白名單的 code 降級到 "internal"，
+//   原 code 進 details.originalCode。這樣 Connection RPC schema 校驗通過，錯誤物件能
+//   真正回傳到 client（而不是被 .catch 當 throw 兜底）。
 assert.equal(missing.error.code, "internal");
 assert.equal(missing.error.details.originalCode, "WORKSPACE_NOT_FOUND");
 
@@ -137,7 +137,7 @@ assert.equal(toolCalls.at(-1).name, "project_continue");
 
 const forbidden = await rpcHandler("action", { sessionId: "session-new", action: "project_memory_add" });
 assert.equal(forbidden.ok, false);
-// 同上：code 降级到 internal，details.originalCode 保留 ACTION_NOT_ALLOWED
+// 同上：code 降級到 internal，details.originalCode 保留 ACTION_NOT_ALLOWED
 assert.equal(forbidden.error.code, "internal");
 assert.equal(forbidden.error.details.originalCode, "ACTION_NOT_ALLOWED");
 

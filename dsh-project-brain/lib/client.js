@@ -147,156 +147,156 @@
       const NS = "dsh-project-brain";
       const dicts = {
         "zh-CN": {
-          "tab.label": "\u9879\u76EE",
-          "header.section": "\u9879\u76EE",
-          "header.untitled": "\u672A\u547D\u540D\u9879\u76EE",
+          "tab.label": "\u5C08\u6848",
+          "header.section": "\u5C08\u6848",
+          "header.untitled": "\u672A\u547D\u540D\u5C08\u6848",
           "header.lastUpdate": "\u4E0A\u6B21\u66F4\u65B0",
-          "phase.title": "\u5F53\u524D\u9636\u6BB5",
-          "phase.empty": "\u6682\u65E0\u8FDB\u884C\u4E2D\u4EFB\u52A1",
-          "todo.title": "\u5F85\u529E",
-          "todo.empty": "\u6682\u65E0\u5F85\u529E",
-          "activity.title": "\u6700\u8FD1\u6D3B\u52A8",
-          "activity.empty": "\u6682\u65E0\u6D3B\u52A8",
-          "memories.title": "\u9879\u76EE\u8BB0\u5FC6",
-          "stats.title": "\u6982\u89C8",
-          "stats.pending": "\u5F85\u529E",
+          "phase.title": "\u7576\u524D\u968E\u6BB5",
+          "phase.empty": "\u66AB\u7121\u9032\u884C\u4E2D\u4EFB\u52D9",
+          "todo.title": "\u5F85\u8FA6",
+          "todo.empty": "\u66AB\u7121\u5F85\u8FA6",
+          "activity.title": "\u6700\u8FD1\u6D3B\u52D5",
+          "activity.empty": "\u66AB\u7121\u6D3B\u52D5",
+          "memories.title": "\u5C08\u6848\u8A18\u61B6",
+          "stats.title": "\u6982\u89BD",
+          "stats.pending": "\u5F85\u8FA6",
           "stats.done": "\u5DF2\u5B8C\u6210",
-          "stats.decisions": "\u51B3\u7B56",
-          "codegraph.title": "\u4EE3\u7801\u7ED3\u6784",
-          "codegraph.files": "\u6587\u4EF6",
-          "codegraph.edges": "\u4F9D\u8D56\u8FB9",
-          "codegraph.langs": "\u8BED\u8A00",
-          "codegraph.noLang": "\u6682\u65E0\u8BED\u8A00\u6570\u636E",
-          "arch.title": "\u9879\u76EE\u67B6\u6784\u56FE",
-          "arch.modules": "\u6A21\u5757",
-          "arch.edges": "\u4F9D\u8D56",
+          "stats.decisions": "\u6C7A\u7B56",
+          "codegraph.title": "\u7A0B\u5F0F\u78BC\u7D50\u69CB",
+          "codegraph.files": "\u6A94\u6848",
+          "codegraph.edges": "\u4F9D\u8CF4\u908A",
+          "codegraph.langs": "\u8A9E\u8A00",
+          "codegraph.noLang": "\u66AB\u7121\u8A9E\u8A00\u8CC7\u6599",
+          "arch.title": "\u5C08\u6848\u67B6\u69CB\u5716",
+          "arch.modules": "\u6A21\u7D44",
+          "arch.edges": "\u4F9D\u8CF4",
           "arch.local": "\u672C\u5730\u5206\u6790",
-          "arch.hybrid": "DSH LLM \u589E\u5F3A",
-          "arch.select": "\u70B9\u4E00\u5C42\u770B\u540C\u5C42\u6A21\u5757\uFF0C\u70B9\u6A21\u5757\u770B\u804C\u8D23",
-          "arch.flows": "\u8FD0\u884C\u8DEF\u5F84",
-          "arch.flowEmpty": "\u8FD8\u6CA1\u6709\u53EF\u5C55\u793A\u7684\u8FD0\u884C\u8DEF\u5F84",
-          "arch.peersHint": "\u540C\u5C42\u6A21\u5757\u662F\u5E76\u5217\u5173\u7CFB\uFF0C\u6CA1\u6709\u56FA\u5B9A\u5148\u540E\u987A\u5E8F",
-          "arch.inspectLayer": "\u5C42\u8BE6\u60C5",
-          "arch.inspectModule": "\u6A21\u5757\u8BE6\u60C5",
-          "arch.related": "\u534F\u4F5C",
-          "arch.runtime": "\u8FD0\u884C\u8DEF\u5F84",
-          "arch.empty": "\u8FD8\u6CA1\u6709\u53EF\u5C55\u793A\u7684\u5206\u5C42",
-          "arch.purpose": "\u9879\u76EE\u5B9A\u4F4D",
-          "arch.risks": "\u67B6\u6784\u63D0\u793A",
-          "arch.style": "\u67B6\u6784\u98CE\u683C",
-          "arch.layers": "\u67B6\u6784\u5206\u5C42",
-          "arch.components": "\u6838\u5FC3\u7EC4\u4EF6",
-          "arch.keyFiles": "\u5173\u952E\u6587\u4EF6\u5BFC\u89C8",
-          "arch.start": "\u5FEB\u901F\u719F\u6089\u8DEF\u5F84",
-          "arch.highlights": "\u8BBE\u8BA1\u8981\u70B9",
-          "arch.trigger": "\u89E6\u53D1",
-          "arch.outcome": "\u7ED3\u679C",
-          "arch.llmFallback": "DSH LLM \u672A\u5B8C\u6210\uFF0C\u5F53\u524D\u5C55\u793A\u672C\u5730\u63A8\u65AD",
-          "arch.actionRetry": "\u91CD\u65B0\u626B\u63CF",
-          "arch.actionChat": "\u5148\u53D1\u4E00\u6761\u6D88\u606F",
-          "arch.actionSettings": "\u68C0\u67E5 DSH \u6A21\u578B\u8DEF\u7531",
-          "arch.retrying": "\u91CD\u65B0\u626B\u63CF\u4E2D\u2026",
+          "arch.hybrid": "DSH LLM \u589E\u5F37",
+          "arch.select": "\u9EDE\u4E00\u5C64\u770B\u540C\u5C64\u6A21\u7D44\uFF0C\u9EDE\u6A21\u7D44\u770B\u8077\u8CAC",
+          "arch.flows": "\u57F7\u884C\u8DEF\u5F91",
+          "arch.flowEmpty": "\u9084\u6C92\u6709\u53EF\u5C55\u793A\u7684\u57F7\u884C\u8DEF\u5F91",
+          "arch.peersHint": "\u540C\u5C64\u6A21\u7D44\u662F\u4E26\u5217\u95DC\u4FC2\uFF0C\u6C92\u6709\u56FA\u5B9A\u5148\u5F8C\u9806\u5E8F",
+          "arch.inspectLayer": "\u5C64\u8A73\u60C5",
+          "arch.inspectModule": "\u6A21\u7D44\u8A73\u60C5",
+          "arch.related": "\u5354\u4F5C",
+          "arch.runtime": "\u57F7\u884C\u8DEF\u5F91",
+          "arch.empty": "\u9084\u6C92\u6709\u53EF\u5C55\u793A\u7684\u5206\u5C64",
+          "arch.purpose": "\u5C08\u6848\u5B9A\u4F4D",
+          "arch.risks": "\u67B6\u69CB\u63D0\u793A",
+          "arch.style": "\u67B6\u69CB\u98A8\u683C",
+          "arch.layers": "\u67B6\u69CB\u5206\u5C64",
+          "arch.components": "\u6838\u5FC3\u5143\u4EF6",
+          "arch.keyFiles": "\u95DC\u9375\u6A94\u6848\u5C0E\u89BD",
+          "arch.start": "\u5FEB\u901F\u719F\u6089\u8DEF\u5F91",
+          "arch.highlights": "\u8A2D\u8A08\u8981\u9EDE",
+          "arch.trigger": "\u89F8\u767C",
+          "arch.outcome": "\u7D50\u679C",
+          "arch.llmFallback": "DSH LLM \u672A\u5B8C\u6210\uFF0C\u7576\u524D\u5C55\u793A\u672C\u5730\u63A8\u65B7",
+          "arch.actionRetry": "\u91CD\u65B0\u6383\u63CF",
+          "arch.actionChat": "\u5148\u767C\u4E00\u689D\u8A0A\u606F",
+          "arch.actionSettings": "\u6AA2\u67E5 DSH \u6A21\u578B\u8DEF\u7531",
+          "arch.retrying": "\u91CD\u65B0\u6383\u63CF\u4E2D\u2026",
           "arch.retryDone": "\u5DF2\u91CD\u65B0\u751F\u6210",
-          "arch.retryFailed": "\u91CD\u65B0\u626B\u63CF\u5931\u8D25",
-          "actions.continue": "\u7EE7\u7EED\u4E0A\u6B21\u5F00\u53D1",
-          "actions.openDashboard": "\u6253\u5F00 Dashboard",
+          "arch.retryFailed": "\u91CD\u65B0\u6383\u63CF\u5931\u6557",
+          "actions.continue": "\u7E7C\u7E8C\u4E0A\u6B21\u958B\u767C",
+          "actions.openDashboard": "\u958B\u555F Dashboard",
           "actions.closeDashboard": "\u6536\u8D77 Dashboard",
-          "actions.copied": "\u5DF2\u590D\u5236\uFF0C\u7C98\u8D34\u5230\u8F93\u5165\u6846\u53D1\u9001",
-          "actions.copyFail": "\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u8F93\u5165",
-          "todostrip.title": "\u6D3B\u8DC3\u5F85\u529E",
-          "todostrip.viewAll": "\u67E5\u770B\u5168\u90E8",
+          "actions.copied": "\u5DF2\u8907\u88FD\uFF0C\u8CBC\u4E0A\u5230\u8F38\u5165\u6846\u50B3\u9001",
+          "actions.copyFail": "\u8907\u88FD\u5931\u6557\uFF0C\u8ACB\u624B\u52D5\u8F38\u5165",
+          "todostrip.title": "\u6D3B\u8E8D\u5F85\u8FA6",
+          "todostrip.viewAll": "\u6AA2\u8996\u5168\u90E8",
           "todostrip.close": "\u6536\u8D77",
-          "todostrip.empty": "\u{1F389} \u6682\u65E0\u6D3B\u8DC3\u5F85\u529E",
-          "onboarding.title": "\u9879\u76EE\u5927\u8111\u672A\u542F\u52A8",
-          "onboarding.body": "\u542F\u52A8\u540E\u4F1A\u626B\u63CF\u9879\u76EE\u3001\u751F\u6210\u67B6\u6784\uFF0C\u5E76\u5728\u4E4B\u540E\u7684\u5BF9\u8BDD\u91CC\u81EA\u52A8\u5E26\u4E0A\u8BB0\u5FC6\u548C\u5F85\u529E\u3002\u5FEB\u901F\u4E0A\u624B\uFF0C\u8D8A\u7528\u8D8A\u61C2\uFF0C\u957F\u671F\u628A\u9879\u76EE\u505A\u4E0B\u53BB\u3002",
-          "onboarding.cta": "\u542F\u52A8\u9879\u76EE\u5927\u8111",
-          "onboarding.f1.title": "\u8BFB\u61C2\u9879\u76EE",
-          "onboarding.f1.desc": "\u8BC6\u522B\u6280\u672F\u6808\u4E0E\u5165\u53E3\uFF0C\u751F\u6210\u5206\u5C42\u67B6\u6784",
-          "onboarding.f2.title": "\u8DE8\u4F1A\u8BDD\u8BB0\u4F4F",
-          "onboarding.f2.desc": "\u65B0\u5BF9\u8BDD\u81EA\u52A8\u5E26\u4E0A\u9879\u76EE\u4E0A\u4E0B\u6587\uFF0C\u4E0D\u7528\u91CD\u590D\u4ECB\u7ECD",
-          "onboarding.f3.title": "\u63A5\u7740\u5F80\u4E0B\u505A",
-          "onboarding.f3.desc": "\u5F85\u529E\u548C\u8BB0\u5FC6\u7559\u5728\u9879\u76EE\u91CC\uFF0C\u56DE\u6765\u5C31\u80FD\u7EED\u4E0A",
-          "onboarding.more": "\u8BB0\u5FC6\u6C89\u6DC0\u3001Git \u5386\u53F2\u53EF\u5728\u542F\u52A8\u540E\u4F7F\u7528",
-          "onboarding.copyPrompt": "\u8BF7\u626B\u63CF\u672C\u9879\u76EE\uFF1A\u8C03\u7528 project_init \u5DE5\u5177\u751F\u6210\u9879\u76EE\u5927\u8111",
-          "onboarding.copied": "\u5DF2\u590D\u5236\u542F\u52A8\u6307\u4EE4\uFF0C\u7C98\u8D34\u53D1\u9001\u5373\u53EF",
-          "loading": "\u52A0\u8F7D\u4E2D\u2026",
+          "todostrip.empty": "\u{1F389} \u66AB\u7121\u6D3B\u8E8D\u5F85\u8FA6",
+          "onboarding.title": "\u5C08\u6848\u5927\u8166\u672A\u555F\u52D5",
+          "onboarding.body": "\u555F\u52D5\u5F8C\u6703\u6383\u63CF\u5C08\u6848\u3001\u751F\u6210\u67B6\u69CB\uFF0C\u4E26\u5728\u4E4B\u5F8C\u7684\u5C0D\u8A71\u88E1\u81EA\u52D5\u5E36\u4E0A\u8A18\u61B6\u548C\u5F85\u8FA6\u3002\u5FEB\u901F\u4E0A\u624B\uFF0C\u8D8A\u7528\u8D8A\u61C2\uFF0C\u9577\u671F\u628A\u5C08\u6848\u505A\u4E0B\u53BB\u3002",
+          "onboarding.cta": "\u555F\u52D5\u5C08\u6848\u5927\u8166",
+          "onboarding.f1.title": "\u8B80\u61C2\u5C08\u6848",
+          "onboarding.f1.desc": "\u8B58\u5225\u6280\u8853\u68E7\u8207\u5165\u53E3\uFF0C\u751F\u6210\u5206\u5C64\u67B6\u69CB",
+          "onboarding.f2.title": "\u8DE8\u6703\u8A71\u8A18\u4F4F",
+          "onboarding.f2.desc": "\u65B0\u5C0D\u8A71\u81EA\u52D5\u5E36\u4E0A\u5C08\u6848\u4E0A\u4E0B\u6587\uFF0C\u4E0D\u7528\u91CD\u8907\u4ECB\u7D39",
+          "onboarding.f3.title": "\u63A5\u8457\u5F80\u4E0B\u505A",
+          "onboarding.f3.desc": "\u5F85\u8FA6\u548C\u8A18\u61B6\u7559\u5728\u5C08\u6848\u88E1\uFF0C\u56DE\u4F86\u5C31\u80FD\u7E8C\u4E0A",
+          "onboarding.more": "\u8A18\u61B6\u6C89\u6FB1\u3001Git \u6B77\u53F2\u53EF\u5728\u555F\u52D5\u5F8C\u4F7F\u7528",
+          "onboarding.copyPrompt": "\u8ACB\u6383\u63CF\u672C\u5C08\u6848\uFF1A\u547C\u53EB project_init \u5DE5\u5177\u751F\u6210\u5C08\u6848\u5927\u8166",
+          "onboarding.copied": "\u5DF2\u8907\u88FD\u555F\u52D5\u6307\u4EE4\uFF0C\u8CBC\u4E0A\u50B3\u9001\u5373\u53EF",
+          "loading": "\u8F09\u5165\u4E2D\u2026",
           "snapshot.label": "\u5FEB\u7167",
-          "snapshot.autoSync": "\u79BB\u7EBF\u5FEB\u7167\uFF1B\u8FDE\u63A5\u6062\u590D\u540E\u81EA\u52A8\u5207\u6362\u5B9E\u65F6\u6570\u636E",
-          "runtime.label": "\u5B9E\u65F6",
-          "runtime.synced": "\u6570\u636E\u6765\u81EA\u5F53\u524D Session workspace",
-          "time.justNow": "\u521A\u521A",
-          "time.minutesAgo": "{n} \u5206\u949F\u524D",
-          "time.hoursAgo": "{n} \u5C0F\u65F6\u524D",
+          "snapshot.autoSync": "\u96E2\u7DDA\u5FEB\u7167\uFF1B\u9023\u7DDA\u6062\u5FA9\u5F8C\u81EA\u52D5\u5207\u63DB\u5373\u6642\u8CC7\u6599",
+          "runtime.label": "\u5373\u6642",
+          "runtime.synced": "\u8CC7\u6599\u4F86\u81EA\u7576\u524D Session workspace",
+          "time.justNow": "\u525B\u525B",
+          "time.minutesAgo": "{n} \u5206\u9418\u524D",
+          "time.hoursAgo": "{n} \u5C0F\u6642\u524D",
           "time.daysAgo": "{n} \u5929\u524D",
-          "prio.urgent": "\u7D27\u6025",
+          "prio.urgent": "\u7DCA\u6025",
           "prio.high": "\u9AD8",
           "prio.medium": "\u4E2D",
           "prio.low": "\u4F4E",
-          "st.pending": "\u5F85\u529E",
-          "st.in_progress": "\u8FDB\u884C\u4E2D",
+          "st.pending": "\u5F85\u8FA6",
+          "st.in_progress": "\u9032\u884C\u4E2D",
           "st.blocked": "\u963B\u585E",
           "st.done": "\u5DF2\u5B8C\u6210",
           "st.cancelled": "\u5DF2\u53D6\u6D88",
-          "dash.title": "Dashboard \xB7 \u9879\u76EE\u5168\u666F",
-          "dash.tech": "\u6280\u672F\u6808",
+          "dash.title": "Dashboard \xB7 \u5C08\u6848\u5168\u666F",
+          "dash.tech": "\u6280\u8853\u68E7",
           "dash.devops": "\u4EA4\u4ED8",
-          "dash.entry": "\u5F00\u53D1\u5165\u53E3",
-          "dash.todo": "\u5F85\u529E\uFF08\u5168\u90E8\uFF09",
-          "dash.timeline": "\u65F6\u95F4\u7EBF",
-          "dash.memory": "\u9879\u76EE\u8BB0\u5FC6",
-          "dash.memory.core": "\u5F53\u524D Core\uFF08\u6BCF\u8F6E\u6CE8\u5165\uFF09",
+          "dash.entry": "\u958B\u767C\u5165\u53E3",
+          "dash.todo": "\u5F85\u8FA6\uFF08\u5168\u90E8\uFF09",
+          "dash.timeline": "\u6642\u9593\u7DDA",
+          "dash.memory": "\u5C08\u6848\u8A18\u61B6",
+          "dash.memory.core": "\u7576\u524D Core\uFF08\u6BCF\u8F2A\u6CE8\u5165\uFF09",
           "dash.memory.dormant": "\u4F11\u7720\uFF08\u4E0D\u6CE8\u5165\uFF0C\u53EF\u7528 project_ask\uFF09",
-          "dash.memory.dormantShow": "\u5C55\u5F00\u4F11\u7720\u8BB0\u5FC6",
-          "dash.memory.dormantHide": "\u6536\u8D77\u4F11\u7720\u8BB0\u5FC6",
-          "dash.memory.archived": "\u5DF2\u5F52\u6863\uFF08\u4E0D\u6CE8\u5165\u3001\u4E0D\u68C0\u7D22\uFF0C\u53EF\u6062\u590D\u6216\u6C38\u4E45\u5220\u9664\uFF09",
-          "dash.memory.archivedShow": "\u5C55\u5F00\u5DF2\u5F52\u6863",
-          "dash.memory.archivedHide": "\u6536\u8D77\u5DF2\u5F52\u6863",
-          "dash.tab.overview": "\u6982\u89C8",
-          "dash.tab.architecture": "\u67B6\u6784",
-          "dash.tab.work": "\u4EFB\u52A1\u52A8\u6001",
-          "dash.tab.knowledge": "\u9879\u76EE\u8BB0\u5FC6",
-          "dash.tab.git": "Git \u5386\u53F2",
-          "dash.tab.settings": "\u8BBE\u7F6E",
-          "settings.probe.embedding": "\u6D4B\u8BD5\u5411\u91CF\u8FDE\u901A",
-          "settings.probe.llm": "\u6D4B\u8BD5\u4F1A\u8BDD LLM",
-          "settings.probe.embeddingHint": "\u7528\u5F53\u524D\u8868\u5355\u503C\u8BF7\u6C42\u4E00\u6B21 embeddings\uFF0C\u4E0D\u5199 cache\u3002\u672A\u4FDD\u5B58\u7684\u4FEE\u6539\u4E5F\u4F1A\u7528\u4E8E\u672C\u6B21\u6D4B\u8BD5\u3002",
-          "settings.probe.llmHint": "\u63A2\u6D4B\u5F53\u524D DSH \u4F1A\u8BDD\u7684\u6A21\u578B\u8DEF\u7531\uFF0C\u4F1A\u8BDD\u6458\u8981\u548C\u67B6\u6784\u589E\u5F3A\u7528\u7684\u662F\u540C\u4E00\u6761 LLM\u3002",
-          "settings.probe.running": "\u6D4B\u8BD5\u4E2D\u2026",
-          "dash.snapshot": "\u6570\u636E\u5FEB\u7167 \xB7 {time}",
+          "dash.memory.dormantShow": "\u5C55\u958B\u4F11\u7720\u8A18\u61B6",
+          "dash.memory.dormantHide": "\u6536\u8D77\u4F11\u7720\u8A18\u61B6",
+          "dash.memory.archived": "\u5DF2\u6B78\u6A94\uFF08\u4E0D\u6CE8\u5165\u3001\u4E0D\u6AA2\u7D22\uFF0C\u53EF\u6062\u5FA9\u6216\u6C38\u4E45\u522A\u9664\uFF09",
+          "dash.memory.archivedShow": "\u5C55\u958B\u5DF2\u6B78\u6A94",
+          "dash.memory.archivedHide": "\u6536\u8D77\u5DF2\u6B78\u6A94",
+          "dash.tab.overview": "\u6982\u89BD",
+          "dash.tab.architecture": "\u67B6\u69CB",
+          "dash.tab.work": "\u4EFB\u52D9\u52D5\u614B",
+          "dash.tab.knowledge": "\u5C08\u6848\u8A18\u61B6",
+          "dash.tab.git": "Git \u6B77\u53F2",
+          "dash.tab.settings": "\u8A2D\u5B9A",
+          "settings.probe.embedding": "\u6E2C\u8A66\u5411\u91CF\u9023\u901A",
+          "settings.probe.llm": "\u6E2C\u8A66\u6703\u8A71 LLM",
+          "settings.probe.embeddingHint": "\u7528\u7576\u524D\u8868\u55AE\u503C\u8ACB\u6C42\u4E00\u6B21 embeddings\uFF0C\u4E0D\u5BEB cache\u3002\u672A\u5132\u5B58\u7684\u4FEE\u6539\u4E5F\u6703\u7528\u65BC\u672C\u6B21\u6E2C\u8A66\u3002",
+          "settings.probe.llmHint": "\u63A2\u6E2C\u7576\u524D DSH \u6703\u8A71\u7684\u6A21\u578B\u8DEF\u7531\uFF0C\u6703\u8A71\u6458\u8981\u548C\u67B6\u69CB\u589E\u5F37\u7528\u7684\u662F\u540C\u4E00\u689D LLM\u3002",
+          "settings.probe.running": "\u6E2C\u8A66\u4E2D\u2026",
+          "dash.snapshot": "\u8CC7\u6599\u5FEB\u7167 \xB7 {time}",
           "dash.none": "\uFF08\u7A7A\uFF09",
-          "briefing.what": "\u8FD9\u662F\u4EC0\u4E48",
-          "briefing.recent": "\u6700\u8FD1\u505A\u4EC0\u4E48",
-          "briefing.stale": "\u67B6\u6784\u53EF\u80FD\u8FC7\u671F\uFF0C\u5173\u952E\u6587\u4EF6\u6309\u626B\u63CF\u5165\u53E3\u964D\u7EA7\u3002",
-          "briefing.empty": "\uFF08\u6682\u65E0\uFF09",
-          "briefing.recent.empty": "\u8FD8\u6CA1\u6709\u4F1A\u8BDD\u6458\u8981",
-          "briefing.recent.outdated": "\u53EF\u80FD\u5DF2\u8FC7\u65F6",
-          "graph.title": "\u5F00\u53D1\u4E3B\u5E72",
-          "graph.empty": "\u8FD8\u6CA1\u6709\u53EF\u5C55\u793A\u7684\u4F1A\u8BDD\u8282\u70B9",
-          "graph.collapsed": "\u5DF2\u6298\u53E0 {n} \u6BB5\u65E0\u5B9E\u8D28\u4EA7\u51FA\u7684\u8BB0\u5F55",
-          "graph.expandAll": "\u5C55\u5F00\u5168\u90E8",
-          "graph.collapse": "\u6309\u91CD\u8981\u8282\u70B9\u663E\u793A",
+          "briefing.what": "\u9019\u662F\u4EC0\u9EBC",
+          "briefing.recent": "\u6700\u8FD1\u505A\u4EC0\u9EBC",
+          "briefing.stale": "\u67B6\u69CB\u53EF\u80FD\u904E\u671F\uFF0C\u95DC\u9375\u6A94\u6848\u6309\u6383\u63CF\u5165\u53E3\u964D\u7D1A\u3002",
+          "briefing.empty": "\uFF08\u66AB\u7121\uFF09",
+          "briefing.recent.empty": "\u9084\u6C92\u6709\u6703\u8A71\u6458\u8981",
+          "briefing.recent.outdated": "\u53EF\u80FD\u5DF2\u904E\u6642",
+          "graph.title": "\u958B\u767C\u4E3B\u5E79",
+          "graph.empty": "\u9084\u6C92\u6709\u53EF\u5C55\u793A\u7684\u6703\u8A71\u7BC0\u9EDE",
+          "graph.collapsed": "\u5DF2\u647A\u758A {n} \u6BB5\u7121\u5BE6\u8CEA\u7522\u51FA\u7684\u8A18\u9304",
+          "graph.expandAll": "\u5C55\u958B\u5168\u90E8",
+          "graph.collapse": "\u6309\u91CD\u8981\u7BC0\u9EDE\u986F\u793A",
           "graph.edge.todo": "TODO",
           "graph.edge.supersede": "\u66FF\u4EE3",
-          "graph.edge.architecture": "\u67B6\u6784",
-          "graph.filesMore": "+{n} \u4E2A\u6587\u4EF6",
-          "suggest.title": "\u{1F4A1} \u4F60\u4ECA\u5929\u53EF\u80FD\u60F3\u63A8\u8FDB",
-          "suggest.llmTag": "AI \u63A8\u8350",
-          "suggest.localTag": "\u672C\u5730\u63A8\u8350",
-          "suggest.fallbackTag": "AI \u6682\u4E0D\u53EF\u7528",
-          "suggest.loading": "\u5206\u6790\u4ECA\u5929\u7684\u7EED\u63A5\u5EFA\u8BAE\u2026",
+          "graph.edge.architecture": "\u67B6\u69CB",
+          "graph.filesMore": "+{n} \u500B\u6A94\u6848",
+          "suggest.title": "\u{1F4A1} \u4F60\u4ECA\u5929\u53EF\u80FD\u60F3\u63A8\u9032",
+          "suggest.llmTag": "AI \u63A8\u85A6",
+          "suggest.localTag": "\u672C\u5730\u63A8\u85A6",
+          "suggest.fallbackTag": "AI \u66AB\u4E0D\u53EF\u7528",
+          "suggest.loading": "\u5206\u6790\u4ECA\u5929\u7684\u7E8C\u63A5\u5EFA\u8B70\u2026",
           "suggest.confidence": "\u7F6E\u4FE1\u5EA6 {pct}%",
           "suggest.refresh": "\u91CD\u65B0\u751F\u6210",
           "suggest.dismiss": "\u6536\u8D77",
-          "suggest.empty": "\u6682\u65E0\u6D3B\u8DC3\u4EFB\u52A1\u548C\u8FD1\u671F\u8BB0\u5FC6\uFF0C\u53EF\u7528 project_todo_add \u89C4\u5212\u4E0B\u4E00\u6B65",
-          "suggest.reasonLabel": "\u4F9D\u636E",
-          "mem.type.decision": "\u51B3\u7B56",
+          "suggest.empty": "\u66AB\u7121\u6D3B\u8E8D\u4EFB\u52D9\u548C\u8FD1\u671F\u8A18\u61B6\uFF0C\u53EF\u7528 project_todo_add \u898F\u5283\u4E0B\u4E00\u6B65",
+          "suggest.reasonLabel": "\u4F9D\u64DA",
+          "mem.type.decision": "\u6C7A\u7B56",
           "mem.type.bug": "Bug",
-          "mem.type.lesson": "\u6559\u8BAD",
+          "mem.type.lesson": "\u6559\u8A13",
           "mem.type.requirement": "\u9700\u6C42",
-          "mem.type.architecture": "\u67B6\u6784",
-          "mem.type.change": "\u53D8\u66F4",
-          "mem.type.context": "\u5907\u6CE8",
-          "mem.type.issue": "\u95EE\u9898",
+          "mem.type.architecture": "\u67B6\u69CB",
+          "mem.type.change": "\u8B8A\u66F4",
+          "mem.type.context": "\u5099\u8A3B",
+          "mem.type.issue": "\u554F\u984C",
           "mem.type.preference": "\u504F\u597D"
         },
         "en-US": {
@@ -633,7 +633,7 @@
       }
       function readRpcResult(resp) {
         if (!resp || resp.ok !== true) {
-          throw new Error(resp && resp.error && resp.error.message || "\u8BF7\u6C42\u5931\u8D25");
+          throw new Error(resp && resp.error && resp.error.message || "\u8ACB\u6C42\u5931\u6557");
         }
         const value = resp.value && typeof resp.value === "object" ? resp.value : {};
         const result = value.result && typeof value.result === "object" ? value.result : null;
@@ -684,15 +684,15 @@
           try {
             const resp = await callRpc("export.openFolder", { folderPath });
             if (!resp || !resp.ok) {
-              throw new Error(resp && resp.error && resp.error.message || "\u65E0\u6CD5\u6253\u5F00\u6587\u4EF6\u5939");
+              throw new Error(resp && resp.error && resp.error.message || "\u7121\u6CD5\u958B\u555F\u8CC7\u6599\u593E");
             }
-            showToast("info", "\u5DF2\u5C1D\u8BD5\u6253\u5F00\u6587\u4EF6\u5939\uFF1A" + folderPath, 3e3);
+            showToast("info", "\u5DF2\u5617\u8A66\u958B\u555F\u8CC7\u6599\u593E\uFF1A" + folderPath, 3e3);
           } catch (e) {
             if (typeof navigator !== "undefined" && navigator.clipboard) {
               navigator.clipboard.writeText(folderPath).catch(() => {
               });
             }
-            showToast("error", "\u6253\u5F00\u6587\u4EF6\u5939\u5931\u8D25\uFF0C\u8DEF\u5F84\u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F\uFF1A" + folderPath, 6e3);
+            showToast("error", "\u958B\u555F\u8CC7\u6599\u593E\u5931\u6557\uFF0C\u8DEF\u5F91\u5DF2\u8907\u88FD\u5230\u526A\u8CBC\u7C3F\uFF1A" + folderPath, 6e3);
           }
         }
         function sizeFormat(bytes) {
@@ -728,9 +728,9 @@
             const openFolderPath = dirPath || defaultDir;
             let toastText;
             if (fileName) {
-              toastText = "\u5DF2\u5BFC\u51FA " + fileName + "\uFF08" + sizeFormat(result.sizeBytes) + "\uFF09" + (copyPath ? "\n\u8DEF\u5F84\uFF1A" + copyPath : "\n\uFF08\u8DEF\u5F84\u672A\u8FD4\u56DE\uFF0C\u8BF7\u5728 dist-backups/ \u76EE\u5F55\u67E5\u627E\uFF09");
+              toastText = "\u5DF2\u532F\u51FA " + fileName + "\uFF08" + sizeFormat(result.sizeBytes) + "\uFF09" + (copyPath ? "\n\u8DEF\u5F91\uFF1A" + copyPath : "\n\uFF08\u8DEF\u5F91\u672A\u8FD4\u56DE\uFF0C\u8ACB\u5728 dist-backups/ \u76EE\u9304\u67E5\u8A62\uFF09");
             } else {
-              toastText = "\u5BFC\u51FA\u6210\u529F\uFF08\u672A\u62FF\u5230\u6587\u4EF6\u540D\uFF0C\u8BF7\u5728 dist-backups/ \u76EE\u5F55\u67E5\u627E\uFF09" + (openFolderPath ? "\n\u76EE\u5F55\uFF1A" + openFolderPath : "");
+              toastText = "\u532F\u51FA\u6210\u529F\uFF08\u672A\u62FF\u5230\u6A94\u540D\uFF0C\u8ACB\u5728 dist-backups/ \u76EE\u9304\u67E5\u8A62\uFF09" + (openFolderPath ? "\n\u76EE\u9304\uFF1A" + openFolderPath : "");
             }
             showToast("success", toastText, 8e3);
             setToastActions({
@@ -738,7 +738,7 @@
               openFolderPath
             });
           } catch (e) {
-            showToast("error", "\u5BFC\u51FA\u5931\u8D25\uFF1A" + String(e && e.message || e));
+            showToast("error", "\u532F\u51FA\u5931\u6557\uFF1A" + String(e && e.message || e));
           } finally {
             setBusy(false);
           }
@@ -752,8 +752,8 @@
           try {
             const resp = await callRpc("import.pickBundle", {});
             if (!resp || !resp.ok) {
-              const msg = resp && resp.error && resp.error.message || "\u7CFB\u7EDF\u6587\u4EF6\u9009\u62E9\u5668\u4E0D\u53EF\u7528";
-              setImportPick((prev) => Object.assign({}, prev || { path: "" }, { error: msg + "\u3002\u8BF7\u7C98\u8D34 zip \u7684\u5B8C\u6574\u8DEF\u5F84\u3002" }));
+              const msg = resp && resp.error && resp.error.message || "\u7CFB\u7D71\u6A94\u6848\u9078\u64C7\u5668\u4E0D\u53EF\u7528";
+              setImportPick((prev) => Object.assign({}, prev || { path: "" }, { error: msg + "\u3002\u8ACB\u8CBC\u4E0A zip \u7684\u5B8C\u6574\u8DEF\u5F91\u3002" }));
               return;
             }
             const value = resp && resp.value || {};
@@ -763,7 +763,7 @@
             }
           } catch (e) {
             setImportPick((prev) => Object.assign({}, prev || { path: "" }, {
-              error: "\u65E0\u6CD5\u6253\u5F00\u6587\u4EF6\u9009\u62E9\u5668\uFF1A" + String(e && e.message || e) + "\u3002\u8BF7\u7C98\u8D34 zip \u7684\u5B8C\u6574\u8DEF\u5F84\u3002"
+              error: "\u7121\u6CD5\u958B\u555F\u6A94\u6848\u9078\u64C7\u5668\uFF1A" + String(e && e.message || e) + "\u3002\u8ACB\u8CBC\u4E0A zip \u7684\u5B8C\u6574\u8DEF\u5F91\u3002"
             }));
           }
         }
@@ -771,7 +771,7 @@
           if (busy || !importPick) return;
           const bundlePath = String(importPick.path || "").trim();
           if (!bundlePath) {
-            setImportPick(Object.assign({}, importPick, { error: "\u8BF7\u586B\u5199 bundle zip \u7684\u5B8C\u6574\u8DEF\u5F84" }));
+            setImportPick(Object.assign({}, importPick, { error: "\u8ACB\u586B\u5BEB bundle zip \u7684\u5B8C\u6574\u8DEF\u5F91" }));
             return;
           }
           setBusy(true);
@@ -781,7 +781,7 @@
             setImportPick(null);
             setPreviewState({ kind: "import", data: result });
           } catch (e) {
-            setImportPick(Object.assign({}, importPick, { error: "\u9884\u89C8\u5931\u8D25\uFF1A" + String(e && e.message || e) }));
+            setImportPick(Object.assign({}, importPick, { error: "\u9810\u89BD\u5931\u6557\uFF1A" + String(e && e.message || e) }));
           } finally {
             setBusy(false);
           }
@@ -792,11 +792,11 @@
           const confirmToken = d.confirmToken;
           const bundlePath = d.bundlePath;
           if (!confirmToken) {
-            showToast("error", "\u7F3A\u5C11 confirmToken\uFF0C\u8BF7\u91CD\u65B0\u9884\u89C8");
+            showToast("error", "\u7F3A\u5C11 confirmToken\uFF0C\u8ACB\u91CD\u65B0\u9810\u89BD");
             return;
           }
           if (!bundlePath) {
-            showToast("error", "\u7F3A\u5C11 bundle \u8DEF\u5F84\uFF0C\u8BF7\u91CD\u65B0\u9884\u89C8");
+            showToast("error", "\u7F3A\u5C11 bundle \u8DEF\u5F91\uFF0C\u8ACB\u91CD\u65B0\u9810\u89BD");
             return;
           }
           setBusy(true);
@@ -805,10 +805,10 @@
             const result = readRpcResult(resp);
             setPreviewState(null);
             notifyPreviewChanged();
-            const extra = result.rescanError ? " \u8111\u5DF2\u5199\u5165\uFF0C\u4F46\u81EA\u52A8\u91CD\u626B\u5931\u8D25\uFF0C\u53EF\u624B\u52A8\u70B9\u300C\u91CD\u65B0\u626B\u63CF\u300D\u3002" : result.backupPath ? " \u65E7\u8111\u5DF2\u5907\u4EFD\u3002" : "";
-            showToast("success", "\u5DF2\u6062\u590D\u3002" + extra);
+            const extra = result.rescanError ? " \u8166\u5DF2\u5BEB\u5165\uFF0C\u4F46\u81EA\u52D5\u91CD\u6383\u5931\u6557\uFF0C\u53EF\u624B\u52D5\u9EDE\u300C\u91CD\u65B0\u6383\u63CF\u300D\u3002" : result.backupPath ? " \u820A\u8166\u5DF2\u5099\u4EFD\u3002" : "";
+            showToast("success", "\u5DF2\u6062\u5FA9\u3002" + extra);
           } catch (e) {
-            showToast("error", "\u5BFC\u5165\u5931\u8D25\uFF1A" + String(e && e.message || e));
+            showToast("error", "\u532F\u5165\u5931\u6557\uFF1A" + String(e && e.message || e));
           } finally {
             setBusy(false);
           }
@@ -821,12 +821,12 @@
             const value = readRpcResult(resp);
             const backups = value && value.backups || [];
             if (backups.length === 0) {
-              showToast("info", "\u5F53\u524D\u9879\u76EE\u6CA1\u6709\u672C\u5730\u5907\u4EFD");
+              showToast("info", "\u7576\u524D\u5C08\u6848\u6C92\u6709\u672C\u5730\u5099\u4EFD");
             } else {
               setBackupList(backups);
             }
           } catch (e) {
-            showToast("error", "\u83B7\u53D6\u5907\u4EFD\u5217\u8868\u5931\u8D25\uFF1A" + String(e && e.message || e));
+            showToast("error", "\u7372\u53D6\u5099\u4EFD\u5217\u8868\u5931\u6557\uFF1A" + String(e && e.message || e));
           } finally {
             setBusy(false);
           }
@@ -840,7 +840,7 @@
             setBackupList(null);
             setPreviewState({ kind: "rollback", data: result, backup });
           } catch (e) {
-            showToast("error", "\u9884\u89C8\u5931\u8D25\uFF1A" + String(e && e.message || e));
+            showToast("error", "\u9810\u89BD\u5931\u6557\uFF1A" + String(e && e.message || e));
           } finally {
             setBusy(false);
           }
@@ -851,7 +851,7 @@
           const confirmToken = d.confirmToken;
           const backupTimestamp = d.backupTimestamp || d.sourceBackupTs || d.sourceBackup && d.sourceBackup.ts;
           if (!confirmToken || !backupTimestamp) {
-            showToast("error", "\u7F3A\u5C11 confirmToken\uFF0C\u8BF7\u91CD\u65B0\u9009\u62E9");
+            showToast("error", "\u7F3A\u5C11 confirmToken\uFF0C\u8ACB\u91CD\u65B0\u9078\u64C7");
             return;
           }
           setBusy(true);
@@ -860,9 +860,9 @@
             readRpcResult(resp);
             setPreviewState(null);
             notifyPreviewChanged();
-            showToast("success", "\u5DF2\u56DE\u6EDA\u5230 " + backupTimestamp);
+            showToast("success", "\u5DF2\u56DE\u6EFE\u5230 " + backupTimestamp);
           } catch (e) {
-            showToast("error", "\u56DE\u6EDA\u5931\u8D25\uFF1A" + String(e && e.message || e));
+            showToast("error", "\u56DE\u6EFE\u5931\u6557\uFF1A" + String(e && e.message || e));
           } finally {
             setBusy(false);
           }
@@ -912,9 +912,9 @@
             style: { display: "flex", gap: "6px", flexShrink: 0, marginLeft: "auto" },
             "data-brain-action-bar": "1"
           },
-          renderButton("\u{1F4BE}", "\u5907\u4EFD", handleExport, "export", { title: "\u5BFC\u51FA\u5F53\u524D\u8111\u5230 zip \u6587\u4EF6" }),
-          renderButton("\u{1F4E5}", "\u6062\u590D", handleImportPick, "import", { title: "\u4ECE zip \u6587\u4EF6\u6062\u590D\u8111\uFF08\u8986\u76D6\u5F53\u524D\uFF09" }),
-          renderButton("\u21A9\uFE0F", "\u56DE\u6EDA", handleRollbackOpen, "rollback", { title: "\u4ECE\u672C\u5730\u5386\u53F2\u5907\u4EFD\u56DE\u6EDA" })
+          renderButton("\u{1F4BE}", "\u5099\u4EFD", handleExport, "export", { title: "\u532F\u51FA\u7576\u524D\u8166\u5230 zip \u6A94\u6848" }),
+          renderButton("\u{1F4E5}", "\u6062\u5FA9", handleImportPick, "import", { title: "\u5F9E zip \u6A94\u6848\u6062\u5FA9\u8166\uFF08\u8986\u84CB\u7576\u524D\uFF09" }),
+          renderButton("\u21A9\uFE0F", "\u56DE\u6EFE", handleRollbackOpen, "rollback", { title: "\u5F9E\u672C\u5730\u6B77\u53F2\u5099\u4EFD\u56DE\u6EFE" })
         );
         return React.createElement(
           "section",
@@ -935,7 +935,7 @@
             React.createElement("span", null, "\u{1F552}"),
             React.createElement("span", null, `${t("header.lastUpdate")} \xB7 ${formatRelativeTime(p.lastUpdateAt, Date.now(), data._localeCode)}`)
           ) : null,
-          // ─── Dialogs（同一组件内挂载，状态由 useState 管理） ───
+          // ─── Dialogs（同一組件內掛載，狀態由 useState 管理） ───
           previewState ? renderPreviewDialog(previewState, { onCancel: () => setPreviewState(null), onConfirm: previewState.kind === "import" ? handleImportConfirm : handleRollbackConfirm, busy }) : null,
           importPick ? renderImportPathDialog(importPick, {
             onCancel: () => setImportPick(null),
@@ -990,11 +990,11 @@
           React.createElement(
             "div",
             { style: cardStyle, "data-brain-dialog": "import-path" },
-            React.createElement("h2", { style: { margin: "0 0 8px", fontSize: "16px", fontWeight: "600" } }, "\u4ECE bundle \u6062\u590D"),
+            React.createElement("h2", { style: { margin: "0 0 8px", fontSize: "16px", fontWeight: "600" } }, "\u5F9E bundle \u6062\u5FA9"),
             React.createElement(
               "p",
               { style: { margin: "0 0 12px", fontSize: "12px", lineHeight: "1.5", color: "var(--dsw-alias-label-secondary)" } },
-              "\u9009\u62E9\u6216\u7C98\u8D34\u5BFC\u51FA\u7684 zip \u5B8C\u6574\u8DEF\u5F84\u3002\u6062\u590D\u4F1A\u8986\u76D6\u5F53\u524D\u8111\uFF0C\u4E0B\u4E00\u6B65\u4F1A\u5148\u7ED9\u4F60\u9884\u89C8\u518D\u786E\u8BA4\u3002"
+              "\u9078\u64C7\u6216\u8CBC\u4E0A\u532F\u51FA\u7684 zip \u5B8C\u6574\u8DEF\u5F91\u3002\u6062\u5FA9\u6703\u8986\u84CB\u7576\u524D\u8166\uFF0C\u4E0B\u4E00\u6B65\u6703\u5148\u7D66\u4F60\u9810\u89BD\u518D\u78BA\u8A8D\u3002"
             ),
             React.createElement(
               "div",
@@ -1002,7 +1002,7 @@
               React.createElement("input", {
                 type: "text",
                 value: state.path || "",
-                placeholder: "\u7C98\u8D34\u5BFC\u51FA\u7684 zip \u5B8C\u6574\u8DEF\u5F84",
+                placeholder: "\u8CBC\u4E0A\u532F\u51FA\u7684 zip \u5B8C\u6574\u8DEF\u5F91",
                 disabled: busy,
                 onChange: (e) => onChange(e.target.value),
                 onKeyDown: (e) => {
@@ -1029,7 +1029,7 @@
                   borderColor: "var(--dsw-alias-border-l1)",
                   flexShrink: 0
                 })
-              }, "\u6D4F\u89C8\u2026")
+              }, "\u700F\u89BD\u2026")
             ),
             state.error ? React.createElement("div", {
               style: { marginTop: "10px", fontSize: "12px", color: "var(--dsw-alias-state-error-primary)", lineHeight: "1.45" }
@@ -1048,7 +1048,7 @@
                 onClick: onPreview,
                 disabled: busy,
                 style: Object.assign({}, btnBase, { background: "var(--dsw-alias-brand-primary)", color: "var(--dsw-alias-bg-base)" })
-              }, busy ? "\u9884\u89C8\u4E2D\u2026" : "\u9884\u89C8\u5F71\u54CD")
+              }, busy ? "\u9810\u89BD\u4E2D\u2026" : "\u9810\u89BD\u5F71\u97FF")
             )
           )
         );
@@ -1114,7 +1114,7 @@
           onClick: onConfirm,
           disabled: busy || !(data && data.confirmToken),
           style: Object.assign({}, btnBase, { background: "var(--dsw-alias-state-warn-primary)", color: "var(--dsw-alias-bg-base)" })
-        }, busy ? "\u5904\u7406\u4E2D\u2026" : "\u8986\u76D6\u5E76\u6062\u590D");
+        }, busy ? "\u8655\u7406\u4E2D\u2026" : "\u8986\u84CB\u4E26\u6062\u5FA9");
         const footerStyle = { display: "flex", gap: "8px", justifyContent: "flex-end", marginTop: "20px" };
         let title, fields, warning;
         const countOf = function() {
@@ -1150,32 +1150,32 @@
             data.manifest && data.manifest.sourceProject && data.manifest.sourceProject.rootPath,
             data.bundlePath
           );
-          title = "\u786E\u8BA4\u4ECE bundle \u6062\u590D\u8111";
+          title = "\u78BA\u8A8D\u5F9E bundle \u6062\u5FA9\u8166";
           fields = [
-            fieldRow("bundle \u6765\u6E90", sourceRoot || "\uFF08\u672A\u77E5\uFF09"),
-            fieldRow("\u5F53\u524D\u8111", currentExists ? currentMem + " \u8BB0\u5FC6 / " + currentTodos + " \u5F85\u529E / " + currentTimeline + " timeline" : "\uFF08\u65E0\uFF09"),
-            fieldRow("\u5373\u5C06\u6062\u590D", incomingMem + " \u8BB0\u5FC6 / " + incomingTodos + " \u5F85\u529E / " + incomingTimeline + " timeline"),
-            fieldRow("\u65E7\u8111\u5C06\u5907\u4EFD\u5230", backupTo || "\uFF08\u65E0\u9700\uFF0C\u65E0\u8111\uFF09"),
-            fieldRow("rootPath \u6539\u5199", (rootFrom || "\uFF08\u7A7A\uFF09") + " \u2192 " + (rootTo || "\uFF08\u7A7A\uFF09"))
+            fieldRow("bundle \u4F86\u6E90", sourceRoot || "\uFF08\u672A\u77E5\uFF09"),
+            fieldRow("\u7576\u524D\u8166", currentExists ? currentMem + " \u8A18\u61B6 / " + currentTodos + " \u5F85\u8FA6 / " + currentTimeline + " timeline" : "\uFF08\u7121\uFF09"),
+            fieldRow("\u5373\u5C07\u6062\u5FA9", incomingMem + " \u8A18\u61B6 / " + incomingTodos + " \u5F85\u8FA6 / " + incomingTimeline + " timeline"),
+            fieldRow("\u820A\u8166\u5C07\u5099\u4EFD\u5230", backupTo || "\uFF08\u7121\u9700\uFF0C\u7121\u8166\uFF09"),
+            fieldRow("rootPath \u6539\u5BEB", (rootFrom || "\uFF08\u7A7A\uFF09") + " \u2192 " + (rootTo || "\uFF08\u7A7A\uFF09"))
           ];
-          warning = textOf(data.warning) || (currentExists ? "\u26A0\uFE0F \u8FD9\u4F1A\u8986\u76D6\u5F53\u524D\u8111\u3002\u65E7\u8111\u4F1A\u81EA\u52A8\u5907\u4EFD\u5230\u4E0A\u65B9\u7684\u8DEF\u5F84\uFF0C\u53EF\u7EE7\u7EED\u56DE\u6EDA\u3002" : "\u8FD9\u662F\u8BE5\u9879\u76EE\u9996\u6B21\u5BFC\u5165\uFF0C\u65E0\u65E7\u8111\u53EF\u5907\u4EFD\u3002");
+          warning = textOf(data.warning) || (currentExists ? "\u26A0\uFE0F \u9019\u6703\u8986\u84CB\u7576\u524D\u8166\u3002\u820A\u8166\u6703\u81EA\u52D5\u5099\u4EFD\u5230\u4E0A\u65B9\u7684\u8DEF\u5F91\uFF0C\u53EF\u7E7C\u7E8C\u56DE\u6EFE\u3002" : "\u9019\u662F\u8A72\u5C08\u6848\u9996\u6B21\u532F\u5165\uFF0C\u7121\u820A\u8166\u53EF\u5099\u4EFD\u3002");
         } else if (kind === "rollback") {
           const sb = data.sourceBackup || {};
           const cb = data.currentBrain || {};
           const currentExists = !!(cb.exists || data.currentBrainExists);
-          const sourceName = textOf(sb.backupName, data.sourceBackupName, "\uFF08\u672A\u77E5\u5907\u4EFD\uFF09");
+          const sourceName = textOf(sb.backupName, data.sourceBackupName, "\uFF08\u672A\u77E5\u5099\u4EFD\uFF09");
           const sourceTs = textOf(sb.ts, data.sourceBackupTs, data.backupTimestamp);
-          title = "\u786E\u8BA4\u56DE\u6EDA\u5230\u5907\u4EFD";
+          title = "\u78BA\u8A8D\u56DE\u6EFE\u5230\u5099\u4EFD";
           fields = [
-            fieldRow("\u76EE\u6807\u5907\u4EFD", sourceName + (sourceTs ? "\uFF08" + sourceTs + "\uFF09" : "")),
+            fieldRow("\u76EE\u6A19\u5099\u4EFD", sourceName + (sourceTs ? "\uFF08" + sourceTs + "\uFF09" : "")),
             fieldRow(
-              "\u5907\u4EFD\u5185\u5BB9",
-              countOf(sb.memCount, data.sourceMemCount) + " \u8BB0\u5FC6 / " + countOf(sb.todoCount, data.sourceTodoCount) + " \u5F85\u529E / " + countOf(sb.timelineCount, data.sourceTimelineCount) + " timeline"
+              "\u5099\u4EFD\u5167\u5BB9",
+              countOf(sb.memCount, data.sourceMemCount) + " \u8A18\u61B6 / " + countOf(sb.todoCount, data.sourceTodoCount) + " \u5F85\u8FA6 / " + countOf(sb.timelineCount, data.sourceTimelineCount) + " timeline"
             ),
-            fieldRow("\u5F53\u524D\u8111", currentExists ? countOf(cb.memCount, data.currentMemories) + " \u8BB0\u5FC6 / " + countOf(cb.todoCount, data.currentTodos) + " \u5F85\u529E / " + countOf(cb.timelineCount, data.currentTimeline) + " timeline" : "\uFF08\u65E0\uFF09"),
-            fieldRow("\u5F53\u524D\u8111\u5148\u5907\u4EFD\u5230", textOf(data.willBackupCurrentTo) || "\uFF08\u65E0\u9700\uFF09")
+            fieldRow("\u7576\u524D\u8166", currentExists ? countOf(cb.memCount, data.currentMemories) + " \u8A18\u61B6 / " + countOf(cb.todoCount, data.currentTodos) + " \u5F85\u8FA6 / " + countOf(cb.timelineCount, data.currentTimeline) + " timeline" : "\uFF08\u7121\uFF09"),
+            fieldRow("\u7576\u524D\u8166\u5148\u5099\u4EFD\u5230", textOf(data.willBackupCurrentTo) || "\uFF08\u7121\u9700\uFF09")
           ];
-          warning = textOf(data.warning) || (currentExists ? "\u26A0\uFE0F \u5F53\u524D\u8111\u4F1A\u81EA\u52A8\u5907\u4EFD\u5230\u4E0A\u65B9\u7684\u8DEF\u5F84\uFF0C\u53EF\u7EE7\u7EED\u56DE\u6EDA\u3002" : "\u5F53\u524D\u8111\u4E0D\u5B58\u5728\uFF0C\u56DE\u6EDA\u540E\u4F1A\u6210\u4E3A\u5F53\u524D\u8111\u3002");
+          warning = textOf(data.warning) || (currentExists ? "\u26A0\uFE0F \u7576\u524D\u8166\u6703\u81EA\u52D5\u5099\u4EFD\u5230\u4E0A\u65B9\u7684\u8DEF\u5F91\uFF0C\u53EF\u7E7C\u7E8C\u56DE\u6EFE\u3002" : "\u7576\u524D\u8166\u4E0D\u5B58\u5728\uFF0C\u56DE\u6EFE\u5F8C\u6703\u6210\u70BA\u7576\u524D\u8166\u3002");
         }
         return React.createElement(
           "div",
@@ -1241,8 +1241,8 @@
           React.createElement(
             "div",
             { style: cardStyle, "data-brain-dialog": "backup-list" },
-            React.createElement("h2", { style: { margin: "0 0 4px", fontSize: "16px", fontWeight: "600" } }, "\u9009\u62E9\u8981\u56DE\u6EDA\u5230\u7684\u5907\u4EFD"),
-            React.createElement("div", { style: { margin: "0 0 12px", fontSize: "11px", color: "var(--dsw-alias-label-secondary)" } }, "\u5171 " + backups.length + " \u4E2A\u5907\u4EFD\uFF08\u6309\u65F6\u95F4\u5012\u5E8F\uFF09"),
+            React.createElement("h2", { style: { margin: "0 0 4px", fontSize: "16px", fontWeight: "600" } }, "\u9078\u64C7\u8981\u56DE\u6EFE\u5230\u7684\u5099\u4EFD"),
+            React.createElement("div", { style: { margin: "0 0 12px", fontSize: "11px", color: "var(--dsw-alias-label-secondary)" } }, "\u5171 " + backups.length + " \u500B\u5099\u4EFD\uFF08\u6309\u6642\u9593\u5012\u5E8F\uFF09"),
             backups.map((b, i) => {
               const sizeKB = Math.max(1, Math.round((b.sizeBytes || 0) / 1024));
               const subtitle = (b.projectExists ? "" : "\uFF08\u4E0D\u5B8C\u6574\uFF09") + ` \xB7 ${sizeKB} KB \xB7 ${b.memCount} mem / ${b.todoCount} todo`;
@@ -1289,7 +1289,7 @@
             navigator.clipboard.writeText(toast.copyPath).then(
               () => {
                 const el = document.querySelector("[data-brain-toast-copy-hint]");
-                if (el) el.textContent = "\u2713 \u5DF2\u590D\u5236\u8DEF\u5F84";
+                if (el) el.textContent = "\u2713 \u5DF2\u8907\u88FD\u8DEF\u5F91";
               },
               () => onDismiss()
             );
@@ -1303,7 +1303,7 @@
             "data-brain-toast-copy-hint": "1",
             style: { fontSize: "10px", opacity: 0.85, marginTop: "4px", fontWeight: "400" }
           },
-          toast.copyPath ? "\u70B9\u51FB\u590D\u5236\u8DEF\u5F84" : toast.openFolderPath ? "\u5DF2\u5C1D\u8BD5\u5728\u6587\u4EF6\u7BA1\u7406\u5668\u4E2D\u6253\u5F00" : ""
+          toast.copyPath ? "\u9EDE\u9078\u8907\u88FD\u8DEF\u5F91" : toast.openFolderPath ? "\u5DF2\u5617\u8A66\u5728\u6A94\u6848\u7BA1\u7406\u5668\u4E2D\u958B\u555F" : ""
         );
         const openFolderBtn = toast.openFolderPath ? React.createElement("button", {
           type: "button",
@@ -1324,7 +1324,7 @@
             cursor: "pointer",
             fontFamily: "inherit"
           }
-        }, "\u{1F4C2} \u5728\u6587\u4EF6\u5939\u4E2D\u663E\u793A") : null;
+        }, "\u{1F4C2} \u5728\u8CC7\u6599\u593E\u4E2D\u986F\u793A") : null;
         return React.createElement(
           "div",
           {
@@ -1364,9 +1364,9 @@
           React.createElement("div", { style: { fontSize: "10px", color: "var(--dsw-alias-label-secondary)", marginTop: "4px", letterSpacing: "0.3px" } }, label)
         );
         const tips = [];
-        if (todos.length > 5) tips.push(`${todos.length} \u4E2A\u5F85\u529E\u8F83\u5BC6\u96C6`);
-        if (memories.length > 30) tips.push("\u8BB0\u5FC6\u8F83\u591A\uFF0C\u53EF\u6574\u7406");
-        const insight = lastAct ? `\u6700\u8FD1 ${formatRelativeTime(lastAct.occurredAt, Date.now(), data._localeCode)}` : "\u6682\u65E0\u6D3B\u52A8";
+        if (todos.length > 5) tips.push(`${todos.length} \u500B\u5F85\u8FA6\u8F03\u5BC6\u96C6`);
+        if (memories.length > 30) tips.push("\u8A18\u61B6\u8F03\u591A\uFF0C\u53EF\u6574\u7406");
+        const insight = lastAct ? `\u6700\u8FD1 ${formatRelativeTime(lastAct.occurredAt, Date.now(), data._localeCode)}` : "\u66AB\u7121\u6D3B\u52D5";
         return React.createElement(
           "section",
           { style: Object.assign({}, sectionStyle, { padding: "12px 14px", margin: compact ? 0 : sectionStyle.margin }), "data-block": "status-banner" },
@@ -1491,13 +1491,13 @@
         }
         const eventIcon = (title) => {
           const t0 = (title || "").toLowerCase();
-          if (t0.includes("init") || t0.includes("\u626B\u63CF") || t0.includes("scan")) return "\u{1F680}";
-          if (t0.includes("memory") || t0.includes("\u8BB0\u5FC6")) return "\u{1F9E0}";
-          if (t0.includes("todo") || t0.includes("\u5F85\u529E")) return "\u{1F4CB}";
+          if (t0.includes("init") || t0.includes("\u6383\u63CF") || t0.includes("scan")) return "\u{1F680}";
+          if (t0.includes("memory") || t0.includes("\u8A18\u61B6")) return "\u{1F9E0}";
+          if (t0.includes("todo") || t0.includes("\u5F85\u8FA6")) return "\u{1F4CB}";
           if (t0.includes("dream") || t0.includes("\u6574\u7406")) return "\u2728";
           if (t0.includes("rescan")) return "\u{1F504}";
           if (t0.includes("session") || t0.includes("\u6458\u8981")) return "\u{1F4DD}";
-          if (t0.includes("diff") || t0.includes("\u67B6\u6784")) return "\u{1F333}";
+          if (t0.includes("diff") || t0.includes("\u67B6\u69CB")) return "\u{1F333}";
           return "\u2022";
         };
         const timelineItem = (it, isLast) => {
@@ -1595,7 +1595,7 @@
               React.createElement("div", { style: { flex: "1 1 auto" } }),
               React.createElement("button", {
                 "data-mem-copy": "1",
-                title: "\u590D\u5236\u5230 LLM \u5E2E\u4F60\u6574\u7406",
+                title: "\u8907\u88FD\u5230 LLM \u5E6B\u4F60\u6574\u7406",
                 style: { background: "transparent", border: "none", cursor: "pointer", fontSize: "11px", color: "var(--dsw-alias-label-secondary)", padding: "0 4px", borderRadius: "4px" },
                 onClick: (e) => copyMem(m, e)
               }, "\u{1F4CB}"),
@@ -1603,7 +1603,7 @@
                 "data-mem-indicator": "1",
                 style: { fontSize: "12px", color: "var(--dsw-alias-label-secondary)", cursor: "pointer", padding: "0 4px", userSelect: "none" },
                 onClick: (e) => toggle(m, e),
-                title: "\u5C55\u5F00/\u6536\u8D77"
+                title: "\u5C55\u958B/\u6536\u8D77"
               }, isOpen ? "\u25BE" : "\u25B8")
             ),
             React.createElement("div", { style: { fontSize: "13px", fontWeight: "600", color: "var(--dsw-alias-label-primary)", lineHeight: "1.4", marginBottom: "4px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", textOverflow: "ellipsis" } }, m.title),
@@ -1626,7 +1626,7 @@
             "div",
             { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" } },
             React.createElement("h3", { style: Object.assign({}, sectionTitleStyle, { margin: 0 }) }, "\u{1F9E0} " + t("memories.title") + " \xB7 " + memories.length),
-            React.createElement("span", { style: { fontSize: "10px", color: "var(--dsw-alias-label-secondary)" } }, "\u{1F4CB} \u70B9\u51FB \u{1F4CB} \u590D\u5236\u7ED9 LLM")
+            React.createElement("span", { style: { fontSize: "10px", color: "var(--dsw-alias-label-secondary)" } }, "\u{1F4CB} \u9EDE\u9078 \u{1F4CB} \u8907\u88FD\u7D66 LLM")
           ),
           React.createElement("div", null, memories.slice(0, 8).map(memCard)),
           memories.length > 8 ? React.createElement("div", { style: { textAlign: "center", fontSize: "11px", color: "var(--dsw-alias-label-secondary)", marginTop: "6px" } }, "+" + (memories.length - 8) + " \u66F4\u591A \u2192 Dashboard") : null
@@ -1679,7 +1679,7 @@
             "span",
             {
               key: "lang-" + item.lang,
-              title: item.lang + " \xB7 " + item.count + " \u4E2A\u6587\u4EF6",
+              title: item.lang + " \xB7 " + item.count + " \u500B\u6A94\u6848",
               style: { display: "inline-flex", alignItems: "center", gap: "4px", padding: "2px 8px", background: "var(--dsw-alias-bg-layer-2)", borderRadius: "10px", fontSize: "11px", fontWeight: "500", marginRight: "4px", marginBottom: "4px", border: "1px solid var(--dsw-alias-border-l1)" }
             },
             React.createElement("span", { style: { width: "8px", height: "8px", borderRadius: "50%", background: "var(--dsw-alias-brand-primary)" } }),
@@ -1692,10 +1692,10 @@
             "span",
             {
               key: "lang-tail",
-              title: langUsage.tail.languages + " \u79CD\u8BED\u8A00\u5171 " + langUsage.tail.count + " \u4E2A\u6587\u4EF6",
+              title: langUsage.tail.languages + " \u7A2E\u8A9E\u8A00\u5171 " + langUsage.tail.count + " \u500B\u6A94\u6848",
               style: { display: "inline-flex", alignItems: "center", gap: "4px", padding: "2px 8px", background: "var(--dsw-alias-bg-layer-2)", borderRadius: "10px", fontSize: "11px", fontWeight: "500", marginRight: "4px", marginBottom: "4px", border: "1px solid var(--dsw-alias-border-l1)", color: "var(--dsw-alias-label-secondary)" }
             },
-            React.createElement("span", null, "\u5176\u5B83 " + langUsage.tail.languages + " \u79CD"),
+            React.createElement("span", null, "\u5176\u5B83 " + langUsage.tail.languages + " \u7A2E"),
             React.createElement("span", null, " \xB7 " + Math.round(langUsage.tail.percent) + "%")
           ));
         }
@@ -1817,11 +1817,11 @@
           const steps = flow && flow.steps || [];
           if (steps.length < 2) return false;
           const name = String(flow.name || "");
-          if (/本地推断|local inference/i.test(name)) return false;
+          if (/本地推斷|local inference/i.test(name)) return false;
           const ids = steps.map(stepComponentId);
           if (ids.length === components.length && ids.every((id, index) => id === components[index].id)) return false;
           const actions = steps.map((step) => typeof step === "object" && step && step.action || "");
-          const generic = actions.length > 0 && actions.every((action) => action === "\u63A5\u6536\u8BF7\u6C42" || action === "\u5B8C\u6210\u5904\u7406" || action === "\u5904\u7406\u5E76\u4F20\u9012");
+          const generic = actions.length > 0 && actions.every((action) => action === "\u63A5\u6536\u8ACB\u6C42" || action === "\u5B8C\u6210\u8655\u7406" || action === "\u8655\u7406\u4E26\u50B3\u905E");
           return !generic;
         }
         const genuineFlows = flows.filter(isGenuineRuntimeFlow);
@@ -2104,7 +2104,7 @@
                 "data-action": "toggle-dashboard",
                 style: buttonStyle(),
                 onClick: (e) => toggleDashboard(e, t),
-                title: localeCode === "en-US" ? "View full project dashboard" : "\u67E5\u770B\u9879\u76EE\u5B8C\u6574\u6570\u636E\u5FEB\u7167"
+                title: localeCode === "en-US" ? "View full project dashboard" : "\u6AA2\u8996\u5C08\u6848\u5B8C\u6574\u8CC7\u6599\u5FEB\u7167"
               },
               React.createElement("span", { style: { fontSize: "16px" } }, "\u{1F4CA}"),
               React.createElement(
@@ -2113,14 +2113,14 @@
                 React.createElement(
                   "div",
                   { style: { fontSize: "13px", fontWeight: "600", lineHeight: "1.2" } },
-                  React.createElement("span", null, localeCode === "en-US" ? "View Dashboard" : "\u67E5\u770B Dashboard"),
+                  React.createElement("span", null, localeCode === "en-US" ? "View Dashboard" : "\u6AA2\u8996 Dashboard"),
                   React.createElement("span", { style: { color: "var(--dsw-alias-label-secondary)", fontWeight: "400", margin: "0 4px" } }, "\xB7"),
-                  React.createElement("span", { style: { color: "var(--dsw-alias-label-secondary)", fontWeight: "400" } }, localeCode === "en-US" ? "Project Overview" : "\u9879\u76EE\u5168\u666F")
+                  React.createElement("span", { style: { color: "var(--dsw-alias-label-secondary)", fontWeight: "400" } }, localeCode === "en-US" ? "Project Overview" : "\u5C08\u6848\u5168\u666F")
                 ),
                 React.createElement(
                   "div",
                   { style: { fontSize: "10px", color: "var(--dsw-alias-label-secondary)", marginTop: "1px" } },
-                  localeCode === "en-US" ? "Tech stack \xB7 todos \xB7 memories \xB7 timeline" : "\u6280\u672F\u6808 \xB7 \u5F85\u529E \xB7 \u8BB0\u5FC6 \xB7 \u65F6\u95F4\u7EBF"
+                  localeCode === "en-US" ? "Tech stack \xB7 todos \xB7 memories \xB7 timeline" : "\u6280\u8853\u68E7 \xB7 \u5F85\u8FA6 \xB7 \u8A18\u61B6 \xB7 \u6642\u9593\u7DDA"
                 )
               ),
               React.createElement("span", { "data-dashboard-indicator": "1", style: { fontSize: "12px", color: "var(--dsw-alias-label-secondary)" } }, "\u25BE")
@@ -2129,10 +2129,10 @@
         );
       }
       const ONBOARDING_PHASES = [
-        { key: "scanning", icon: "\u{1F50D}", label: "\u626B\u63CF\u9879\u76EE\u7ED3\u6784\u2026" },
-        { key: "graph", icon: "\u{1F3DB}\uFE0F", label: "\u6784\u5EFA\u67B6\u6784\u5173\u7CFB\u2026" },
-        { key: "analyzing", icon: "\u{1F9E0}", label: "DSH LLM \u8BED\u4E49\u5206\u6790\u2026" },
-        { key: "done", icon: "\u2705", label: "\u67B6\u6784\u4E0E\u9879\u76EE\u8111\u5DF2\u751F\u6210" }
+        { key: "scanning", icon: "\u{1F50D}", label: "\u6383\u63CF\u5C08\u6848\u7D50\u69CB\u2026" },
+        { key: "graph", icon: "\u{1F3DB}\uFE0F", label: "\u69CB\u5EFA\u67B6\u69CB\u95DC\u4FC2\u2026" },
+        { key: "analyzing", icon: "\u{1F9E0}", label: "DSH LLM \u8A9E\u7FA9\u5206\u6790\u2026" },
+        { key: "done", icon: "\u2705", label: "\u67B6\u69CB\u8207\u5C08\u6848\u8166\u5DF2\u751F\u6210" }
       ];
       const ONBOARDING_FEATURES = [
         { icon: "\u2318", titleKey: "onboarding.f1.title", descKey: "onboarding.f1.desc" },
@@ -2196,12 +2196,12 @@
           advancePhase(0);
           if (!sessionId) {
             setPhase("error");
-            setErrMsg("\u672A\u627E\u5230\u5F53\u524D Session\uFF0C\u8BF7\u5148\u5728 DSH \u4E2D\u6253\u5F00\u8BE5\u9879\u76EE");
+            setErrMsg("\u672A\u627E\u5230\u7576\u524D Session\uFF0C\u8ACB\u5148\u5728 DSH \u4E2D\u958B\u555F\u8A72\u5C08\u6848");
             return;
           }
           if (!rpc || typeof rpc.call !== "function") {
             setPhase("error");
-            setErrMsg("DSH Connection RPC \u4E0D\u53EF\u7528\uFF0C\u8BF7\u786E\u8BA4\u63D2\u4EF6\u4F9D\u8D56\u5DF2\u6B63\u786E\u5B89\u88C5");
+            setErrMsg("DSH Connection RPC \u4E0D\u53EF\u7528\uFF0C\u8ACB\u78BA\u8A8D\u5916\u639B\u4F9D\u8CF4\u5DF2\u6B63\u78BA\u5B89\u88DD");
             return;
           }
           const timers = [];
@@ -2233,7 +2233,7 @@
               }
             }
           } else {
-            const errStr = resp && resp.error && resp.error.message || "\u672A\u77E5\u9519\u8BEF";
+            const errStr = resp && resp.error && resp.error.message || "\u672A\u77E5\u932F\u8AA4";
             setPhase("error");
             setErrMsg(errStr);
           }
@@ -2248,7 +2248,7 @@
           ctaNode = React.createElement(
             "div",
             { style: { marginTop: "16px" }, "data-block": "onboarding-loading" },
-            // 转圈圈：CSS conic-gradient 实现（不依赖 framer-motion / 第三方）
+            // 轉圈圈：CSS conic-gradient 實現（不依賴 framer-motion / 第三方）
             React.createElement(
               "div",
               {
@@ -2269,7 +2269,7 @@
               }),
               React.createElement("span", null, ONBOARDING_PHASES[phaseStep] ? ONBOARDING_PHASES[phaseStep].label : "\u5206\u6790\u4E2D\u2026")
             ),
-            // 进度指示（4 步）
+            // 進度指示（4 步）
             React.createElement(
               "div",
               {
@@ -2318,8 +2318,8 @@
                   border: "1px solid rgba(220,38,38,0.25)"
                 }
               },
-              React.createElement("div", { style: { fontWeight: "600", marginBottom: "4px" } }, "\u274C \u542F\u52A8\u5931\u8D25"),
-              React.createElement("div", null, errMsg || "\u672A\u77E5\u9519\u8BEF")
+              React.createElement("div", { style: { fontWeight: "600", marginBottom: "4px" } }, "\u274C \u555F\u52D5\u5931\u6557"),
+              React.createElement("div", null, errMsg || "\u672A\u77E5\u932F\u8AA4")
             ),
             React.createElement(
               "button",
@@ -2329,7 +2329,7 @@
                 "data-action": "retry"
               },
               React.createElement("span", { style: { fontSize: "16px" } }, "\u{1F501}"),
-              React.createElement("span", null, "\u91CD\u8BD5")
+              React.createElement("span", null, "\u91CD\u8A66")
             ),
             React.createElement(
               "button",
@@ -2345,9 +2345,9 @@
                   width: "100%",
                   fontFamily: "inherit"
                 },
-                onClick: () => copyPrompt(t("onboarding.copyPrompt"), null, "\u5DF2\u590D\u5236", "\u590D\u5236\u5931\u8D25")
+                onClick: () => copyPrompt(t("onboarding.copyPrompt"), null, "\u5DF2\u8907\u88FD", "\u8907\u88FD\u5931\u6557")
               },
-              "\u{1F4CB} \u590D\u5236\u542F\u52A8\u6307\u4EE4\uFF08\u515C\u5E95\uFF09"
+              "\u{1F4CB} \u8907\u88FD\u555F\u52D5\u6307\u4EE4\uFF08\u515C\u5E95\uFF09"
             )
           );
         } else {
@@ -2395,10 +2395,10 @@
             )),
             React.createElement("div", { style: { fontSize: "11px", color: "var(--dsw-alias-label-secondary)", marginTop: "6px", paddingTop: "8px", borderTop: "1px dashed var(--dsw-alias-border-l1)" } }, t("onboarding.more"))
           ),
-          // path 提示（让用户知道会扫哪个目录）
+          // path 提示（讓使用者知道會掃哪個目錄）
           // v0.5.1：即使 build-time map miss，只要 sessionId 存在，host 端 initProject RPC
-          //   会用 getCwdBySession 兜底解析 cwd，所以这里不应该再显示"未检测到 workspace 路径"
-          //   警告；改为显示"等待从 sessionId 解析"提示，让用户知道会自动兜底。
+          //   會用 getCwdBySession 兜底解析 cwd，所以這裡不應該再顯示"未檢測到 workspace 路徑"
+          //   警告；改為顯示"等待從 sessionId 解析"提示，讓使用者知道會自動兜底。
           path ? React.createElement(
             "div",
             {
@@ -2429,7 +2429,7 @@
               "data-workspace-session-id": String(sessionId).slice(0, 12) + "\u2026"
             },
             React.createElement("span", null, "\u{1F50C}"),
-            React.createElement("span", null, "build \u672A\u7EB3\u5165\u6B64 session\uFF0C\u70B9\u51FB\u542F\u52A8\u5C06\u7531 host \u81EA\u52A8\u89E3\u6790\u8DEF\u5F84")
+            React.createElement("span", null, "build \u672A\u7D0D\u5165\u6B64 session\uFF0C\u9EDE\u9078\u555F\u52D5\u5C07\u7531 host \u81EA\u52D5\u89E3\u6790\u8DEF\u5F91")
           ) : React.createElement(
             "div",
             {
@@ -2443,10 +2443,10 @@
               }
             },
             React.createElement("span", null, "\u26A0\uFE0F"),
-            React.createElement("span", null, "\u672A\u68C0\u6D4B\u5230 workspace \u8DEF\u5F84")
+            React.createElement("span", null, "\u672A\u6AA2\u6E2C\u5230 workspace \u8DEF\u5F91")
           ),
           ctaNode,
-          // 注入转圈动画 keyframes（一次性）
+          // 注入轉圈動畫 keyframes（一次性）
           React.createElement("style", null, "@keyframes dsh-brain-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }")
         );
       }
@@ -2492,11 +2492,11 @@
               setState({ status: "ready", data: res.value.suggestion, error: null });
               return;
             }
-            let errMsg = "\u667A\u80FD\u7EED\u63A5\u5931\u8D25";
+            let errMsg = "\u667A\u6167\u7E8C\u63A5\u5931\u6557";
             if (res.error && res.error.message) errMsg = res.error.message + " (" + (res.error.code || "?") + ")";
-            else if (!res.value) errMsg = "RPC value \u4E3A\u7A7A";
-            else if (!res.value.suggestion) errMsg = "value.suggestion \u4E3A\u7A7A";
-            else errMsg = "\u672A\u77E5\u72B6\u6001\uFF1A" + JSON.stringify(res).slice(0, 200);
+            else if (!res.value) errMsg = "RPC value \u70BA\u7A7A";
+            else if (!res.value.suggestion) errMsg = "value.suggestion \u70BA\u7A7A";
+            else errMsg = "\u672A\u77E5\u72C0\u614B\uFF1A" + JSON.stringify(res).slice(0, 200);
             setState({ status: "error", data: null, error: errMsg });
           } catch (error) {
             setState({ status: "error", data: null, error: "throw: " + String(error && error.message || error) });
@@ -2552,7 +2552,7 @@
               "data-suggest-status": "uninit"
             },
             React.createElement("span", null, "\u{1F4A1} "),
-            React.createElement("span", null, localeCode === "en-US" ? "Init project brain to see today's continuation." : "\u521D\u59CB\u5316\u9879\u76EE\u8111\u540E\u67E5\u770B\u4ECA\u5929\u53EF\u80FD\u63A8\u8FDB\u7684\u5185\u5BB9\u3002")
+            React.createElement("span", null, localeCode === "en-US" ? "Init project brain to see today's continuation." : "\u521D\u59CB\u5316\u5C08\u6848\u8166\u5F8C\u6AA2\u8996\u4ECA\u5929\u53EF\u80FD\u63A8\u9032\u7684\u5167\u5BB9\u3002")
           );
         }
         if (dismissed) {
@@ -2581,7 +2581,7 @@
                 },
                 "data-action": "suggest-show"
               },
-              "\u{1F4A1} " + (localeCode === "en-US" ? "Show suggestion" : "\u67E5\u770B\u7EED\u63A5\u5EFA\u8BAE")
+              "\u{1F4A1} " + (localeCode === "en-US" ? "Show suggestion" : "\u6AA2\u8996\u7E8C\u63A5\u5EFA\u8B70")
             )
           );
         }
@@ -2688,13 +2688,13 @@
       }
       function GitTab({ gitInfo, t, onRefresh, autoRefresh, onToggleAutoRefresh }) {
         if (!gitInfo) {
-          return React.createElement("div", { style: { padding: "20px", textAlign: "center", fontSize: "12px", color: "var(--dsw-alias-label-secondary)" }, "data-block": "git-loading" }, "\u23F3 \u52A0\u8F7D git \u5386\u53F2...");
+          return React.createElement("div", { style: { padding: "20px", textAlign: "center", fontSize: "12px", color: "var(--dsw-alias-label-secondary)" }, "data-block": "git-loading" }, "\u23F3 \u8F09\u5165 git \u6B77\u53F2...");
         }
         if (gitInfo.available !== true) {
           return React.createElement(
             "div",
             { style: { padding: "20px", textAlign: "center", fontSize: "12px", color: "var(--dsw-alias-label-secondary)" }, "data-block": "git-empty" },
-            "\u{1F4C2} \u5F53\u524D\u9879\u76EE\u4E0D\u662F git \u4ED3\u5E93",
+            "\u{1F4C2} \u7576\u524D\u5C08\u6848\u4E0D\u662F git \u5009\u5EAB",
             gitInfo.error ? React.createElement("div", { style: { marginTop: "6px", fontSize: "10px", opacity: 0.7 } }, gitInfo.error) : null
           );
         }
@@ -2706,10 +2706,10 @@
           if (!ts) return "";
           const diff = Date.now() / 1e3 - ts;
           if (diff < 60) return Math.round(diff) + "\u79D2\u524D";
-          if (diff < 3600) return Math.round(diff / 60) + "\u5206\u949F\u524D";
-          if (diff < 86400) return Math.round(diff / 3600) + "\u5C0F\u65F6\u524D";
+          if (diff < 3600) return Math.round(diff / 60) + "\u5206\u9418\u524D";
+          if (diff < 86400) return Math.round(diff / 3600) + "\u5C0F\u6642\u524D";
           if (diff < 30 * 86400) return Math.round(diff / 86400) + "\u5929\u524D";
-          if (diff < 365 * 86400) return Math.round(diff / 2592e3) + "\u4E2A\u6708\u524D";
+          if (diff < 365 * 86400) return Math.round(diff / 2592e3) + "\u500B\u6708\u524D";
           return Math.round(diff / 31536e3) + "\u5E74\u524D";
         };
         const fmtDate = (ts) => {
@@ -2724,17 +2724,17 @@
         }
         const palette = [
           { fg: "#1f6feb", bg: "#ddf4ff" },
-          // 蓝
+          // 藍
           { fg: "#1a7f37", bg: "#dafbe1" },
-          // 绿
+          // 綠
           { fg: "#8250df", bg: "#fbefff" },
           // 紫
           { fg: "#cf222e", bg: "#ffebe9" },
-          // 红
+          // 紅
           { fg: "#9a6700", bg: "#fff8c5" },
-          // 黄
+          // 黃
           { fg: "#0a3069", bg: "#dbeafe" }
-          // 深蓝
+          // 深藍
         ];
         const colorByBranch = /* @__PURE__ */ new Map();
         let colorIdx = 0;
@@ -2917,7 +2917,7 @@
             React.createElement(
               "div",
               { style: { minWidth: 0 } },
-              React.createElement("div", { style: subjectStyle, title: c.subject }, c.subject || "(\u65E0\u6807\u9898)"),
+              React.createElement("div", { style: subjectStyle, title: c.subject }, c.subject || "(\u7121\u6A19\u984C)"),
               React.createElement(
                 "div",
                 { style: metaStyle },
@@ -2926,7 +2926,7 @@
                 React.createElement("span", null, "\xB7"),
                 React.createElement("span", { title: c.isoTime || "" }, relTime(c.timestamp)),
                 c.isMerge ? React.createElement("span", { style: { color: "var(--dsw-alias-state-warn-primary)", fontSize: "10px" } }, "\u2387 merge") : null,
-                // v0.4.x: 变更文件摘要（来自 history.js 的 tree diff；pack 不可读时为 0）
+                // v0.4.x: 變更檔案摘要（來自 history.js 的 tree diff；pack 不可讀時為 0）
                 typeof c.filesChangedTotal === "number" && c.filesChangedTotal > 0 ? (() => {
                   const fileStatText = "\u{1F4C1} " + (c.filesAdded ? "+" + c.filesAdded + " " : "") + (c.filesModified ? "~" + c.filesModified + " " : "") + (c.filesRemoved ? "-" + c.filesRemoved + " " : "") + "(" + c.filesChangedTotal + " \u6587\u4EF6)";
                   return React.createElement("span", {
@@ -2934,11 +2934,11 @@
                   }, fileStatText);
                 })() : null
               ),
-              // 展开后的详情
+              // 展開後的詳情
               isExpanded ? React.createElement(
                 "div",
                 { style: expandedPanelStyle },
-                c.body ? React.createElement("div", { style: bodyTextStyle }, c.body) : React.createElement("div", { style: Object.assign({}, bodyTextStyle, { opacity: 0.6, fontStyle: "italic" }) }, "\uFF08\u65E0\u8BE6\u7EC6\u63CF\u8FF0\uFF09"),
+                c.body ? React.createElement("div", { style: bodyTextStyle }, c.body) : React.createElement("div", { style: Object.assign({}, bodyTextStyle, { opacity: 0.6, fontStyle: "italic" }) }, "\uFF08\u7121\u8A73\u7D30\u63CF\u8FF0\uFF09"),
                 React.createElement(
                   "div",
                   { style: detailRowStyle },
@@ -2969,7 +2969,7 @@
                   React.createElement("div", { style: detailLabelStyle }, "Merged"),
                   React.createElement("div", { style: monospaceStyle, color: "var(--dsw-alias-state-warn-primary)" }, c.extraParents.join(", "))
                 ) : null,
-                // v0.4.x: Changed Files 列表（tree diff 失败时不显示）
+                // v0.4.x: Changed Files 列表（tree diff 失敗時不顯示）
                 Array.isArray(c.filesChanged) && c.filesChanged.length > 0 ? React.createElement(
                   "div",
                   { style: Object.assign({}, detailRowStyle, { alignItems: "flex-start" }) },
@@ -3068,7 +3068,7 @@
                 "div",
                 { style: { display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" } },
                 React.createElement("span", { style: statusBadgeStyle(kind) }, label),
-                React.createElement("span", { style: { fontSize: "11px", color: "var(--dsw-alias-label-secondary)" } }, total2 + " \u6587\u4EF6" + (truncated ? "\uFF08\u5DF2\u622A\u65AD\uFF09" : ""))
+                React.createElement("span", { style: { fontSize: "11px", color: "var(--dsw-alias-label-secondary)" } }, total2 + " \u6A94\u6848" + (truncated ? "\uFF08\u5DF2\u622A\u65B7\uFF09" : ""))
               ),
               visible.length > 0 ? React.createElement(
                 "div",
@@ -3081,8 +3081,8 @@
                     React.createElement("span", { style: filePathStyle }, f)
                   )
                 ),
-                !wtExpanded && sample.length > 8 ? React.createElement("div", { style: { fontSize: "10px", color: "var(--dsw-alias-label-secondary)", paddingLeft: "16px" } }, "+ " + (sample.length - 8) + " \u66F4\u591A\uFF08\u70B9\u51FB\u5C55\u5F00\u67E5\u770B\u5168\u90E8\uFF09") : null,
-                wtExpanded && truncated ? React.createElement("div", { style: { fontSize: "10px", color: "var(--dsw-alias-label-secondary)", paddingLeft: "16px" } }, "\uFF08\u540E\u7AEF\u5DF2\u622A\u65AD\uFF0C\u5168\u90E8 " + total2 + " \u4E2A\uFF09") : null
+                !wtExpanded && sample.length > 8 ? React.createElement("div", { style: { fontSize: "10px", color: "var(--dsw-alias-label-secondary)", paddingLeft: "16px" } }, "+ " + (sample.length - 8) + " \u66F4\u591A\uFF08\u9EDE\u9078\u5C55\u958B\u6AA2\u8996\u5168\u90E8\uFF09") : null,
+                wtExpanded && truncated ? React.createElement("div", { style: { fontSize: "10px", color: "var(--dsw-alias-label-secondary)", paddingLeft: "16px" } }, "\uFF08\u5F8C\u7AEF\u5DF2\u622A\u65B7\uFF0C\u5168\u90E8 " + total2 + " \u500B\uFF09") : null
               ) : null
             );
           };
@@ -3101,7 +3101,7 @@
               ),
               workTree.reference === "fallback" ? React.createElement("span", {
                 style: { fontSize: "10px", padding: "1px 7px", borderRadius: "9px", background: "var(--dsw-alias-state-warn-bg, var(--dsw-alias-bg-layer-1))", border: "1px solid var(--dsw-alias-state-warn-primary)", color: "var(--dsw-alias-state-warn-primary)", fontWeight: "600" },
-                title: "HEAD tree \u4E0D\u53EF\u8BFB\uFF08pack \u89E3\u6790\u9650\u5236\uFF09\uFF0C\u5DF2\u6CBF first-parent \u94FE\u56DE\u9000\u5230 " + (workTree.referenceCommitShort || "?") + " \u4F5C\u4E3A\u53C2\u8003\uFF0C\u7ED3\u679C\u53EF\u80FD\u7565\u6709\u8FC7\u671F"
+                title: "HEAD tree \u4E0D\u53EF\u8B80\uFF08pack \u89E3\u6790\u9650\u5236\uFF09\uFF0C\u5DF2\u6CBF first-parent \u93C8\u56DE\u9000\u5230 " + (workTree.referenceCommitShort || "?") + " \u4F5C\u70BA\u53C3\u8003\uFF0C\u7D50\u679C\u53EF\u80FD\u7565\u6709\u904E\u671F"
               }, "vs " + (workTree.referenceCommitShort || "fallback")) : null,
               React.createElement("span", { style: { marginLeft: "auto", fontSize: "11px", color: "var(--dsw-alias-label-secondary)" } }, wtExpanded ? "\u25B4" : "\u25BE")
             ),
@@ -3124,22 +3124,22 @@
             React.createElement(
               "span",
               { style: { fontSize: "12px", color: "var(--dsw-alias-label-secondary)" } },
-              commits.length + " \u4E2A\u63D0\u4EA4" + (gitInfo.truncated ? "\uFF08\u5DF2\u622A\u65AD\uFF09" : "")
+              commits.length + " \u500B\u63D0\u4EA4" + (gitInfo.truncated ? "\uFF08\u5DF2\u622A\u65B7\uFF09" : "")
             ),
             otherBranches.length > 0 ? React.createElement(
               "span",
               { style: { fontSize: "11px", color: "var(--dsw-alias-label-secondary)" } },
-              "\xB7 " + otherBranches.length + " \u4E2A\u5176\u4ED6\u5206\u652F"
+              "\xB7 " + otherBranches.length + " \u500B\u5176\u4ED6\u5206\u652F"
             ) : null,
             gitInfo.head ? React.createElement("span", { style: { marginLeft: "auto", fontFamily: "ui-monospace, monospace", fontSize: "10px", color: "var(--dsw-alias-label-secondary)" } }, "HEAD " + gitInfo.head.substring(0, 7)) : null,
-            // v0.4.x: 自动刷新开关 + 手动刷新按钮
+            // v0.4.x: 自動重新整理開關 + 手動重新整理按鈕
             typeof onRefresh === "function" ? React.createElement(
               "span",
               { style: { display: "inline-flex", alignItems: "center", gap: "4px", marginLeft: "8px" } },
               typeof onToggleAutoRefresh === "function" ? React.createElement("button", {
                 key: "auto",
                 type: "button",
-                title: autoRefresh ? "\u81EA\u52A8\u5237\u65B0\u5DF2\u5F00\u542F\uFF0830s \u95F4\u9694\uFF09\uFF0C\u70B9\u51FB\u5173\u95ED" : "\u81EA\u52A8\u5237\u65B0\u5DF2\u5173\u95ED\uFF0C\u70B9\u51FB\u5F00\u542F",
+                title: autoRefresh ? "\u81EA\u52D5\u91CD\u65B0\u6574\u7406\u5DF2\u958B\u555F\uFF0830s \u9593\u9694\uFF09\uFF0C\u9EDE\u9078\u95DC\u9589" : "\u81EA\u52D5\u91CD\u65B0\u6574\u7406\u5DF2\u95DC\u9589\uFF0C\u9EDE\u9078\u958B\u555F",
                 onClick: () => onToggleAutoRefresh(!autoRefresh),
                 "data-git-auto": autoRefresh ? "1" : "0",
                 style: {
@@ -3155,11 +3155,11 @@
                   alignItems: "center",
                   gap: "4px"
                 }
-              }, React.createElement("span", { style: { width: "6px", height: "6px", borderRadius: "50%", background: autoRefresh ? "var(--dsw-alias-state-success-primary)" : "var(--dsw-alias-label-secondary)" } }), autoRefresh ? "\u81EA\u52A8 30s" : "\u81EA\u52A8\u5173") : null,
+              }, React.createElement("span", { style: { width: "6px", height: "6px", borderRadius: "50%", background: autoRefresh ? "var(--dsw-alias-state-success-primary)" : "var(--dsw-alias-label-secondary)" } }), autoRefresh ? "\u81EA\u52D5 30s" : "\u81EA\u52D5\u95DC") : null,
               React.createElement("button", {
                 key: "refresh",
                 type: "button",
-                title: "\u5237\u65B0 Git \u6570\u636E",
+                title: "\u91CD\u65B0\u6574\u7406 Git \u8CC7\u6599",
                 onClick: onRefresh,
                 "data-git-refresh": "1",
                 style: {
@@ -3177,12 +3177,12 @@
             ) : null
           ),
           // commits 列表
-          commits.length === 0 ? React.createElement("div", { style: { padding: "20px", textAlign: "center", fontSize: "12px", color: "var(--dsw-alias-label-secondary)" } }, "\uFF08\u65E0\u63D0\u4EA4\u5386\u53F2\uFF09") : React.createElement(
+          commits.length === 0 ? React.createElement("div", { style: { padding: "20px", textAlign: "center", fontSize: "12px", color: "var(--dsw-alias-label-secondary)" } }, "\uFF08\u7121\u63D0\u4EA4\u6B77\u53F2\uFF09") : React.createElement(
             "div",
             { style: listStyle },
             commits.map((c, idx) => renderRow(c, idx))
           ),
-          // v0.4.x: Working Tree 区块 — HEAD tree vs 工作树对比，不依赖 git binary
+          // v0.4.x: Working Tree 區塊 — HEAD tree vs 工作樹對比，不依賴 git binary
           renderWorkTreeSection(gitInfo.workTree)
         );
       }
@@ -3190,27 +3190,27 @@
         {
           group: "retrieval",
           icon: "\u{1F50E}",
-          title: { "zh-CN": "\u68C0\u7D22\u4E0E\u5411\u91CF", "en-US": "Retrieval & vectors" },
+          title: { "zh-CN": "\u6AA2\u7D22\u8207\u5411\u91CF", "en-US": "Retrieval & vectors" },
           fields: [
             {
               key: "retrievalMode",
-              label: { "zh-CN": "\u68C0\u7D22\u6A21\u5F0F", "en-US": "Retrieval mode" },
+              label: { "zh-CN": "\u6AA2\u7D22\u6A21\u5F0F", "en-US": "Retrieval mode" },
               type: "enum",
-              options: [{ v: "keyword", l: { "zh-CN": "\u5173\u952E\u8BCD (BM25)", "en-US": "Keyword (BM25)" } }, { v: "hybrid", l: { "zh-CN": "\u6DF7\u5408 (\u5173\u952E\u8BCD + \u5411\u91CF)", "en-US": "Hybrid (keyword + vector)" } }],
+              options: [{ v: "keyword", l: { "zh-CN": "\u95DC\u9375\u8A5E (BM25)", "en-US": "Keyword (BM25)" } }, { v: "hybrid", l: { "zh-CN": "\u6DF7\u5408 (\u95DC\u9375\u8A5E + \u5411\u91CF)", "en-US": "Hybrid (keyword + vector)" } }],
               hint: { "zh-CN": "hybrid \u9700\u8981\u5148\u914D\u7F6E\u4E0B\u65B9 Embedding", "en-US": "hybrid requires Embedding configured below" }
             },
             {
               key: "vectorEnabled",
-              label: { "zh-CN": "\u542F\u7528\u5411\u91CF\u68C0\u7D22", "en-US": "Vector retrieval" },
+              label: { "zh-CN": "\u555F\u7528\u5411\u91CF\u6AA2\u7D22", "en-US": "Vector retrieval" },
               type: "boolean",
-              hint: { "zh-CN": "\u5173\u95ED\u65F6\u5373\u4F7F\u914D\u4E86 embedding \u4E5F\u53EA\u7528\u5173\u952E\u8BCD", "en-US": "When off, retrieval is keyword-only even if embedding is configured" }
+              hint: { "zh-CN": "\u95DC\u9589\u6642\u5373\u4F7F\u914D\u4E86 embedding \u4E5F\u53EA\u7528\u95DC\u9375\u8A5E", "en-US": "When off, retrieval is keyword-only even if embedding is configured" }
             },
             {
               key: "embeddingBaseURL",
               label: { "zh-CN": "Embedding \u5730\u5740", "en-US": "Embedding base URL" },
               type: "string",
               placeholder: "https://api.openai.com/v1",
-              hint: { "zh-CN": "OpenAI \u517C\u5BB9 /v1/embeddings \u7AEF\u70B9\uFF1B\u7559\u7A7A = \u7981\u7528\u5411\u91CF", "en-US": "OpenAI-compatible /v1/embeddings endpoint; empty = no vectors" }
+              hint: { "zh-CN": "OpenAI \u76F8\u5BB9 /v1/embeddings \u7AEF\u9EDE\uFF1B\u7559\u7A7A = \u505C\u7528\u5411\u91CF", "en-US": "OpenAI-compatible /v1/embeddings endpoint; empty = no vectors" }
             },
             {
               key: "embeddingModel",
@@ -3223,108 +3223,108 @@
               label: { "zh-CN": "API Key", "en-US": "API Key" },
               type: "password",
               placeholder: "sk-\u2026 \u6216 PROJECT_BRAIN_EMBEDDING_API_KEY",
-              hint: { "zh-CN": "\u4F18\u5148\u76F4\u63A5\u586B\u5199 API Key\u3002\u5982\u679C\u586B\u7684\u662F PROJECT_BRAIN_EMBEDDING_API_KEY \u8FD9\u7C7B\u5168\u5927\u5199\u540D\u5B57\uFF0C\u5219\u4E0D\u4F1A\u628A\u5B83\u5F53\u4F5C\u5BC6\u94A5\uFF0C\u800C\u662F\u8BFB\u53D6\u672C\u673A\u540C\u540D\u73AF\u5883\u53D8\u91CF\u7684\u503C\uFF1B\u8BF7\u5148\u5728\u7CFB\u7EDF\u6216\u7528\u6237\u73AF\u5883\u53D8\u91CF\u91CC\u914D\u597D\u8BE5\u9879\uFF0C\u5E76\u5B8C\u5168\u9000\u51FA\u518D\u6253\u5F00 DSH Desktop\u3002", "en-US": "Paste the API key to use it directly. An ALL_CAPS name like PROJECT_BRAIN_EMBEDDING_API_KEY is not the secret: the plugin reads the local environment variable of the same name. Set that env var on this machine, then fully quit and reopen DSH Desktop." }
+              hint: { "zh-CN": "\u512A\u5148\u76F4\u63A5\u586B\u5BEB API Key\u3002\u5982\u679C\u586B\u7684\u662F PROJECT_BRAIN_EMBEDDING_API_KEY \u9019\u985E\u5168\u5927\u5BEB\u540D\u5B57\uFF0C\u5247\u4E0D\u6703\u628A\u5B83\u7576\u4F5C\u91D1\u9470\uFF0C\u800C\u662F\u8B80\u53D6\u672C\u6A5F\u540C\u540D\u74B0\u5883\u8B8A\u6578\u7684\u503C\uFF1B\u8ACB\u5148\u5728\u7CFB\u7D71\u6216\u4F7F\u7528\u8005\u74B0\u5883\u8B8A\u6578\u88E1\u914D\u597D\u8A72\u9805\uFF0C\u4E26\u5B8C\u5168\u9000\u51FA\u518D\u958B\u555F DSH Desktop\u3002", "en-US": "Paste the API key to use it directly. An ALL_CAPS name like PROJECT_BRAIN_EMBEDDING_API_KEY is not the secret: the plugin reads the local environment variable of the same name. Set that env var on this machine, then fully quit and reopen DSH Desktop." }
             },
             {
               key: "embeddingDimensions",
-              label: { "zh-CN": "\u5411\u91CF\u7EF4\u5EA6", "en-US": "Vector dimensions" },
+              label: { "zh-CN": "\u5411\u91CF\u7DAD\u5EA6", "en-US": "Vector dimensions" },
               type: "number",
-              hint: { "zh-CN": "0 = \u7531\u670D\u52A1\u81EA\u52A8\u63A8\u65AD", "en-US": "0 = auto from service" }
+              hint: { "zh-CN": "0 = \u7531\u670D\u52D9\u81EA\u52D5\u63A8\u65B7", "en-US": "0 = auto from service" }
             },
             { key: "embeddingBatchSize", label: { "zh-CN": "Embedding \u6279\u5927\u5C0F", "en-US": "Embedding batch size" }, type: "number", min: 1, max: 128 },
-            { key: "embeddingMaxIndexPerRun", label: { "zh-CN": "\u5355\u6B21\u6700\u5927\u7D22\u5F15\u6761\u76EE", "en-US": "Max items per indexing run" }, type: "number", min: 1, max: 500 },
-            { key: "embeddingTimeoutMs", label: { "zh-CN": "Embedding \u8D85\u65F6 (ms)", "en-US": "Embedding timeout (ms)" }, type: "number", min: 1e3, max: 12e4, step: 1e3 }
+            { key: "embeddingMaxIndexPerRun", label: { "zh-CN": "\u55AE\u6B21\u6700\u5927\u7D22\u5F15\u689D\u76EE", "en-US": "Max items per indexing run" }, type: "number", min: 1, max: 500 },
+            { key: "embeddingTimeoutMs", label: { "zh-CN": "Embedding \u8D85\u6642 (ms)", "en-US": "Embedding timeout (ms)" }, type: "number", min: 1e3, max: 12e4, step: 1e3 }
           ]
         },
         {
           group: "weights",
           icon: "\u2696\uFE0F",
-          title: { "zh-CN": "\u68C0\u7D22\u6743\u91CD", "en-US": "Retrieval weights" },
-          hint: { "zh-CN": "\u53EA\u4F5C\u7528\u4E8E project_ask \u7684\u8BB0\u5FC6\u6392\u5E8F\uFF08\u4E0D\u7BA1\u5217\u8868\u548C\u4F1A\u8BDD\u6CE8\u5165\uFF09\u3002\u54EA\u9879\u66F4\u5927\u54EA\u9879\u66F4\u4F18\u5148\uFF0C\u4E94\u9879\u76F8\u5BF9\u5927\u5C0F\u5373\u53EF\uFF0C\u4E0D\u5FC5\u51D1\u6210 1\u3002\u4FDD\u5B58\u540E\u4E0B\u6B21\u63D0\u95EE\u751F\u6548\u3002", "en-US": "Applies only to project_ask memory ranking, not list or session inject. Higher = more influence; need not sum to 1. Takes effect on the next ask after save." },
+          title: { "zh-CN": "\u6AA2\u7D22\u6B0A\u91CD", "en-US": "Retrieval weights" },
+          hint: { "zh-CN": "\u53EA\u4F5C\u7528\u65BC project_ask \u7684\u8A18\u61B6\u6392\u5E8F\uFF08\u4E0D\u7BA1\u5217\u8868\u548C\u6703\u8A71\u6CE8\u5165\uFF09\u3002\u54EA\u9805\u66F4\u5927\u54EA\u9805\u66F4\u512A\u5148\uFF0C\u4E94\u9805\u76F8\u5C0D\u5927\u5C0F\u5373\u53EF\uFF0C\u4E0D\u5FC5\u6E4A\u6210 1\u3002\u5132\u5B58\u5F8C\u4E0B\u6B21\u63D0\u554F\u751F\u6548\u3002", "en-US": "Applies only to project_ask memory ranking, not list or session inject. Higher = more influence; need not sum to 1. Takes effect on the next ask after save." },
           fields: [
             {
               key: "keywordWeight",
-              label: { "zh-CN": "\u5173\u952E\u8BCD\u6743\u91CD", "en-US": "Keyword" },
+              label: { "zh-CN": "\u95DC\u9375\u8A5E\u6B0A\u91CD", "en-US": "Keyword" },
               type: "number",
               min: 0,
               max: 1,
               step: 0.05,
-              hint: { "zh-CN": "\u5B57\u9762\u5339\u914D\uFF08BM25\uFF09\u3002\u95EE\u9898\u91CC\u6709\u4E13\u6709\u540D\u8BCD\u3001\u6587\u4EF6\u540D\u3001\u672F\u8BED\u65F6\u8C03\u9AD8\u3002", "en-US": "Lexical BM25. Raise when the question contains names, files, or exact terms." }
+              hint: { "zh-CN": "\u5B57\u9762\u5339\u914D\uFF08BM25\uFF09\u3002\u554F\u984C\u88E1\u6709\u5C08\u6709\u540D\u8A5E\u3001\u6A94\u540D\u3001\u8853\u8A9E\u6642\u8ABF\u9AD8\u3002", "en-US": "Lexical BM25. Raise when the question contains names, files, or exact terms." }
             },
             {
               key: "vectorWeight",
-              label: { "zh-CN": "\u5411\u91CF\u6743\u91CD", "en-US": "Vector" },
+              label: { "zh-CN": "\u5411\u91CF\u6B0A\u91CD", "en-US": "Vector" },
               type: "number",
               min: 0,
               max: 1,
               step: 0.05,
-              hint: { "zh-CN": "\u8BED\u4E49\u76F8\u8FD1\u3002\u540C\u4E49\u6539\u5199\u3001\u8BCD\u5BF9\u4E0D\u4E0A\u65F6\u9760\u8FD9\u9879\u3002\u672A\u5EFA\u5411\u91CF\u6216\u672A\u5F00 hybrid \u65F6\u6B64\u9879\u4E3A 0\u3002", "en-US": "Semantic similarity. Helps paraphrases. Stays 0 until vectors are indexed in hybrid mode." }
+              hint: { "zh-CN": "\u8A9E\u7FA9\u76F8\u8FD1\u3002\u540C\u7FA9\u6539\u5BEB\u3001\u8A5E\u5C0D\u4E0D\u4E0A\u6642\u9760\u9019\u9805\u3002\u672A\u5EFA\u5411\u91CF\u6216\u672A\u958B hybrid \u6642\u6B64\u9805\u70BA 0\u3002", "en-US": "Semantic similarity. Helps paraphrases. Stays 0 until vectors are indexed in hybrid mode." }
             },
             {
               key: "importanceWeight",
-              label: { "zh-CN": "\u91CD\u8981\u6027\u6743\u91CD", "en-US": "Importance" },
+              label: { "zh-CN": "\u91CD\u8981\u6027\u6B0A\u91CD", "en-US": "Importance" },
               type: "number",
               min: 0,
               max: 1,
               step: 0.05,
-              hint: { "zh-CN": "\u8BB0\u5FC6\u81EA\u5E26\u7684\u91CD\u8981\u6027\u3002\u9ED8\u8BA4\u6700\u5927\uFF0C\u8BA9\u6807\u8FC7\u91CD\u8981\u7684\u51B3\u7B56\u6392\u524D\u9762\u3002", "en-US": "Memory importance. Highest by default so marked decisions rank first." }
+              hint: { "zh-CN": "\u8A18\u61B6\u81EA\u5E36\u7684\u91CD\u8981\u6027\u3002\u9810\u8A2D\u6700\u5927\uFF0C\u8B93\u6A19\u904E\u91CD\u8981\u7684\u6C7A\u7B56\u6392\u524D\u9762\u3002", "en-US": "Memory importance. Highest by default so marked decisions rank first." }
             },
             {
               key: "confidenceWeight",
-              label: { "zh-CN": "\u53EF\u4FE1\u5EA6\u6743\u91CD", "en-US": "Confidence" },
+              label: { "zh-CN": "\u53EF\u4FE1\u5EA6\u6B0A\u91CD", "en-US": "Confidence" },
               type: "number",
               min: 0,
               max: 1,
               step: 0.05,
-              hint: { "zh-CN": "\u62BD\u53D6\u53EF\u4FE1\u5EA6\u3002\u4E00\u822C\u4FDD\u6301\u8F83\u4F4E\uFF0C\u907F\u514D\u6A21\u578B\u81EA\u8BC4\u6324\u6389\u4E8B\u5B9E\u3002", "en-US": "Extraction confidence. Keep low so model self-scores do not dominate." }
+              hint: { "zh-CN": "\u62BD\u53D6\u53EF\u4FE1\u5EA6\u3002\u4E00\u822C\u4FDD\u6301\u8F03\u4F4E\uFF0C\u907F\u514D\u6A21\u578B\u81EA\u8A55\u64E0\u6389\u4E8B\u5BE6\u3002", "en-US": "Extraction confidence. Keep low so model self-scores do not dominate." }
             },
             {
               key: "recencyWeight",
-              label: { "zh-CN": "\u65F6\u65B0\u6027\u6743\u91CD", "en-US": "Recency" },
+              label: { "zh-CN": "\u6642\u65B0\u6027\u6B0A\u91CD", "en-US": "Recency" },
               type: "number",
               min: 0,
               max: 1,
               step: 0.05,
-              hint: { "zh-CN": "\u8D8A\u65B0\u8D8A\u9AD8\uFF1A\u7EA6 7 \u5929\u5185\u6EE1\u5206\uFF0C\u7EA6 180 \u5929\u964D\u5230 0\u3002", "en-US": "Newer ranks higher: full score within ~7 days, near 0 by ~180 days." }
+              hint: { "zh-CN": "\u8D8A\u65B0\u8D8A\u9AD8\uFF1A\u7D04 7 \u5929\u5167\u6EFF\u5206\uFF0C\u7D04 180 \u5929\u964D\u5230 0\u3002", "en-US": "Newer ranks higher: full score within ~7 days, near 0 by ~180 days." }
             }
           ]
         },
         {
           group: "summary",
           icon: "\u{1F4DD}",
-          title: { "zh-CN": "\u4F1A\u8BDD\u6458\u8981 (LLM)", "en-US": "Session summary (LLM)" },
+          title: { "zh-CN": "\u6703\u8A71\u6458\u8981 (LLM)", "en-US": "Session summary (LLM)" },
           fields: [
             {
               key: "sessionSemanticMemoryEnabled",
-              label: { "zh-CN": "\u542F\u7528\u4F1A\u8BDD\u6458\u8981", "en-US": "Enable session summary" },
+              label: { "zh-CN": "\u555F\u7528\u6703\u8A71\u6458\u8981", "en-US": "Enable session summary" },
               type: "boolean",
-              hint: { "zh-CN": "\u4F1A\u8BDD\u5B89\u9759\u4E00\u6BB5\u65F6\u95F4\u540E\u81EA\u52A8\u8C03 LLM \u62BD\u53D6\u8BED\u4E49\u8BB0\u5FC6\u5E76\u505A\u8BC1\u636E\u6821\u9A8C\u3002\u4E0D\u9700\u8981\u5173\u95ED\u4F1A\u8BDD\u3002", "en-US": "After the session goes quiet, extract semantic memories with a grounding check. Closing the session is not required." }
+              hint: { "zh-CN": "\u6703\u8A71\u5B89\u975C\u4E00\u6BB5\u6642\u9593\u5F8C\u81EA\u52D5\u8ABF LLM \u62BD\u53D6\u8A9E\u7FA9\u8A18\u61B6\u4E26\u505A\u8B49\u64DA\u6821\u9A57\u3002\u4E0D\u9700\u8981\u95DC\u9589\u6703\u8A71\u3002", "en-US": "After the session goes quiet, extract semantic memories with a grounding check. Closing the session is not required." }
             },
             {
               key: "sessionIdleSummaryMs",
-              label: { "zh-CN": "\u7A7A\u95F2\u591A\u4E45\u518D\u6458\u8981 (ms)", "en-US": "Idle before summary (ms)" },
+              label: { "zh-CN": "\u7A7A\u9592\u591A\u4E45\u518D\u6458\u8981 (ms)", "en-US": "Idle before summary (ms)" },
               type: "number",
               min: 3e4,
               max: 36e5,
               step: 1e3,
-              hint: { "zh-CN": "\u6BCF\u6B21\u4F1A\u8BDD\u6709\u52A8\u9759\u90FD\u91CD\u65B0\u8BA1\u65F6\u3002\u5B89\u9759\u6EE1\u8FD9\u6BB5\u65F6\u95F4\u624D\u6458\u8981\uFF0C\u9ED8\u8BA4 5 \u5206\u949F\u3002\u4F1A\u8BDD\u88AB\u9500\u6BC1\u65F6\u4ECD\u4F1A\u7ACB\u523B\u6458\u8981\u3002", "en-US": "Each flush resets the timer. A summary runs after this much quiet time (default 5 minutes). Session dispose still summarizes immediately." }
+              hint: { "zh-CN": "\u6BCF\u6B21\u6703\u8A71\u6709\u52D5\u975C\u90FD\u91CD\u65B0\u8A08\u6642\u3002\u5B89\u975C\u6EFF\u9019\u6BB5\u6642\u9593\u624D\u6458\u8981\uFF0C\u9810\u8A2D 5 \u5206\u9418\u3002\u6703\u8A71\u88AB\u92B7\u71EC\u6642\u4ECD\u6703\u7ACB\u523B\u6458\u8981\u3002", "en-US": "Each flush resets the timer. A summary runs after this much quiet time (default 5 minutes). Session dispose still summarizes immediately." }
             },
-            { key: "sessionSemanticMaxChars", label: { "zh-CN": "Transcript \u622A\u65AD (chars)", "en-US": "Transcript truncate (chars)" }, type: "number", min: 2e3, max: 4e4, step: 1e3 },
+            { key: "sessionSemanticMaxChars", label: { "zh-CN": "Transcript \u622A\u65B7 (chars)", "en-US": "Transcript truncate (chars)" }, type: "number", min: 2e3, max: 4e4, step: 1e3 },
             { key: "sessionSemanticMaxItems", label: { "zh-CN": "\u6BCF\u6B21\u6700\u591A\u62BD\u53D6", "en-US": "Max items per extraction" }, type: "number", min: 1, max: 8 },
-            { key: "sessionSemanticTimeoutMs", label: { "zh-CN": "LLM \u8D85\u65F6 (ms)", "en-US": "LLM timeout (ms)" }, type: "number", min: 5e3, max: 12e4, step: 1e3 }
+            { key: "sessionSemanticTimeoutMs", label: { "zh-CN": "LLM \u8D85\u6642 (ms)", "en-US": "LLM timeout (ms)" }, type: "number", min: 5e3, max: 12e4, step: 1e3 }
           ]
         },
         {
           group: "arch",
           icon: "\u{1F3D7}\uFE0F",
-          title: { "zh-CN": "\u67B6\u6784\u5206\u6790", "en-US": "Architecture analysis" },
+          title: { "zh-CN": "\u67B6\u69CB\u5206\u6790", "en-US": "Architecture analysis" },
           fields: [
-            { key: "architectureEnabled", label: { "zh-CN": "\u542F\u7528\u67B6\u6784\u5206\u6790", "en-US": "Enable" }, type: "boolean" },
-            { key: "architectureLlmEnabled", label: { "zh-CN": "LLM \u589E\u5F3A", "en-US": "LLM enrichment" }, type: "boolean" },
-            { key: "architectureLlmIncludeSource", label: { "zh-CN": "\u5411 LLM \u6CE8\u5165\u6E90\u7801\u7247\u6BB5", "en-US": "Inject source snippets into LLM" }, type: "boolean" },
-            { key: "architectureMaxFiles", label: { "zh-CN": "\u6700\u5927\u626B\u63CF\u6587\u4EF6\u6570", "en-US": "Max files scanned" }, type: "number", min: 20, max: 1e3 },
-            { key: "architectureMaxNodes", label: { "zh-CN": "\u6700\u5927\u67B6\u6784\u8282\u70B9", "en-US": "Max architecture nodes" }, type: "number", min: 6, max: 60 },
-            { key: "architectureLlmTimeoutMs", label: { "zh-CN": "LLM \u8D85\u65F6 (ms)", "en-US": "LLM timeout (ms)" }, type: "number", min: 5e3, max: 12e4, step: 1e3 }
+            { key: "architectureEnabled", label: { "zh-CN": "\u555F\u7528\u67B6\u69CB\u5206\u6790", "en-US": "Enable" }, type: "boolean" },
+            { key: "architectureLlmEnabled", label: { "zh-CN": "LLM \u589E\u5F37", "en-US": "LLM enrichment" }, type: "boolean" },
+            { key: "architectureLlmIncludeSource", label: { "zh-CN": "\u5411 LLM \u6CE8\u5165\u539F\u59CB\u78BC\u7247\u6BB5", "en-US": "Inject source snippets into LLM" }, type: "boolean" },
+            { key: "architectureMaxFiles", label: { "zh-CN": "\u6700\u5927\u6383\u63CF\u6A94\u6848\u6578", "en-US": "Max files scanned" }, type: "number", min: 20, max: 1e3 },
+            { key: "architectureMaxNodes", label: { "zh-CN": "\u6700\u5927\u67B6\u69CB\u7BC0\u9EDE", "en-US": "Max architecture nodes" }, type: "number", min: 6, max: 60 },
+            { key: "architectureLlmTimeoutMs", label: { "zh-CN": "LLM \u8D85\u6642 (ms)", "en-US": "LLM timeout (ms)" }, type: "number", min: 5e3, max: 12e4, step: 1e3 }
           ]
         }
       ];
@@ -3363,7 +3363,7 @@
               setState({ loaded: true, writable: !!res.value.writable, config: res.value.config || {}, dirty: {}, saving: false, error: null, info: null });
             } else {
               const code = res && res.error && res.error.code || "E_RPC";
-              const msg = res && res.error && res.error.message || "\u65E0\u6CD5\u8BFB\u53D6\u63D2\u4EF6\u8BBE\u7F6E";
+              const msg = res && res.error && res.error.message || "\u7121\u6CD5\u8B80\u53D6\u5916\u639B\u8A2D\u5B9A";
               setState((s) => Object.assign({}, s, { loaded: true, error: msg + (code !== "E_RPC" ? " [" + code + "]" : "") }));
             }
           } catch (e) {
@@ -3393,10 +3393,10 @@
           try {
             const res = await rpc.call("/project-brain", "settings", { sessionId, action: "update", patch });
             if (res && res.ok && res.value) {
-              setState({ loaded: true, writable: !!res.value.writable, config: res.value.config || {}, dirty: {}, saving: false, error: null, info: "\u2713 \u5DF2\u4FDD\u5B58" });
+              setState({ loaded: true, writable: !!res.value.writable, config: res.value.config || {}, dirty: {}, saving: false, error: null, info: "\u2713 \u5DF2\u5132\u5B58" });
             } else {
               const code = res && res.error && res.error.code || "E_RPC";
-              const msg = res && res.error && res.error.message || "\u4FDD\u5B58\u5931\u8D25";
+              const msg = res && res.error && res.error.message || "\u5132\u5B58\u5931\u6557";
               setState((s) => Object.assign({}, s, { saving: false, error: msg + (code !== "E_RPC" ? " [" + code + "]" : "") }));
             }
           } catch (e) {
@@ -3404,7 +3404,7 @@
           }
         }
         function discard() {
-          setState((s) => Object.assign({}, s, { dirty: {}, error: null, info: "\u5DF2\u4E22\u5F03\u672C\u5730\u4FEE\u6539\uFF08\u70B9\u51FB\u300C\u91CD\u65B0\u8BFB\u53D6\u300D\u4F1A\u5237\u65B0\u670D\u52A1\u5668\u503C\uFF09" }));
+          setState((s) => Object.assign({}, s, { dirty: {}, error: null, info: "\u5DF2\u4E1F\u68C4\u672C\u5730\u4FEE\u6539\uFF08\u9EDE\u9078\u300C\u91CD\u65B0\u8B80\u53D6\u300D\u6703\u91CD\u65B0\u6574\u7406\u4F3A\u670D\u5668\u503C\uFF09" }));
         }
         async function runProbe(target) {
           if (!rpc || typeof rpc.call !== "function" || probes[target] && probes[target].status === "running") return;
@@ -3548,8 +3548,8 @@
                   {
                     type: "button",
                     "data-action": "toggle-secret",
-                    "aria-label": revealed ? locale === "en-US" ? "Hide API key" : "\u9690\u85CF\u5BC6\u94A5" : locale === "en-US" ? "Show API key" : "\u663E\u793A\u5BC6\u94A5",
-                    title: revealed ? locale === "en-US" ? "Hide" : "\u9690\u85CF" : locale === "en-US" ? "Show" : "\u663E\u793A",
+                    "aria-label": revealed ? locale === "en-US" ? "Hide API key" : "\u96B1\u85CF\u91D1\u9470" : locale === "en-US" ? "Show API key" : "\u986F\u793A\u91D1\u9470",
+                    title: revealed ? locale === "en-US" ? "Hide" : "\u96B1\u85CF" : locale === "en-US" ? "Show" : "\u986F\u793A",
                     onClick: () => setRevealSecrets((s) => Object.assign({}, s, { [field.key]: !s[field.key] })),
                     style: {
                       position: "absolute",
@@ -3630,7 +3630,7 @@
           );
         }
         if (!state.loaded) {
-          return React.createElement("div", { style: { padding: "20px", textAlign: "center", fontSize: "12px", color: "var(--dsw-alias-label-secondary)" } }, "\u52A0\u8F7D\u8BBE\u7F6E\u4E2D\u2026");
+          return React.createElement("div", { style: { padding: "20px", textAlign: "center", fontSize: "12px", color: "var(--dsw-alias-label-secondary)" } }, "\u8F09\u5165\u8A2D\u5B9A\u4E2D\u2026");
         }
         const dirtyCount = Object.keys(state.dirty).length;
         return React.createElement(
@@ -3650,10 +3650,10 @@
               color: state.writable ? "var(--dsw-alias-state-success-primary)" : "var(--dsw-alias-state-warn-primary)"
             } },
             React.createElement("span", null, state.writable ? "\u2705" : "\u26A0\uFE0F"),
-            React.createElement("span", { style: { flex: "1 1 auto", lineHeight: "1.45" } }, state.writable ? locale === "en-US" ? "Settings are writable. After editing, scroll to the bottom of this page and click Save \u2014 unsaved changes do not take effect." : "\u914D\u7F6E\u53EF\u5199\u3002\u6539\u5B8C\u540E\u8BF7\u6EDA\u5230\u672C\u9875\u6700\u5E95\u90E8\u70B9\u300C\u4FDD\u5B58\u300D\uFF1B\u672A\u70B9\u4FDD\u5B58\u4E0D\u4F1A\u751F\u6548\u3002" : locale === "en-US" ? "Settings read-only in this runtime (DSH settings service unavailable). Configure via DSH settings panel or env vars." : "\u5F53\u524D\u8FD0\u884C\u65F6\u914D\u7F6E\u4E3A\u53EA\u8BFB\uFF08DSH settings \u670D\u52A1\u4E0D\u53EF\u7528\uFF09\u3002\u8BF7\u901A\u8FC7 DSH \u8BBE\u7F6E\u9762\u677F\u6216\u73AF\u5883\u53D8\u91CF\u914D\u7F6E\u3002"),
+            React.createElement("span", { style: { flex: "1 1 auto", lineHeight: "1.45" } }, state.writable ? locale === "en-US" ? "Settings are writable. After editing, scroll to the bottom of this page and click Save \u2014 unsaved changes do not take effect." : "\u914D\u7F6E\u53EF\u5BEB\u3002\u6539\u5B8C\u5F8C\u8ACB\u6EFE\u5230\u672C\u9801\u6700\u5E95\u90E8\u9EDE\u300C\u5132\u5B58\u300D\uFF1B\u672A\u9EDE\u5132\u5B58\u4E0D\u6703\u751F\u6548\u3002" : locale === "en-US" ? "Settings read-only in this runtime (DSH settings service unavailable). Configure via DSH settings panel or env vars." : "\u7576\u524D\u57F7\u884C\u6642\u914D\u7F6E\u70BA\u53EA\u8B80\uFF08DSH settings \u670D\u52D9\u4E0D\u53EF\u7528\uFF09\u3002\u8ACB\u901A\u904E DSH \u8A2D\u5B9A\u9762\u677F\u6216\u74B0\u5883\u8B8A\u6578\u914D\u7F6E\u3002"),
             React.createElement(
               "span",
-              { style: { marginLeft: "auto", cursor: "pointer", opacity: 0.85 }, onClick: loadSettings, title: locale === "en-US" ? "Reload" : "\u91CD\u65B0\u8BFB\u53D6" },
+              { style: { marginLeft: "auto", cursor: "pointer", opacity: 0.85 }, onClick: loadSettings, title: locale === "en-US" ? "Reload" : "\u91CD\u65B0\u8B80\u53D6" },
               "\u27F3"
             )
           ),
@@ -3700,7 +3700,7 @@
             !state.error && !state.info ? React.createElement(
               "span",
               { style: { color: "var(--dsw-alias-label-secondary)", fontSize: "11px", flex: "1 1 auto" } },
-              dirtyCount > 0 ? dirtyCount + (locale === "en-US" ? " unsaved field(s)" : " \u9879\u672A\u4FDD\u5B58") : locale === "en-US" ? "No changes" : "\u65E0\u4FEE\u6539"
+              dirtyCount > 0 ? dirtyCount + (locale === "en-US" ? " unsaved field(s)" : " \u9805\u672A\u5132\u5B58") : locale === "en-US" ? "No changes" : "\u7121\u4FEE\u6539"
             ) : null,
             React.createElement("button", {
               type: "button",
@@ -3717,7 +3717,7 @@
                 opacity: dirtyCount === 0 ? 0.5 : 1,
                 fontFamily: "inherit"
               }
-            }, locale === "en-US" ? "Discard" : "\u653E\u5F03\u4FEE\u6539"),
+            }, locale === "en-US" ? "Discard" : "\u653E\u68C4\u4FEE\u6539"),
             React.createElement("button", {
               type: "button",
               onClick: save,
@@ -3734,7 +3734,7 @@
                 fontWeight: "600",
                 fontFamily: "inherit"
               }
-            }, state.saving ? "\u4FDD\u5B58\u4E2D\u2026" : locale === "en-US" ? "Save" : "\u4FDD\u5B58")
+            }, state.saving ? "\u5132\u5B58\u4E2D\u2026" : locale === "en-US" ? "Save" : "\u5132\u5B58")
           )
         );
       }
@@ -3924,10 +3924,10 @@
           try {
             const res = await Promise.race([
               rpc.call("/project-brain", endpoint, Object.assign({ sessionId: sessionId || void 0 }, extra || {})),
-              new Promise((_, reject) => setTimeout(() => reject(new Error("\u64CD\u4F5C\u8D85\u65F6\uFF0C\u8BF7\u5237\u65B0\u540E\u786E\u8BA4\u662F\u5426\u5DF2\u751F\u6548")), 15e3))
+              new Promise((_, reject) => setTimeout(() => reject(new Error("\u64CD\u4F5C\u8D85\u6642\uFF0C\u8ACB\u91CD\u65B0\u6574\u7406\u5F8C\u78BA\u8A8D\u662F\u5426\u5DF2\u751F\u6548")), 15e3))
             ]);
             if (!res || !res.ok || !res.value) {
-              setMemoryError(res && res.error && res.error.message || "\u64CD\u4F5C\u5931\u8D25");
+              setMemoryError(res && res.error && res.error.message || "\u64CD\u4F5C\u5931\u6557");
               return null;
             }
             if (res.value.preview && typeof onPreviewUpdate === "function") {
@@ -3997,7 +3997,7 @@
             }
           }
           const stats = res.value && res.value.result && res.value.result.data && res.value.result.data.stats;
-          return { message: stats ? t("arch.retryDone") + " \xB7 " + (stats.files || 0) + " \u6587\u4EF6" : t("arch.retryDone") };
+          return { message: stats ? t("arch.retryDone") + " \xB7 " + (stats.files || 0) + " \u6A94\u6848" : t("arch.retryDone") };
         }, [sessionId, rpc, onPreviewUpdate, t]);
         const [gitInfo, setGitInfo] = React.useState(null);
         const [gitAutoRefresh, setGitAutoRefresh] = React.useState(() => {
@@ -4044,30 +4044,30 @@
           const detail = result && result.data ? result.data : {};
           if (action === "rescan") {
             const stats = detail.stats || {};
-            return "\u626B\u63CF\u5B8C\u6210 \xB7 " + (stats.files || 0) + " \u4E2A\u6587\u4EF6";
+            return "\u6383\u63CF\u5B8C\u6210 \xB7 " + (stats.files || 0) + " \u500B\u6A94\u6848";
           }
           if (action === "todos") {
-            return "\u6D3B\u8DC3 " + (detail.active || 0) + " \u9879 \xB7 \u5DF2\u5B8C\u6210 " + (detail.done || 0) + " \u9879";
+            return "\u6D3B\u8E8D " + (detail.active || 0) + " \u9805 \xB7 \u5DF2\u5B8C\u6210 " + (detail.done || 0) + " \u9805";
           }
           if (action === "overview") {
-            return detail.suggestedNextStep ? "\u4E0B\u4E00\u6B65\uFF1A" + detail.suggestedNextStep : "\u9879\u76EE\u5168\u666F\u5DF2\u5237\u65B0";
+            return detail.suggestedNextStep ? "\u4E0B\u4E00\u6B65\uFF1A" + detail.suggestedNextStep : "\u5C08\u6848\u5168\u666F\u5DF2\u91CD\u65B0\u6574\u7406";
           }
           if (action === "dreamCommit") {
             const committed = detail.committed || {};
-            return "\u6574\u7406\u5B8C\u6210 \xB7 " + (committed.beforeCount || 0) + " \u2192 " + (committed.afterCount || 0) + " \u6761\u8BB0\u5FC6";
+            return "\u6574\u7406\u5B8C\u6210 \xB7 " + (committed.beforeCount || 0) + " \u2192 " + (committed.afterCount || 0) + " \u689D\u8A18\u61B6";
           }
-          return "\u6267\u884C\u5B8C\u6210";
+          return "\u57F7\u884C\u5B8C\u6210";
         }
         async function runQuickAction(qa) {
           const previous = quickActionState[qa.id] || {};
           const action = qa.action === "dream" && previous.status === "confirm" ? "dreamCommit" : qa.action;
           if (Object.values(quickActionState).some((state) => state && state.status === "loading")) return;
           setQuickActionState((states) => Object.assign({}, states, {
-            [qa.id]: { status: "loading", message: action === "dreamCommit" ? "\u6B63\u5728\u63D0\u4EA4\u6574\u7406\u2026" : "\u6B63\u5728\u6267\u884C\u2026" }
+            [qa.id]: { status: "loading", message: action === "dreamCommit" ? "\u6B63\u5728\u63D0\u4EA4\u6574\u7406\u2026" : "\u6B63\u5728\u57F7\u884C\u2026" }
           }));
           if (!sessionId || !rpc || typeof rpc.call !== "function") {
             setQuickActionState((states) => Object.assign({}, states, {
-              [qa.id]: { status: "error", message: !sessionId ? "\u672A\u627E\u5230\u5F53\u524D Session" : "DSH Runtime RPC \u4E0D\u53EF\u7528" }
+              [qa.id]: { status: "error", message: !sessionId ? "\u672A\u627E\u5230\u7576\u524D Session" : "DSH Runtime RPC \u4E0D\u53EF\u7528" }
             }));
             return;
           }
@@ -4084,7 +4084,7 @@
             setQuickActionState((states) => Object.assign({}, states, {
               [qa.id]: {
                 status: "error",
-                message: response && response.error && response.error.message || "\u64CD\u4F5C\u6267\u884C\u5931\u8D25"
+                message: response && response.error && response.error.message || "\u64CD\u4F5C\u57F7\u884C\u5931\u6557"
               }
             }));
             return;
@@ -4096,12 +4096,12 @@
             const candidates = (summary.mergeCandidates || 0) + (summary.archiveCandidates || 0);
             if (candidates > 0) {
               setQuickActionState((states) => Object.assign({}, states, {
-                [qa.id]: { status: "confirm", message: "\u53D1\u73B0 " + candidates + " \u9879\u5019\u9009\uFF0C\u70B9\u51FB\u786E\u8BA4\u6574\u7406" }
+                [qa.id]: { status: "confirm", message: "\u767C\u73FE " + candidates + " \u9805\u5019\u9078\uFF0C\u9EDE\u9078\u78BA\u8A8D\u6574\u7406" }
               }));
               return;
             }
             setQuickActionState((states) => Object.assign({}, states, {
-              [qa.id]: { status: "success", message: "\u68C0\u67E5\u5B8C\u6210 \xB7 \u65E0\u9700\u6574\u7406" }
+              [qa.id]: { status: "success", message: "\u6AA2\u67E5\u5B8C\u6210 \xB7 \u7121\u9700\u6574\u7406" }
             }));
             return;
           }
@@ -4211,7 +4211,7 @@
         const structureChips = (stackLayers.structure || []).map(
           (s) => React.createElement("span", {
             key: "struct-" + s,
-            title: "\u4EE3\u7801\u7ED3\u6784",
+            title: "\u7A0B\u5F0F\u78BC\u7D50\u69CB",
             style: {
               display: "inline-flex",
               alignItems: "center",
@@ -4265,7 +4265,7 @@
             "span",
             {
               key: "lang-" + item.lang,
-              title: item.lang + " \xB7 " + item.count + " \u4E2A\u6587\u4EF6",
+              title: item.lang + " \xB7 " + item.count + " \u500B\u6A94\u6848",
               style: { display: "inline-flex", alignItems: "center", gap: "4px", padding: "3px 10px", background: "var(--dsw-alias-bg-layer-2)", borderRadius: "10px", fontSize: "11px", fontWeight: "500", marginRight: "4px", marginBottom: "4px", border: "1px solid var(--dsw-alias-border-l1)" }
             },
             React.createElement("span", { style: { width: "8px", height: "8px", borderRadius: "50%", background: "var(--dsw-alias-state-warn-primary)" } }),
@@ -4278,10 +4278,10 @@
             "span",
             {
               key: "lang-tail",
-              title: langUsage.tail.languages + " \u79CD\u8BED\u8A00\u5171 " + langUsage.tail.count + " \u4E2A\u6587\u4EF6",
+              title: langUsage.tail.languages + " \u7A2E\u8A9E\u8A00\u5171 " + langUsage.tail.count + " \u500B\u6A94\u6848",
               style: { display: "inline-flex", alignItems: "center", gap: "4px", padding: "3px 10px", background: "var(--dsw-alias-bg-layer-2)", borderRadius: "10px", fontSize: "11px", fontWeight: "500", marginRight: "4px", marginBottom: "4px", border: "1px solid var(--dsw-alias-border-l1)", color: "var(--dsw-alias-label-secondary)" }
             },
-            React.createElement("span", null, "\u5176\u5B83 " + langUsage.tail.languages + " \u79CD"),
+            React.createElement("span", null, "\u5176\u5B83 " + langUsage.tail.languages + " \u7A2E"),
             React.createElement("span", null, " \xB7 " + Math.round(langUsage.tail.percent) + "%")
           ));
         }
@@ -4697,7 +4697,7 @@
               "data-mem-id": m.id,
               "data-mem-status": m.status || "active",
               onClick: () => openMemoryModal(m),
-              title: "\u70B9\u51FB\u67E5\u770B\u5B8C\u6574\u5185\u5BB9",
+              title: "\u9EDE\u9078\u6AA2\u8996\u5B8C\u6574\u5167\u5BB9",
               style: {
                 padding: "12px 14px",
                 background: "var(--dsw-alias-bg-layer-1)",
@@ -4726,7 +4726,7 @@
               "div",
               { style: { display: "flex", gap: "8px", alignItems: "flex-start", flexWrap: "wrap" } },
               React.createElement("span", { style: Object.assign({}, typeChipStyle, { marginTop: "1px" }) }, typeLabel(m.type)),
-              m.pinned === true ? React.createElement("span", { title: "\u5DF2\u7F6E\u9876\uFF1ACore \u6EE1\u5458\u65F6\u4E0D\u4F1A\u88AB\u6324\u6389", style: { fontSize: "10px", padding: "1px 7px", borderRadius: "8px", background: "var(--dsw-alias-brand-primary)", color: "var(--dsw-alias-bg-base)", fontWeight: "600" } }, "\u7F6E\u9876") : null,
+              m.pinned === true ? React.createElement("span", { title: "\u5DF2\u7F6E\u9802\uFF1ACore \u6EFF\u54E1\u6642\u4E0D\u6703\u88AB\u64E0\u6389", style: { fontSize: "10px", padding: "1px 7px", borderRadius: "8px", background: "var(--dsw-alias-brand-primary)", color: "var(--dsw-alias-bg-base)", fontWeight: "600" } }, "\u7F6E\u9802") : null,
               m.status && m.status !== "active" ? React.createElement("span", { style: { fontSize: "10px", padding: "1px 7px", borderRadius: "8px", background: "var(--dsw-alias-bg-layer-2)", color: "var(--dsw-alias-label-secondary)", fontWeight: "600" } }, m.status) : null,
               React.createElement("span", { style: { fontSize: "13px", fontWeight: "600", flex: "1 1 200px", minWidth: 0, wordBreak: "break-word", lineHeight: 1.4, color: "var(--dsw-alias-label-primary)" } }, m.title)
             ),
@@ -4741,7 +4741,7 @@
                 m.createdAt ? React.createElement("span", { style: { fontVariantNumeric: "tabular-nums" } }, formatMemTime(m.createdAt)) : null,
                 Array.isArray(m.tags) && m.tags.length > 0 ? React.createElement("span", { style: { maxWidth: "160px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }, title: m.tags.map((tag) => "#" + tag).join(" ") }, m.tags.slice(0, 3).map((tag) => "#" + tag).join(" ")) : null
               ),
-              contentStr ? React.createElement("span", { style: { fontSize: "10px", padding: "2px 9px", borderRadius: "10px", background: "var(--dsw-alias-bg-layer-2)", color: "var(--dsw-alias-label-primary)", fontWeight: "600", border: "1px solid var(--dsw-alias-border-l1)", flex: "0 0 auto" } }, "\u25B8 \u67E5\u770B\u8BE6\u60C5") : null
+              contentStr ? React.createElement("span", { style: { fontSize: "10px", padding: "2px 9px", borderRadius: "10px", background: "var(--dsw-alias-bg-layer-2)", color: "var(--dsw-alias-label-primary)", fontWeight: "600", border: "1px solid var(--dsw-alias-border-l1)", flex: "0 0 auto" } }, "\u25B8 \u6AA2\u8996\u8A73\u60C5") : null
             )
           );
         };
@@ -4850,18 +4850,18 @@
               },
               onClick: (e) => e.stopPropagation()
             },
-            // 头部：type chip + title + close
+            // 頭部：type chip + title + close
             React.createElement(
               "div",
               { style: { padding: "14px 18px", borderBottom: "1px solid var(--dsw-alias-border-l1)", display: "flex", alignItems: "flex-start", gap: "10px", background: "linear-gradient(90deg, var(--dsw-alias-bg-layer-1), var(--dsw-alias-bg-layer-2))" } },
               React.createElement("span", { style: typeChipStyle }, typeLabel(memoryModal.type)),
-              memoryModal.pinned === true ? React.createElement("span", { title: "\u5DF2\u7F6E\u9876", style: { flex: "0 0 auto", fontSize: "10px", padding: "1px 7px", borderRadius: "8px", background: "var(--dsw-alias-brand-primary)", color: "var(--dsw-alias-bg-base)", fontWeight: "600" } }, "\u7F6E\u9876") : null,
-              React.createElement("span", { style: { fontSize: "15px", fontWeight: "600", flex: "1 1 auto", minWidth: 0, wordBreak: "break-word", lineHeight: 1.45 } }, memoryModal.title || "(\u65E0\u6807\u9898)"),
+              memoryModal.pinned === true ? React.createElement("span", { title: "\u5DF2\u7F6E\u9802", style: { flex: "0 0 auto", fontSize: "10px", padding: "1px 7px", borderRadius: "8px", background: "var(--dsw-alias-brand-primary)", color: "var(--dsw-alias-bg-base)", fontWeight: "600" } }, "\u7F6E\u9802") : null,
+              React.createElement("span", { style: { fontSize: "15px", fontWeight: "600", flex: "1 1 auto", minWidth: 0, wordBreak: "break-word", lineHeight: 1.45 } }, memoryModal.title || "(\u7121\u6A19\u984C)"),
               React.createElement("button", {
                 type: "button",
                 "data-action": "memory-modal-close",
                 onClick: closeMemoryModal,
-                title: "\u5173\u95ED",
+                title: "\u95DC\u9589",
                 style: {
                   background: "transparent",
                   border: "1px solid var(--dsw-alias-border-l1)",
@@ -4877,14 +4877,14 @@
                 }
               }, "\xD7")
             ),
-            // 主体：只读时渲染 markdown，编辑态换成表单（v1.2.x 起正文走 markdown：标题/列表/代码块/链接等）
+            // 主體：只讀時渲染 markdown，編輯態換成表單（v1.2.x 起正文走 markdown：標題/列表/程式碼塊/連結等）
             React.createElement("div", {
               "data-block": "memory-modal-body",
               style: { padding: "20px 24px 24px", overflowY: "auto", flex: "1 1 auto", color: "var(--dsw-alias-label-primary)" }
             }, memoryDraft ? React.createElement(
               "div",
               { "data-block": "memory-edit-form", style: { display: "flex", flexDirection: "column", gap: "14px" } },
-              memoryField("\u6807\u9898", React.createElement("input", {
+              memoryField("\u6A19\u984C", React.createElement("input", {
                 type: "text",
                 "data-field": "memory-title",
                 value: memoryDraft.title,
@@ -4892,7 +4892,7 @@
                 onChange: (e) => updateDraft({ title: e.target.value }),
                 style: memoryInputStyle
               })),
-              memoryField("\u6B63\u6587\uFF08\u81F3\u5C11 12 \u4E2A\u5B57\u7B26\uFF09", React.createElement("textarea", {
+              memoryField("\u6B63\u6587\uFF08\u81F3\u5C11 12 \u500B\u5B57\u5143\uFF09", React.createElement("textarea", {
                 "data-field": "memory-content",
                 value: memoryDraft.content,
                 rows: 10,
@@ -4903,7 +4903,7 @@
               React.createElement(
                 "div",
                 { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "12px" } },
-                memoryField("\u7C7B\u578B", React.createElement("select", {
+                memoryField("\u578B\u5225", React.createElement("select", {
                   "data-field": "memory-type",
                   value: memoryDraft.type,
                   onChange: (e) => updateDraft({ type: e.target.value }),
@@ -4919,7 +4919,7 @@
                   onChange: (e) => updateDraft({ importance: Number(e.target.value) }),
                   style: { width: "100%", accentColor: "var(--dsw-alias-brand-primary)" }
                 })),
-                memoryField("\u72B6\u6001", React.createElement(
+                memoryField("\u72C0\u614B", React.createElement(
                   "select",
                   {
                     "data-field": "memory-status",
@@ -4927,10 +4927,10 @@
                     onChange: (e) => updateDraft({ status: e.target.value }),
                     style: memoryInputStyle
                   },
-                  React.createElement("option", { value: "active" }, "Core\uFF08\u6BCF\u8F6E\u6CE8\u5165\uFF09"),
+                  React.createElement("option", { value: "active" }, "Core\uFF08\u6BCF\u8F2A\u6CE8\u5165\uFF09"),
                   React.createElement("option", { value: "dormant" }, "\u4F11\u7720\uFF08\u4E0D\u6CE8\u5165\uFF09")
                 )),
-                memoryField("\u7F6E\u9876", React.createElement(
+                memoryField("\u7F6E\u9802", React.createElement(
                   "label",
                   {
                     style: { display: "flex", alignItems: "center", gap: "7px", fontSize: "12px", padding: "8px 0", cursor: "pointer", color: "var(--dsw-alias-label-secondary)" }
@@ -4942,22 +4942,22 @@
                     onChange: (e) => updateDraft({ pinned: e.target.checked }),
                     style: { accentColor: "var(--dsw-alias-brand-primary)", margin: 0 }
                   }),
-                  React.createElement("span", null, "Core \u6EE1\u5458\u65F6\u4E0D\u88AB\u6324\u6389")
+                  React.createElement("span", null, "Core \u6EFF\u54E1\u6642\u4E0D\u88AB\u64E0\u6389")
                 ))
               ),
-              memoryField("\u6807\u7B7E\uFF08\u9017\u53F7\u5206\u9694\uFF09", React.createElement("input", {
+              memoryField("\u6A19\u7C64\uFF08\u9017\u865F\u5206\u9694\uFF09", React.createElement("input", {
                 type: "text",
                 "data-field": "memory-tags",
                 value: memoryDraft.tags,
                 onChange: (e) => updateDraft({ tags: e.target.value }),
                 style: memoryInputStyle
               }))
-            ) : memoryModal.content ? renderMarkdown(String(memoryModal.content), React) : React.createElement("div", { style: { fontSize: "13.5px", color: "var(--dsw-alias-label-secondary)" } }, "\uFF08\u65E0\u5185\u5BB9\uFF09")),
+            ) : memoryModal.content ? renderMarkdown(String(memoryModal.content), React) : React.createElement("div", { style: { fontSize: "13.5px", color: "var(--dsw-alias-label-secondary)" } }, "\uFF08\u7121\u5167\u5BB9\uFF09")),
             memoryError ? React.createElement("div", {
               "data-block": "memory-modal-error",
               style: { padding: "8px 18px", fontSize: "11.5px", color: "var(--dsw-alias-state-error-primary)", background: "var(--dsw-alias-bg-layer-2)", borderTop: "1px solid var(--dsw-alias-border-l1)" }
             }, "\u26A0 " + memoryError) : null,
-            // 底部：importance + 时间 + tags + 复制
+            // 底部：importance + 時間 + tags + 複製
             React.createElement(
               "div",
               { style: { padding: "10px 18px", borderTop: "1px solid var(--dsw-alias-border-l1)", display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap", fontSize: "11px", color: "var(--dsw-alias-label-secondary)", background: "var(--dsw-alias-bg-layer-2)" } },
@@ -4984,11 +4984,11 @@
                   disabled: memoryBusy,
                   onClick: saveMemoryEdit,
                   style: memoryButtonStyle("primary")
-                }, memoryBusy ? "\u4FDD\u5B58\u4E2D\u2026" : "\u2713 \u4FDD\u5B58")
+                }, memoryBusy ? "\u5132\u5B58\u4E2D\u2026" : "\u2713 \u5132\u5B58")
               ) : confirmDelete ? React.createElement(
                 React.Fragment,
                 null,
-                React.createElement("span", { style: { color: "var(--dsw-alias-state-error-primary)", fontWeight: "600" } }, "\u6C38\u4E45\u5220\u9664\u540E\u65E0\u6CD5\u6062\u590D\uFF0C\u786E\u5B9A\uFF1F"),
+                React.createElement("span", { style: { color: "var(--dsw-alias-state-error-primary)", fontWeight: "600" } }, "\u6C38\u4E45\u522A\u9664\u5F8C\u7121\u6CD5\u6062\u5FA9\uFF0C\u78BA\u5B9A\uFF1F"),
                 React.createElement("button", {
                   type: "button",
                   "data-action": "memory-delete-cancel",
@@ -5002,7 +5002,7 @@
                   disabled: memoryBusy,
                   onClick: deleteMemory,
                   style: memoryButtonStyle("danger")
-                }, memoryBusy ? "\u5220\u9664\u4E2D\u2026" : "\u786E\u8BA4\u6C38\u4E45\u5220\u9664")
+                }, memoryBusy ? "\u522A\u9664\u4E2D\u2026" : "\u78BA\u8A8D\u6C38\u4E45\u522A\u9664")
               ) : React.createElement(
                 React.Fragment,
                 null,
@@ -5011,39 +5011,39 @@
                   "data-action": "memory-modal-copy",
                   onClick: (e) => {
                     const text = (memoryModal.title || "") + "\n\n" + (memoryModal.content || "");
-                    copyPrompt(text, e, "\u2713 \u5DF2\u590D\u5236", "\u590D\u5236\u5931\u8D25");
+                    copyPrompt(text, e, "\u2713 \u5DF2\u8907\u88FD", "\u8907\u88FD\u5931\u6557");
                   },
                   style: memoryButtonStyle()
-                }, "\u{1F4CB} \u590D\u5236\u5168\u6587"),
+                }, "\u{1F4CB} \u8907\u88FD\u5168\u6587"),
                 React.createElement("button", {
                   type: "button",
                   "data-action": "memory-edit-start",
                   disabled: memoryBusy,
                   onClick: () => startMemoryEdit(memoryModal),
                   style: memoryButtonStyle()
-                }, "\u270F\uFE0F \u7F16\u8F91"),
+                }, "\u270F\uFE0F \u7DE8\u8F2F"),
                 isArchivedMemory(memoryModal) ? React.createElement("button", {
                   type: "button",
                   "data-action": "memory-restore",
                   disabled: memoryBusy,
                   onClick: () => setMemoryStatus("active"),
                   style: memoryButtonStyle()
-                }, "\u21A9 \u6062\u590D") : React.createElement("button", {
+                }, "\u21A9 \u6062\u5FA9") : React.createElement("button", {
                   type: "button",
                   "data-action": "memory-archive",
                   disabled: memoryBusy,
                   onClick: () => setMemoryStatus("archived"),
-                  title: "\u4ECE Core \u548C\u68C0\u7D22\u4E2D\u79FB\u9664\uFF0C\u4E4B\u540E\u53EF\u5728\u300C\u5DF2\u5F52\u6863\u300D\u91CC\u6062\u590D",
+                  title: "\u5F9E Core \u548C\u6AA2\u7D22\u4E2D\u79FB\u9664\uFF0C\u4E4B\u5F8C\u53EF\u5728\u300C\u5DF2\u6B78\u6A94\u300D\u88E1\u6062\u5FA9",
                   style: memoryButtonStyle()
-                }, "\u{1F5C2} \u5F52\u6863"),
+                }, "\u{1F5C2} \u6B78\u6A94"),
                 React.createElement("button", {
                   type: "button",
                   "data-action": "memory-delete",
                   disabled: memoryBusy,
                   onClick: () => setConfirmDelete(true),
-                  title: "\u7269\u7406\u5220\u9664\uFF0C\u4E0D\u53EF\u6062\u590D",
+                  title: "\u7269\u7406\u522A\u9664\uFF0C\u4E0D\u53EF\u6062\u5FA9",
                   style: memoryButtonStyle()
-                }, "\u{1F5D1} \u5220\u9664")
+                }, "\u{1F5D1} \u522A\u9664")
               )
             )
           )
@@ -5057,12 +5057,12 @@
             React.createElement("span", { style: { fontSize: "18px" } }, "\u{1F3AF}"),
             React.createElement("span", { style: { flex: "1 1 auto" } }, t("dash.title")),
             React.createElement("span", {
-              title: retrieval.vectorConfigured ? retrieval.embeddingModel || "hybrid" : "\u65E0\u9700\u914D\u7F6E\uFF0C\u6570\u636E\u4FDD\u7559\u5728\u9879\u76EE\u5185",
+              title: retrieval.vectorConfigured ? retrieval.embeddingModel || "hybrid" : "\u7121\u9700\u914D\u7F6E\uFF0C\u8CC7\u6599\u4FDD\u7559\u5728\u5C08\u6848\u5167",
               style: { fontSize: "10px", padding: "2px 7px", borderRadius: "8px", background: "var(--dsw-alias-bg-layer-2)", color: "var(--dsw-alias-label-secondary)", border: "1px solid var(--dsw-alias-border-l1)" }
-            }, retrieval.configuredMode === "hybrid" ? "\u5411\u91CF\u5DF2\u914D\u7F6E" : "\u672C\u5730\u68C0\u7D22"),
-            React.createElement("span", { style: { fontSize: "10px", color: "var(--dsw-alias-label-secondary)" } }, "\u70B9\u51FB\u5361\u7247\u540E\u53F0\u6267\u884C")
+            }, retrieval.configuredMode === "hybrid" ? "\u5411\u91CF\u5DF2\u914D\u7F6E" : "\u672C\u5730\u6AA2\u7D22"),
+            React.createElement("span", { style: { fontSize: "10px", color: "var(--dsw-alias-label-secondary)" } }, "\u9EDE\u9078\u5361\u7247\u5F8C\u81FA\u57F7\u884C")
           ),
-          // v0.4.15 智能续接：Session 开始时主动给出"今天可能想推进什么"
+          // v0.4.15 智慧續接：Session 開始時主動給出"今天可能想推進什麼"
           React.createElement(SuggestionCard, {
             t,
             localeCode,
@@ -5072,14 +5072,14 @@
             embeddedSuggestion: data.suggestion || null,
             workspacePath: data._workspacePath || null
           }),
-          // v0.4.11: Quick Actions 2x2 网格（替代"继续上次开发"鸡肋按钮）
+          // v0.4.11: Quick Actions 2x2 網格（替代"繼續上次開發"雞肋按鈕）
           (() => {
             const isEn = localeCode === "en-US";
             const quickActions = [
-              { id: "qa-rescan", action: "rescan", icon: "\u{1F504}", title: isEn ? "Rescan" : "\u91CD\u65B0\u626B\u63CF", desc: isEn ? "Incrementally refresh project structure" : "\u589E\u91CF\u66F4\u65B0\u9879\u76EE\u7ED3\u6784" },
-              { id: "qa-todo", action: "todos", icon: "\u{1F4CB}", title: isEn ? "Review todos" : "\u6574\u7406\u5F85\u529E", desc: isEn ? "View active tasks" : "\u67E5\u770B\u6D3B\u8DC3\u4EFB\u52A1" },
-              { id: "qa-memory", action: "dream", icon: "\u{1F9E0}", title: isEn ? "Organize memories" : "\u6574\u7406\u8BB0\u5FC6", desc: isEn ? "Deduplicate and archive stale items" : "\u53BB\u91CD + \u5F52\u6863\u8FC7\u671F" },
-              { id: "qa-summary", action: "overview", icon: "\u{1F3AF}", title: isEn ? "Project overview" : "\u9879\u76EE\u5168\u666F", desc: isEn ? "Summarize current status" : "\u603B\u89C8\u5F53\u524D\u72B6\u6001" }
+              { id: "qa-rescan", action: "rescan", icon: "\u{1F504}", title: isEn ? "Rescan" : "\u91CD\u65B0\u6383\u63CF", desc: isEn ? "Incrementally refresh project structure" : "\u589E\u91CF\u66F4\u65B0\u5C08\u6848\u7D50\u69CB" },
+              { id: "qa-todo", action: "todos", icon: "\u{1F4CB}", title: isEn ? "Review todos" : "\u6574\u7406\u5F85\u8FA6", desc: isEn ? "View active tasks" : "\u6AA2\u8996\u6D3B\u8E8D\u4EFB\u52D9" },
+              { id: "qa-memory", action: "dream", icon: "\u{1F9E0}", title: isEn ? "Organize memories" : "\u6574\u7406\u8A18\u61B6", desc: isEn ? "Deduplicate and archive stale items" : "\u53BB\u91CD + \u6B78\u6A94\u904E\u671F" },
+              { id: "qa-summary", action: "overview", icon: "\u{1F3AF}", title: isEn ? "Project overview" : "\u5C08\u6848\u5168\u666F", desc: isEn ? "Summarize current status" : "\u7E3D\u89BD\u7576\u524D\u72C0\u614B" }
             ];
             return React.createElement(
               "div",
@@ -5088,7 +5088,7 @@
                 const state = quickActionState[qa.id] || { status: "idle", message: "" };
                 const busy = state.status === "loading";
                 const anyBusy = Object.values(quickActionState).some((item) => item && item.status === "loading");
-                const trailing = busy ? React.createElement("span", { "data-spinner": "1", style: { width: "15px", height: "15px", borderRadius: "50%", border: "2px solid var(--dsw-alias-border-l2)", borderTopColor: "var(--dsw-alias-brand-primary)", animation: "dsh-brain-spin 0.9s linear infinite", display: "inline-block" } }) : state.status === "success" ? "\u2705" : state.status === "error" ? "\u274C" : state.status === "confirm" ? "\u786E\u8BA4" : "\u25B6";
+                const trailing = busy ? React.createElement("span", { "data-spinner": "1", style: { width: "15px", height: "15px", borderRadius: "50%", border: "2px solid var(--dsw-alias-border-l2)", borderTopColor: "var(--dsw-alias-brand-primary)", animation: "dsh-brain-spin 0.9s linear infinite", display: "inline-block" } }) : state.status === "success" ? "\u2705" : state.status === "error" ? "\u274C" : state.status === "confirm" ? "\u78BA\u8A8D" : "\u25B6";
                 return React.createElement(
                   "button",
                   {
@@ -5131,7 +5131,7 @@
             "div",
             { style: { padding: "0 12px 8px", fontSize: "10px", color: "var(--dsw-alias-label-secondary)", display: "flex", alignItems: "center", gap: "4px" } },
             React.createElement("span", null, "\u{1F4A1}"),
-            React.createElement("span", null, "\u64CD\u4F5C\u5C06\u5728\u5F53\u524D\u5DE5\u4F5C\u533A\u540E\u53F0\u6267\u884C\uFF1B\u6574\u7406\u8BB0\u5FC6\u4F1A\u5148\u9884\u89C8\u518D\u786E\u8BA4")
+            React.createElement("span", null, "\u64CD\u4F5C\u5C07\u5728\u7576\u524D\u5DE5\u4F5C\u5340\u5F8C\u81FA\u57F7\u884C\uFF1B\u6574\u7406\u8A18\u61B6\u6703\u5148\u9810\u89BD\u518D\u78BA\u8A8D")
           ),
           React.createElement("style", null, "@keyframes dsh-brain-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }"),
           React.createElement(
@@ -5193,7 +5193,7 @@
             React.createElement("span", null, "\u{1F552}"),
             React.createElement("span", null, t("dash.snapshot", { time: formatDate(data.generatedAt || Date.now()) }))
           ),
-          // v1.1.x-fix：项目记忆详情弹框（fixed 定位，挂在 dashboard 末尾不影响布局）
+          // v1.1.x-fix：專案記憶詳情彈框（fixed 定位，掛在 dashboard 末尾不影響佈局）
           memoryModalNode
         );
       }
@@ -5242,10 +5242,10 @@
         function compressRpcError(err) {
           const raw = err && err.message ? err.message : typeof err === "string" ? err : String(err || "");
           if (/invalid_union|invalid_value|No matching discriminator/.test(raw)) {
-            return "[DSH schema] host \u8FD4\u56DE\u7684 result \u4E0D\u7B26\u5408 Connection RPC schema\uFF08\u901A\u5E38\u662F DSH \u5347\u7EA7/\u964D\u7EA7\u5F15\u5165\u7684\u534F\u8BAE\u4E0D\u517C\u5BB9\uFF0C\u6216\u63D2\u4EF6\u8FD4\u56DE\u4E86 schema \u672A\u58F0\u660E\u7684\u5B57\u6BB5\uFF09";
+            return "[DSH schema] host \u8FD4\u56DE\u7684 result \u4E0D\u7B26\u5408 Connection RPC schema\uFF08\u901A\u5E38\u662F DSH \u5347\u7D1A/\u964D\u7D1A\u5F15\u5165\u7684\u5354\u8B70\u4E0D\u76F8\u5BB9\uFF0C\u6216\u5916\u639B\u8FD4\u56DE\u4E86 schema \u672A\u5BA3\u544A\u7684\u6B04\u4F4D\uFF09";
           }
           if (/Failed to fetch|NetworkError|ECONNREFUSED|ENOTFOUND|timeout/i.test(raw)) {
-            return "[DSH IPC] host \u901A\u9053\u4E0D\u53EF\u8FBE\uFF08" + raw.slice(0, 80) + "\uFF09";
+            return "[DSH IPC] host \u901A\u9053\u4E0D\u53EF\u9054\uFF08" + raw.slice(0, 80) + "\uFF09";
           }
           return raw.length > 200 ? raw.slice(0, 200) + "\u2026" : raw;
         }
@@ -5280,7 +5280,7 @@
                 setRuntimeError({
                   code: err.code || "RPC_EMPTY",
                   originalCode,
-                  message: err.message || "host RPC \u8FD4\u56DE\u5F02\u5E38",
+                  message: err.message || "host RPC \u8FD4\u56DE\u7570\u5E38",
                   sessionId: sid,
                   at: Date.now()
                 });
@@ -5367,7 +5367,7 @@
                   "div",
                   { style: { display: "flex", alignItems: "center" } },
                   React.createElement("span", { className: "dsh-brain-loading-dot" }),
-                  React.createElement("span", null, localeCode === "en-US" ? "Resolving workspace from Session\u2026" : "\u6B63\u5728\u4ECE Session \u89E3\u6790 workspace\u2026")
+                  React.createElement("span", null, localeCode === "en-US" ? "Resolving workspace from Session\u2026" : "\u6B63\u5728\u5F9E Session \u89E3\u6790 workspace\u2026")
                 ),
                 React.createElement(
                   "div",
@@ -5384,11 +5384,11 @@
             const isWorkspaceMiss = effectiveCode === "workspace-not-found";
             const isSchema = (errCode === "RPC_THROW" || errCode === "internal") && /\[DSH schema\]/.test(runtimeError.message || "");
             const isNetwork = (errCode === "RPC_THROW" || errCode === "internal") && /\[DSH IPC\]/.test(runtimeError.message || "");
-            const bannerTitle = isWorkspaceMiss ? localeCode === "en-US" ? "Workspace path not found for this Session" : "\u65E0\u6CD5\u4ECE\u5F53\u524D Session \u89E3\u6790 workspace \u8DEF\u5F84" : isSchema ? localeCode === "en-US" ? "DSH host returned a malformed result" : "DSH host \u8FD4\u56DE\u7684 result \u534F\u8BAE\u4E0D\u5339\u914D" : isNetwork ? localeCode === "en-US" ? "Cannot reach DSH host" : "\u65E0\u6CD5\u8FDE\u63A5 DSH host" : localeCode === "en-US" ? "Host RPC failed" : "host \u8FDE\u63A5\u5931\u8D25";
-            const bannerReason = isWorkspaceMiss ? localeCode === "en-US" ? "DSH Host could not resolve cwd for this sessionId. Usually means DSH has not yet registered the session workspace (cold start) or the session has no cwd header." : "DSH Host \u6682\u65F6\u65E0\u6CD5\u89E3\u6790\u5F53\u524D sessionId \u5BF9\u5E94\u7684 cwd\uFF08\u901A\u5E38 DSH \u8FD8\u6CA1\u628A session workspace \u6CE8\u518C\u8FDB\u6765\uFF0C\u6216 session header \u7F3A cwd \u5B57\u6BB5\uFF09\u3002" : isSchema ? localeCode === "en-US" ? "The result of /project-brain preview did not match Connection RPC schema. This usually means the plugin and DSH Desktop versions are out of sync \u2014 try restarting DSH." : "/project-brain preview \u8FD4\u56DE\u7684 result \u4E0D\u7B26\u5408 Connection RPC schema\uFF0C\u901A\u5E38\u662F\u63D2\u4EF6\u4E0E DSH \u684C\u9762\u7248\u672C\u4E0D\u4E00\u81F4\u5BFC\u81F4\u2014\u2014\u91CD\u542F DSH \u8BD5\u8BD5\u3002" : localeCode === "en-US" ? `RPC "${errCode}"${originalCode ? " (was " + originalCode + ")" : ""} \u2014 ${runtimeError.message || "(no message)"}` : `RPC "${errCode}"${originalCode ? "\uFF08\u539F code=" + originalCode + "\uFF09" : ""} \u2014 ${runtimeError.message || "\u672A\u77E5\u9519\u8BEF"}`;
-            const bannerAction = isWorkspaceMiss ? localeCode === "en-US" ? "Action: wait a moment and switch again, or open any file in the project root so DSH registers the workspace, then return." : "\u5EFA\u8BAE\uFF1A\u7B49 1~2 \u79D2\u518D\u5207\u4E00\u6B21\uFF0C\u6216\u5728\u9879\u76EE\u6839\u76EE\u5F55\u968F\u4FBF\u6253\u5F00\u4E00\u4E2A\u6587\u4EF6\u8BA9 DSH \u6CE8\u518C workspace \u540E\u518D\u56DE\u6765\u3002" : isSchema ? localeCode === "en-US" ? "Action: fully quit DSH Desktop (right-click tray \u2192 Quit) and restart. Reopen the project \u2014 the bundle will be reloaded." : "\u5EFA\u8BAE\uFF1A\u5B8C\u5168\u9000\u51FA DSH \u684C\u9762\uFF08\u6258\u76D8\u53F3\u952E \u2192 Quit\uFF09\u540E\u91CD\u65B0\u542F\u52A8\uFF0C\u518D\u6253\u5F00\u8BE5\u9879\u76EE\u5373\u53EF\u91CD\u65B0\u52A0\u8F7D bundle\u3002" : localeCode === "en-US" ? "Action: check DSH Desktop network/plugin health, or restart DSH. The retry interval is 5s." : "\u5EFA\u8BAE\uFF1A\u68C0\u67E5 DSH \u684C\u9762\u7F51\u7EDC/\u63D2\u4EF6\u72B6\u6001\uFF0C\u6216\u91CD\u542F DSH\u3002\u5BA2\u6237\u7AEF\u6BCF 5 \u79D2\u4F1A\u81EA\u52A8\u91CD\u8BD5\u3002";
-            const bannerSeverity = isWorkspaceMiss ? "\u8F7B" : isSchema || isNetwork ? "\u4E2D" : "\u4E2D";
-            const severityLabel = localeCode === "en-US" ? isWorkspaceMiss ? "Severity: low" : "Severity: medium" : `\u4E25\u91CD\u7A0B\u5EA6\uFF1A${bannerSeverity}`;
+            const bannerTitle = isWorkspaceMiss ? localeCode === "en-US" ? "Workspace path not found for this Session" : "\u7121\u6CD5\u5F9E\u7576\u524D Session \u89E3\u6790 workspace \u8DEF\u5F91" : isSchema ? localeCode === "en-US" ? "DSH host returned a malformed result" : "DSH host \u8FD4\u56DE\u7684 result \u5354\u8B70\u4E0D\u5339\u914D" : isNetwork ? localeCode === "en-US" ? "Cannot reach DSH host" : "\u7121\u6CD5\u9023\u7DDA DSH host" : localeCode === "en-US" ? "Host RPC failed" : "host \u9023\u7DDA\u5931\u6557";
+            const bannerReason = isWorkspaceMiss ? localeCode === "en-US" ? "DSH Host could not resolve cwd for this sessionId. Usually means DSH has not yet registered the session workspace (cold start) or the session has no cwd header." : "DSH Host \u66AB\u6642\u7121\u6CD5\u89E3\u6790\u7576\u524D sessionId \u5C0D\u61C9\u7684 cwd\uFF08\u901A\u5E38 DSH \u9084\u6C92\u628A session workspace \u8A3B\u518A\u9032\u4F86\uFF0C\u6216 session header \u7F3A cwd \u6B04\u4F4D\uFF09\u3002" : isSchema ? localeCode === "en-US" ? "The result of /project-brain preview did not match Connection RPC schema. This usually means the plugin and DSH Desktop versions are out of sync \u2014 try restarting DSH." : "/project-brain preview \u8FD4\u56DE\u7684 result \u4E0D\u7B26\u5408 Connection RPC schema\uFF0C\u901A\u5E38\u662F\u5916\u639B\u8207 DSH \u684C\u9762\u7248\u672C\u4E0D\u4E00\u81F4\u5C0E\u81F4\u2014\u2014\u91CD\u555F DSH \u8A66\u8A66\u3002" : localeCode === "en-US" ? `RPC "${errCode}"${originalCode ? " (was " + originalCode + ")" : ""} \u2014 ${runtimeError.message || "(no message)"}` : `RPC "${errCode}"${originalCode ? "\uFF08\u539F code=" + originalCode + "\uFF09" : ""} \u2014 ${runtimeError.message || "\u672A\u77E5\u932F\u8AA4"}`;
+            const bannerAction = isWorkspaceMiss ? localeCode === "en-US" ? "Action: wait a moment and switch again, or open any file in the project root so DSH registers the workspace, then return." : "\u5EFA\u8B70\uFF1A\u7B49 1~2 \u79D2\u518D\u5207\u4E00\u6B21\uFF0C\u6216\u5728\u5C08\u6848\u6839\u76EE\u9304\u96A8\u4FBF\u958B\u555F\u4E00\u500B\u6A94\u6848\u8B93 DSH \u8A3B\u518A workspace \u5F8C\u518D\u56DE\u4F86\u3002" : isSchema ? localeCode === "en-US" ? "Action: fully quit DSH Desktop (right-click tray \u2192 Quit) and restart. Reopen the project \u2014 the bundle will be reloaded." : "\u5EFA\u8B70\uFF1A\u5B8C\u5168\u9000\u51FA DSH \u684C\u9762\uFF08\u6258\u76E4\u53F3\u9375 \u2192 Quit\uFF09\u5F8C\u91CD\u65B0\u555F\u52D5\uFF0C\u518D\u958B\u555F\u8A72\u5C08\u6848\u5373\u53EF\u91CD\u65B0\u8F09\u5165 bundle\u3002" : localeCode === "en-US" ? "Action: check DSH Desktop network/plugin health, or restart DSH. The retry interval is 5s." : "\u5EFA\u8B70\uFF1A\u6AA2\u67E5 DSH \u684C\u9762\u7DB2\u8DEF/\u5916\u639B\u72C0\u614B\uFF0C\u6216\u91CD\u555F DSH\u3002\u5BA2\u6236\u7AEF\u6BCF 5 \u79D2\u6703\u81EA\u52D5\u91CD\u8A66\u3002";
+            const bannerSeverity = isWorkspaceMiss ? "\u8F15" : isSchema || isNetwork ? "\u4E2D" : "\u4E2D";
+            const severityLabel = localeCode === "en-US" ? isWorkspaceMiss ? "Severity: low" : "Severity: medium" : `\u56B4\u91CD\u7A0B\u5EA6\uFF1A${bannerSeverity}`;
             const banner = React.createElement(
               "div",
               {
@@ -5727,7 +5727,7 @@
               name: "conversation.view",
               id: "project-brain",
               order: 35,
-              label: () => "\u9879\u76EE"
+              label: () => "\u5C08\u6848"
             },
             (props) => React.createElement(SidebarPreviewRoot, Object.assign({}, props, { _dshLocale: dshLocale }))
           )

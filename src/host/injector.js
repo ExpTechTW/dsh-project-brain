@@ -1,29 +1,29 @@
 // injector.js - Context Injector（v0.3.0）
-// SPEC §4.5：跨 Session 续接时，从 Project Brain 挑选应注入的 Memory。
-// 通过 systemPrompt.service.section() 注册一个 "project-brain-context" 段，
-// DSH 每次 assemble prompt 时调用 render() 返回 markdown 文本。
+// SPEC §4.5：跨 Session 續接時，從 Project Brain 挑選應注入的 Memory。
+// 通過 systemPrompt.service.section() 註冊一個 "project-brain-context" 段，
+// DSH 每次 assemble prompt 時呼叫 render() 返回 markdown 文本。
 //
-// 数据流：
-//   ① agent/session-start → 清 cache（让下个 section render 重读 .project-brain/）
+// 資料流：
+//   ① agent/session-start → 清 cache（讓下個 section render 重讀 .project-brain/）
 //   ② preview.changed → 清 cache
-//   ③ section.render → 同步从 module cache 取预读数据（render 是同步的）
+//   ③ section.render → 同步從 module cache 取預讀資料（render 是同步的）
 //
-// 预读策略：在 agent/session-start 监听里，async 读 .project-brain/{memory,todo,timeline}.jsonl
-//   → 存到 module 变量 → render 直接用。
+// 預讀策略：在 agent/session-start 監聽裡，async 讀 .project-brain/{memory,todo,timeline}.jsonl
+//   → 存到 module 變數 → render 直接用。
 //
-// 选择算法（SPEC §4.5）：
+// 選擇演算法（SPEC §4.5）：
 //   score = importance * 0.5 + recency_score * 0.3 + moduleMatch * 0.2
-//   recency_score: 7天内=1.0，90天线性衰减到0
-//   moduleMatch: 当前 cwd 命中 relatedFiles/relatedModules 计分（这里用 cwd 作为弱相关）
+//   recency_score: 7天內=1.0，90天線性衰減到0
+//   moduleMatch: 當前 cwd 命中 relatedFiles/relatedModules 計分（這裡用 cwd 作為弱相關）
 //
-// Token 预算：默认 1500 token 上限，超出截断。
+// Token 預算：預設 1500 token 上限，超出截斷。
 
 import { brainPath, readJsonl, readJson } from "./store/brain-files.js";
 import { buildInjectionContext } from "./memory/inject-context.js";
 import { ensureHousekeepOnRead } from "./memory/admit.js";
 
-// 每个 workspace 独立缓存。旧实现只有一个 module-global cache，A 项目启动后再
-// 打开 B 项目时，B 的 system prompt 可能拿到 A 的记忆。
+// 每個 workspace 獨立快取。舊實現只有一個 module-global cache，A 專案啟動後再
+// 開啟 B 專案時，B 的 system prompt 可能拿到 A 的記憶。
 const projectCache = new Map();
 const sessionProjects = new Map();
 
@@ -64,12 +64,12 @@ function resolveContextProject(context, sessions) {
       if (cwd) return cwd;
     } catch (e) {}
   }
-  // 单项目进程下保留兼容；多项目时宁可不注入，也绝不猜测并串数据。
+  // 單專案程序下保留相容；多專案時寧可不注入，也絕不猜測並串資料。
   if (projectCache.size === 1) return projectCache.keys().next().value;
   return null;
 }
 
-// 从 fs 服务读取项目数据（async）
+// 從 fs 服務讀取專案資料（async）
 async function loadProjectDataForInjection(fs, projectPath) {
   try {
     const [project, memories, todos, timeline] = await Promise.all([
@@ -84,7 +84,7 @@ async function loadProjectDataForInjection(fs, projectPath) {
   }
 }
 
-// 预读并刷新 cache
+// 預讀並重新整理 cache
 async function refreshCache(fs, projectPath) {
   if (!fs || !projectPath) return;
   try { await ensureHousekeepOnRead(fs, projectPath); } catch (e) {}
@@ -96,7 +96,7 @@ async function refreshCache(fs, projectPath) {
   projectCache.set(projectPath, { data, ts: Date.now() });
 }
 
-// 只读取指定 workspace 的 ready 数据。
+// 只讀取指定 workspace 的 ready 資料。
 function getCachedSection(projectPath) {
   const cached = projectPath ? projectCache.get(projectPath) : null;
   if (!cached || !cached.data) return null;
@@ -104,7 +104,7 @@ function getCachedSection(projectPath) {
   return buildInjectionContext({ project, memories, todos, timeline });
 }
 
-// 主入口：注册 systemPrompt section + 监听 session-start 预读
+// 主入口：註冊 systemPrompt section + 監聽 session-start 預讀
 export function setupInjector(ctx, fs, sandboxPolicy) {
   if (!ctx) return;
 
@@ -120,14 +120,14 @@ export function setupInjector(ctx, fs, sandboxPolicy) {
     } catch (e) {}
   };
 
-  // 1) 注册 systemPrompt section（text 是函数，每次 assemble 调用）
-  //   v0.3.1 修复：DSH PromptSection 用 `text: string | ((ctx) => string)`，不是 `render`。
-  //   之前传 `render` 字段导致 DSH 在合并 sections 时对 undefined 调 .indexOf 抛错。
+  // 1) 註冊 systemPrompt section（text 是函式，每次 assemble 呼叫）
+  //   v0.3.1 修復：DSH PromptSection 用 `text: string | ((ctx) => string)`，不是 `render`。
+  //   之前傳 `render` 欄位導致 DSH 在合併 sections 時對 undefined 調 .indexOf 拋錯。
   if (systemPrompt && typeof systemPrompt.section === "function") {
     try {
       const section = {
         name: "project-brain-context",
-        order: 100,  // harness=-100, persona=0, tool guidance=100-199; 我们放在工具指引区间内
+        order: 100,  // harness=-100, persona=0, tool guidance=100-199; 我們放在工具指引區間內
         text: (context) => {
           try {
             const projectPath = resolveContextProject(context, sessions);
@@ -143,7 +143,7 @@ export function setupInjector(ctx, fs, sandboxPolicy) {
       if (typeof ctx.effect === "function") {
         try { ctx.effect(() => disposer, "dsh-project-brain:injector:section"); } catch (e) {}
       }
-      logger("info", "injector: systemPrompt section registered (v0.3.1: text 字段修复)");
+      logger("info", "injector: systemPrompt section registered (v0.3.1: text 欄位修復)");
     } catch (e) {
       logger("warn", "injector: section registration failed: " + String((e && e.message) || e));
     }
@@ -151,7 +151,7 @@ export function setupInjector(ctx, fs, sandboxPolicy) {
     logger("warn", "injector: systemPrompt service unavailable, skip section registration");
   }
 
-  // 2) agent/session-start → 预读 cache
+  // 2) agent/session-start → 預讀 cache
   if (ctx.on) {
     try {
       ctx.on("agent/session-start", (payload) => {
@@ -176,7 +176,7 @@ export function setupInjector(ctx, fs, sandboxPolicy) {
     }
   }
 
-  // 3) preview.changed → 刷新 cache（用户调了 project_todo_add 等后立即反映）
+  // 3) preview.changed → 重新整理 cache（使用者調了 project_todo_add 等後立即反映）
   if (ctx.on) {
     try {
       ctx.on("project_brain/preview.changed", (payload) => {

@@ -1,6 +1,6 @@
-// smoke-test.mjs - 离线端到端验证（无需 DSH runtime）
-// 覆盖：scanner / brain-files / brain-logic / build.loadProjectData
-// 用一个临时 fixture 项目跑完整数据流，输出 PASS/FAIL，失败非零退出。
+// smoke-test.mjs - 離線端到端驗證（無需 DSH runtime）
+// 覆蓋：scanner / brain-files / brain-logic / build.loadProjectData
+// 用一個臨時 fixture 專案跑完整資料流，輸出 PASS/FAIL，失敗非零退出。
 //
 // 用法：node scripts/smoke-test.mjs
 
@@ -24,7 +24,7 @@ function check(name, cond, extra) {
   }
 }
 
-// ─── DSH fs 服务适配器（node 实现，接口与 src 内使用面一致） ───
+// ─── DSH fs 服務介面卡（node 實現，介面與 src 內使用面一致） ───
 const fsAdapter = {
   async resolve(p, opts) {
     if (opts && opts.cwd) return join(opts.cwd, p);
@@ -44,7 +44,7 @@ const fsAdapter = {
   processPath(target) { return target; },
 };
 
-// ─── fixture 项目 ───
+// ─── fixture 專案 ───
 const root = mkdtempSync(join(tmpdir(), "dsh-brain-smoke-"));
 mkdirSync(join(root, "src"), { recursive: true });
 writeFileSync(join(root, "package.json"), JSON.stringify({
@@ -68,8 +68,8 @@ const decorativeReadme = `<p align="center"><a href="https://github.com/example/
 
 Project is a reusable local-first knowledge service for software teams.
 `;
-check("README 跳过 HTML Logo/徽章并提取自然语言简介", firstReadmeParagraph(decorativeReadme) === "Project is a reusable local-first knowledge service for software teams.", firstReadmeParagraph(decorativeReadme));
-check("历史 HTML 描述不会直接进入 UI", sanitizeProjectDescription('<p align="center"> <a href="https://github.com/apconw/Aix-DB">') === null);
+check("README 跳過 HTML Logo/徽章並提取自然語言簡介", firstReadmeParagraph(decorativeReadme) === "Project is a reusable local-first knowledge service for software teams.", firstReadmeParagraph(decorativeReadme));
+check("歷史 HTML 描述不會直接進入 UI", sanitizeProjectDescription('<p align="center"> <a href="https://github.com/apconw/Aix-DB">') === null);
 
 console.log("== scanner ==");
 const scan = await scanProject(fsAdapter, root);
@@ -94,7 +94,7 @@ check("jsonl appended preserves content", timeline[1].occurredAt === 3000);
 
 const mem = logic.makeMemoryEntry({ type: "decision", title: "用 build-time embed", content: "why", importance: 0.9 }, 4000);
 await files.appendJsonl(fsAdapter, files.brainPath(root, "memory.jsonl"), mem);
-const todo = logic.makeTodoEntry({ title: "实现 project_continue", priority: "high" }, 5000);
+const todo = logic.makeTodoEntry({ title: "實現 project_continue", priority: "high" }, 5000);
 await files.appendJsonl(fsAdapter, files.brainPath(root, "todo.jsonl"), todo);
 
 console.log("== brain-logic ==");
@@ -112,7 +112,7 @@ check("readBrain todo 1", brain.todos.length === 1);
 const cont = logic.buildContinueData(brain, 9000);
 check("continue.project.name", cont.project && cont.project.name === "smoke-fixture");
 check("continue.pendingTodos 1", cont.pendingTodos.length === 1);
-check("continue.suggestedNextStep mentions task", String(cont.suggestedNextStep).indexOf("实现 project_continue") >= 0);
+check("continue.suggestedNextStep mentions task", String(cont.suggestedNextStep).indexOf("實現 project_continue") >= 0);
 check("continue.topMemories 1", cont.topMemories.length === 1 && cont.topMemories[0].type === "decision");
 
 console.log("== build.loadProjectData ==");
@@ -122,18 +122,18 @@ check("pd.project.name", pd.project && pd.project.name === "smoke-fixture");
 check("pd.stats.pendingTodos 1", pd.stats.pendingTodos === 1, JSON.stringify(pd.stats));
 check("pd.stats.decisions 1", pd.stats.decisions === 1, JSON.stringify(pd.stats));
 check("pd.timelineAll 2", pd.timelineAll.length === 2);
-check("pd.todos contains todo", pd.todos.length === 1 && pd.todos[0].title === "实现 project_continue");
+check("pd.todos contains todo", pd.todos.length === 1 && pd.todos[0].title === "實現 project_continue");
 check("pd.phase.progress.total 1", pd.phase && pd.phase.progress.total === 1, JSON.stringify(pd.phase));
 check("pd.generatedAt number", typeof pd.generatedAt === "number");
 
-// 未初始化路径
+// 未初始化路徑
 const pdEmpty = loadProjectData(join(tmpdir(), "dsh-brain-nonexistent-xyz"));
 check("loadProjectData uninitialized", pdEmpty.initialized === false);
 
-// todo done 逻辑
+// todo done 邏輯
 const done = logic.findTodo([todo], todo.id);
 check("findTodo by id", done && done.id === todo.id);
-const done2 = logic.findTodo([todo], "实现 project_continue");
+const done2 = logic.findTodo([todo], "實現 project_continue");
 check("findTodo by title", done2 && done2.id === todo.id);
 
 console.log(`\n== RESULT: ${passed} passed, ${failed} failed ==`);

@@ -76,27 +76,27 @@ const llm = {
   async *stream(options) {
     streamedOptions = options;
     yield { type: "text-delta", index: 0, text: JSON.stringify({
-      overview: { purpose: "演示分层应用", audience: "开发者", category: "Web 应用", architectureStyle: "分层架构", value: "验证架构分析" },
-      summary: "界面通过接口调用业务规则，业务规则访问数据存储。",
+      overview: { purpose: "演示分層應用", audience: "開發者", category: "Web 應用", architectureStyle: "分層架構", value: "驗證架構分析" },
+      summary: "介面通過介面呼叫業務規則，業務規則訪問資料儲存。",
       layers: [
-        { id: "experience", name: "体验层", responsibility: "处理用户交互" },
-        { id: "business", name: "业务层", responsibility: "执行业务规则" },
-        { id: "persistence", name: "持久化层", responsibility: "保存项目数据" },
+        { id: "experience", name: "體驗層", responsibility: "處理使用者互動" },
+        { id: "business", name: "業務層", responsibility: "執行業務規則" },
+        { id: "persistence", name: "持久化層", responsibility: "儲存專案資料" },
       ],
       components: [
-        { id: "workspace-ui", name: "工作区界面", layerId: "experience", type: "ui", responsibility: "呈现项目状态", details: "调用项目接口", importantFiles: ["src/ui/App.tsx"], evidencePaths: ["src/ui/App.tsx"], technologies: ["React"], confidence: 0.9 },
-        { id: "rules-engine", name: "规则引擎", layerId: "business", type: "service", responsibility: "执行业务规则", details: "连接接口与数据", importantFiles: ["src/core/service.ts"], evidencePaths: ["src/core/service.ts"], technologies: ["TypeScript"], confidence: 0.88 },
-        { id: "project-store", name: "项目数据仓库", layerId: "persistence", type: "data", responsibility: "保存项目数据", details: "提供数据访问", importantFiles: ["src/db/store.ts"], evidencePaths: ["src/db/store.ts"], technologies: ["TypeScript"], confidence: 0.86 },
+        { id: "workspace-ui", name: "工作區介面", layerId: "experience", type: "ui", responsibility: "呈現專案狀態", details: "呼叫專案介面", importantFiles: ["src/ui/App.tsx"], evidencePaths: ["src/ui/App.tsx"], technologies: ["React"], confidence: 0.9 },
+        { id: "rules-engine", name: "規則引擎", layerId: "business", type: "service", responsibility: "執行業務規則", details: "連線介面與資料", importantFiles: ["src/core/service.ts"], evidencePaths: ["src/core/service.ts"], technologies: ["TypeScript"], confidence: 0.88 },
+        { id: "project-store", name: "專案資料倉儲", layerId: "persistence", type: "data", responsibility: "儲存專案資料", details: "提供資料訪問", importantFiles: ["src/db/store.ts"], evidencePaths: ["src/db/store.ts"], technologies: ["TypeScript"], confidence: 0.86 },
       ],
       relationships: [
-        { from: "workspace-ui", to: "rules-engine", label: "调用", type: "request", description: "发起业务请求", confidence: 0.9 },
-        { from: "rules-engine", to: "project-store", label: "读写", type: "data-flow", description: "访问项目数据", confidence: 0.88 },
+        { from: "workspace-ui", to: "rules-engine", label: "呼叫", type: "request", description: "發起業務請求", confidence: 0.9 },
+        { from: "rules-engine", to: "project-store", label: "讀寫", type: "data-flow", description: "訪問專案資料", confidence: 0.88 },
       ],
-      runtimeFlows: [{ name: "主请求流", trigger: "用户操作", outcome: "返回项目数据", steps: [{ componentId: "workspace-ui", action: "发起请求", file: "src/ui/App.tsx" }, { componentId: "rules-engine", action: "处理规则", file: "src/core/service.ts" }, { componentId: "project-store", action: "读取数据", file: "src/db/store.ts" }] }],
-      keyFiles: [{ path: "src/core/service.ts", role: "业务入口", whyImportant: "连接接口和数据层", category: "core" }],
-      gettingStarted: ["先看规则引擎"],
-      designHighlights: ["分层职责清晰"],
-      risks: ["核心服务需要保持边界清晰"],
+      runtimeFlows: [{ name: "主請求流", trigger: "使用者操作", outcome: "返回專案資料", steps: [{ componentId: "workspace-ui", action: "發起請求", file: "src/ui/App.tsx" }, { componentId: "rules-engine", action: "處理規則", file: "src/core/service.ts" }, { componentId: "project-store", action: "讀取資料", file: "src/db/store.ts" }] }],
+      keyFiles: [{ path: "src/core/service.ts", role: "業務入口", whyImportant: "連線介面和資料層", category: "core" }],
+      gettingStarted: ["先看規則引擎"],
+      designHighlights: ["分層職責清晰"],
+      risks: ["核心服務需要保持邊界清晰"],
     }) };
     yield { type: "finish", reason: { kind: "stop" } };
   },
@@ -123,8 +123,8 @@ const hybrid = await buildArchitecture({
 });
 assert.equal(hybrid.source, "hybrid");
 assert.equal(hybrid.llm.used, true);
-assert.equal(hybrid.overview.architectureStyle, "分层架构");
-assert.equal(hybrid.components.some((item) => item.name === "规则引擎"), true);
+assert.equal(hybrid.overview.architectureStyle, "分層架構");
+assert.equal(hybrid.components.some((item) => item.name === "規則引擎"), true);
 assert.equal(hybrid.components.some((item) => item.name.startsWith("src/")), false);
 assert.equal(streamedOptions.provider, "dsh-provider");
 assert.equal(streamedOptions.model, "dsh-model");
@@ -169,12 +169,12 @@ const repairLlm = {
   async *stream() {
     repairCalls += 1;
     const output = repairCalls === 1
-      ? "架构分析：{not valid json}"
+      ? "架構分析：{not valid json}"
       : JSON.stringify({
-          layers: [{ id: "interface", name: "接口层", responsibility: "接收请求" }, { id: "domain", name: "领域层", responsibility: "处理业务" }],
+          layers: [{ id: "interface", name: "介面層", responsibility: "接收請求" }, { id: "domain", name: "領域層", responsibility: "處理業務" }],
           components: [
-            { id: "ui", name: "工作区界面", layerId: "interface", responsibility: "展示项目", evidencePaths: ["src/ui/App.tsx"] },
-            { id: "engine", name: "分析引擎", layerId: "domain", responsibility: "分析项目", evidencePaths: ["src/core/service.ts"] },
+            { id: "ui", name: "工作區介面", layerId: "interface", responsibility: "展示專案", evidencePaths: ["src/ui/App.tsx"] },
+            { id: "engine", name: "分析引擎", layerId: "domain", responsibility: "分析專案", evidencePaths: ["src/core/service.ts"] },
           ],
         });
     yield { type: "text-delta", index: 0, text: output };

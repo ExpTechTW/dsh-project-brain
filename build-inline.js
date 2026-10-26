@@ -1,10 +1,10 @@
-// build-inline.js: 不依赖 esbuild，纯 Node FS 拼接
-// v0.5.0-fix: sandbox 阻止 esbuild spawn 子进程（EPERM）→ 退路方案
-// 1) client bundle: IIFE wrap + __PLACEHOLDER__ 替换（lib/client.js）
-// 2) host bundle: 把整个 src/ 镜像到 lib/（保证 ESM import ./tools.js 等能解析到 lib/tools.js）
+// build-inline.js: 不依賴 esbuild，純 Node FS 拼接
+// v0.5.0-fix: sandbox 阻止 esbuild spawn 子程序（EPERM）→ 退路方案
+// 1) client bundle: IIFE wrap + __PLACEHOLDER__ 替換（lib/client.js）
+// 2) host bundle: 把整個 src/ 映象到 lib/（保證 ESM import ./tools.js 等能解析到 lib/tools.js）
 //    - lib/index.js 是 src/index.js 的副本
-//    - lib/tools.js, lib/scanner.js, lib/host/*.js 等子模块也都复制到 lib/ 相同位置
-//    DSH 加载 lib/index.js 时，import "./tools.js" 解析到 lib/tools.js ✅
+//    - lib/tools.js, lib/scanner.js, lib/host/*.js 等子模組也都複製到 lib/ 相同位置
+//    DSH 載入 lib/index.js 時，import "./tools.js" 解析到 lib/tools.js ✅
 import { fileURLToPath } from "node:url";
 import { dirname, resolve, join } from "node:path";
 import { readFileSync, existsSync, writeFileSync, mkdirSync, rmSync, statSync, readdirSync } from "node:fs";
@@ -85,7 +85,7 @@ function loadProjectData(workspace) {
       languages: raw.languages || {}, entrypoints: raw.entrypoints || [],
       lastUpdateAt: raw.updatedAt || raw.lastScannedAt || Date.now(),
     },
-    phase: { title: "已扫描（" + (raw.entrypoints ? raw.entrypoints.length : 0) + " 个入口）", progress: { done: 1, total: 1 } },
+    phase: { title: "已掃描（" + (raw.entrypoints ? raw.entrypoints.length : 0) + " 個入口）", progress: { done: 1, total: 1 } },
     recentActivity, memories, memoriesAll,
     todos: todosAll.slice(0, 50),
     timelineAll,
@@ -105,7 +105,7 @@ const allWorkspaces = { sessionToWorkspaceId: {}, workspaceProjects: {}, workspa
 console.log("[dsh-project-brain:build-inline] workspace:", workspacePath || "(none)");
 console.log("[dsh-project-brain:build-inline] project data: initialized=" + projectData.initialized);
 
-// ─── 1) client bundle: IIFE wrap + placeholder 替换 ───
+// ─── 1) client bundle: IIFE wrap + placeholder 替換 ───
 const clientSrc = readFileSync(resolve(__dirname, "src/client.js"), "utf8");
 const projectDataJson = JSON.stringify(JSON.stringify(projectData));
 const allWorkspacesJson = JSON.stringify(JSON.stringify(allWorkspaces));
@@ -120,18 +120,18 @@ const clientFinal = "\uFEFF/* dsh-project-brain client bundle (build-inline.js) 
 writeFileSync(resolve(pkgDir, "lib/client.js"), clientFinal);
 console.log("[dsh-project-brain:build-inline] client bundle -> " + clientFinal.length + " bytes");
 
-// ─── 2) host bundle: 镜像 src/ → lib/ ───
-//    lib/index.js 是 src/index.js 副本（顶层入口）
-//    lib/tools.js, lib/scanner.js, lib/host/... 等所有子模块也复制到 lib/ 相同位置
-//    这样 DSH 加载 lib/index.js 时，import "./tools.js" 解析到 lib/tools.js ✅
+// ─── 2) host bundle: 映象 src/ → lib/ ───
+//    lib/index.js 是 src/index.js 副本（頂層入口）
+//    lib/tools.js, lib/scanner.js, lib/host/... 等所有子模組也複製到 lib/ 相同位置
+//    這樣 DSH 載入 lib/index.js 時，import "./tools.js" 解析到 lib/tools.js ✅
 //
-//    注意：lib/ 是 DSH 实际加载位置（package.json "main": "./dsh-project-brain/lib/index.js"）
-//    保留 lib/client.js（构建产物，不在 src 镜像范围）
+//    注意：lib/ 是 DSH 實際載入位置（package.json "main": "./dsh-project-brain/lib/index.js"）
+//    保留 lib/client.js（構建產物，不在 src 映象範圍）
 const libDir = resolve(pkgDir, "lib");
 const srcDir = resolve(__dirname, "src");
 mkdirSync(libDir, { recursive: true });
 
-// 清理 lib/ 下旧的 src 镜像（保留 client.js / client.js.map 等构建产物 + .map 文件）
+// 清理 lib/ 下舊的 src 映象（保留 client.js / client.js.map 等構建產物 + .map 檔案）
 function cleanLibOfSrc() {
   function walk(dir) {
     let names;
@@ -144,8 +144,8 @@ function cleanLibOfSrc() {
         walk(p);
         try { const r = readdirSync(p); if (r.length === 0) rmSync(p, { recursive: true, force: true }); } catch (e) {}
       } else if (st.isFile() && /\.(js|mjs)$/i.test(name)) {
-        // 保留 client.js（构建产物，IIFE bundle）
-        // 保留 .map（sourcemap 关联文件）
+        // 保留 client.js（構建產物，IIFE bundle）
+        // 保留 .map（sourcemap 關聯檔案）
         if (/^client\.js$/i.test(name)) continue;
         if (/\.map$/i.test(name)) continue;
         rmSync(p, { force: true });
@@ -155,7 +155,7 @@ function cleanLibOfSrc() {
   walk(libDir);
 }
 
-// 复制 src/ → lib/（保留目录结构 + 所有 .js/.mjs 文件；跳过 src/client.js，避免覆盖 IIFE bundle）
+// 複製 src/ → lib/（保留目錄結構 + 所有 .js/.mjs 檔案；跳過 src/client.js，避免覆蓋 IIFE bundle）
 function copyTree(from, to) {
   const st = statSync(from);
   if (st.isDirectory()) {
@@ -164,8 +164,8 @@ function copyTree(from, to) {
       copyTree(join(from, name), join(to, name));
     }
   } else if (st.isFile() && /\.(js|mjs)$/i.test(from)) {
-    // 关键：跳过 src/client.js — 它对应构建产物 lib/client.js（IIFE wrap），
-    //   保留 lib/client.js，不要被 src 原文件覆盖
+    // 關鍵：跳過 src/client.js — 它對應構建產物 lib/client.js（IIFE wrap），
+    //   保留 lib/client.js，不要被 src 原檔案覆蓋
     if (/[/\\]client\.js$/i.test(from)) return;
     writeFileSync(to, readFileSync(from));
   }
@@ -177,16 +177,16 @@ copyTree(srcDir, libDir);
 const indexSrc = readFileSync(resolve(libDir, "index.js"), "utf8");
 const indexMap = resolve(libDir, "index.js.map");
 try { rmSync(indexMap, { force: true }); } catch (e) {}
-console.log("[dsh-project-brain:build-inline] host bundle -> lib/index.js " + indexSrc.length + " bytes + 子模块已镜像");
+console.log("[dsh-project-brain:build-inline] host bundle -> lib/index.js " + indexSrc.length + " bytes + 子模組已映象");
 
-// 验证关键子模块存在
+// 驗證關鍵子模組存在
 const needChecks = ["tools.js", "scanner.js", "host/sidebar/aggregator.js", "host/rpc/sidebar.js"];
 for (const rel of needChecks) {
   const p = join(libDir, rel);
   console.log("  check lib/" + rel + ": " + (existsSync(p) ? "OK" : "MISSING"));
 }
 
-// 验证 lib/client.js 是 IIFE bundle（不是 src/client.js 镜像）
+// 驗證 lib/client.js 是 IIFE bundle（不是 src/client.js 映象）
 const clientHead = readFileSync(resolve(libDir, "client.js"), "utf8").slice(0, 100);
 console.log("[dsh-project-brain:build-inline] client.js head: " + clientHead.replace(/\n/g, " | ").slice(0, 80));
 

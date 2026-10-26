@@ -17,7 +17,7 @@ Long-term memory exists to help the next session maintain the project: decisions
 - Local-first: `.project-brain/memory.jsonl` remains the only fact store. Vector cache stays derived and optional.
 - Precision over recall: missing a fact is acceptable; injecting a false or ephemeral “fact” is not.
 - Rules have veto power. An LLM cannot override a rule failure.
-- Automatic writes (agent tool, session extract) require LLM confirmation. User utterance “记住 / 记一下 / remember” only needs to pass rules.
+- Automatic writes (agent tool, session extract) require LLM confirmation. User utterance “記住 / 記一下 / remember” only needs to pass rules.
 - Uninitialized projects: no memory writes, no half-created `.project-brain/` from the memory subsystem.
 - Injection never silently truncates Core. Eviction happens at write time.
 - Housekeeping never deletes a durable decision. Title-similarity merge-and-drop is forbidden.
@@ -57,7 +57,7 @@ Required fields on new writes: `id`, `type`, `title`, `content`, `importance`, `
 
 `source.kind` is one of:
 
-- `user_explicit` — realtime strong “记住” signal
+- `user_explicit` — realtime strong “記住” signal
 - `agent` — `project_memory_add` (automatic channel)
 - `session_semantic` — session-end LLM extract (automatic channel)
 - `project_diff` — `project_diff` after admit (automatic channel; never mock)
@@ -88,12 +88,12 @@ Reject (not memory) when any of:
 
 1. Type not in the allow-list above (`context` without `user_explicit` fails).
 2. Title or content looks like a changelog **genre**, not merely because a durable sentence mentions a version. Reject when:
-   - title is version-led release notes: `v1.2.0 …`, `… patch #3`, `release`, `changelog`, or combines a version token with `patch` / `改动` / `验收`
-   - keywords: `改了 N 个文件`, `本次 session 改动`, `commit`, `PR #` as the main claim
+   - title is version-led release notes: `v1.2.0 …`, `… patch #3`, `release`, `changelog`, or combines a version token with `patch` / `改動` / `驗收`
+   - keywords: `改了 N 個檔案`, `本次 session 改動`, `commit`, `PR #` as the main claim
    - body is primarily a file list (`- path/to/file` lines ≥ 3 and little prose)
-   - Do **not** reject a decision whose title is a standing fact that happens to include a version (`codegraph 以 tree-sitter 0.25 为运行时`)
+   - Do **not** reject a decision whose title is a standing fact that happens to include a version (`codegraph 以 tree-sitter 0.25 為執行時`)
 3. Content shorter than 20 characters after trim.
-4. Content is not a durable statement: reject if the **whole body** is a this-session activity report (file lists, “改了 N 个文件”, 验收清单). Do **not** reject merely because a lesson starts with `刚才` / `本次` (`刚才踩了 host 不热更新，改 host 必须重启` is durable). Durable means it would still be true without a date or version number.
+4. Content is not a durable statement: reject if the **whole body** is a this-session activity report (file lists, “改了 N 個檔案”, 驗收清單). Do **not** reject merely because a lesson starts with `剛才` / `本次` (`剛才踩了 host 不熱更新，改 host 必須重啟` is durable). Durable means it would still be true without a date or version number.
 
 Rule failure routing:
 
@@ -109,11 +109,11 @@ Rule failure routing:
 | Agent tool | `project_memory_add` | Yes | Yes |
 | Session extract | `session/disposed` | Yes, per item | Yes, in the same extract call (`durable` flag) |
 | `project_diff` | tool execute, not dry-run | Yes | Yes (real route only; mock → refuse write) |
-| Weak realtime | “以后都 / 约定 / going forward” | Do not write at ingest | Session extract may pick it up |
+| Weak realtime | “以後都 / 約定 / going forward” | Do not write at ingest | Session extract may pick it up |
 
-Strong regex remains the current strong patterns (`记住|记一下|备忘|别忘了|remember|don't forget|…`). Weak patterns are removed from realtime writes.
+Strong regex remains the current strong patterns (`記住|記一下|備忘|別忘了|remember|don't forget|…`). Weak patterns are removed from realtime writes.
 
-After a strong “记住” match, **do not** apply `NEGATIVE_CONTEXTS` git/commit veto. “记住：不要 force push” is a standing constraint and must be admitted if it passes the durable rule gate. Git-word blacklist may only skip utterances that are clearly this-turn VCS instructions **without** a remember signal.
+After a strong “記住” match, **do not** apply `NEGATIVE_CONTEXTS` git/commit veto. “記住：不要 force push” is a standing constraint and must be admitted if it passes the durable rule gate. Git-word blacklist may only skip utterances that are clearly this-turn VCS instructions **without** a remember signal.
 
 `project_memory_add` is never `user_explicit`, even if the agent claims the user asked. Only the realtime detector seeing the user message can set `user_explicit`.
 
@@ -188,7 +188,7 @@ User `project_memory_archive` sets `archived` (rejected/unwanted). It does not u
 
 ## 7. Injection
 
-Replace Top-K `retrieveMemories("")` and the extra “最近决策链” block.
+Replace Top-K `retrieveMemories("")` and the extra “最近決策鏈” block.
 
 Shared assembler `buildInjectionContext(brain)` used by:
 
@@ -199,19 +199,19 @@ Markdown shape:
 
 ```
 ## Project Brain
-### 项目概况
-### Core 记忆          (all active, newest updatedAt first)
-### 上次会话           (latest timeline session_summary.summary from a disposed session)
-### 活跃 TODO
+### 專案概況
+### Core 記憶          (all active, newest updatedAt first)
+### 上次會話           (latest timeline session_summary.summary from a disposed session)
+### 活躍 TODO
 ```
 
 Rules:
 
 - Inject **all** `active` memories. No truncation of Core. Cap is enforced at write.
-- Last session summary: one entry, max **400** tokens, truncate on sentence boundary and append `（摘要已截断）`. If missing, omit the heading. Do not substitute git file lists.
-- Token budget of the whole section: Core first (≤800), summary second (≤400), then 概况 + TODO. Combined Core+summary stays ≤1200 so 概况/TODO still fit under ~1500. Do not silently drop Core items.
+- Last session summary: one entry, max **400** tokens, truncate on sentence boundary and append `（摘要已截斷）`. If missing, omit the heading. Do not substitute git file lists.
+- Token budget of the whole section: Core first (≤800), summary second (≤400), then 概況 + TODO. Combined Core+summary stays ≤1200 so 概況/TODO still fit under ~1500. Do not silently drop Core items.
 - Empty/uninitialized: return `""`.
-- Prompt 约定: remove “用户说记住就调 project_memory_add”. Replace with: only call `project_memory_add` for durable decisions/constraints/lessons; the tool may reject and must not be retried as changelog. Use `project_todo_*` for in-flight work — continue fidelity depends on TODOs, not on stuffing recap into memory.
+- Prompt 約定: remove “使用者說記住就調 project_memory_add”. Replace with: only call `project_memory_add` for durable decisions/constraints/lessons; the tool may reject and must not be retried as changelog. Use `project_todo_*` for in-flight work — continue fidelity depends on TODOs, not on stuffing recap into memory.
 
 ## 8. Read APIs
 
@@ -274,7 +274,7 @@ Deterministic, no LLM. Returns `{ rows, changed, actions }`.
 
 **Automatic (session dispose, after extracts are admitted):** call `housekeepMemories`. Persist only on change. This replaces the ≥30 auto-dream block. No extra threshold.
 
-**Manual (`project_dream`):** keep the tool and Dashboard「整理记忆」.
+**Manual (`project_dream`):** keep the tool and Dashboard「整理記憶」.
 
 - `dryRun=true` (default): return `actions` (applied-if-commit: `archive_rule`, `evict_to_dormant`; informational: `suggest_supersede`). No file writes.
 - `dryRun=false`: apply the same as `housekeepMemories` (steps 1–2 only). Still do **not** apply Jaccard deletes or auto-supersede.
@@ -329,7 +329,7 @@ Do not add a new database, graph store, or MemGPT-style per-turn core editor.
 
 All without a live LLM (mock confirm).
 
-- Rule gate: version title, `patch` title, file-list body, `本次 session 改动 N 个文件`, type `change`/`issue` routing, `context` without user_explicit rejected, user_explicit context accepted if durable
+- Rule gate: version title, `patch` title, file-list body, `本次 session 改動 N 個檔案`, type `change`/`issue` routing, `context` without user_explicit rejected, user_explicit context accepted if durable
 - Uninitialized: realtime and `memory_add` do not create files
 - Channel: user_explicit persist with LLM mock throwing; `memory_add` with LLM unavailable → no row; `memory_add` with `admit: false` → no row
 - Conflict: explicit `supersedes` id marks old `superseded`; Jaccard-only pair does not
@@ -338,7 +338,7 @@ All without a live LLM (mock confirm).
 - Grep: no `memory.jsonl` append outside `admit.js` in `src/`
 - `suggest.js` evidence memories are core-only
 - Remember signal containing “commit” still admits
-- Lesson starting with `刚才` + standing fact is not rule-rejected
+- Lesson starting with `剛才` + standing fact is not rule-rejected
 - Injector vs continue: same assembler output for same fixture
 - Backfill: `v1.2.0 patch` title → archived
 - Summarizer: no LLM memories and git files present → timeline only, zero `type=change` memory

@@ -1,4 +1,4 @@
-// 一次性：为 dsh-project-brain 项目写入 TODO 条目（用共享逻辑）
+// 一次性：為 dsh-project-brain 專案寫入 TODO 條目（用共享邏輯）
 import { join } from "node:path";
 import { mkdirSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { makeTodoEntry } from "../src/host/store/brain-logic.js";
@@ -13,9 +13,9 @@ if (existsSync(file)) {
 }
 const now = Date.now();
 const items = [
-  { title: "P0.5 Session 摘要（session/disposed 监听 -> 自动记忆）", priority: "high" },
-  { title: "补全 init/rescan/continue 工具与 RPC continueSession 联调验证", priority: "medium" },
-  { title: "更新 README/TODO/SPEC 至 P0.4.1 并提交 git", priority: "medium" },
+  { title: "P0.5 Session 摘要（session/disposed 監聽 -> 自動記憶）", priority: "high" },
+  { title: "補全 init/rescan/continue 工具與 RPC continueSession 聯調驗證", priority: "medium" },
+  { title: "更新 README/TODO/SPEC 至 P0.4.1 並提交 git", priority: "medium" },
   { title: "Dashboard 完善 + conversation.input.dock TODO strip（P0.7 入口）", priority: "low" },
 ];
 for (const it of items) todos.push(makeTodoEntry(it, now));

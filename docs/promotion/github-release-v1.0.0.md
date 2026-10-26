@@ -1,60 +1,60 @@
-# dsh-project-brain v1.0.0 · 首个稳定版本
+# dsh-project-brain v1.0.0 · 首個穩定版本
 
-> **第一个稳定版。** 39/39 端到端验收全过 + 用户实测 DSH Desktop UI 通过。
-> npm dist-tag: `latest` (从 `0.7.0-beta.2` 升级)
-> 安装: `dsh plugin --profile web add github:yj-liuzepeng/dsh-project-brain#v1.0.0`
+> **第一個穩定版。** 39/39 端到端驗收全過 + 使用者實測 DSH Desktop UI 通過。
+> npm dist-tag: `latest` (從 `0.7.0-beta.2` 升級)
+> 安裝: `dsh plugin --profile web add github:yj-liuzepeng/dsh-project-brain#v1.0.0`
 
-## 🎉 v1.0.0 是首个稳定版本
+## 🎉 v1.0.0 是首個穩定版本
 
-之前所有发布都是 `0.x` / `beta`，现在通过 39 项端到端验收（16 smoke suite + 23 host-acceptance scenarios），可以放心推荐给所有 DSH 用户使用。
+之前所有釋出都是 `0.x` / `beta`，現在通過 39 項端到端驗收（16 smoke suite + 23 host-acceptance scenarios），可以放心推薦給所有 DSH 使用者使用。
 
-## ✅ 升级路径
+## ✅ 升級路徑
 
-- **数据兼容**：`.project-brain/` 全部数据格式与 `0.7.0-beta.2` 完全兼容，无需迁移
-- **工具兼容**：16 个 `project_*` 工具的名称、签名与返回值不变
-- **配置兼容**：`config.json` 字段兼容，新增字段都有默认值
-- **必须重启**：升级后完全退出 DSH Desktop 并重新打开（hot reload 不支持 host bundle 改动）
+- **資料相容**：`.project-brain/` 全部資料格式與 `0.7.0-beta.2` 完全相容，無需遷移
+- **工具相容**：16 個 `project_*` 工具的名稱、簽名與返回值不變
+- **配置相容**：`config.json` 欄位相容，新增欄位都有預設值
+- **必須重啟**：升級後完全退出 DSH Desktop 並重新開啟（hot reload 不支援 host bundle 改動）
 
-## 🌟 v1.0.0 与 v0.7.0-beta.2 的差异（仅关键项）
+## 🌟 v1.0.0 與 v0.7.0-beta.2 的差異（僅關鍵項）
 
-### Fixed（P0 发布阻塞修复）
+### Fixed（P0 釋出阻塞修復）
 
-- `npm install` ERESOLVE 复发（v0.7.0-beta.1 修复过的同类问题）—— 加 `overrides.tree-sitter` 强制统一
-- `npm test` 在干净 node 环境 `ERR_MODULE_NOT_FOUND` —— 拆分 `scanAndWrite` 纯逻辑层，去除 `dsh-tools` 对 smoke 的传递依赖
+- `npm install` ERESOLVE 復發（v0.7.0-beta.1 修復過的同類問題）—— 加 `overrides.tree-sitter` 強制統一
+- `npm test` 在乾淨 node 環境 `ERR_MODULE_NOT_FOUND` —— 拆分 `scanAndWrite` 純邏輯層，去除 `dsh-tools` 對 smoke 的傳遞依賴
 - Windows 下 `execFileSync('npm')` ENOENT —— `npm.cmd + shell: true`，接住 DEP0190
-- 单 suite 失败阻断后续 —— `run-smoke.mjs` 改为收集全部失败
-- `smoke-append-line` / `smoke-runtime-workspace` / `smoke-theme-tokens` Windows 兼容
+- 單 suite 失敗阻斷後續 —— `run-smoke.mjs` 改為收集全部失敗
+- `smoke-append-line` / `smoke-runtime-workspace` / `smoke-theme-tokens` Windows 相容
 
 ### Added
 
 - `@deepseek-ai/dsh-tools` / `@deepseek-ai/schemastery` 加到 devDependencies
-- 智能续接 `project_suggest_next`（v0.4.15）—— Session 开始时主动给出"💡 你今天可能想推进 X"+依据
-- 技术栈推断大幅扩展（v0.4.14）：JS / Python / Go / Rust 框架与 ORM 补全；techStack 字段支持多值
-- 本地 AST 分析支持 6 种语言：JS / Python / Go / Java / Rust / C/C++
-- API endpoint + DB schema 跨语言适配
-- config.json `languages` 白名单
-- `scripts/dev-reload.mjs` 一键开发重载
-- `scripts/host-acceptance.mjs` 39 项端到端验收
-- `ACCEPTANCE.md` / `USER_VERIFICATION.md` 文档
+- 智慧續接 `project_suggest_next`（v0.4.15）—— Session 開始時主動給出"💡 你今天可能想推進 X"+依據
+- 技術棧推斷大幅擴充套件（v0.4.14）：JS / Python / Go / Rust 框架與 ORM 補全；techStack 欄位支援多值
+- 本地 AST 分析支援 6 種語言：JS / Python / Go / Java / Rust / C/C++
+- API endpoint + DB schema 跨語言適配
+- config.json `languages` 白名單
+- `scripts/dev-reload.mjs` 一鍵開發過載
+- `scripts/host-acceptance.mjs` 39 項端到端驗收
+- `ACCEPTANCE.md` / `USER_VERIFICATION.md` 文件
 
 ### Changed
 
 - npm keywords 增加 `dsh-plugin` / `cordis` / `cordis-plugin` / `ai-coding`
 - README + README.zh-CN + STORE_LISTING + CHANGELOG 同步 v1.0.0
 
-## 🛠 安装
+## 🛠 安裝
 
 ```bash
 # Web / Desktop 通用
 dsh plugin --profile web add github:yj-liuzepeng/dsh-project-brain#v1.0.0
 
-# 升级已有用户
+# 升級已有使用者
 dsh plugin --profile web update dsh-project-brain
 ```
 
-升级后**完全退出 DSH Desktop 并重新打开**。
+升級後**完全退出 DSH Desktop 並重新開啟**。
 
-## 🧪 验证
+## 🧪 驗證
 
 ```bash
 git clone https://github.com/yj-liuzepeng/dsh-project-brain.git
@@ -69,9 +69,9 @@ npm run verify:install      # CLEAN_TARBALL_INSTALL_PASS
 npm audit                   # 0 vulnerabilities
 ```
 
-## 📚 文档
+## 📚 文件
 
-- [README](./README.md) · [README.zh-CN](./README.zh-CN.md)
+- [README](./README.md) · [README.zh-TW](./README.zh-TW.md)
 - [INSTALL](./INSTALL.md)
 - [CHANGELOG](./CHANGELOG.md)
 - [ACCEPTANCE](./ACCEPTANCE.md)
@@ -80,16 +80,16 @@ npm audit                   # 0 vulnerabilities
 - [STORE_LISTING](./STORE_LISTING.md)
 - [RELEASE_CHECKLIST](./RELEASE_CHECKLIST.md)
 
-## 💬 反馈
+## 💬 反饋
 
-- [Discussions](https://github.com/yj-liuzepeng/dsh-project-brain/discussions) · [DSH 社区展示帖](https://github.com/deepseek-ai/deepseek-harness/discussions/5121)
-- [MyDSH 插件市场](https://mydsh.dev/plugin?repo=yj-liuzepeng%2Fdsh-project-brain)
-- [Issues](https://github.com/yj-liuzepeng/dsh-project-brain/issues)（bug 用 `bug_report.yml` 模板；feature 用 `feature_request.yml`；用法问题用 `question.yml` 或去 Discussions）
+- [Discussions](https://github.com/yj-liuzepeng/dsh-project-brain/discussions) · [DSH 社群展示帖](https://github.com/deepseek-ai/deepseek-harness/discussions/5121)
+- [MyDSH 外掛市場](https://mydsh.dev/plugin?repo=yj-liuzepeng%2Fdsh-project-brain)
+- [Issues](https://github.com/yj-liuzepeng/dsh-project-brain/issues)（bug 用 `bug_report.yml` 模板；feature 用 `feature_request.yml`；用法問題用 `question.yml` 或去 Discussions）
 
 ## 🛡 安全
 
-发现安全问题请走 [GitHub Security Advisories](https://github.com/yj-liuzepeng/dsh-project-brain/security/advisories/new) 私密渠道，不要在 issue 公开。
+發現安全問題請走 [GitHub Security Advisories](https://github.com/yj-liuzepeng/dsh-project-brain/security/advisories/new) 私密渠道，不要在 issue 公開。
 
 ---
 
-构建者：[@yj-liuzepeng](https://github.com/yj-liuzepeng) · 授权：[MIT](./LICENSE)
+構建者：[@yj-liuzepeng](https://github.com/yj-liuzepeng) · 授權：[MIT](./LICENSE)

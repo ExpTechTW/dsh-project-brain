@@ -1,6 +1,6 @@
-// scanner-fix-test.mjs - 验证 scanner 递归修复是否正确
-// 用 node:fs adapter（与 scripts/verify-preview.mjs 一致），扫描插件自身目录
-// 预期 fileCount > 0，languages.javascript >= 10，scanDepth 递归正常
+// scanner-fix-test.mjs - 驗證 scanner 遞迴修復是否正確
+// 用 node:fs adapter（與 scripts/verify-preview.mjs 一致），掃描外掛自身目錄
+// 預期 fileCount > 0，languages.javascript >= 10，scanDepth 遞迴正常
 
 import { readFileSync, readdirSync, existsSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -33,7 +33,7 @@ check("topLevel contains README.md", scan.topLevel.includes("README.md"));
 check("topLevel excludes node_modules", !scan.topLevel.includes("node_modules"));
 check("topLevel excludes .git", !scan.topLevel.includes(".git"));
 check("topLevel excludes .project-brain", !scan.topLevel.includes(".project-brain"));
-// 验证 recursive: src/host/store/*.js 至少被识别为 javascript
+// 驗證 recursive: src/host/store/*.js 至少被識別為 javascript
 check("languages.javascript >= 10 (recursive scan works)", (scan.languages.javascript || 0) >= 10, "got " + scan.languages.javascript);
 
 console.log("\n== result ==");

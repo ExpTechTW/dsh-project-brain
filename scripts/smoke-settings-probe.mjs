@@ -10,7 +10,7 @@ function check(name, fn) {
   console.log("  PASS  " + name);
 }
 
-check("大写蛇形是环境变量名，UUID/sk- 是直接密钥", () => {
+check("大寫蛇形是環境變數名，UUID/sk- 是直接金鑰", () => {
   assert.equal(isEmbeddingEnvRef("PROJECT_BRAIN_EMBEDDING_API_KEY"), true);
   assert.equal(isEmbeddingEnvRef("ARK_API_KEY"), true);
   assert.equal(isEmbeddingEnvRef("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"), false);
@@ -22,14 +22,14 @@ const inlineResolved = await resolveEmbeddingApiKey("aaaaaaaa-bbbb-cccc-dddd-eee
 });
 const envMiss = await resolveEmbeddingApiKey("ARK_API_KEY", async () => null);
 const envHit = await resolveEmbeddingApiKey("ARK_API_KEY", async () => "from-env");
-check("resolveEmbeddingApiKey：直填 key 原样返回，变量名才去解析", () => {
+check("resolveEmbeddingApiKey：直填 key 原樣返回，變數名才去解析", () => {
   assert.equal(inlineResolved, "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
   assert.equal(envMiss, null);
   assert.equal(envHit, "from-env");
 });
 
 const disabled = await probeEmbedding({ config: { vectorEnabled: false, embeddingBaseURL: "https://example.test/v1", embeddingModel: "m" } });
-check("向量关闭时探测失败且不发请求", () => {
+check("向量關閉時探測失敗且不發請求", () => {
   assert.equal(disabled.ok, false);
   assert.equal(disabled.code, "EMBEDDING_DISABLED");
 });
@@ -37,7 +37,7 @@ check("向量关闭时探测失败且不发请求", () => {
 const missingEndpoint = await probeEmbedding({
   config: { vectorEnabled: true, retrievalMode: "hybrid", embeddingBaseURL: "", embeddingModel: "m", embeddingApiKeyEnv: "" },
 });
-check("缺地址时探测失败", () => {
+check("缺地址時探測失敗", () => {
   assert.equal(missingEndpoint.ok, false);
   assert.equal(missingEndpoint.code, "EMBEDDING_NOT_CONFIGURED");
 });
@@ -52,7 +52,7 @@ const missingKey = await probeEmbedding({
   },
   resolveCredential: async () => null,
 });
-check("环境变量名解析不到密钥时失败", () => {
+check("環境變數名解析不到金鑰時失敗", () => {
   assert.equal(missingKey.ok, false);
   assert.equal(missingKey.code, "EMBEDDING_CREDENTIAL_MISSING");
   assert.equal(missingKey.details && missingKey.details.envName, "PROJECT_BRAIN_EMBEDDING_API_KEY");
@@ -75,7 +75,7 @@ const inlineProbe = await probeEmbedding({
     return { ok: true, json: async () => ({ data: [{ index: 0, embedding: [0.1, 0.2] }] }) };
   },
 });
-check("设置里直接填 UUID key 会带 Bearer 发出", () => {
+check("設定裡直接填 UUID key 會帶 Bearer 發出", () => {
   assert.equal(inlineProbe.ok, true);
   assert.equal(inlineCalls[0], "Bearer aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
   assert.equal(Object.hasOwn(inlineProbe.details || {}, "apiKey"), false);
@@ -101,7 +101,7 @@ const okProbe = await probeEmbedding({
     return { ok: true, json: async () => ({ data: [{ index: 0, embedding: zeros }] }) };
   },
 });
-check("连通成功返回维度和耗时，不写 cache", () => {
+check("連通成功返回維度和耗時，不寫 cache", () => {
   assert.equal(okProbe.ok, true);
   assert.equal(okProbe.code, "OK");
   assert.equal(okProbe.details.dimensions, 1024);
@@ -122,13 +122,13 @@ const httpFail = await probeEmbedding({
   },
   fetchImpl: async () => ({ ok: false, status: 404, text: async () => "no such path" }),
 });
-check("HTTP 失败带上 EMBEDDING_API_ERROR", () => {
+check("HTTP 失敗帶上 EMBEDDING_API_ERROR", () => {
   assert.equal(httpFail.ok, false);
   assert.equal(httpFail.code, "EMBEDDING_API_ERROR");
 });
 
 const noLlm = await probeSessionLlm({ llm: null, route: { provider: "ark", model: "x" }, sessionId: "s1" });
-check("无 LLM 服务时探测失败", () => {
+check("無 LLM 服務時探測失敗", () => {
   assert.equal(noLlm.ok, false);
   assert.equal(noLlm.code, "LLM_SERVICE_UNAVAILABLE");
 });
@@ -138,7 +138,7 @@ const noRoute = await probeSessionLlm({
   route: null,
   sessionId: "s1",
 });
-check("无会话路由时探测失败", () => {
+check("無會話路由時探測失敗", () => {
   assert.equal(noRoute.ok, false);
   assert.equal(noRoute.code, "LLM_SESSION_ROUTE_UNAVAILABLE");
 });
@@ -156,7 +156,7 @@ const llmOk = await probeSessionLlm({
   sessionId: "s1",
   timeoutMs: 5000,
 });
-check("LLM 连通成功带回路由信息", () => {
+check("LLM 連通成功帶回路由資訊", () => {
   assert.equal(llmOk.ok, true);
   assert.equal(llmOk.code, "OK");
   assert.equal(llmOk.details.provider, "volcengine");
@@ -221,7 +221,7 @@ const rpcEmb = await rpcHandler("settings", {
     embeddingApiKeyEnv: "FORM_KEY",
   },
 });
-check("RPC probe embedding 用表单覆盖值且 ok=true 包装结果", () => {
+check("RPC probe embedding 用表單覆蓋值且 ok=true 包裝結果", () => {
   assert.equal(rpcEmb.ok, true);
   assert.equal(rpcEmb.value.probe.target, "embedding");
   assert.equal(rpcEmb.value.probe.ok, false);
@@ -230,7 +230,7 @@ check("RPC probe embedding 用表单覆盖值且 ok=true 包装结果", () => {
 });
 
 const rpcLlm = await rpcHandler("settings", { sessionId: "sid", action: "probe", target: "llm" });
-check("RPC probe llm 走当前会话路由", () => {
+check("RPC probe llm 走當前會話路由", () => {
   assert.equal(rpcLlm.ok, true);
   assert.equal(rpcLlm.value.probe.target, "llm");
   assert.equal(rpcLlm.value.probe.ok, true);
@@ -238,7 +238,7 @@ check("RPC probe llm 走当前会话路由", () => {
 });
 
 const rpcBad = await rpcHandler("settings", { sessionId: "sid", action: "probe", target: "nope" });
-check("未知探测目标是 RPC 错误", () => {
+check("未知探測目標是 RPC 錯誤", () => {
   assert.equal(rpcBad.ok, false);
 });
 

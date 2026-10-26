@@ -2,34 +2,34 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 人第一屏与 Agent 注入共用四句 briefing；关会话轻扫/稀架构刷新并标记过期；任务动态升级为 Session 主干图（时间边 + 硬证据边）。
+**Goal:** 人第一屏與 Agent 注入共用四句 briefing；關會話輕掃/稀架構重新整理並標記過期；任務動態升級為 Session 主幹圖（時間邊 + 硬證據邊）。
 
-**Architecture:** 新增两个无 I/O 纯函数 `buildProjectBriefing`、`buildSessionGraph`。Injector / continue / aggregator 只消费它们。`scanAndWrite` 增加 `architectureMode`。`architectureRelevantFiles` 拆成轻扫与架构触发。不新增 json 库、不调用 LLM 画边。
+**Architecture:** 新增兩個無 I/O 純函式 `buildProjectBriefing`、`buildSessionGraph`。Injector / continue / aggregator 只消費它們。`scanAndWrite` 增加 `architectureMode`。`architectureRelevantFiles` 拆成輕掃與架構觸發。不新增 json 庫、不呼叫 LLM 畫邊。
 
-**Tech Stack:** 现有 Node ESM、jsonl、`scripts/smoke-*.mjs`、`npm test` / `npm run test:acceptance`。
+**Tech Stack:** 現有 Node ESM、jsonl、`scripts/smoke-*.mjs`、`npm test` / `npm run test:acceptance`。
 
 **Spec:** `docs/superpowers/specs/2026-09-18-project-familiarity-design.md`  
 **Flow:** `docs/superpowers/specs/2026-09-18-project-familiarity-flow.md`
 
 ## Global Constraints
 
-- Durable Core 不推翻：`admitMemory` 单写者，Core 15 / 800，无 Jaccard 删除。
-- briefing 与 injection 四段必须同源；continue.injection === injector markdown。
-- `architectureMode: "light"` 不得覆盖 `architecture.json`。
-- README / CHANGELOG / lockfile / 纯测试 不得单独触发 full 架构。
-- 图纯函数禁止 LLM。
-- 未初始化项目不写假节点。
-- 用户未要求时不要 git commit。
+- Durable Core 不推翻：`admitMemory` 單寫者，Core 15 / 800，無 Jaccard 刪除。
+- briefing 與 injection 四段必須同源；continue.injection === injector markdown。
+- `architectureMode: "light"` 不得覆蓋 `architecture.json`。
+- README / CHANGELOG / lockfile / 純測試 不得單獨觸發 full 架構。
+- 圖純函式禁止 LLM。
+- 未初始化專案不寫假節點。
+- 使用者未要求時不要 git commit。
 
 ---
 
-### Task 1: Briefing 纯函数 + 注入改接
+### Task 1: Briefing 純函式 + 注入改接
 
 **Files:**
 - Create: `src/host/memory/briefing.js`
 - Modify: `src/host/memory/inject-context.js`
-- Modify: `src/tools/continue.js`（若它只调 `buildInjectionContext` 则可能零改）
-- Test: `scripts/smoke-project-briefing.mjs`（新建）并加入 `scripts/run-smoke.mjs`
+- Modify: `src/tools/continue.js`（若它只調 `buildInjectionContext` 則可能零改）
+- Test: `scripts/smoke-project-briefing.mjs`（新建）並加入 `scripts/run-smoke.mjs`
 
 **Interfaces:**
 
@@ -41,9 +41,9 @@ export function isArchitectureStale(brain, now) // used by briefing; fingerprint
 export function buildInjectionContext(brain) // must start with briefing.markdown then Core
 ```
 
-- [ ] **Step 1: 写失败测试** `scripts/smoke-project-briefing.mjs`
+- [ ] **Step 1: 寫失敗測試** `scripts/smoke-project-briefing.mjs`
 
-覆盖 PF-1、PF-2、PF-3、PF-9、PF-10：
+覆蓋 PF-1、PF-2、PF-3、PF-9、PF-10：
 
 ```js
 import { buildProjectBriefing } from "../src/host/memory/briefing.js";
@@ -58,7 +58,7 @@ const brain = {
 };
 
 const b = buildProjectBriefing(brain);
-assert(b.markdown.includes("从哪改"));
+assert(b.markdown.includes("從哪改"));
 assert(b.startHere.includes("src/index.js"));
 assert(b.stuck[0].id === "t1");
 assert(b.lastWhySource === "session_summary");
@@ -66,9 +66,9 @@ const inj = buildInjectionContext(brain);
 assert(inj.includes(b.markdown));
 assert(inj.includes("Session cwd wins"));
 
-const changelogBrain = { ...brain, timeline: [{ eventType: "session_summary", summary: "改了 8 个文件", occurredAt: 2 }] };
+const changelogBrain = { ...brain, timeline: [{ eventType: "session_summary", summary: "改了 8 個檔案", occurredAt: 2 }] };
 const b2 = buildProjectBriefing(changelogBrain);
-assert(b2.lastWhySource !== "session_summary" || !/改了\s*\d+\s*个文件/.test(b2.lastWhy));
+assert(b2.lastWhySource !== "session_summary" || !/改了\s*\d+\s*個檔案/.test(b2.lastWhy));
 
 const staleBrain = { ...brain, architectureStale: true };
 const b3 = buildProjectBriefing(staleBrain);
@@ -76,44 +76,44 @@ assert(b3.stale === true);
 assert(!b3.startHere.includes("src/host/injector.js"));
 ```
 
-changelog 否决复用 `isChangelogGenre`（从 `admit.js` import），不要复制一份正则。
+changelog 否決複用 `isChangelogGenre`（從 `admit.js` import），不要複製一份正則。
 
-- [ ] **Step 2: 跑测试确认失败**
+- [ ] **Step 2: 跑測試確認失敗**
 
 Run: `node scripts/smoke-project-briefing.mjs`  
-Expected: `ERR_MODULE_NOT_FOUND` 或断言失败（`buildProjectBriefing` 不存在）。
+Expected: `ERR_MODULE_NOT_FOUND` 或斷言失敗（`buildProjectBriefing` 不存在）。
 
-- [ ] **Step 3: 实现 `briefing.js` 并改 `buildInjectionContext`**
+- [ ] **Step 3: 實現 `briefing.js` 並改 `buildInjectionContext`**
 
-`markdown` 固定中文小标题（注入给当前中文为主的 Agent；UI 第一屏用 i18n，但 **字段** 仍是同一 `startHere`/`stuck`/`lastWhy`）：
+`markdown` 固定中文小標題（注入給當前中文為主的 Agent；UI 第一屏用 i18n，但 **欄位** 仍是同一 `startHere`/`stuck`/`lastWhy`）：
 
 ```text
-### 这是什么
-### 从哪改
-### 现在卡在哪
-### 最近为什么
+### 這是什麼
+### 從哪改
+### 現在卡在哪
+### 最近為什麼
 ```
 
-过期时「从哪改」只输出 entrypoints，并加一行 `架构可能过期，关键文件按扫描入口降级。`
+過期時「從哪改」只輸出 entrypoints，並加一行 `架構可能過期，關鍵檔案按掃描入口降級。`
 
-Core 段保持现有列表格式。删掉注入里重复的「活跃 TODO」大段（TODO 只在 stuck）。「上次会话」blockquote 合并进「最近为什么」，不要两段各写一次 summary。
+Core 段保持現有列表格式。刪掉注入裡重複的「活躍 TODO」大段（TODO 只在 stuck）。「上次會話」blockquote 合併進「最近為什麼」，不要兩段各寫一次 summary。
 
-`architectureStale` v1：若 `brain.architectureStale === true` 或 `brain.architecture.stale === true` 或 `brain.project.architectureStale === true` 则 stale。指纹字段可在 Task 3 写入 project.json 后再接到 `isArchitectureStale`。
+`architectureStale` v1：若 `brain.architectureStale === true` 或 `brain.architecture.stale === true` 或 `brain.project.architectureStale === true` 則 stale。指紋欄位可在 Task 3 寫入 project.json 後再接到 `isArchitectureStale`。
 
-- [ ] **Step 4: 跑测试确认通过**
+- [ ] **Step 4: 跑測試確認通過**
 
 Run: `node scripts/smoke-project-briefing.mjs`  
-Expected: 进程 exit 0，打印 `PASS`。
+Expected: 程序 exit 0，列印 `PASS`。
 
-- [ ] **Step 5: 把脚本加入 `scripts/run-smoke.mjs` 列表并跑 `npm test` 确认无回归**
+- [ ] **Step 5: 把指令碼加入 `scripts/run-smoke.mjs` 列表並跑 `npm test` 確認無迴歸**
 
 ---
 
-### Task 2: Session 图纯函数
+### Task 2: Session 圖純函式
 
 **Files:**
 - Create: `src/host/memory/session-graph.js`
-- Test: `scripts/smoke-session-graph.mjs`（新建）并加入 `scripts/run-smoke.mjs`
+- Test: `scripts/smoke-session-graph.mjs`（新建）並加入 `scripts/run-smoke.mjs`
 
 **Interfaces:**
 
@@ -123,11 +123,11 @@ export function buildSessionGraph(brain)
 //   nodes: [{ id, sessionId, occurredAt, label, files, filesMore, important, trunk: true }],
 //   edges: [{ from, to, kind: "time" | "evidence", reason: "todo"|"supersede"|"architecture" }],
 //   collapsedEmptyCount: number,
-//   hiddenCount: number // 抽稀藏起的 trunk 节点
+//   hiddenCount: number // 抽稀藏起的 trunk 節點
 // }
 ```
 
-- [ ] **Step 1: 写失败测试**
+- [ ] **Step 1: 寫失敗測試**
 
 ```js
 import { buildSessionGraph } from "../src/host/memory/session-graph.js";
@@ -177,35 +177,35 @@ assert(chain.edges.length === 1);
 
 // changelog summary not used as label
 const cl = buildSessionGraph({
-  timeline: [{ eventType: "session_summary", sessionId: "c", summary: "改了 8 个文件", occurredAt: 1, files: ["src/x.js"] }],
+  timeline: [{ eventType: "session_summary", sessionId: "c", summary: "改了 8 個檔案", occurredAt: 1, files: ["src/x.js"] }],
   todos: [], memories: [],
 });
-assert(cl.nodes[0].label === "代码有变更（无摘要）");
+assert(cl.nodes[0].label === "程式碼有變更（無摘要）");
 ```
 
-现有 `todo` timeline 可能没有 `todoId`。图实现应对：`detail` 解析 `id=` 或条目上的 `todoId`；都没有则 **不画** todo 证据边（只 time）。测试里用显式 `todoId`。
+現有 `todo` timeline 可能沒有 `todoId`。圖實現應對：`detail` 解析 `id=` 或條目上的 `todoId`；都沒有則 **不畫** todo 證據邊（只 time）。測試裡用顯式 `todoId`。
 
-- [ ] **Step 2: 跑测试确认失败**
+- [ ] **Step 2: 跑測試確認失敗**
 
 Run: `node scripts/smoke-session-graph.mjs`  
-Expected: 模块不存在。
+Expected: 模組不存在。
 
-- [ ] **Step 3: 实现 `session-graph.js`**
+- [ ] **Step 3: 實現 `session-graph.js`**
 
-抽稀：`nodes.length > 40` 时 `important` = 有 evidence 边端点、或 files、或 label 来自 summary。非 important 计入 `hiddenCount`，默认 `nodes` 仍返回全部并带 `hidden: true`，方便 UI 折叠。
+抽稀：`nodes.length > 40` 時 `important` = 有 evidence 邊端點、或 files、或 label 來自 summary。非 important 計入 `hiddenCount`，預設 `nodes` 仍返回全部並帶 `hidden: true`，方便 UI 摺疊。
 
-- [ ] **Step 4: 测试通过并 `npm test`**
+- [ ] **Step 4: 測試通過並 `npm test`**
 
 ---
 
-### Task 3: 两档刷新 + 触发文件拆分 + summary 结构化
+### Task 3: 兩檔重新整理 + 觸發檔案拆分 + summary 結構化
 
 **Files:**
-- Modify: `src/host/architecture/analyzer.js`（拆 `sourceChangeFiles` / `architectureTriggerFiles`；保留 `architectureRelevantFiles` 作为 deprecated wrapper = trigger，避免漏改调用方）
-- Modify: `src/host/scan-and-write.js`（`runtime.architectureMode`: `"full"` 默认 | `"light"` | `"none"`）
+- Modify: `src/host/architecture/analyzer.js`（拆 `sourceChangeFiles` / `architectureTriggerFiles`；保留 `architectureRelevantFiles` 作為 deprecated wrapper = trigger，避免漏改呼叫方）
+- Modify: `src/host/scan-and-write.js`（`runtime.architectureMode`: `"full"` 預設 | `"light"` | `"none"`）
 - Modify: `src/host/summarizer.js`
-- Modify: `src/host/memory/session-extractor.js`（prompt：summary 1–3 句 what+why，禁止改了 N 个文件）
-- Test: `scripts/smoke-architecture-triggers.mjs`（新建）+ 扩展 `scripts/smoke-session-lifecycle.mjs` 或 durable-core 若已断言 refresh
+- Modify: `src/host/memory/session-extractor.js`（prompt：summary 1–3 句 what+why，禁止改了 N 個檔案）
+- Test: `scripts/smoke-architecture-triggers.mjs`（新建）+ 擴充套件 `scripts/smoke-session-lifecycle.mjs` 或 durable-core 若已斷言 refresh
 
 **Interfaces:**
 
@@ -213,10 +213,10 @@ Expected: 模块不存在。
 export function sourceChangeFiles(files) // boolean, spec §6.1
 export function architectureTriggerFiles(files) // boolean, spec §6.1
 export async function scanAndWrite(fs, sandboxPolicy, args, toolLabel, runtime)
-// runtime.architectureMode === "light" → 写 project.json，不调用 buildArchitecture，不写 architecture.json
+// runtime.architectureMode === "light" → 寫 project.json，不呼叫 buildArchitecture，不寫 architecture.json
 ```
 
-- [ ] **Step 1: 失败测试 PF-4 PF-5**
+- [ ] **Step 1: 失敗測試 PF-4 PF-5**
 
 ```js
 import { sourceChangeFiles, architectureTriggerFiles } from "../src/host/architecture/analyzer.js";
@@ -229,15 +229,15 @@ assert(architectureTriggerFiles(["package.json"]) === true);
 assert(architectureTriggerFiles(["src/host/injector.js"]) === true);
 ```
 
-再测 `scanAndWrite` light：用现有 smoke 的 memfs/fixture，断言调用前后 `architecture.json` mtime/内容不变，`project.json` 更新。若 fixture 过重，测 `architectureMode` 分支：light 时 spy/flag `buildArchitecture` 未被调用（把 analyzer 调用包在 `if (mode !== "light")`）。
+再測 `scanAndWrite` light：用現有 smoke 的 memfs/fixture，斷言呼叫前後 `architecture.json` mtime/內容不變，`project.json` 更新。若 fixture 過重，測 `architectureMode` 分支：light 時 spy/flag `buildArchitecture` 未被呼叫（把 analyzer 呼叫包在 `if (mode !== "light")`）。
 
-- [ ] **Step 2: 跑测试确认失败**（README 当前会令 `architectureRelevantFiles` 为 true）
+- [ ] **Step 2: 跑測試確認失敗**（README 當前會令 `architectureRelevantFiles` 為 true）
 
-- [ ] **Step 3: 实现拆分与 summarizer 顺序**
+- [ ] **Step 3: 實現拆分與 summarizer 順序**
 
-`summarizeOne` timeline 条目增加 `files: changedFiles.slice(0, 20)`。`summary` 经 `isChangelogGenre(title, summary)` 则清空。
+`summarizeOne` timeline 條目增加 `files: changedFiles.slice(0, 20)`。`summary` 經 `isChangelogGenre(title, summary)` 則清空。
 
-刷新：
+重新整理：
 
 ```js
 if (sourceChangeFiles(r.files)) {
@@ -248,22 +248,22 @@ if (architectureTriggerFiles(r.files)) {
 }
 ```
 
-`project_init` / `project_rescan` / 手动 RPC 保持默认 `full`。
+`project_init` / `project_rescan` / 手動 RPC 保持預設 `full`。
 
-light 失败、full 失败：不 throw。full 失败时 `project.json.architectureStale = true`（能写则写）。full 成功则 `architectureStale = false`。
+light 失敗、full 失敗：不 throw。full 失敗時 `project.json.architectureStale = true`（能寫則寫）。full 成功則 `architectureStale = false`。
 
-- [ ] **Step 4: 测试通过；`isArchitectureStale` 读 `project.architectureStale`**
+- [ ] **Step 4: 測試通過；`isArchitectureStale` 讀 `project.architectureStale`**
 
 - [ ] **Step 5: `npm test`**
 
 ---
 
-### Task 4: Aggregator + Client 第一屏 + 任务动态图
+### Task 4: Aggregator + Client 第一屏 + 任務動態圖
 
 **Files:**
 - Modify: `src/host/sidebar/aggregator.js`（preview 增加 `briefing`、`sessionGraph`）
-- Modify: `src/client.js`（概览主视野四句；任务动态 Tab 渲染节点+边；i18n zh/en）
-- Test: 扩展 `scripts/smoke-todostrip.mjs` 或新建 `scripts/smoke-familiarity-client.mjs` 对 **源码字符串** 断言（与现有 todostrip 一样扫 `src/client.js` / 构建产物）
+- Modify: `src/client.js`（概覽主視野四句；任務動態 Tab 渲染節點+邊；i18n zh/en）
+- Test: 擴充套件 `scripts/smoke-todostrip.mjs` 或新建 `scripts/smoke-familiarity-client.mjs` 對 **原始碼字串** 斷言（與現有 todostrip 一樣掃 `src/client.js` / 構建產物）
 
 **Interfaces:** preview JSON 增加：
 
@@ -272,24 +272,24 @@ briefing: buildProjectBriefing(...)
 sessionGraph: buildSessionGraph(...)
 ```
 
-- [ ] **Step 1: 失败测试**
+- [ ] **Step 1: 失敗測試**
 
-Client 源码须含 `data-block="briefing"`、`data-block="session-graph"`、`data-graph-kind`。Aggregator 单元：对内存 brain 调 `buildSidebarPreview` 或抽出的 `buildRuntimePreview`（若 preview 组装在 aggregator 后半段 `buildPreviewFromParts`，优先抽 20 行纯函数避免 fs）。
+Client 原始碼須含 `data-block="briefing"`、`data-block="session-graph"`、`data-graph-kind`。Aggregator 單元：對記憶體 brain 調 `buildSidebarPreview` 或抽出的 `buildRuntimePreview`（若 preview 組裝在 aggregator 後半段 `buildPreviewFromParts`，優先抽 20 行純函式避免 fs）。
 
-若 `buildSidebarPreview` 强依赖磁盘，则测 `buildRuntimePreview(p, architecture, timeline, memories, todos)` —— **本任务允许**从 aggregator 抽出该函数，避免新 fs fixture。
+若 `buildSidebarPreview` 強依賴磁碟，則測 `buildRuntimePreview(p, architecture, timeline, memories, todos)` —— **本任務允許**從 aggregator 抽出該函式，避免新 fs fixture。
 
-- [ ] **Step 2: 跑测试确认失败**
+- [ ] **Step 2: 跑測試確認失敗**
 
 - [ ] **Step 3: UI**
 
-概览：四句用 `briefing` 字段，不要再拼一套。stale 时 Callout 文案「架构可能过期」。  
-任务动态：按 `occurredAt` 竖向时间链画 trunk 节点；`evidence` 边用短标注（TODO / 替代 / 架构）。`collapsedEmptyCount > 0` 显示「已折叠 N 次空会话」。点节点展开 `label` 全文 + files。Git Tab 不动。
+概覽：四句用 `briefing` 欄位，不要再拼一套。stale 時 Callout 文案「架構可能過期」。  
+任務動態：按 `occurredAt` 豎向時間鏈畫 trunk 節點；`evidence` 邊用短標註（TODO / 替代 / 架構）。`collapsedEmptyCount > 0` 顯示「已摺疊 N 次空會話」。點節點展開 `label` 全文 + files。Git Tab 不動。
 
-不要把 40+ 节点默认全展开：`hidden === true` 默认不画，提供「展开全部」。
+不要把 40+ 節點預設全展開：`hidden === true` 預設不畫，提供「展開全部」。
 
-- [ ] **Step 4: 测试通过 + `npm run build` + `npm test` + `npm run test:acceptance`**
+- [ ] **Step 4: 測試通過 + `npm run build` + `npm test` + `npm run test:acceptance`**
 
-验收 AC：host-acceptance 若断言 injection 含「活跃 TODO」标题，改为断言含「现在卡在哪」或 briefing 小标题。改测试以符合 spec，不要为迁就旧文案破坏 PF-1。
+驗收 AC：host-acceptance 若斷言 injection 含「活躍 TODO」標題，改為斷言含「現在卡在哪」或 briefing 小標題。改測試以符合 spec，不要為遷就舊文案破壞 PF-1。
 
 ---
 
@@ -298,12 +298,12 @@ Client 源码须含 `data-block="briefing"`、`data-block="session-graph"`、`da
 | Spec | Task |
 | --- | --- |
 | §4 第一屏四句 | 1, 4 |
-| §5 共用 briefing / 不重复 TODO | 1 |
-| §6 过期与两档刷新 | 3 |
+| §5 共用 briefing / 不重複 TODO | 1 |
+| §6 過期與兩檔重新整理 | 3 |
 | §7 summary 合同 | 3 |
-| §8 图 | 2, 4 |
-| PF-1..10 | 见各 task 测试 |
+| §8 圖 | 2, 4 |
+| PF-1..10 | 見各 task 測試 |
 
 ## Placeholder scan
 
-无 TBD。手动里程碑明确不做。`todoId` 缺失则不强行画证据边。
+無 TBD。手動里程碑明確不做。`todoId` 缺失則不強行畫證據邊。

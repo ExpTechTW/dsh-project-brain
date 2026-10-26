@@ -1,14 +1,14 @@
-// access.js — 记录记忆被检索命中的时间。
+// access.js — 記錄記憶被檢索命中的時間。
 //
-// 没有这个回写，lastAccessedAt 永远只在归档/替换时被写一次，
-// 于是一条反复被 project_ask 查到的 dormant 记忆会一直沉着：
-// 排序看的是 updatedAt，淘汰看的是 importance，两边都感知不到「常用」。
+// 沒有這個回寫，lastAccessedAt 永遠只在歸檔/替換時被寫一次，
+// 於是一條反覆被 project_ask 查到的 dormant 記憶會一直沉著：
+// 排序看的是 updatedAt，淘汰看的是 importance，兩邊都感知不到「常用」。
 
 import { brainPath, readJsonl, writeJsonl } from "../store/brain-files.js";
 import { brainTxKey, withWriteLock } from "../store/write-lock.js";
 
-// 同一条记忆在这个窗口内重复命中只记一次，避免一轮对话里连续几次 ask
-// 就把整个 memory.jsonl 重写好几遍。
+// 同一條記憶在這個視窗內重複命中只記一次，避免一輪對話裡連續幾次 ask
+// 就把整個 memory.jsonl 重寫好幾遍。
 export const ACCESS_THROTTLE_MS = 5 * 60 * 1000;
 const MAX_ACCESS_COUNT = 9999;
 
@@ -30,7 +30,7 @@ export function applyAccessTouch(rows, ids, now = Date.now(), throttleMs = ACCES
   return { changed: touched.length > 0, rows: next, touched };
 }
 
-// 检索是只读操作，这里的写入不该让 ask 失败。调用方直接忽略返回的 error 即可。
+// 檢索是隻讀操作，這裡的寫入不該讓 ask 失敗。呼叫方直接忽略返回的 error 即可。
 export async function recordMemoryAccess({ fs, projectPath, ids, now = Date.now() } = {}) {
   if (!fs || !projectPath || !ids || ids.length === 0) return { changed: false, touched: [] };
   try {

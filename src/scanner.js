@@ -1,20 +1,20 @@
 import { STACK_FIELD_TO_TECHSTACK } from "./stack-taxonomy.js";
 
-// Scanner：扫项目根、识别技术栈、统计语言、找入口
-// 全部基于 fs 服务（DSH 抽象），无直接 Node fs 依赖
+// Scanner：掃專案根、識別技術棧、統計語言、找入口
+// 全部基於 fs 服務（DSH 抽象），無直接 Node fs 依賴
 //
-// 关键修复（P0.4.8 / 续开发）：
+// 關鍵修復（P0.4.8 / 續開發）：
 //   DSH fs.listDir 返回 FsDirEntry = { name, type: 'file'|'directory'|'other', target: FsTarget }
-//   之前的代码用 e.isFile / e.isDirectory（boolean）— DSH 实际没这俩字段，导致
-//   recursion 一个文件都没计数（实测 files:0 / languages:{}）。
-//   改为 e.type 优先，e.isFile/isDirectory（boolean/method）作为 fallback，
-//   recursion 直接用 e.target（resolved FsTarget），仅当缺失时回退 fs.resolve。
+//   之前的程式碼用 e.isFile / e.isDirectory（boolean）— DSH 實際沒這倆欄位，導致
+//   recursion 一個檔案都沒計數（實測 files:0 / languages:{}）。
+//   改為 e.type 優先，e.isFile/isDirectory（boolean/method）作為 fallback，
+//   recursion 直接用 e.target（resolved FsTarget），僅當缺失時回退 fs.resolve。
 
 const IGNORE_DIRS = new Set([
   "node_modules", ".git", "dist", "build", "__pycache__",
   ".venv", "venv", ".next", "target", ".DS_Store",
   ".idea", ".vscode", "coverage", ".turbo", ".cache", "out",
-  ".project-brain", // 自身的项目脑数据目录，不应被扫
+  ".project-brain", // 自身的專案腦資料目錄，不應被掃
 ]);
 
 function shouldIgnoreDir(name) {
@@ -30,12 +30,12 @@ function isPythonRequirementsName(name) {
   return /^requirements[-._][a-z0-9._-]+\.txt$/.test(lower);
 }
 
-// v1.2.x：技术流行度分数表（用户核心诉求："主要的技术栈放前面，次要往后排"）
-//   分数依据（粗略估算）：
-//     - GitHub stars / npm 每周下载量 / pip 周下载量 / 行业渗透率
-//     - 同一 field 内，分数越高越靠前
-//     - 没收录的技术 → 默认 50（中等）
-//   注意：分数是"重要性启发"，不是"客观真理"；用户可按项目特征覆盖
+// v1.2.x：技術流行度分數表（使用者核心訴求："主要的技術棧放前面，次要往後排"）
+//   分數依據（粗略估算）：
+//     - GitHub stars / npm 每週下載量 / pip 周下載量 / 行業滲透率
+//     - 同一 field 內，分數越高越靠前
+//     - 沒收錄的技術 → 預設 50（中等）
+//   注意：分數是"重要性啟發"，不是"客觀真理"；使用者可按專案特徵覆蓋
 const STACK_POPULARITY = {
   // === framework-frontend ===
   "React": 100, "Vue": 95, "Angular": 80, "Svelte": 70, "Solid": 45, "Preact": 50,
@@ -85,7 +85,7 @@ const STACK_POPULARITY = {
   "GraphQL": 85, "gRPC": 75, "OpenAPI/Swagger": 65, "tRPC": 55, "REST": 50, "MCP": 70,
   // === payment ===
   "Stripe": 90, "PayPal": 50,
-  // === ai（v1.2.x patch #4：AI/ML 框架提升到主视野）===
+  // === ai（v1.2.x patch #4：AI/ML 框架提升到主視野）===
   "LangChain": 90, "LangGraph": 88, "LlamaIndex": 75, "OpenAI SDK": 100, "Anthropic SDK": 95,
   "Google Generative AI": 75, "Cohere": 55, "Hugging Face": 85,
   "PyTorch": 90, "TensorFlow": 80, "JAX": 45, "scikit-learn": 75, "Keras": 60,
@@ -99,7 +99,7 @@ const STACK_POPULARITY = {
   "GORM": 65, "Ent": 35, "sqlx": 55, "Bun": 35, "Diesel": 45, "SeaORM": 40, "Hibernate": 65, "MyBatis": 50,
 };
 const STACK_DEFAULT_SCORE = 50;
-// 按 popularity 分数降序排序 stack[field] 数组（用户核心诉求：主要的在前）
+// 按 popularity 分數降序排序 stack[field] 陣列（使用者核心訴求：主要的在前）
 function sortStackByPopularity(stack) {
   const score = (item) => (STACK_POPULARITY[item] != null ? STACK_POPULARITY[item] : STACK_DEFAULT_SCORE);
   for (const field of Object.keys(stack)) {
@@ -110,9 +110,9 @@ function sortStackByPopularity(stack) {
   return stack;
 }
 
-// v1.2.x patch #4：把常被误归为"工具"的 AI/ML 数据栈库提升到主视野 stack.ai
-//   pandas/numpy/scikit-learn 是"用了什么"级别的依赖，不是辅助工具
-//   归到 tooling 折叠后用户看不到，导致"识别为空"的错觉
+// v1.2.x patch #4：把常被誤歸為"工具"的 AI/ML 資料棧庫提升到主視野 stack.ai
+//   pandas/numpy/scikit-learn 是"用了什麼"級別的依賴，不是輔助工具
+//   歸到 tooling 摺疊後用戶看不到，導致"識別為空"的錯覺
 const AI_ML_TOOLING_TO_STACK = {
   "pandas": "pandas",
   "numpy": "NumPy",
@@ -133,7 +133,7 @@ function promoteAIMLToStack(result) {
   for (const item of result.tooling) {
     const aiName = AI_ML_TOOLING_TO_STACK[item];
     if (aiName) {
-      // 用 setStack 保持 techStack 兼容 + pushStack 进 stack.ai
+      // 用 setStack 保持 techStack 相容 + pushStack 進 stack.ai
       result.techStack && (function () {
         if (!Array.isArray(result.techStack.ai)) result.techStack.ai = result.techStack.ai ? [result.techStack.ai] : [];
         if (!result.techStack.ai.includes(aiName)) result.techStack.ai.push(aiName);
@@ -147,15 +147,15 @@ function promoteAIMLToStack(result) {
   result.tooling = remaining;
 }
 
-// v1.2.x patch #4：兜底——manifest 缺失时扫源码 import 识别 framework
-//   限制：仅当 stack 完全为空时启用；只读前几个 .py/.js/.ts 文件头 50 行
-//   目的：解决"只有源码没有 manifest"的数据科学项目识别为空问题
+// v1.2.x patch #4：兜底——manifest 缺失時掃原始碼 import 識別 framework
+//   限制：僅當 stack 完全為空時啟用；只讀前幾個 .py/.js/.ts 檔案頭 50 行
+//   目的：解決"只有原始碼沒有 manifest"的資料科學專案識別為空問題
 async function fallbackScanImports(fs, rootTarget, result) {
-  // 仅当 stack 完全没有内容时启用
+  // 僅當 stack 完全沒有內容時啟用
   const hasAny = Object.keys(result.stack).some((k) => Array.isArray(result.stack[k]) && result.stack[k].length > 0);
   if (hasAny) return;
 
-  // 限制：最多读 20 个文件，每个文件前 60 行
+  // 限制：最多讀 20 個檔案，每個檔案前 60 行
   const MAX_FILES = 20;
   const MAX_LINE = 60;
   const candidates = [];
@@ -245,7 +245,7 @@ async function fallbackScanImports(fs, rootTarget, result) {
     "passport": "Passport.js", "next-auth": "Auth.js (NextAuth)",
     "stripe": "Stripe",
   };
-  // 收集 import 信号：每个字段命中次数累加，取 ≥1 的视为存在
+  // 收集 import 訊號：每個欄位命中次數累加，取 ≥1 的視為存在
   const hits = {};
   for (const entry of candidates) {
     const target = entry.target || await childTarget(fs, rootTarget, entry);
@@ -256,13 +256,13 @@ async function fallbackScanImports(fs, rootTarget, result) {
     const lines = txt.split(/\n/).slice(0, MAX_LINE).join("\n");
     for (const [hint, field] of Object.entries(IMPORT_HINTS)) {
       const esc = hint.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      // 兼容 4 种语法：
+      // 相容 4 種語法：
       //   1) Python: `import foo` / `import foo.bar` / `import foo as bar`
       //   2) Python: `from foo import ...` / `from foo.bar import ...`
       //   3) JS/TS: `from "foo"` / `from "foo/bar"`
       //   4) JS/TS: `import foo from "foo"` / `import "foo"` / `require("foo")`
       const patterns = [
-        // 1) Python: import foo (后跟空白/; /行尾)
+        // 1) Python: import foo (後跟空白/; /行尾)
         new RegExp("(?:^|\\s)import\\s+['\"]?" + esc + "['\"]?(?:\\s*as\\s+\\w+|\\s|;|$)", "m"),
         // 2) Python: from foo import / from foo.bar import
         new RegExp("(?:^|\\s)from\\s+['\"]?" + esc + "(?:\\.\\w+)?['\"]?\\s+import", "m"),
@@ -279,7 +279,7 @@ async function fallbackScanImports(fs, rootTarget, result) {
       }
     }
   }
-  // 写入 result.stack
+  // 寫入 result.stack
   for (const [hint, count] of Object.entries(hits)) {
     if (count < 1) continue;
     const field = IMPORT_HINTS[hint];
@@ -343,7 +343,7 @@ export function sanitizeProjectDescription(value) {
 function isMeaningfulDescription(value) {
   const text = String(value || "").trim();
   if (text.length < 12) return false;
-  if (/^(?:english|中文|简体中文|繁體中文|docs?|documentation|homepage)(?:\s*[|·/]\s*(?:english|中文|简体中文|繁體中文|docs?|documentation|homepage))*$/i.test(text)) return false;
+  if (/^(?:english|中文|簡體中文|繁體中文|docs?|documentation|homepage)(?:\s*[|·/]\s*(?:english|中文|簡體中文|繁體中文|docs?|documentation|homepage))*$/i.test(text)) return false;
   const chinese = (text.match(/[\u3400-\u9fff]/g) || []).length;
   const words = (text.match(/[A-Za-z0-9][A-Za-z0-9'_-]*/g) || []).length;
   return chinese >= 6 || words >= 3;
@@ -390,23 +390,23 @@ async function readText(fs, rootPath, name) {
   }
 }
 
-// 检测 entry 是 file / directory / other（兼容 DSH FsDirEntry + 旧 adapter）
+// 檢測 entry 是 file / directory / other（相容 DSH FsDirEntry + 舊 adapter）
 function entryKind(e) {
   if (!e) return "other";
-  // DSH FsDirEntry.type 优先
+  // DSH FsDirEntry.type 優先
   if (typeof e.type === "string") {
     if (e.type === "file" || e.type === "directory" || e.type === "other") return e.type;
   }
-  // 旧 adapter：boolean
+  // 舊 adapter：boolean
   if (e.isFile === true) return "file";
   if (e.isDirectory === true) return "directory";
-  // 旧 adapter：method（node Dirent）
+  // 舊 adapter：method（node Dirent）
   if (typeof e.isFile === "function" && e.isFile()) return "file";
   if (typeof e.isDirectory === "function" && e.isDirectory()) return "directory";
   return "other";
 }
 
-// 拿到 child 的 FsTarget（用于递归）。优先用 entry 自带的 target，否则 re-resolve。
+// 拿到 child 的 FsTarget（用於遞迴）。優先用 entry 自帶的 target，否則 re-resolve。
 async function childTarget(fs, parentTarget, entry) {
   if (entry && entry.target) return entry.target;
   try {
@@ -420,18 +420,18 @@ export async function scanProject(fs, projectPath) {
   const rootTarget = await fs.resolve(projectPath);
   const rootPath = processPathOf(fs, rootTarget);
 
-  // ── 输出 schema（v1.2.x 重构） ──
-  //   techStack：老 schema，按分类键（structure/backend/frontend/orm/database/cache/queue/...）存原始识别结果
-  //              保留向后兼容，mergeTechStackWithArchitecture 仍消费它
-  //   stack：    新 schema，主视野技术栈。按"用了什么"的视角分组：
+  // ── 輸出 schema（v1.2.x 重構） ──
+  //   techStack：老 schema，按分類鍵（structure/backend/frontend/orm/database/cache/queue/...）存原始識別結果
+  //              保留向後相容，mergeTechStackWithArchitecture 仍消費它
+  //   stack：    新 schema，主視野技術棧。按"用了什麼"的視角分組：
   //                framework-frontend / framework-backend / framework-fullstack
   //                webserver / database / cache / queue / search
   //                container / mobile / desktop
   //                iac / ci / observability / auth / api
-  //              每个值是数组。多语言栈并存自动累加。
-  //   tooling：  缩小到"工程工具"语义：构建/Lint/测试/类型/包管理。
-  //              不再含 GitHub Actions / Make / Docker / Terraform（这些已归到 stack）。
-  //   structure：代码结构标签（Monorepo / Cargo Workspace）单独保留，独立展示。
+  //              每個值是陣列。多語言棧並存自動累加。
+  //   tooling：  縮小到"工程工具"語義：構建/Lint/測試/型別/包管理。
+  //              不再含 GitHub Actions / Make / Docker / Terraform（這些已歸到 stack）。
+  //   structure：程式碼結構標籤（Monorepo / Cargo Workspace）單獨保留，獨立展示。
   function addTo(map, field, value) {
     if (!value) return;
     const cur = map[field];
@@ -439,11 +439,11 @@ export async function scanProject(fs, projectPath) {
     else if (Array.isArray(cur)) { if (!cur.includes(value)) cur.push(value); }
     else if (cur !== value) map[field] = [cur, value];
   }
-  // techStack 兼容老代码（单值 → 数组渐进式）
+  // techStack 相容老程式碼（單值 → 陣列漸進式）
   function setStack(field, value) {
     addTo(result.techStack, field, value);
   }
-  // stack：新的主视野分组（始终数组形式）
+  // stack：新的主視野分組（始終陣列形式）
   function pushStack(field, value) {
     if (!value) return;
     if (!Array.isArray(result.stack[field])) result.stack[field] = result.stack[field] ? [result.stack[field]] : [];
@@ -453,11 +453,11 @@ export async function scanProject(fs, projectPath) {
   const result = {
     projectName: null,
     description: null,
-    techStack: {},          // 老 schema（保留向后兼容）
-    stack: {},              // 新 schema（主视野：框架/中间件/运行时）
-    structure: [],          // 代码结构标签（Monorepo/Cargo Workspace）单独
+    techStack: {},          // 老 schema（保留向後相容）
+    stack: {},              // 新 schema（主視野：框架/中介軟體/執行時）
+    structure: [],          // 程式碼結構標籤（Monorepo/Cargo Workspace）單獨
     languages: {},
-    tooling: [],            // 工程工具（构建/Lint/测试/类型/包管理）
+    tooling: [],            // 工程工具（構建/Lint/測試/型別/包管理）
     fileCount: 0,
     topLevel: [],
     entrypoints: [],
@@ -471,7 +471,7 @@ export async function scanProject(fs, projectPath) {
     return result;
   }
 
-  // topLevel：保留所有非忽略项（包括目录），方便后续 Phase 区块展示
+  // topLevel：保留所有非忽略項（包括目錄），方便後續 Phase 區塊展示
   result.topLevel = entries
     .map((e) => e && e.name)
     .filter((n) => n && !shouldIgnoreDir(n))
@@ -592,7 +592,7 @@ export async function scanProject(fs, projectPath) {
         if (deps["cohere-ai"]) { setStack("ai", "Cohere"); pushStack("ai", "Cohere"); }
         if (deps["langchain"] || deps["@langchain/core"]) { setStack("ai", "LangChain"); pushStack("ai", "LangChain"); }
         if (deps["llamaindex"]) { setStack("ai", "LlamaIndex"); pushStack("ai", "LlamaIndex"); }
-        // Engineering tooling（构建/Lint/测试/类型/包管理）—— 不进 stack
+        // Engineering tooling（構建/Lint/測試/型別/包管理）—— 不進 stack
         if (deps.vite) result.tooling.push("Vite");
         if (deps.webpack) result.tooling.push("webpack");
         if (deps.esbuild) result.tooling.push("esbuild");
@@ -620,9 +620,9 @@ export async function scanProject(fs, projectPath) {
         if (deps["@emotion/react"]) result.tooling.push("Emotion");
         if (deps.sass || deps["sass-loader"]) result.tooling.push("Sass");
         if (deps["postcss"]) result.tooling.push("PostCSS");
-        // 包管理器（通过 lockfile 检测，由 build.js 补）
+        // 包管理器（通過 lockfile 檢測，由 build.js 補）
         if (pkg.workspaces) { setStack("structure", "Monorepo"); if (!result.structure.includes("Monorepo")) result.structure.push("Monorepo"); }
-        // 入口：npm run dev / build（仅当 scripts 存在时）
+        // 入口：npm run dev / build（僅當 scripts 存在時）
         if (pkg.scripts && pkg.scripts.dev) {
           result.entrypoints.push({ path: "npm run dev", type: "script" });
         }
@@ -641,12 +641,12 @@ export async function scanProject(fs, projectPath) {
   }
   const requirements = requirementParts.length ? requirementParts.join("\n") : null;
   const pyProject = names.includes("pyproject.toml") ? await readText(fs, rootPath, "pyproject.toml") : null;
-  // v1.2.x patch #4：加 Pipfile（pipenv）/ setup.cfg 识别
+  // v1.2.x patch #4：加 Pipfile（pipenv）/ setup.cfg 識別
   const pipfile = names.includes("Pipfile") ? await readText(fs, rootPath, "Pipfile") : null;
   const setupCfg = names.includes("setup.cfg") ? await readText(fs, rootPath, "setup.cfg") : null;
-  // 合并所有 Python manifest 用于 pyHas 检测
+  // 合併所有 Python manifest 用於 pyHas 檢測
   const pyAllSources = [pyProject, requirements, pipfile, setupCfg].filter(Boolean).join("\n");
-  // helper：检查所有 Python manifest（pyproject/requirements/Pipfile/setup.cfg）是否含某包名
+  // helper：檢查所有 Python manifest（pyproject/requirements/Pipfile/setup.cfg）是否含某包名
   const pyHas = (pkg) => {
     const re = new RegExp("(?:^|\\s|\\[|\\b)" + pkg + "(?:\\b|\\s|\\[|>=|<|=|!|~)", "i");
     return pyAllSources ? re.test(pyAllSources) : false;
@@ -719,9 +719,9 @@ export async function scanProject(fs, projectPath) {
   if (pyHas("opentelemetry-api") || pyHas("opentelemetry-sdk")) { setStack("observability", "OpenTelemetry"); pushStack("observability", "OpenTelemetry"); }
   if (pyHas("structlog")) { setStack("observability", "Structlog"); pushStack("observability", "Structlog"); }
   if (pyHas("loguru")) { setStack("observability", "Loguru"); pushStack("observability", "Loguru"); }
-  // AI / ML — v1.2.x patch #4：AI/ML 框架全部进入主视野 stack.ai（不再归 tooling）
+  // AI / ML — v1.2.x patch #4：AI/ML 框架全部進入主視野 stack.ai（不再歸 tooling）
   //   pandas/numpy / scikit-learn / pytorch / tensorflow / keras / jax
-  //   langchain / llama-index / openai / anthropic / huggingface 已经在下面识别并 setStack("ai", ...)
+  //   langchain / llama-index / openai / anthropic / huggingface 已經在下面識別並 setStack("ai", ...)
   if (pyHas("pandas")) { setStack("ai", "pandas"); pushStack("ai", "pandas"); }
   if (pyHas("numpy")) { setStack("ai", "NumPy"); pushStack("ai", "NumPy"); }
   if (pyHas("polars")) { setStack("ai", "Polars"); pushStack("ai", "Polars"); }
@@ -738,7 +738,7 @@ export async function scanProject(fs, projectPath) {
   if (pyHas("langgraph")) { setStack("ai", "LangGraph"); pushStack("ai", "LangGraph"); }
   if (pyHas("llama-index")) { setStack("ai", "LlamaIndex"); pushStack("ai", "LlamaIndex"); }
   if (pyHas("huggingface-hub") || pyHas("transformers")) { setStack("ai", "Hugging Face"); pushStack("ai", "Hugging Face"); }
-  // 工程工具（保留）—— pandas/numpy 已迁到 stack.ai，不再 push tooling
+  // 工程工具（保留）—— pandas/numpy 已遷到 stack.ai，不再 push tooling
   if (pyHas("pytest")) result.tooling.push("pytest");
   if (pyHas("ruff")) result.tooling.push("Ruff");
   if (pyHas("black")) result.tooling.push("Black");
@@ -779,14 +779,14 @@ export async function scanProject(fs, projectPath) {
     else if (/valyala\/fasthttp/.test(goMod)) { setStack("backend", "FastHTTP"); pushStack("framework-backend", "FastHTTP"); }
     else if (/grpc-ecosystem\/grpc-gateway/.test(goMod)) { setStack("api", "gRPC"); pushStack("api", "gRPC"); }
     else if (/99designs\/gqlgen/.test(goMod)) { setStack("api", "GraphQL"); pushStack("api", "GraphQL"); }
-    // 队列
+    // 佇列
     if (/segmentio\/kafka-go/.test(goMod) || /confluentinc\/confluent-kafka-go/.test(goMod)) { setStack("queue", "Kafka"); pushStack("queue", "Kafka"); }
     if (/nats-io\/nats\.go/.test(goMod)) { setStack("queue", "NATS"); pushStack("queue", "NATS"); }
     if (/streadway\/amqp/.test(goMod) || /rabbitmq\/amqp091-go/.test(goMod)) { setStack("queue", "RabbitMQ"); pushStack("queue", "RabbitMQ"); }
-    // 认证
+    // 認證
     if (/golang-jwt\/jwt/.test(goMod) || /lestrrat-go\/jxw/.test(goMod)) { setStack("auth", "JWT"); pushStack("auth", "JWT"); }
     if (/coreos\/go-oidc/.test(goMod) || /oauth2/.test(goMod)) { setStack("auth", "OAuth2/OIDC"); pushStack("auth", "OAuth2/OIDC"); }
-    // 可观测性
+    // 可觀測性
     if (/prometheus\/client_golang/.test(goMod)) { setStack("observability", "Prometheus"); pushStack("observability", "Prometheus"); }
     if (/getsentry\/sentry-go/.test(goMod)) { setStack("observability", "Sentry"); pushStack("observability", "Sentry"); }
     if (/opentelemetry\/otel/.test(goMod)) { setStack("observability", "OpenTelemetry"); pushStack("observability", "OpenTelemetry"); }
@@ -799,7 +799,7 @@ export async function scanProject(fs, projectPath) {
   const buildGradle = names.some((n) => n === "build.gradle" || n === "build.gradle.kts") ? await readText(fs, rootPath, names.find((n) => n === "build.gradle" || n === "build.gradle.kts")) : null;
   if (pomXml || buildGradle) {
     const javaText = (pomXml || "") + "\n" + (buildGradle || "");
-    // Spring Boot 细分
+    // Spring Boot 細分
     if (/spring-boot-starter|spring-boot-starter-web|spring-boot-starter-data/i.test(javaText)) {
       setStack("backend", "Spring Boot");
       pushStack("framework-backend", "Spring Boot");
@@ -826,7 +826,7 @@ export async function scanProject(fs, projectPath) {
       /* gradle misconfig, ignore */
     }
   }
-  // —— Kotlin / Scala 独立识别 ——
+  // —— Kotlin / Scala 獨立識別 ——
   if (names.some((n) => /\.kt$|\.kts$/i.test(n))) {
     setStack("framework-backend", "Kotlin");
     pushStack("framework-backend", "Kotlin");
@@ -863,14 +863,14 @@ export async function scanProject(fs, projectPath) {
     pushStack("framework-backend", ".NET");
   }
   if (names.some((n) => /\.csproj$/.test(n))) {
-    /* ASP.NET 隐式覆盖 */
+    /* ASP.NET 隱式覆蓋 */
   }
   // —— Rust ——
   const cargoToml = names.includes("Cargo.toml") ? await readText(fs, rootPath, "Cargo.toml") : null;
   if (cargoToml) {
     setStack("backend", "Rust");
     pushStack("framework-backend", "Rust");
-    // 识别子 crate workspace
+    // 識別子 crate workspace
     if (/\[workspace\]/.test(cargoToml)) {
       setStack("structure", "Cargo Workspace");
       if (!result.structure.includes("Cargo Workspace")) result.structure.push("Cargo Workspace");
@@ -909,8 +909,8 @@ export async function scanProject(fs, projectPath) {
     if (/^tokio\s*=/m.test(cargoToml)) result.tooling.push("Tokio");
     if (/^serde\s*=/m.test(cargoToml)) result.tooling.push("Serde");
   }
-  // —— 顶层基础设施：Web Server / 容器 / IaC / CI / k8s ——
-  // Dockerfile 检测：从内容找 FROM nginx/caddy/traefik/apache/httpd（更鲁棒，支持 multi-stage）
+  // —— 頂層基礎設施：Web Server / 容器 / IaC / CI / k8s ——
+  // Dockerfile 檢測：從內容找 FROM nginx/caddy/traefik/apache/httpd（更魯棒，支援 multi-stage）
   const dockerfileNames = names.filter((n) => /^Dockerfile(\..+)?$/.test(n));
   if (dockerfileNames.length > 0) {
     setStack("container", "Docker");
@@ -919,7 +919,7 @@ export async function scanProject(fs, projectPath) {
   for (const df of dockerfileNames) {
     const txt = await readText(fs, rootPath, df);
     if (!txt) continue;
-    // global match：multi-stage build 有多个 FROM，全部要识别
+    // global match：multi-stage build 有多個 FROM，全部要識別
     const fromRe = /^\s*FROM\s+([^\s]+)/gm;
     let m;
     while ((m = fromRe.exec(txt)) !== null) {
@@ -928,10 +928,10 @@ export async function scanProject(fs, projectPath) {
       if (/(^|\/)caddy\b/.test(img)) { setStack("webserver", "Caddy"); pushStack("webserver", "Caddy"); }
       if (/(^|\/)traefik\b/.test(img)) { setStack("webserver", "Traefik"); pushStack("webserver", "Traefik"); }
       if (/(^|\/)(apache|httpd)\b/.test(img)) { setStack("webserver", "Apache"); pushStack("webserver", "Apache"); }
-      // 不识别纯基础镜像（node/python/alpine/ubuntu/debian）
+      // 不識別純基礎映象（node/python/alpine/ubuntu/debian）
     }
   }
-  // docker-compose / compose 文件
+  // docker-compose / compose 檔案
   const composeNames = names.filter((n) => /^(docker-compose|compose)(\..+)?\.(yml|yaml)$/.test(n));
   for (const cf of composeNames) {
     const txt = await readText(fs, rootPath, cf);
@@ -942,7 +942,7 @@ export async function scanProject(fs, projectPath) {
     if (/image:\s*(nginx|caddy|traefik|httpd|apache)/i.test(txt)) {
       /* handled below per-service */
     }
-    // 服务级识别（粗略扫描常见 image: xxx）
+    // 服務級識別（粗略掃描常見 image: xxx）
     const imageRe = /image:\s*([^\s]+)/gi;
     let m;
     while ((m = imageRe.exec(txt)) !== null) {
@@ -969,7 +969,7 @@ export async function scanProject(fs, projectPath) {
       if (/(^|\/)vault\b/.test(img)) { setStack("auth", "Vault"); pushStack("auth", "Vault"); }
     }
   }
-  // 独立配置文件：Caddyfile / nginx.conf / Traefik 动态配置
+  // 獨立配置檔案：Caddyfile / nginx.conf / Traefik 動態配置
   if (names.includes("Caddyfile")) { setStack("webserver", "Caddy"); pushStack("webserver", "Caddy"); }
   if (names.some((n) => /^nginx(\..+)?\.conf$|^nginx\.conf$/.test(n))) { setStack("webserver", "Nginx"); pushStack("webserver", "Nginx"); }
   if (names.some((n) => /^traefik(\..+)?\.yml$|^traefik(\..+)?\.yaml$/.test(n))) { setStack("webserver", "Traefik"); pushStack("webserver", "Traefik"); }
@@ -996,7 +996,7 @@ export async function scanProject(fs, projectPath) {
   if (names.some((n) => /^azure-pipelines.*\.yml$/.test(n))) { setStack("ci", "Azure Pipelines"); pushStack("ci", "Azure Pipelines"); }
   if (names.some((n) => /^bitbucket-pipelines\.yml$/.test(n))) { setStack("ci", "Bitbucket Pipelines"); pushStack("ci", "Bitbucket Pipelines"); }
   if (names.some((n) => /^\.drone\.yml$|^drone\.yml$/.test(n))) { setStack("ci", "Drone"); pushStack("ci", "Drone"); }
-  // 包管理器（lockfile 检测）
+  // 包管理器（lockfile 檢測）
   if (names.includes("pnpm-lock.yaml") || names.includes("pnpm-workspace.yaml")) result.tooling.push("pnpm");
   if (names.includes("yarn.lock")) result.tooling.push("Yarn");
   if (names.includes("package-lock.json")) result.tooling.push("npm");
@@ -1014,21 +1014,21 @@ export async function scanProject(fs, projectPath) {
     setStack("structure", "Rush Monorepo");
     if (!result.structure.includes("Rush Monorepo")) result.structure.push("Rush Monorepo");
   }
-  // 构建/Make
+  // 構建/Make
   if (names.includes("Makefile")) result.tooling.push("Make");
-  // 检测 SQL 文件存在（之前 EXT_LANG 有 .sql 但 techStack 没数据库字段）
+  // 檢測 SQL 檔案存在（之前 EXT_LANG 有 .sql 但 techStack 沒資料庫欄位）
   if (result.languages.sql && !result.techStack.database) {
     setStack("database", "SQL");
     pushStack("database", "SQL");
   }
 
-  // README 首段通常比目录名更能帮助用户快速理解陌生项目。
+  // README 首段通常比目錄名更能幫助使用者快速理解陌生專案。
   if (!result.description) {
     const readmeName = names.find((n) => /^readme(?:\.[a-z0-9]+)?$/i.test(n));
     if (readmeName) result.description = firstReadmeParagraph(await readText(fs, rootPath, readmeName));
   }
 
-  // —— 入口候选（递归完成后按相对路径判断）——
+  // —— 入口候選（遞迴完成後按相對路徑判斷）——
   const entryCandidates = [
     ["main.ts", "service"], ["main.js", "service"],
     ["index.ts", "service"], ["index.js", "service"],
@@ -1038,7 +1038,7 @@ export async function scanProject(fs, projectPath) {
     ["src/main.ts", "service"], ["src/main.js", "service"],
     ["src/index.ts", "service"], ["src/index.js", "service"],
   ];
-  // —— 递归扫文件 / 目录（限深 5，足够覆盖典型项目 src/host/store/...）——
+  // —— 遞迴掃檔案 / 目錄（限深 5，足夠覆蓋典型專案 src/host/store/...）——
   const relativeFiles = new Set();
   async function scanDepth(target, depth, prefix) {
     if (depth > 5) return;
@@ -1065,7 +1065,7 @@ export async function scanProject(fs, projectPath) {
         const nextPrefix = prefix ? prefix + "/" + e.name : e.name;
         await scanDepth(subT, depth + 1, nextPrefix);
       }
-      // kind === 'other' 跳过（symlink / 不识别）
+      // kind === 'other' 跳過（symlink / 不識別）
     }
   }
   await scanDepth(rootTarget, 0, "");
@@ -1076,19 +1076,19 @@ export async function scanProject(fs, projectPath) {
     }
   }
   result.tooling = Array.from(new Set(result.tooling)).sort();
-  // 架构分析只消费相对路径，不在 project.json 中暴露机器绝对路径。
+  // 架構分析只消費相對路徑，不在 project.json 中暴露機器絕對路徑。
   result.files = Array.from(relativeFiles).sort();
 
-  // v1.2.x patch #4：把常被误归为"工具"的 AI/ML 数据栈库提升到主视野 stack.ai
-  //   用户的"能量分析"项目（数据科学典型）只装 pandas/numpy/pytorch 等，
-  //   它们被归到 tooling 后折叠，主视野显示空——所以要把它们升级到 stack.ai
+  // v1.2.x patch #4：把常被誤歸為"工具"的 AI/ML 資料棧庫提升到主視野 stack.ai
+  //   使用者的"能量分析"專案（資料科學典型）只裝 pandas/numpy/pytorch 等，
+  //   它們被歸到 tooling 後摺疊，主視野顯示空——所以要把它們升級到 stack.ai
   promoteAIMLToStack(result);
 
-  // v1.2.x patch #4：兜底——manifest 为空时扫源码 import 找 framework
-  //   仅当 stack 完全为空时启用（避免与 manifest 识别重复）
+  // v1.2.x patch #4：兜底——manifest 為空時掃原始碼 import 找 framework
+  //   僅當 stack 完全為空時啟用（避免與 manifest 識別重複）
   await fallbackScanImports(fs, rootTarget, result);
 
-  // v1.2.x patch #3：按 popularity 分数降序排序 stack 各字段（用户核心诉求：主要的在前）
+  // v1.2.x patch #3：按 popularity 分數降序排序 stack 各欄位（使用者核心訴求：主要的在前）
   sortStackByPopularity(result.stack);
 
   return result;

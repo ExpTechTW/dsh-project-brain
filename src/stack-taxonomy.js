@@ -1,5 +1,5 @@
-// 技术栈展示口径：运行时主视野 / 交付（CI·IaC·观测） / 工程工具另计
-// 语言名不进框架 chip（语言统计卡片已经展示）
+// 技術棧展示口徑：執行時主視野 / 交付（CI·IaC·觀測） / 工程工具另計
+// 語言名不進框架 chip（語言統計卡片已經展示）
 
 export const RUNTIME_STACK_FIELDS = [
   "framework-frontend", "framework-backend", "framework-fullstack",

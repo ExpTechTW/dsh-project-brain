@@ -1,32 +1,32 @@
-# Show HN 帖文（4 标题变体 + 完整正文）
+# Show HN 帖文（4 標題變體 + 完整正文）
 
-> **目标平台**：[news.ycombinator.com](https://news.ycombinator.com/) 的 Show HN
-> **最佳发布时机**：周二 / 周三 / 周四 美东上午 8-10 点（Pacific 5-7am / 北京 21-23 点）
-> **准备清单**：landing page、3 张截图、demo video（如有）、issue tracker、discussion 区
+> **目標平臺**：[news.ycombinator.com](https://news.ycombinator.com/) 的 Show HN
+> **最佳釋出時機**：週二 / 週三 / 週四 美東上午 8-10 點（Pacific 5-7am / 北京 21-23 點）
+> **準備清單**：landing page、3 張截圖、demo video（如有）、issue tracker、discussion 區
 
 ---
 
-## 标题候选（A/B 测试）
+## 標題候選（A/B 測試）
 
-### 变体 1（推荐）：明确痛点 + 解决方案
+### 變體 1（推薦）：明確痛點 + 解決方案
 
 > **Show HN: dsh-project-brain – Persistent project memory for DSH (1.0.0)**
 
-### 变体 2：差异化定位
+### 變體 2：差異化定位
 
 > **Show HN: dsh-project-brain – A plugin that gives your AI coding assistant a long-term memory of your codebase**
 
-### 变体 3：技术卖点
+### 變體 3：技術賣點
 
 > **Show HN: dsh-project-brain – Host/Client split architecture + 6-language AST analysis for AI coding tools**
 
-### 变体 4：本地化 / 隐私强调
+### 變體 4：本地化 / 隱私強調
 
 > **Show HN: dsh-project-brain – Local-first project memory for DSH (no cloud, no lock-in)**
 
 ---
 
-## 正文模板（推荐长度 400-800 字）
+## 正文模板（推薦長度 400-800 字）
 
 ```markdown
 Hi HN,
@@ -94,19 +94,19 @@ Happy to answer any questions — and looking forward to your feedback!
 
 ---
 
-## HN 发布 checklist（发布前 30 分钟）
+## HN 釋出 checklist（釋出前 30 分鐘）
 
-- [ ] 在 https://news.ycombinator.com/shownew.html 准备草稿（先不提交）
-- [ ] GitHub README 顶部 demo gif / 视频链接就位（目前没有，待录）
-- [ ] Social preview 图已设到 GitHub repo（Settings → Social preview）
-- [ ] 至少 3 个 issues 已关闭或回应（避免 "issues are empty" 批评）
-- [ ] Discussion 区有 1-2 个种子帖（让用户有地方讨论）
-- [ ] Twitter 上同步发同一条，@hn_frontpage_pages 之类账号
-- [ ] 自己 + 1-2 个朋友准备好 1 小时内回应评论（HN 前 2 小时评论密度决定上首页）
+- [ ] 在 https://news.ycombinator.com/shownew.html 準備草稿（先不提交）
+- [ ] GitHub README 頂部 demo gif / 影片連結就位（目前沒有，待錄）
+- [ ] Social preview 圖已設到 GitHub repo（Settings → Social preview）
+- [ ] 至少 3 個 issues 已關閉或回應（避免 "issues are empty" 批評）
+- [ ] Discussion 區有 1-2 個種子帖（讓使用者有地方討論）
+- [ ] Twitter 上同步發同一條，@hn_frontpage_pages 之類賬號
+- [ ] 自己 + 1-2 個朋友準備好 1 小時內回應評論（HN 前 2 小時評論密度決定上首頁）
 
-## HN 后续动作（前 24 小时）
+## HN 後續動作（前 24 小時）
 
-- 1 小时内回应每一条评论（HN 算法看早期评论密度）
-- 准备 3-5 条 FAQ 答案（避免重复回答）
-- 如果被顶到首页：发 Twitter 庆祝，链接回 HN
-- 如果被拍：感谢批评，记录到 issue，不要反驳（HN 文化）
+- 1 小時內回應每一條評論（HN 演算法看早期評論密度）
+- 準備 3-5 條 FAQ 答案（避免重複回答）
+- 如果被頂到首頁：發 Twitter 慶祝，連結回 HN
+- 如果被拍：感謝批評，記錄到 issue，不要反駁（HN 文化）

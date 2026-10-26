@@ -33,8 +33,8 @@ const tests = [
   "smoke-familiarity-client.mjs",
 ];
 
-// v0.7.0-beta.3 release-fix：单 suite 失败不应阻断其他 suite 验证。
-// 收集所有失败在末尾统一报告，CI 能一眼看出哪些 suite 需要修。
+// v0.7.0-beta.3 release-fix：單 suite 失敗不應阻斷其他 suite 驗證。
+// 收集所有失敗在末尾統一報告，CI 能一眼看出哪些 suite 需要修。
 const failures = [];
 for (const test of tests) {
   console.log("\n=== " + test + " ===");

@@ -1,56 +1,56 @@
-# DSH 插件市场文案
+# DSH 外掛市場文案
 
-> 发布状态：`1.3.0` 稳定版（v1.2.0 的 minor 版本，Durable Core 站立记忆 + 架构并列泳道 + 技术栈分层重构 + 截图从 7 张扩到 10 张）。
+> 釋出狀態：`1.3.0` 穩定版（v1.2.0 的 minor 版本，Durable Core 站立記憶 + 架構並列泳道 + 技術棧分層重構 + 截圖從 7 張擴到 10 張）。
 
-## 名称
+## 名稱
 
 dsh-project-brain
 
-## 一句话描述
+## 一句話描述
 
-让 DSH 持久理解当前项目：自动分析工作区，跨对话保留决策、变更、待办和开发上下文。
+讓 DSH 持久理解當前專案：自動分析工作區，跨對話保留決策、變更、待辦和開發上下文。
 
-## 长描述
+## 長描述
 
-dsh-project-brain 为每个 DSH workspace 建立独立的本地“项目大脑”。首次启动会生成架构认知报告，说明项目定位、架构风格、概念分层、职责组件、运行流程、关键文件和阅读顺序；目录只作为证据。默认复用当前 DSH Session 的模型深入分析，模型不可用时自动使用本地职责模型。后续把架构决策、需求约束、Bug 根因、经验教训、Git 变化和待办持续沉淀到项目自己的 `.project-brain/`。
+dsh-project-brain 為每個 DSH workspace 建立獨立的本地“專案大腦”。首次啟動會生成架構認知報告，說明專案定位、架構風格、概念分層、職責元件、執行流程、關鍵檔案和閱讀順序；目錄只作為證據。預設複用當前 DSH Session 的模型深入分析，模型不可用時自動使用本地職責模型。後續把架構決策、需求約束、Bug 根因、經驗教訓、Git 變化和待辦持續沉澱到專案自己的 `.project-brain/`。
 
-切换对话时，插件会自动恢复当前项目的关键记忆、活跃待办和最近活动。切换 workspace 时，Host 根据 live Session 安全解析对应目录，项目之间不会串数据。Sidebar 与 TodoStrip 使用运行时 RPC 实时读取，无需重新构建插件。
+切換對話時，外掛會自動恢復當前專案的關鍵記憶、活躍待辦和最近活動。切換 workspace 時，Host 根據 live Session 安全解析對應目錄，專案之間不會串資料。Sidebar 與 TodoStrip 使用執行時 RPC 即時讀取，無需重新構建外掛。
 
-所有项目脑数据保存在本地。架构分析默认向当前 DSH 模型发送 README、manifest、结构事实和有限关键源码摘要，可关闭源码摘要或完全关闭 LLM。记忆查询默认使用本地 BM25；Embedding 服务仍需用户主动配置。
+所有專案腦資料儲存在本地。架構分析預設向當前 DSH 模型傳送 README、manifest、結構事實和有限關鍵原始碼摘要，可關閉原始碼摘要或完全關閉 LLM。記憶查詢預設使用本地 BM25；Embedding 服務仍需使用者主動配置。
 
 ## 能力
 
-- 任意 DSH workspace 自动识别和初始化
-- 初始化/重扫自动维护架构认知报告，源码变化后按内容指纹增量刷新
-- 当前 DSH LLM 零配置语义增强 + 本地静态分析降级
-- 13 个项目分析、记忆、待办、查询和 Git diff 工具
-- 跨 Session 项目上下文注入
-- 默认本地检索 + 可选混合向量语义召回
-- Memory V2 状态、来源与可信度字段，归档内容不会污染上下文
-- Session Git 变更摘要 + 当前 DSH LLM 语义记忆抽取，并带隐私过滤、数量限制、去重与失败降级
-- 多 workspace 强隔离
-- 中英文界面与 DSH 主题适配
-- 发布构建不携带开发者本机项目数据
+- 任意 DSH workspace 自動識別和初始化
+- 初始化/重掃自動維護架構認知報告，原始碼變化後按內容指紋增量重新整理
+- 當前 DSH LLM 零配置語義增強 + 本地靜態分析降級
+- 13 個專案分析、記憶、待辦、查詢和 Git diff 工具
+- 跨 Session 專案上下文注入
+- 預設本地檢索 + 可選混合向量語義召回
+- Memory V2 狀態、來源與可信度欄位，歸檔內容不會汙染上下文
+- Session Git 變更摘要 + 當前 DSH LLM 語義記憶抽取，並帶隱私過濾、數量限制、去重與失敗降級
+- 多 workspace 強隔離
+- 中英文介面與 DSH 主題適配
+- 釋出構建不攜帶開發者本機專案資料
 
-## 标签
+## 標籤
 
 `developer-tools`, `project-management`, `memory`, `context`, `local-first`, `sidebar`, `ai-assistant`
 
-## 隐私摘要
+## 隱私摘要
 
-- 项目数据存储在 `<workspace>/.project-brain/`
-- Client 无法指定任意 Host 文件路径
-- 架构分析默认复用当前 DSH 模型并发送有限关键源码摘要，不发送绝对路径；源码摘要与 LLM 均可分别关闭
-- 向量缓存位于 `.project-brain/cache/`，属于可删除、可重建的派生数据
-- 发布包不嵌入本地 Session ID、workspace 路径或项目记忆
+- 專案資料儲存在 `<workspace>/.project-brain/`
+- Client 無法指定任意 Host 檔案路徑
+- 架構分析預設複用當前 DSH 模型併發送有限關鍵原始碼摘要，不傳送絕對路徑；原始碼摘要與 LLM 均可分別關閉
+- 向量快取位於 `.project-brain/cache/`，屬於可刪除、可重建的派生資料
+- 釋出包不嵌入本地 Session ID、workspace 路徑或專案記憶
 
-## 发布前检查
+## 釋出前檢查
 
-- [x] `npm test`：13 组 smoke suite（含架构、Session 语义记忆、Memory V2 与混合检索）通过
-- [x] 默认构建为 release-safe runtime RPC 模式
-- [x] npm 发布文件 allowlist
-- [x] 发布隐私自动检查：无本机路径、Session ID、凭据或 `.project-brain/` 数据
+- [x] `npm test`：13 組 smoke suite（含架構、Session 語義記憶、Memory V2 與混合檢索）通過
+- [x] 預設構建為 release-safe runtime RPC 模式
+- [x] npm 釋出檔案 allowlist
+- [x] 釋出隱私自動檢查：無本機路徑、Session ID、憑據或 `.project-brain/` 資料
 - [x] `npm audit`：0 vulnerabilities
 - [x] MIT License
-- [x] README 已包含项目大脑启动入口、项目状态卡、Dashboard 概览、架构并列泳道（概览 + 展开）、任务动态、项目记忆、自建设置（向量 + 权重）和 Git 历史截图（共 10 张）
-- [ ] 在目标 DSH profile 与客户端环境完成一次真实安装和跨项目切换验收
+- [x] README 已包含專案大腦啟動入口、專案狀態卡、Dashboard 概覽、架構並列泳道（概覽 + 展開）、任務動態、專案記憶、自建設定（向量 + 權重）和 Git 歷史截圖（共 10 張）
+- [ ] 在目標 DSH profile 與客戶端環境完成一次真實安裝和跨專案切換驗收

@@ -1,7 +1,7 @@
-// rpc-payload.js — Dashboard 导入/回滚预览的扁平 RPC 载荷
+// rpc-payload.js — Dashboard 匯入/回滾預覽的扁平 RPC 載荷
 //
-// DSH Connection 的 schemastery 可能丢掉嵌套对象（impact / manifest / sourceBackup）。
-// 因此把 UI 需要的字段全部摊成顶层原始类型，并保留一份嵌套结构给能收到的客户端。
+// DSH Connection 的 schemastery 可能丟掉巢狀物件（impact / manifest / sourceBackup）。
+// 因此把 UI 需要的欄位全部攤成頂層原始型別，並保留一份巢狀結構給能收到的客戶端。
 
 function num(v) {
   const n = Number(v);
@@ -24,8 +24,8 @@ export function shapeImportPreviewData(preview, bundlePath, confirmToken) {
   const rootPathFrom = str(rewrite.from);
   const rootPathTo = str(rewrite.to);
   const warning = currentExists
-    ? "导入将覆盖当前脑，旧脑会自动备份到 " + (backupWillCreateAt || "本地备份目录")
-    : "这是该项目首次导入，无旧脑可备份。";
+    ? "匯入將覆蓋當前腦，舊腦會自動備份到 " + (backupWillCreateAt || "本地備份目錄")
+    : "這是該專案首次匯入，無舊腦可備份。";
 
   const impact = {
     currentBrainExists: currentExists,
@@ -78,8 +78,8 @@ export function shapeRollbackPreviewData(preview, backupTimestamp, confirmToken)
   const currentExists = !!current.exists;
   const willBackupCurrentTo = str(preview && preview.willBackupCurrentTo);
   const warning = currentExists
-    ? "回滚前会先把当前脑备份到 " + (willBackupCurrentTo || "本地备份目录") + "，可继续回滚。"
-    : "当前脑不存在，回滚后会成为当前脑。";
+    ? "回滾前會先把當前腦備份到 " + (willBackupCurrentTo || "本地備份目錄") + "，可繼續回滾。"
+    : "當前腦不存在，回滾後會成為當前腦。";
 
   return {
     mode: "preview",

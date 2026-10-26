@@ -1,23 +1,23 @@
-// write-lock.js — 按 key 串行化写入序列。
+// write-lock.js — 按 key 序列化寫入序列。
 //
-// 为什么需要：DSH 的 fs 只有覆盖写，appendLine 是「读全文 → 拼接 → 写全文」，
-// admit / housekeep / 人工编辑则是「读整表 → 改 → 写整表」。两个并发的序列
-// 会各自基于旧快照写回，后写的把先写的抹掉，而且没有任何报错。
+// 為什麼需要：DSH 的 fs 只有覆蓋寫，appendLine 是「讀全文 → 拼接 → 寫全文」，
+// admit / housekeep / 人工編輯則是「讀整表 → 改 → 寫整表」。兩個併發的序列
+// 會各自基於舊快照寫回，後寫的把先寫的抹掉，而且沒有任何報錯。
 //
-// 两层 key，获取顺序永远是「事务锁 → 文件锁」，且两者 key 不同，不会互相死锁：
-//   - 事务锁 brainTxKey(projectPath, file)：包住整个读-改-写序列
-//   - 文件锁 path：包住单次 append / 覆盖写
+// 兩層 key，獲取順序永遠是「事務鎖 → 檔案鎖」，且兩者 key 不同，不會互相死鎖：
+//   - 事務鎖 brainTxKey(projectPath, file)：包住整個讀-改-寫序列
+//   - 檔案鎖 path：包住單次 append / 覆蓋寫
 //
-// 持锁期间不要调用任何可能再取同一把锁的函数（典型的是 buildWorkspacePreview →
-// persistHousekeep）。真这么写了会被下面的重入检测当场拦下，而不是静默挂起。
+// 持鎖期間不要呼叫任何可能再取同一把鎖的函式（典型的是 buildWorkspacePreview →
+// persistHousekeep）。真這麼寫了會被下面的重入檢測當場攔下，而不是靜默掛起。
 
 import { AsyncLocalStorage } from "node:async_hooks";
 
 const chains = new Map();
 
-// 记录当前异步调用链已经持有哪些 key。持锁期间再取同一把锁 = 自己等自己，
-// 表现是「操作其实成功了，但调用方永远收不到返回」——最难查的那种 bug。
-// 与其挂死，不如当场抛错把调用路径暴露出来。
+// 記錄當前非同步呼叫鏈已經持有哪些 key。持鎖期間再取同一把鎖 = 自己等自己，
+// 表現是「操作其實成功了，但呼叫方永遠收不到返回」——最難查的那種 bug。
+// 與其掛死，不如當場拋錯把呼叫路徑暴露出來。
 const heldKeys = new AsyncLocalStorage();
 
 export function withWriteLock(key, task) {
@@ -34,10 +34,10 @@ export function withWriteLock(key, task) {
   const run = () => heldKeys.run(nextHeld, task);
 
   const prev = chains.get(k);
-  // 队列空时直接跑，省掉一次微任务跳转——串行调用是最常见的路径。
+  // 佇列空時直接跑，省掉一次微任務跳轉——序列呼叫是最常見的路徑。
   const result = prev ? prev.then(run) : (async () => run())();
-  // 链上只传递「已完成」信号并吞掉错误，否则一次失败会毒化后面排队的所有任务。
-  // 顺手清空闲置的 key，避免长时间运行后 Map 里堆满已完成的链。
+  // 鏈上只傳遞「已完成」訊號併吞掉錯誤，否則一次失敗會毒化後面排隊的所有任務。
+  // 順手清空閒置的 key，避免長時間執行後 Map 裡堆滿已完成的鏈。
   let tail;
   const settle = () => {
     if (chains.get(k) === tail) chains.delete(k);
@@ -51,7 +51,7 @@ export function brainTxKey(projectPath, file) {
   return String(projectPath || "") + "::tx::" + String(file || "memory.jsonl");
 }
 
-// 仅供测试断言用：正常运行时队列应该很快排空。
+// 僅供測試斷言用：正常執行時佇列應該很快排空。
 export function pendingLockCount() {
   return chains.size;
 }

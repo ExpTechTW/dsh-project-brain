@@ -1,4 +1,4 @@
-// 调试 detector 输出
+// 除錯 detector 輸出
 import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";

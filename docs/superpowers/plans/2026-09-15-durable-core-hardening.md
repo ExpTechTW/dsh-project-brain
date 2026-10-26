@@ -24,7 +24,7 @@
 - Modify: `src/host/memory/admit.js`
 - Test: `scripts/smoke-durable-core.mjs`
 
-- [x] Failing tests: durable `release-fix` body admitted; patch+验收 body rejected; activity report rejected; close-importance evicts older; `ensureHousekeepOnRead` archives changelog without timeline spam; `admit: false` writes nothing
+- [x] Failing tests: durable `release-fix` body admitted; patch+驗收 body rejected; activity report rejected; close-importance evicts older; `ensureHousekeepOnRead` archives changelog without timeline spam; `admit: false` writes nothing
 - [x] Implement `isActivityReport`, relax version+release unless body is a report, 0.1 importance buckets, `ensureHousekeepOnRead`, compact automatic content to 400 chars
 - [x] Smoke pass
 
@@ -46,7 +46,7 @@
 
 - [x] Memory tab: Core first, dormant collapsed
 - [x] Spec status line = implemented
-- [x] Supersede outdated 三大核心决策 with Durable Core fact
+- [x] Supersede outdated 三大核心決策 with Durable Core fact
 
 ### Task 4: Verify
 

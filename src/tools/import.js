@@ -1,9 +1,9 @@
-// project_import Tool — 从 bundle zip 还原 .project-brain/
+// project_import Tool — 從 bundle zip 還原 .project-brain/
 //
-// 流程（dryRun → apply 两步机制）：
-//   1. dryRun=true  → 解析 bundle → 计算 impact → 发放 confirmToken
-//   2. UI 显示预览，用户确认
-//   3. dryRun=false + confirmToken → 备份当前脑 → 解压 → 改写 rootPath → 触发 rescan
+// 流程（dryRun → apply 兩步機制）：
+//   1. dryRun=true  → 解析 bundle → 計算 impact → 發放 confirmToken
+//   2. UI 顯示預覽，使用者確認
+//   3. dryRun=false + confirmToken → 備份當前腦 → 解壓 → 改寫 rootPath → 觸發 rescan
 
 import { defineTool } from "@deepseek-ai/dsh-tools";
 import { promises as fsp } from "node:fs";
@@ -40,31 +40,31 @@ export function buildProjectImportTool({ fs, sandboxPolicy }) {
   return defineTool({
     name: "project_import",
     description:
-      "dsh-project-brain: 从 bundle zip 还原 .project-brain/。**两步机制**：先 dryRun=true 看预览，" +
-      "把返回的 confirmToken 传给 dryRun=false 才实际写入；5 分钟内必须完成。" +
-      "导入会备份当前脑 → 解压 → 改写 rootPath → 触发 rescan。失败回滚可调 project_rollback_backup。",
+      "dsh-project-brain: 從 bundle zip 還原 .project-brain/。**兩步機制**：先 dryRun=true 看預覽，" +
+      "把返回的 confirmToken 傳給 dryRun=false 才實際寫入；5 分鐘內必須完成。" +
+      "匯入會備份當前腦 → 解壓 → 改寫 rootPath → 觸發 rescan。失敗回滾可調 project_rollback_backup。",
     parameters: {
-      path: { type: "string", description: "目的地项目根路径（默认从 session cwd 推断）" },
-      bundlePath: { type: "string", description: "bundle zip 文件绝对路径（必填）" },
-      dryRun: { type: "boolean", description: "true=仅预览，false=实际写入（默认 false）" },
-      confirmToken: { type: "string", description: "dryRun 返回的 token；dryRun=false 时必填" },
+      path: { type: "string", description: "目的地專案根路徑（預設從 session cwd 推斷）" },
+      bundlePath: { type: "string", description: "bundle zip 檔案絕對路徑（必填）" },
+      dryRun: { type: "boolean", description: "true=僅預覽，false=實際寫入（預設 false）" },
+      confirmToken: { type: "string", description: "dryRun 返回的 token；dryRun=false 時必填" },
     },
     output: { schema: baseOutputSchema, render: renderImport },
     async execute(args, exec) {
       try {
         const projectPath = resolveProjectPath(args, exec, sandboxPolicy);
         if (projectPath === ".") {
-          return { ok: false, code: "E_NO_PATH", message: "无法解析项目路径（请显式传 path）" };
+          return { ok: false, code: "E_NO_PATH", message: "無法解析專案路徑（請顯式傳 path）" };
         }
         const bundlePath = args && args.bundlePath;
         if (!bundlePath) {
           return { ok: false, code: "E_BUNDLE_PATH_REQUIRED", message: "bundlePath 必填" };
         }
-        // 校验 bundle 文件存在
+        // 校驗 bundle 檔案存在
         try {
           await fsp.access(bundlePath);
         } catch (e) {
-          return { ok: false, code: "E_BUNDLE_NOT_FOUND", message: "bundle 文件不存在：" + bundlePath };
+          return { ok: false, code: "E_BUNDLE_NOT_FOUND", message: "bundle 檔案不存在：" + bundlePath };
         }
 
         const isDryRun = !!(args && args.dryRun);
@@ -115,8 +115,8 @@ export function buildProjectImportTool({ fs, sandboxPolicy }) {
               },
               confirmToken,
               warning: preview.currentBrain.exists
-                ? "导入将覆盖当前脑，旧脑会自动备份到 " + preview.backupWillCreateAt
-                : "这是该项目首次导入，无备份可建。",
+                ? "匯入將覆蓋當前腦，舊腦會自動備份到 " + preview.backupWillCreateAt
+                : "這是該專案首次匯入，無備份可建。",
             },
           };
         }
@@ -124,15 +124,15 @@ export function buildProjectImportTool({ fs, sandboxPolicy }) {
         // ─── Apply ───
         const token = args && args.confirmToken;
         if (!token) {
-          return { ok: false, code: "E_CONFIRM_TOKEN_REQUIRED", message: "dryRun=false 必须传 confirmToken（先 dryRun=true 拿到 token）" };
+          return { ok: false, code: "E_CONFIRM_TOKEN_REQUIRED", message: "dryRun=false 必須傳 confirmToken（先 dryRun=true 拿到 token）" };
         }
         const payload = tokenStore.consume(token, { kind: "import" });
         if (!payload) {
-          return { ok: false, code: "E_CONFIRM_TOKEN_MISMATCH", message: "confirmToken 无效、已过期或类型不匹配（请重新 dryRun）" };
+          return { ok: false, code: "E_CONFIRM_TOKEN_MISMATCH", message: "confirmToken 無效、已過期或型別不匹配（請重新 dryRun）" };
         }
-        // 校验 token 内 bundlePath 与当前一致（防止 token 复用跨项目）
+        // 校驗 token 內 bundlePath 與當前一致（防止 token 複用跨專案）
         if (payload.bundlePath !== bundlePath || payload.destProjectPath !== projectPath) {
-          return { ok: false, code: "E_CONFIRM_TOKEN_MISMATCH", message: "confirmToken 与当前参数不匹配（请重新 dryRun）" };
+          return { ok: false, code: "E_CONFIRM_TOKEN_MISMATCH", message: "confirmToken 與當前引數不匹配（請重新 dryRun）" };
         }
 
         let applied;
@@ -140,7 +140,7 @@ export function buildProjectImportTool({ fs, sandboxPolicy }) {
           applied = await applyBundle({
             bundlePath,
             destProjectPath: projectPath,
-            triggerRescan: false, // 由调用方调度
+            triggerRescan: false, // 由呼叫方排程
           });
         } catch (e) {
           return {
@@ -150,14 +150,14 @@ export function buildProjectImportTool({ fs, sandboxPolicy }) {
           };
         }
 
-        // 写 timeline
+        // 寫 timeline
         try {
           const now = Date.now();
           const event = {
             id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
             title: applied.backupPath
-              ? "导入 bundle（已备份旧脑到 " + path.basename(applied.backupPath) + "）"
-              : "导入 bundle（首次）",
+              ? "匯入 bundle（已備份舊腦到 " + path.basename(applied.backupPath) + "）"
+              : "匯入 bundle（首次）",
             eventType: "import",
             occurredAt: now,
             payload: {
@@ -167,7 +167,7 @@ export function buildProjectImportTool({ fs, sandboxPolicy }) {
             },
           };
           await appendJsonl(fs, brainPath(projectPath, "timeline.jsonl"), event);
-        } catch (e) { /* 不阻断主流程 */ }
+        } catch (e) { /* 不阻斷主流程 */ }
 
         emitPreviewChanged(exec, projectPath);
 
@@ -177,11 +177,11 @@ export function buildProjectImportTool({ fs, sandboxPolicy }) {
             mode: "applied",
             bundlePath,
             backupPath: applied.backupPath,
-            rescanTriggered: false, // 留给 RPC 层调度
+            rescanTriggered: false, // 留給 RPC 層排程
             fileCount: applied.fileCount,
             sourceManifest: applied.sourceManifest,
-            warning: "脑数据已写入。建议手动调 project_rescan 刷新架构与统计；" +
-              "若需恢复旧脑，可调 project_rollback_backup。",
+            warning: "腦資料已寫入。建議手動調 project_rescan 重新整理架構與統計；" +
+              "若需恢復舊腦，可調 project_rollback_backup。",
           },
         };
       } catch (e) {
@@ -209,17 +209,17 @@ function renderImport(_args, value) {
         { type: "text", text: "  source: " + (d.manifest && d.manifest.sourceProject && d.manifest.sourceProject.rootPath) },
         { type: "text", text: "  current brain: " + (impact.currentBrainExists
           ? `${impact.currentMemories} mem / ${impact.currentTodos} todo / ${impact.currentTimeline} timeline`
-          : "(无)") },
+          : "(無)") },
         { type: "text", text: "  incoming: " + `${impact.incomingMemories} mem / ${impact.incomingTodos} todo / ${impact.incomingTimeline} timeline` },
-        { type: "text", text: "  backup will create: " + (impact.backupWillCreateAt || "(无脑，无需备份)") },
+        { type: "text", text: "  backup will create: " + (impact.backupWillCreateAt || "(無腦，無需備份)") },
         { type: "text", text: "  rootPath rewrite: " + (impact.rootPathRewrite && impact.rootPathRewrite.from) + " → " + (impact.rootPathRewrite && impact.rootPathRewrite.to) },
-        { type: "text", text: "  confirmToken: " + d.confirmToken + " (5 分钟内传给 dryRun=false 才会真正执行)" },
+        { type: "text", text: "  confirmToken: " + d.confirmToken + " (5 分鐘內傳給 dryRun=false 才會真正執行)" },
       ];
     }
     if (d.mode === "applied") {
       return [
         { type: "text", text: "dsh-project-brain: import APPLIED" },
-        { type: "text", text: "  backup: " + (d.backupPath || "(无)") },
+        { type: "text", text: "  backup: " + (d.backupPath || "(無)") },
         { type: "text", text: "  files restored: " + d.fileCount },
         { type: "text", text: "  " + (d.warning || "") },
       ];

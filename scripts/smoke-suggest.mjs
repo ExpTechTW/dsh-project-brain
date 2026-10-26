@@ -1,11 +1,11 @@
-// smoke-suggest.mjs - v0.4.15 智能续接
+// smoke-suggest.mjs - v0.4.15 智慧續接
 //
-// 覆盖：
-//   1) buildLocalSuggestion 纯规则路径（in_progress / pending / blocked / 记忆 / 空）
-//   2) parseSuggestJson 容错（围栏 / 尾逗号 / 非 JSON）
-//   3) normalizeSuggestion 字段裁剪
+// 覆蓋：
+//   1) buildLocalSuggestion 純規則路徑（in_progress / pending / blocked / 記憶 / 空）
+//   2) parseSuggestJson 容錯（圍欄 / 尾逗號 / 非 JSON）
+//   3) normalizeSuggestion 欄位裁剪
 //   4) buildSuggestPromptForLlm evidence 收集（含 architecture）
-//   5) buildSuggestTool 完整路径：mock fs + mock llm
+//   5) buildSuggestTool 完整路徑：mock fs + mock llm
 
 import { mkdirSync, writeFileSync, rmSync, existsSync } from "node:fs";
 import { join } from "node:path";
@@ -16,12 +16,12 @@ function pass(name) { _pass++; RESULTS.push({ ok: true, name }); }
 function fail(name, msg) { _fail++; RESULTS.push({ ok: false, name, msg }); console.error("FAIL:", name, "-", msg); }
 function assert(cond, name, msg) { cond ? pass(name) : fail(name, msg || "assertion failed"); }
 
-// ── 1) 纯规则 fallback ──
+// ── 1) 純規則 fallback ──
 const { buildLocalSuggestion, parseSuggestJson, normalizeSuggestion, buildSuggestPromptForLlm, buildEvidence } = await import("../src/host/suggest.js");
 
 const now = Date.now();
 
-// 场景 A：有 in_progress TODO
+// 場景 A：有 in_progress TODO
 {
   const brain = {
     project: { name: "demo", techStack: { backend: "FastAPI" } },
@@ -37,22 +37,22 @@ const now = Date.now();
   assert(out.data.suggestion.confidence >= 0.7, "high confidence for in_progress");
 }
 
-// 场景 B：只有 pending TODO
+// 場景 B：只有 pending TODO
 {
   const brain = {
     project: { name: "demo" },
     memories: [],
     todos: [
       { id: "p1", title: "修小 bug", status: "pending", priority: "low" },
-      { id: "p2", title: "补文档", status: "pending", priority: "urgent" },
+      { id: "p2", title: "補文件", status: "pending", priority: "urgent" },
     ],
     timeline: [],
   };
   const out = buildLocalSuggestion(brain, now);
-  assert(out.data.suggestion.suggestedTodoId === "p2", `urgent 优先 (got ${out.data.suggestion.suggestedTodoId})`);
+  assert(out.data.suggestion.suggestedTodoId === "p2", `urgent 優先 (got ${out.data.suggestion.suggestedTodoId})`);
 }
 
-// 场景 C：只有 blocked
+// 場景 C：只有 blocked
 {
   const brain = {
     project: { name: "demo" },
@@ -61,10 +61,10 @@ const now = Date.now();
     timeline: [],
   };
   const out = buildLocalSuggestion(brain, now);
-  assert(out.data.suggestion.title.includes("阻塞"), `blocked 路径 (got ${out.data.suggestion.title})`);
+  assert(out.data.suggestion.title.includes("阻塞"), `blocked 路徑 (got ${out.data.suggestion.title})`);
 }
 
-// 场景 D：只有记忆
+// 場景 D：只有記憶
 {
   const brain = {
     project: { name: "demo" },
@@ -73,18 +73,18 @@ const now = Date.now();
     timeline: [],
   };
   const out = buildLocalSuggestion(brain, now);
-  assert(out.data.suggestion.title.includes("SQLite") || out.data.suggestion.title.includes("回顾") || out.data.suggestion.title.includes("记忆"), `记忆路径 (got ${out.data.suggestion.title})`);
+  assert(out.data.suggestion.title.includes("SQLite") || out.data.suggestion.title.includes("回顧") || out.data.suggestion.title.includes("記憶"), `記憶路徑 (got ${out.data.suggestion.title})`);
 }
 
-// 场景 E：完全空
+// 場景 E：完全空
 {
   const brain = { project: { name: "demo" }, memories: [], todos: [], timeline: [] };
   const out = buildLocalSuggestion(brain, now);
-  assert(out.data.suggestion.confidence <= 0.3, "空数据 → 低置信度");
-  assert(out.data.suggestion.title.includes("规划") || out.data.suggestion.title.includes("初始化"), `空数据 title (got ${out.data.suggestion.title})`);
+  assert(out.data.suggestion.confidence <= 0.3, "空資料 → 低置信度");
+  assert(out.data.suggestion.title.includes("規劃") || out.data.suggestion.title.includes("初始化"), `空資料 title (got ${out.data.suggestion.title})`);
 }
 
-// 场景 F：relatedFiles 关联的 TODO + 记忆
+// 場景 F：relatedFiles 關聯的 TODO + 記憶
 {
   const brain = {
     project: { name: "demo" },
@@ -93,17 +93,17 @@ const now = Date.now();
     timeline: [],
   };
   const out = buildLocalSuggestion(brain, now);
-  assert(out.data.suggestion.suggestedMemoryIds.includes("m1"), `relatedFiles 关联记忆被选出 (got ${out.data.suggestion.suggestedMemoryIds.join(",")})`);
+  assert(out.data.suggestion.suggestedMemoryIds.includes("m1"), `relatedFiles 關聯記憶被選出 (got ${out.data.suggestion.suggestedMemoryIds.join(",")})`);
 }
 
-// ── 2) parseSuggestJson 容错 ──
+// ── 2) parseSuggestJson 容錯 ──
 assert(parseSuggestJson('{"title":"a","reason":"b"}') !== null, "parse plain JSON");
 assert(parseSuggestJson('```json\n{"title":"a","reason":"b"}\n```') !== null, "parse code-fence JSON");
 assert(parseSuggestJson('noise {"title":"a","reason":"b"} noise') !== null, "parse balanced sub-object");
 assert(parseSuggestJson('{"title":"a","reason":"b",}') !== null, "parse trailing comma");
 assert(parseSuggestJson('not json') === null, "reject non-JSON");
 
-// ── 3) normalizeSuggestion 字段裁剪 ──
+// ── 3) normalizeSuggestion 欄位裁剪 ──
 {
   const normalized = normalizeSuggestion({ title: "abc", reason: "def", confidence: 0.9, suggestedTodoId: "t1", suggestedMemoryIds: ["m1", "m2"] });
   assert(normalized && normalized.title === "abc", "title preserved");
@@ -126,18 +126,18 @@ assert(parseSuggestJson('not json') === null, "reject non-JSON");
     project: { name: "demo", techStack: { backend: "FastAPI" } },
     memories: [
       { id: "m1", type: "decision", title: "用 SQLite", importance: 0.9, createdAt: now - 1000 },
-      { id: "m2", type: "architecture", title: "分层设计", importance: 0.7, createdAt: now - 2000 },
+      { id: "m2", type: "architecture", title: "分層設計", importance: 0.7, createdAt: now - 2000 },
     ],
     todos: [{ id: "t1", title: "做 X", status: "in_progress", priority: "high" }],
     timeline: [{ id: "e1", title: "上次 session 完成", eventType: "session_summary", occurredAt: now - 86400_000 }],
-    architecture: { summary: "整体架构概览文本" },
+    architecture: { summary: "整體架構概覽文本" },
   };
   const { prompt, evidence } = buildSuggestPromptForLlm(brain, now);
   assert(prompt.includes("demo"), "prompt includes project name");
   assert(prompt.includes("FastAPI"), "prompt includes techStack");
   assert(prompt.includes("做 X"), "prompt includes in_progress todo");
   assert(prompt.includes("用 SQLite"), "prompt includes memory");
-  assert(prompt.includes("整体架构"), "prompt includes architecture summary");
+  assert(prompt.includes("整體架構"), "prompt includes architecture summary");
   assert(evidence.activeTodos.inProgress.length === 1, "evidence has in_progress");
   assert(evidence.daysSinceLastSession === 1, "evidence computes daysSinceLastSession");
 }
@@ -148,12 +148,12 @@ assert(parseSuggestJson('not json') === null, "reject non-JSON");
   const brainDir = join(FIXTURE, ".project-brain");
   if (existsSync(brainDir)) rmSync(brainDir, { recursive: true, force: true });
   mkdirSync(brainDir, { recursive: true });
-  writeFileSync(join(brainDir, "project.json"), JSON.stringify({ name: "demo", techStack: { backend: "FastAPI" }, description: "测试项目" }));
+  writeFileSync(join(brainDir, "project.json"), JSON.stringify({ name: "demo", techStack: { backend: "FastAPI" }, description: "測試專案" }));
   writeFileSync(join(brainDir, "todo.jsonl"), JSON.stringify({ id: "t1", title: "OAuth", status: "in_progress", priority: "high", createdAt: now }) + "\n");
   writeFileSync(join(brainDir, "memory.jsonl"), "");
   writeFileSync(join(brainDir, "timeline.jsonl"), "");
 
-  // mock fs（node 直读）
+  // mock fs（node 直讀）
   const fs = {
     resolve: async (p) => ({ path: p }),
     readText: async (target) => {
@@ -166,7 +166,7 @@ assert(parseSuggestJson('not json') === null, "reject non-JSON");
     listDir: async () => [],
   };
 
-  // 5a) useLLM=false → 强制本地
+  // 5a) useLLM=false → 強制本地
   const { buildSuggestTool } = await import("../src/tools/suggest.js");
   const tool = buildSuggestTool({ fs, sandboxPolicy: {}, getLlm: () => null });
   const localResult = await tool.execute({ path: FIXTURE, useLLM: false }, { session: { cwd: FIXTURE } });
@@ -174,23 +174,23 @@ assert(parseSuggestJson('not json') === null, "reject non-JSON");
   assert(localResult.data.source === "local", `local source (got ${localResult.data.source})`);
   assert(localResult.data.suggestion.title.includes("OAuth"), `local suggestion hits in_progress todo (got ${localResult.data.suggestion.title})`);
 
-  // 5b) LLM 成功（mock 返回严格 JSON）
+  // 5b) LLM 成功（mock 返回嚴格 JSON）
   const fakeLlm = {
     stream: async function* () {
-      yield { type: "text-delta", index: 0, text: '{"title":"推进 OAuth 集成","reason":"进行中的 OAuth 任务与上次 session 的设计决策一致","confidence":0.88,"suggestedTodoId":"t1","suggestedMemoryIds":[]}' };
+      yield { type: "text-delta", index: 0, text: '{"title":"推進 OAuth 整合","reason":"進行中的 OAuth 任務與上次 session 的設計決策一致","confidence":0.88,"suggestedTodoId":"t1","suggestedMemoryIds":[]}' };
       yield { type: "finish", reason: { kind: "stop" } };
     },
   };
-  // resolveSessionRoute 从 session.events 找 request/context 或 request/header 事件
+  // resolveSessionRoute 從 session.events 找 request/context 或 request/header 事件
   const routeEvent = { type: "request/context", data: { provider: "test", model: "test-1" } };
   const tool2 = buildSuggestTool({ fs, sandboxPolicy: {}, getLlm: () => fakeLlm });
   const llmResult = await tool2.execute({ path: FIXTURE }, { session: { cwd: FIXTURE, events: [routeEvent] } });
   assert(llmResult.ok, "tool LLM: ok");
   assert(llmResult.data.source === "llm", `LLM source (got ${llmResult.data.source})`);
-  assert(llmResult.data.suggestion.title === "推进 OAuth 集成", `LLM suggestion title (got ${llmResult.data.suggestion.title})`);
+  assert(llmResult.data.suggestion.title === "推進 OAuth 整合", `LLM suggestion title (got ${llmResult.data.suggestion.title})`);
   assert(llmResult.data.suggestion.confidence >= 0.8, "LLM confidence >0.8");
 
-  // 5c) LLM 失败 → 自动降级到本地
+  // 5c) LLM 失敗 → 自動降級到本地
   const fakeLlmFail = {
     stream: async function* () {
       throw new Error("simulated LLM failure");
@@ -203,12 +203,12 @@ assert(parseSuggestJson('not json') === null, "reject non-JSON");
   assert(fallbackResult.data.llmError && fallbackResult.data.llmError.message, "fallback includes llmError");
   assert(fallbackResult.data.suggestion.title.includes("OAuth"), "fallback still returns useful suggestion");
 
-  // 5d) LLM 无可用 route → source=local_no_route
+  // 5d) LLM 無可用 route → source=local_no_route
   const tool4 = buildSuggestTool({ fs, sandboxPolicy: {}, getLlm: () => fakeLlm });
   const noRouteResult = await tool4.execute({ path: FIXTURE }, { session: { cwd: FIXTURE } });
   assert(noRouteResult.ok && noRouteResult.data.source === "local_no_route", `no_route source (got ${noRouteResult.data.source})`);
 
-  // 5e) 项目未初始化
+  // 5e) 專案未初始化
   rmSync(brainDir, { recursive: true, force: true });
   mkdirSync(brainDir, { recursive: true });
   const uninitResult = await tool.execute({ path: FIXTURE, useLLM: false }, { session: { cwd: FIXTURE } });
@@ -219,7 +219,7 @@ assert(parseSuggestJson('not json') === null, "reject non-JSON");
   rmSync(brainDir, { recursive: true, force: true });
 }
 
-// ── 6) buildEvidence 边界 ──
+// ── 6) buildEvidence 邊界 ──
 {
   const ev = buildEvidence({ project: { name: "x" }, memories: [], todos: [], timeline: [] }, now);
   assert(ev.activeTodos.inProgress.length === 0 && ev.activeTodos.pending.length === 0, "empty todos");
@@ -230,7 +230,7 @@ assert(parseSuggestJson('not json') === null, "reject non-JSON");
   assert(ev.project === null, "null project tolerated");
 }
 
-// ── 输出 ──
+// ── 輸出 ──
 console.log(`\n[smoke-suggest] ${_pass}/${_pass + _fail} PASS`);
 for (const r of RESULTS) if (!r.ok) console.error(`  FAIL: ${r.name} - ${r.msg}`);
 if (_fail > 0) process.exit(1);

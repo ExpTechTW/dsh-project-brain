@@ -1,60 +1,60 @@
-# Twitter / X 构建日记 5 条
+# Twitter / X 構建日記 5 條
 
-> **目标账号**：@yj_liuzepeng（如果有）或个人账号
-> **节奏**：每天 1 条，共 5 天
-> **标签**：#buildinpublic #DSH #AIcoding #LocalAI
+> **目標賬號**：@yj_liuzepeng（如果有）或個人賬號
+> **節奏**：每天 1 條，共 5 天
+> **標籤**：#buildinpublic #DSH #AIcoding #LocalAI
 
 ---
 
-## Day 1（v0.6.0 → v0.7.0-beta 基础）
+## Day 1（v0.6.0 → v0.7.0-beta 基礎）
 
 **Tweet**：
 ```
-🚀 启动 dsh-project-brain：让 DSH 持久理解你的项目
+🚀 啟動 dsh-project-brain：讓 DSH 持久理解你的專案
 
-每次新对话都要重新介绍项目吗？架构、决策、踩过的坑、关键文件 —— 你说得累，AI 听得糊。
+每次新對話都要重新介紹專案嗎？架構、決策、踩過的坑、關鍵檔案 —— 你說得累，AI 聽得糊。
 
-dsh-project-brain 把每个 DSH 工作区变成一个本地「项目大脑」：
-✅ 自动架构分析
-✅ 跨 Session 长期记忆
-✅ 工作区隔离
+dsh-project-brain 把每個 DSH 工作區變成一個本地「專案大腦」：
+✅ 自動架構分析
+✅ 跨 Session 長期記憶
+✅ 工作區隔離
 
-v0.6.0-beta 已发布在 npm。
+v0.6.0-beta 已釋出在 npm。
 
 #buildinpublic #DSH
 ```
 
 ---
 
-## Day 2（v0.7.0-beta.1 多语言 AST）
+## Day 2（v0.7.0-beta.1 多語言 AST）
 
 **Tweet**：
 ```
-🌳 v0.7.0-beta.1：把 6 种语言纳入本地 AST 分析
+🌳 v0.7.0-beta.1：把 6 種語言納入本地 AST 分析
 
-之前只能用 JS/TS + Python。现在支持：
+之前只能用 JS/TS + Python。現在支援：
 • Go（gin / gorm）
 • Java（Spring / JPA）
 • Rust（tokio / axum）
-• C/C++（基础 #include）
+• C/C++（基礎 #include）
 
-为什么？DSH LLM 不一定可用，本地分析必须兜底完整。
+為什麼？DSH LLM 不一定可用，本地分析必須兜底完整。
 
 #buildinpublic #AIcoding #LocalAI
 ```
 
 ---
 
-## Day 3（v0.7.0 记忆机制优化）
+## Day 3（v0.7.0 記憶機制最佳化）
 
 **Tweet**：
 ```
-🧠 记忆机制 v2：双通道 + 跨对话高保真续接
+🧠 記憶機制 v2：雙通道 + 跨對話高保真續接
 
-dsh-project-brain 默认 BM25 检索（零配置），可选 Embedding 混合。
-Session 关闭时自动抽取语义记忆，注入到下次对话的 system prompt。
+dsh-project-brain 預設 BM25 檢索（零配置），可選 Embedding 混合。
+Session 關閉時自動抽取語義記憶，注入到下次對話的 system prompt。
 
-关键设计：本地规则 vs LLM 升级失败降级，绝对不阻塞 Session 启动。
+關鍵設計：本地規則 vs LLM 升級失敗降級，絕對不阻塞 Session 啟動。
 
 #DSH #LocalFirst
 ```
@@ -65,51 +65,51 @@ Session 关闭时自动抽取语义记忆，注入到下次对话的 system prom
 
 **Tweet**：
 ```
-✨ v0.7.0 UI 进化：
-• TodoStrip 折叠 —— composer 上方不挡视野
-• GitTab VSCode 风格时间线 —— 纯 Node.js，无 shell 依赖
-• Dashboard 自建设置入口 —— Embedding 配置即时生效
+✨ v0.7.0 UI 進化：
+• TodoStrip 摺疊 —— composer 上方不擋視野
+• GitTab VSCode 風格時間線 —— 純 Node.js，無 shell 依賴
+• Dashboard 自建設定入口 —— Embedding 配置即時生效
 
-每一个改动都从真实使用场景出发，不是为了炫技。
+每一個改動都從真實使用場景出發，不是為了炫技。
 
 #buildinpublic #UI
 ```
 
 ---
 
-## Day 5（v1.0.0 stable 发布）
+## Day 5（v1.0.0 stable 釋出）
 
 **Tweet**：
 ```
-🎉 dsh-project-brain v1.0.0 稳定版发布
+🎉 dsh-project-brain v1.0.0 穩定版釋出
 
-7 项 P0 修复 + 39/39 端到端验收 + 用户实测通过。
+7 項 P0 修復 + 39/39 端到端驗收 + 使用者實測通過。
 
-第一个真正可以推荐给所有 DSH 用户的版本。
+第一個真正可以推薦給所有 DSH 使用者的版本。
 
 📦 npm: dsh-project-brain@1.0.0
-🚀 安装：dsh plugin --profile web add github:yj-liuzepeng/dsh-project-brain#v1.0.0
+🚀 安裝：dsh plugin --profile web add github:yj-liuzepeng/dsh-project-brain#v1.0.0
 ⭐ GitHub: github.com/yj-liuzepeng/dsh-project-brain
 
-下一个里程碑：v1.1 跨 Session 共享模式 + 多 Workspace 联动。
+下一個里程碑：v1.1 跨 Session 共享模式 + 多 Workspace 聯動。
 
 #DSH #buildinpublic
 ```
 
 ---
 
-## Twitter 发布 checklist
+## Twitter 釋出 checklist
 
-- [ ] 每条配 1 张截图（01.png ~ 07.png）
-- [ ] 每条独立成 thread，第一条 hook 最强
-- [ ] 时间：每个工作日 10:00 AM（本地时间），中国时间 22:00 也行
-- [ ] @deepseek_ai（DSH 官方）+ 几个 DSH 圈 KOL
-- [ ] 24 小时内回应所有 reply
-- [ ] 把这些 thread 归档到 GitHub Discussions：[Show and tell] tag
+- [ ] 每條配 1 張截圖（01.png ~ 07.png）
+- [ ] 每條獨立成 thread，第一條 hook 最強
+- [ ] 時間：每個工作日 10:00 AM（本地時間），中國時間 22:00 也行
+- [ ] @deepseek_ai（DSH 官方）+ 幾個 DSH 圈 KOL
+- [ ] 24 小時內回應所有 reply
+- [ ] 把這些 thread 歸檔到 GitHub Discussions：[Show and tell] tag
 
-## Bonus：发完 5 条后做什么
+## Bonus：發完 5 條後做什麼
 
-- 周报：把 5 条串成一篇 blog post（中文 + 英文）
-- 数据：观察哪些推文 engagement 最高，下一轮针对该主题深挖
-- 转化：在 bio 里加 GitHub 链接，置顶一条「我是做什么的」
-- 长期：每月一条 update，1 周年时回顾完整历程（最容易上 trending）
+- 週報：把 5 條串成一篇 blog post（中文 + 英文）
+- 資料：觀察哪些推文 engagement 最高，下一輪針對該主題深挖
+- 轉化：在 bio 裡加 GitHub 連結，置頂一條「我是做什麼的」
+- 長期：每月一條 update，1 週年時回顧完整歷程（最容易上 trending）

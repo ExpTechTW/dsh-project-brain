@@ -1,13 +1,13 @@
-// vacuum.js — 把主文件里过期的死行移出去，控制 memory.jsonl / timeline.jsonl 的体积。
+// vacuum.js — 把主檔案裡過期的死行移出去，控制 memory.jsonl / timeline.jsonl 的體積。
 //
-// 为什么需要：fs 只有覆盖写，每次 append 都要读全文再写全文。归档行永久堆在
-// memory.jsonl 里，timeline 更是每次操作都加一条，时间一长每写一条都要搬几 MB。
+// 為什麼需要：fs 只有覆蓋寫，每次 append 都要讀全文再寫全文。歸檔行永久堆在
+// memory.jsonl 裡，timeline 更是每次操作都加一條，時間一長每寫一條都要搬幾 MB。
 //
-// 为什么不是真删：这个项目一贯的姿态是「宁可留着也不误删」——dream 从不因标题
-// 相似删除，supersede 也保留旧条目。所以这里搬到 .project-brain/archive/ 下，
-// 主文件真的变小，数据仍然找得回来。
+// 為什麼不是真刪：這個專案一貫的姿態是「寧可留著也不誤刪」——dream 從不因標題
+// 相似刪除，supersede 也保留舊條目。所以這裡搬到 .project-brain/archive/ 下，
+// 主檔案真的變小，資料仍然找得回來。
 //
-// 触发方式：只挂在 project_dream 的 mode=full 上，且 dryRun 默认 true。不自动跑。
+// 觸發方式：只掛在 project_dream 的 mode=full 上，且 dryRun 預設 true。不自動跑。
 
 import { brainPath, readJsonl, writeJsonl } from "../store/brain-files.js";
 import { brainTxKey, withWriteLock } from "../store/write-lock.js";
@@ -16,9 +16,9 @@ import { isCoreMemory } from "../store/brain-logic.js";
 const DAY_MS = 86_400_000;
 
 export const VACUUM_DEFAULTS = Object.freeze({
-  // 归档多久之后才允许搬走
+  // 歸檔多久之後才允許搬走
   memoryRetainDays: 90,
-  // 即使全都超期，也至少留这么多条归档在主文件里
+  // 即使全都超期，也至少留這麼多條歸檔在主檔案裡
   memoryMinRetained: 200,
   timelineMaxEvents: 2000,
   timelineRetainDays: 180,
@@ -43,7 +43,7 @@ function ageMs(entry, now) {
   return at > 0 ? now - at : Infinity;
 }
 
-// 活跃记忆的 supersededBy 指向谁，谁就是证据链的一环，再旧也不能搬走。
+// 活躍記憶的 supersededBy 指向誰，誰就是證據鏈的一環，再舊也不能搬走。
 function referencedIds(rows) {
   const referenced = new Set();
   for (const m of rows || []) {
@@ -67,7 +67,7 @@ export function planMemoryVacuum(rows, { now = Date.now(), config } = {}) {
     .filter((m) => ageMs(m, now) > cutoff)
     .sort((a, b) => ageMs(b, now) - ageMs(a, now));
 
-  // 留一个下限：就算全都超期，也别把归档区一次清空，用户还想翻。
+  // 留一個下限：就算全都超期，也別把歸檔區一次清空，使用者還想翻。
   const overflow = Math.max(0, dead.length - opts.memoryMinRetained);
   const evict = evictable.slice(0, overflow);
   const evictIds = new Set(evict.map((m) => String(m.id)));
@@ -86,8 +86,8 @@ export function planMemoryVacuum(rows, { now = Date.now(), config } = {}) {
   };
 }
 
-// 第一屏的「最近做什么」读最新的 session_summary，任务动态的主干起点是 init。
-// 这两类再旧也留着，否则截断会把界面打回「暂无」。
+// 第一屏的「最近做什麼」讀最新的 session_summary，任務動態的主幹起點是 init。
+// 這兩類再舊也留著，否則截斷會把介面打回「暫無」。
 function isTimelineAnchor(event, latestSummaryId) {
   if (!event) return false;
   if (event.eventType === "init") return true;
@@ -135,7 +135,7 @@ export function archiveFileName(kind, now) {
   return "archive/" + kind + "-" + stamp + ".jsonl";
 }
 
-// 先把要搬走的行写进 archive/，确认落盘成功再缩主文件。顺序反了就是真删。
+// 先把要搬走的行寫進 archive/，確認落盤成功再縮主檔案。順序反了就是真刪。
 async function relocate({ fs, projectPath, kind, mainFile, plan, now }) {
   if (!plan.evict.length) return { ok: true, moved: 0, archivePath: null };
   const archiveRel = archiveFileName(kind, now);
@@ -145,7 +145,7 @@ async function relocate({ fs, projectPath, kind, mainFile, plan, now }) {
   }
   const wroteMain = await writeJsonl(fs, brainPath(projectPath, mainFile), plan.keep);
   if (!wroteMain) {
-    // archive 已经写了但主文件没缩，数据没丢，下次再跑一遍即可。
+    // archive 已經寫了但主檔案沒縮，資料沒丟，下次再跑一遍即可。
     return { ok: false, code: "E_MAIN_WRITE_FAILED", moved: 0, archivePath: archiveRel };
   }
   return { ok: true, moved: plan.evict.length, archivePath: archiveRel };
@@ -170,7 +170,7 @@ export async function vacuumBrain({ fs, projectPath, config, now = Date.now(), d
   if (dryRun) return { ok: true, dryRun: true, plan, archives: [] };
   if (plan.totalEvicted === 0) return { ok: true, dryRun: false, plan, archives: [], changed: false };
 
-  // 和 admit / 人工编辑抢同一把事务锁：整表重写期间不能有别人在 append。
+  // 和 admit / 人工編輯搶同一把事務鎖：整表重寫期間不能有別人在 append。
   return withWriteLock(brainTxKey(projectPath, "memory.jsonl"), async () => {
     const archives = [];
     const memoryMoved = await relocate({ fs, projectPath, kind: "memory", mainFile: "memory.jsonl", plan: memoryPlan, now });

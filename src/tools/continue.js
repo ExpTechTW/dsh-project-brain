@@ -1,7 +1,7 @@
-// project_continue Tool - P0.6 最小实现
-// 读取 .project-brain/ 四类数据（project/timeline/memory/todo），组装跨 Session 恢复上下文。
-// Top-K 记忆选择：importance*0.5 + recency*0.3 + typeBoost*0.2（brain-logic.memoryScore）。
-// Context Injector（会话启动自动注入）属于后续 P0.6 完整版，本工具先提供 Agent 主动调用通道。
+// project_continue Tool - P0.6 最小實現
+// 讀取 .project-brain/ 四類資料（project/timeline/memory/todo），組裝跨 Session 恢復上下文。
+// Top-K 記憶選擇：importance*0.5 + recency*0.3 + typeBoost*0.2（brain-logic.memoryScore）。
+// Context Injector（會話啟動自動注入）屬於後續 P0.6 完整版，本工具先提供 Agent 主動呼叫通道。
 
 import { defineTool } from "@deepseek-ai/dsh-tools";
 import { readBrain } from "../host/store/brain-files.js";
@@ -14,11 +14,11 @@ export function buildContinueTool({ fs, sandboxPolicy }) {
   return defineTool({
     name: "project_continue",
     description:
-      "dsh-project-brain: 恢复当前项目的开发上下文（用户说「继续上次的开发」时调用）。" +
-      "返回项目概要、全部 Core 记忆、上次会话摘要、活跃待办与建议下一步，" +
-      "据此可直接续接开发，无需用户重新描述项目。",
+      "dsh-project-brain: 恢復當前專案的開發上下文（使用者說「繼續上次的開發」時呼叫）。" +
+      "返回專案概要、全部 Core 記憶、上次會話摘要、活躍待辦與建議下一步，" +
+      "據此可直接續接開發，無需使用者重新描述專案。",
     parameters: {
-      path: { type: "string", description: "项目根路径（绝对路径），默认 sandboxPolicy.workspaceRoot" },
+      path: { type: "string", description: "專案根路徑（絕對路徑），預設 sandboxPolicy.workspaceRoot" },
     },
     output: {
       schema: {
@@ -63,7 +63,7 @@ export function buildContinueTool({ fs, sandboxPolicy }) {
           return {
             ok: false,
             code: "E_NOT_INITIALIZED",
-            message: "该项目还没有 .project-brain/project.json，请先调用 project_init",
+            message: "該專案還沒有 .project-brain/project.json，請先呼叫 project_init",
           };
         }
         return { ok: true, data: data };

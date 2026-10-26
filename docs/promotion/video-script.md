@@ -1,28 +1,28 @@
-# 5 分钟演示视频脚本
+# 5 分鐘演示影片指令碼
 
-> **总时长**：5 分钟
-> **画幅**：1920×1080（16:9）或 1280×720
-> **上传平台**：YouTube（海外）+ Bilibili（中文），README 顶部嵌入
-> **风格**：屏幕录制 + 旁白，节奏明快，每段 30 秒
+> **總時長**：5 分鐘
+> **畫幅**：1920×1080（16:9）或 1280×720
+> **上傳平臺**：YouTube（海外）+ Bilibili（中文），README 頂部嵌入
+> **風格**：螢幕錄製 + 旁白，節奏明快，每段 30 秒
 
 ---
 
-## 0:00–0:30 痛点
+## 0:00–0:30 痛點
 
-**画面**：一个空 IDE，新对话
+**畫面**：一個空 IDE，新對話
 **旁白**：
-> 「每次新对话都要重新介绍项目吗？架构、决策、踩过的坑、关键文件 —— 你说得累，AI 听得糊。这是个长期被忽视的痛点。」
+> 「每次新對話都要重新介紹專案嗎？架構、決策、踩過的坑、關鍵檔案 —— 你說得累，AI 聽得糊。這是個長期被忽視的痛點。」
 
 **字幕**：
-> 新对话 = 重新解释项目 = 浪费时间 + AI 上下文爆炸
+> 新對話 = 重新解釋專案 = 浪費時間 + AI 上下文爆炸
 
 ---
 
-## 0:30–1:00 一行安装
+## 0:30–1:00 一行安裝
 
-**画面**：终端命令
+**畫面**：終端命令
 **旁白**：
-> 「今天介绍一个 DSH 插件，叫 dsh-project-brain。装它就一行命令。」
+> 「今天介紹一個 DSH 外掛，叫 dsh-project-brain。裝它就一行命令。」
 
 **字幕**：
 ```bash
@@ -30,131 +30,131 @@ dsh plugin --profile web add \
   github:yj-liuzepeng/dsh-project-brain#v1.0.0
 ```
 
-**画面**：DSH Desktop 完全退出 → 重新打开 → 插件列表出现 dsh-project-brain v1.0.0
+**畫面**：DSH Desktop 完全退出 → 重新開啟 → 外掛列表出現 dsh-project-brain v1.0.0
 
 ---
 
-## 1:00–1:30 init + Dashboard 总览
+## 1:00–1:30 init + Dashboard 總覽
 
-**画面**：进入一个项目工作区
+**畫面**：進入一個專案工作區
 **旁白**：
-> 「进入项目，点启动项目大脑。10 秒后 Dashboard 出来了。」
+> 「進入專案，點啟動專案大腦。10 秒後 Dashboard 出來了。」
 
-**字幕**：项目识别为 Monorepo，2 个入口，1 个 GitHub Actions
+**字幕**：專案識別為 Monorepo，2 個入口，1 個 GitHub Actions
 
-**画面**：Dashboard 总览（截图 01.png 同款）
+**畫面**：Dashboard 總覽（截圖 01.png 同款）
 
 **旁白**：
-> 「顶上自动推荐今天要推进什么 —— 这是 v0.7.0 新增的 SuggestionCard，用本地规则 + 可选 LLM 升级。下面 4 个 Quick Action 一键调用。」
+> 「頂上自動推薦今天要推進什麼 —— 這是 v0.7.0 新增的 SuggestionCard，用本地規則 + 可選 LLM 升級。下面 4 個 Quick Action 一鍵呼叫。」
 
 ---
 
-## 1:30–2:00 架构分层图
+## 1:30–2:00 架構分層圖
 
-**画面**：点 "架构" tab
+**畫面**：點 "架構" tab
 **旁白**：
-> 「架构 tab 自动生成 4 层分层图：接口层、宿主注入层、扫描与分析层、记忆与检索层。这是 DSH LLM 增强过的，比目录树有用 100 倍。」
+> 「架構 tab 自動生成 4 層分層圖：介面層、宿主注入層、掃描與分析層、記憶與檢索層。這是 DSH LLM 增強過的，比目錄樹有用 100 倍。」
 
-**字幕**：DSH LLM 增强 · 39/39 验收 · 6 语言支持
+**字幕**：DSH LLM 增強 · 39/39 驗收 · 6 語言支援
 
 ---
 
-## 2:00–2:30 跨 Session 记忆恢复
+## 2:00–2:30 跨 Session 記憶恢復
 
-**画面**：关闭当前 session，新开一个
+**畫面**：關閉當前 session，新開一個
 **旁白**：
-> 「关键来了 —— 我关掉当前对话，新开一个，AI 立刻就知道这是哪个项目、上次聊了什么、还有哪些 TODO 没完成。」
+> 「關鍵來了 —— 我關掉當前對話，新開一個，AI 立刻就知道這是哪個專案、上次聊了什麼、還有哪些 TODO 沒完成。」
 
-**字幕**：system prompt 自动注入 Top-K memories + 活跃 TODO
+**字幕**：system prompt 自動注入 Top-K memories + 活躍 TODO
 
-**画面**：新 Session 第一条消息 → AI 主动提到上次讨论的支付方案
+**畫面**：新 Session 第一條訊息 → AI 主動提到上次討論的支付方案
 
 ---
 
-## 2:30–3:00 项目记忆类型演示
+## 2:30–3:00 專案記憶型別演示
 
-**画面**：点 "项目记忆" tab
+**畫面**：點 "專案記憶" tab
 **旁白**：
-> 「记忆分 8 种类型：决策、需求、架构、变更、Bug、经验、Issue、上下文。每条都能打分、加标签、关联文件。」
+> 「記憶分 8 種類型：決策、需求、架構、變更、Bug、經驗、Issue、上下文。每條都能打分、加標籤、關聯檔案。」
 
-**画面**：切换到"设置" tab
+**畫面**：切換到"設定" tab
 **旁白**：
-> 「设置里可以配置 Embedding，默认本地 BM25 检索，启用混合向量后立刻生效 —— 不需要重启。」
+> 「設定裡可以配置 Embedding，預設本地 BM25 檢索，啟用混合向量後立刻生效 —— 不需要重啟。」
 
 ---
 
-## 3:00–3:30 多语言技术栈识别
+## 3:00–3:30 多語言技術棧識別
 
-**画面**：点 "概览" tab
+**畫面**：點 "概覽" tab
 **旁白**：
-> 「技术栈自动识别 JS、C、Go、Java、Python、Rust，6 种语言全覆盖。开发入口、CI、框架一次扫清。」
+> 「技術棧自動識別 JS、C、Go、Java、Python、Rust，6 種語言全覆蓋。開發入口、CI、框架一次掃清。」
 
 **字幕**：tree-sitter-c/go/java/rust/python/javascript 本地 AST
 
 ---
 
-## 3:30–4:00 Git 历史 VSCode 风格
+## 3:30–4:00 Git 歷史 VSCode 風格
 
-**画面**：点 "Git 历史" tab
+**畫面**：點 "Git 歷史" tab
 **旁白**：
-> 「Git 历史用 VSCode 风格时间线，分支切换、commit 详情、文件改动数一目了然。纯 Node.js 实现，无 shell 依赖。」
+> 「Git 歷史用 VSCode 風格時間線，分支切換、commit 詳情、檔案改動數一目瞭然。純 Node.js 實現，無 shell 依賴。」
 
 ---
 
 ## 4:00–4:30 完整工作流演示
 
-**画面**：完整跑一次
+**畫面**：完整跑一次
 **旁白**：
-> 「串起来用：init → rescan → 问 AI 一个架构问题 → AI 直接基于记忆回答 → 你写下决策 → 下次新对话 AI 自动提到这条决策。」
+> 「串起來用：init → rescan → 問 AI 一個架構問題 → AI 直接基於記憶回答 → 你寫下決策 → 下次新對話 AI 自動提到這條決策。」
 
-**字幕**：异常发现 → 原因诊断 → 节能措施 → 措施执行 → 效果验证
-> （注：此处可结合论文选题演示能耗异常诊断场景）
+**字幕**：異常發現 → 原因診斷 → 節能措施 → 措施執行 → 效果驗證
+> （注：此處可結合論文選題演示能耗異常診斷場景）
 
 ---
 
-## 4:30–5:00 总结 + CTA
+## 4:30–5:00 總結 + CTA
 
-**画面**：GitHub repo + npm + 安装命令
+**畫面**：GitHub repo + npm + 安裝命令
 **旁白**：
-> 「dsh-project-brain，v1.0.0 稳定版，开箱即用，完全本地优先。GitHub 8k stars、npm 周下载 100+。如果你也想让 AI 真的懂你的项目，从一条命令开始。」
+> 「dsh-project-brain，v1.0.0 穩定版，開箱即用，完全本地優先。GitHub 8k stars、npm 周下載 100+。如果你也想讓 AI 真的懂你的專案，從一條命令開始。」
 
 **字幕**：
 ```bash
-# 安装
+# 安裝
 dsh plugin --profile web add \
   github:yj-liuzepeng/dsh-project-brain#v1.0.0
 
-# 反馈
+# 反饋
 github.com/yj-liuzepeng/dsh-project-brain
 ```
 
-**片尾**：DSH Logo + 鸣谢 + 订阅按钮
+**片尾**：DSH Logo + 鳴謝 + 訂閱按鈕
 
 ---
 
-## 制作 checklist
+## 製作 checklist
 
-- [ ] 屏幕录制软件：OBS Studio（免费）/ ScreenFlow（mac）
-- [ ] 旁白：普通话流利版（中文版）+ 英文版（出海版）
-- [ ] 字幕：YouTube 字幕自动生成 + 手动校对
-- [ ] 背景音乐：低 BGM（避免干扰旁白），YouTube Audio Library 免费
-- [ ] 封面：复用 docs/social-preview.png
-- [ ] 标签：DSH、AI 编程、Cordis、项目记忆、Cursor 对比
+- [ ] 螢幕錄製軟體：OBS Studio（免費）/ ScreenFlow（mac）
+- [ ] 旁白：普通話流利版（中文版）+ 英文版（出海版）
+- [ ] 字幕：YouTube 字幕自動生成 + 手動校對
+- [ ] 背景音樂：低 BGM（避免干擾旁白），YouTube Audio Library 免費
+- [ ] 封面：複用 docs/social-preview.png
+- [ ] 標籤：DSH、AI 程式設計、Cordis、專案記憶、Cursor 對比
 
-## 发布 checklist
+## 釋出 checklist
 
-- [ ] YouTube：标题含 "dsh-project-brain"、"v1.0.0"、"DSH"
-- [ ] Bilibili：分区选「科技」→「编程」，标签同上
-- [ ] README 顶部加视频嵌入（`<iframe>` 或缩略图链接）
-- [ ] 视频描述含 GitHub / npm / MyDSH 链接
-- [ ] 发布后 24 小时内回应前 10 条评论
+- [ ] YouTube：標題含 "dsh-project-brain"、"v1.0.0"、"DSH"
+- [ ] Bilibili：分割槽選「科技」→「程式設計」，標籤同上
+- [ ] README 頂部加影片嵌入（`<iframe>` 或縮圖連結）
+- [ ] 影片描述含 GitHub / npm / MyDSH 連結
+- [ ] 釋出後 24 小時內回應前 10 條評論
 
-## 衍生短视频（1 分钟版，用于 Twitter / 短视频平台）
+## 衍生短影片（1 分鐘版，用於 Twitter / 短影片平臺）
 
-- 0:00–0:10 痛点一句话
-- 0:10–0:20 安装命令
-- 0:20–0:40 Dashboard 总览 + SuggestionCard
-- 0:40–0:50 跨 Session 记忆恢复
-- 0:50–1:00 CTA + 链接
+- 0:00–0:10 痛點一句話
+- 0:10–0:20 安裝命令
+- 0:20–0:40 Dashboard 總覽 + SuggestionCard
+- 0:40–0:50 跨 Session 記憶恢復
+- 0:50–1:00 CTA + 連結
 
-发布到：YouTube Shorts / Bilibili 短视频 / TikTok / X（Twitter）视频。
+釋出到：YouTube Shorts / Bilibili 短影片 / TikTok / X（Twitter）影片。

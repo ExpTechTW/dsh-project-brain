@@ -1,4 +1,4 @@
-// Dream / housekeep：禁止 Jaccard merge-and-drop；changelog 归档但保留行；超额 Core → dormant。
+// Dream / housekeep：禁止 Jaccard merge-and-drop；changelog 歸檔但保留行；超額 Core → dormant。
 
 import { housekeepMemories } from "../src/host/memory/admit.js";
 import { isCoreMemory, makeMemoryEntry } from "../src/host/store/brain-logic.js";
@@ -11,19 +11,19 @@ let fail = 0;
 const check = (name, ok) => { if (ok) { console.log(`  [PASS] ${name}`); pass++; } else { console.log(`  [FAIL] ${name}`); fail++; } };
 
 const similar = [
-  makeMemoryEntry({ id: "mem-m1", type: "decision", title: "采用 build-time embed 走静态 client 架构", content: "webServer live fetch 在 static plugin fiber 下不可用，详细分析见设计文档。", importance: 0.7 }, now - 86400000),
-  makeMemoryEntry({ id: "mem-m2", type: "decision", title: "采用 build-time embed 走静态 client 架构", content: "同样的长期架构约束，第二条正文也足够长以通过规则门。", importance: 0.5 }, now - 86400000),
-  makeMemoryEntry({ id: "mem-m3", type: "decision", title: "采用 build-time embed 走静态 client 架构", content: "第三条仍然是同一条架构决策的重复表述，自动路径不得删除。", importance: 0.6 }, now - 86400000),
+  makeMemoryEntry({ id: "mem-m1", type: "decision", title: "採用 build-time embed 走靜態 client 架構", content: "webServer live fetch 在 static plugin fiber 下不可用，詳細分析見設計文件。", importance: 0.7 }, now - 86400000),
+  makeMemoryEntry({ id: "mem-m2", type: "decision", title: "採用 build-time embed 走靜態 client 架構", content: "同樣的長期架構約束，第二條正文也足夠長以通過規則門。", importance: 0.5 }, now - 86400000),
+  makeMemoryEntry({ id: "mem-m3", type: "decision", title: "採用 build-time embed 走靜態 client 架構", content: "第三條仍然是同一條架構決策的重複表述，自動路徑不得刪除。", importance: 0.6 }, now - 86400000),
 ];
 const changelog = makeMemoryEntry({
   id: "mem-c1", type: "change",
-  title: "v1.2.0 patch #3：同步仓库",
-  content: "git 快进 main 并验收 156/156，这是 changelog 不是长期事实。",
+  title: "v1.2.0 patch #3：同步倉庫",
+  content: "git 快進 main 並驗收 156/156，這是 changelog 不是長期事實。",
 }, now);
 const durable = makeMemoryEntry({
   id: "mem-h1", type: "lesson",
-  title: "DSH host bundle 不会自动热重载",
-  content: "改 host 代码必须重启 DSH Desktop，不要指望热更新。",
+  title: "DSH host bundle 不會自動熱過載",
+  content: "改 host 程式碼必須重啟 DSH Desktop，不要指望熱更新。",
   importance: 0.85,
 }, now - 7 * 86400000);
 
@@ -43,7 +43,7 @@ check("archiveReason backfill_rule", c1 && c1.archiveReason === "backfill_rule")
 check("durable lesson stays core", isCoreMemory(ch.rows.find((m) => m.id === "mem-h1")));
 
 console.log("=== cap evicts excess active, never deletes ===");
-// 显式给上限，测的是淘汰行为本身，不跟着默认配置走。
+// 顯式給上限，測的是淘汰行為本身，不跟著預設配置走。
 const CAP = { maxItems: 15, maxTokens: 800 };
 const OVER = CAP.maxItems + 1;
 const many = [];
@@ -51,8 +51,8 @@ for (let i = 0; i < OVER; i++) {
   many.push(makeMemoryEntry({
     id: "mem-cap-" + i,
     type: "decision",
-    title: "长期决策 " + i,
-    content: "这是一条仍然成立的项目决策，用来撑满 Core 上限。编号 " + i,
+    title: "長期決策 " + i,
+    content: "這是一條仍然成立的專案決策，用來撐滿 Core 上限。編號 " + i,
     importance: i === 0 ? 0.2 : 0.8,
   }, now - (OVER - i) * 86400000));
 }

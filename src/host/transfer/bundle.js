@@ -1,7 +1,7 @@
-// bundle.js — zip bundle 导出 / 解析 / 应用 / 预览
+// bundle.js — zip bundle 匯出 / 解析 / 應用 / 預覽
 //
-// 物理格式：标准 ZIP（deflate 压缩 + CRC32），无加密。
-// 文件结构：
+// 物理格式：標準 ZIP（deflate 壓縮 + CRC32），無加密。
+// 檔案結構：
 //   dsh-brain-<name>-<ts>.zip
 //   ├── manifest.json           ← schemaVersion / pluginVersion / sourceProject / checksum / options
 //   └── .project-brain/
@@ -12,11 +12,11 @@
 //       ├── architecture.json
 //       └── cache/...
 //
-// 设计要点：
-//   - 无第三方依赖：手写 zip（Local File Header + Central Directory + EOCD），CRC32 也手写
-//   - 使用 deflate 压缩（node:zlib.deflateRawSync）— bundle 体积 < .project-brain 的 60%
-//   - 排除项：.grill/, node_modules/, .git/, tmp-*.txt, *.log, debug.log
-//   - manifest schemaVersion=1（向后兼容锚点）
+// 設計要點：
+//   - 無第三方依賴：手寫 zip（Local File Header + Central Directory + EOCD），CRC32 也手寫
+//   - 使用 deflate 壓縮（node:zlib.deflateRawSync）— bundle 體積 < .project-brain 的 60%
+//   - 排除項：.grill/, node_modules/, .git/, tmp-*.txt, *.log, debug.log
+//   - manifest schemaVersion=1（向後相容錨點）
 
 import { createHash } from "node:crypto";
 import { deflateRawSync } from "node:zlib";
@@ -25,10 +25,10 @@ import path from "node:path";
 import { assertSafeProjectPath } from "../store/brain-files.js";
 
 // bundle.js 直接用 node:fs（不走 DSH fs service）：
-//   - bundle 操作都在已知项目路径内的 .project-brain/，路径由 assertSafeProjectPath 校验
-//   - 不需要 sandboxPolicy（write 路径都是 projectPath 内）
-//   - 兼容 smoke 测试（没有 DSH fs 实例）
-//   - 与 src/host/rebuild-sync.js / scripts/smoke-*.mjs 的 node:fs 直连保持一致
+//   - bundle 操作都在已知專案路徑內的 .project-brain/，路徑由 assertSafeProjectPath 校驗
+//   - 不需要 sandboxPolicy（write 路徑都是 projectPath 內）
+//   - 相容 smoke 測試（沒有 DSH fs 例項）
+//   - 與 src/host/rebuild-sync.js / scripts/smoke-*.mjs 的 node:fs 直連保持一致
 
 async function readJsonFile(filePath) {
   try {
@@ -64,7 +64,7 @@ const BUNDLE_EXCLUDED_FILES = [
   /^tmp-.*\.txt$/i, /^debug\.log$/i, /\.log$/i, /\.tmp$/i,
 ];
 
-// ─── CRC32（zip 必备，标准多项式 0xEDB88320） ───
+// ─── CRC32（zip 必備，標準多項式 0xEDB88320） ───
 const CRC_TABLE = (() => {
   const t = new Uint32Array(256);
   for (let n = 0; n < 256; n++) {
@@ -84,14 +84,14 @@ function crc32(buf) {
   return (c ^ 0xFFFFFFFF) >>> 0;
 }
 
-// DOS 时间（zip 用，分辨率 2 秒）
+// DOS 時間（zip 用，解析度 2 秒）
 function dosTime(date = new Date()) {
   const t = ((date.getHours() & 0x1F) << 11) | ((date.getMinutes() & 0x3F) << 5) | ((date.getSeconds() / 2) & 0x1F);
   const d = (((date.getFullYear() - 1980) & 0x7F) << 9) | (((date.getMonth() + 1) & 0x0F) << 5) | (date.getDate() & 0x1F);
   return { time: t & 0xFFFF, date: d & 0xFFFF };
 }
 
-// ─── 收集待打包文件清单 ───
+// ─── 收集待打包檔案清單 ───
 function sanitizeProjectName(name) {
   return String(name || "project")
     .replace(/[\\/:*?"<>|]/g, "-")
@@ -110,7 +110,7 @@ function tsString(date = new Date()) {
 }
 
 /**
- * 递归收集 .project-brain/ 下所有需要打包的文件
+ * 遞迴收集 .project-brain/ 下所有需要打包的檔案
  * 返回 [{ relPath: ".project-brain/project.json", absPath, size, sha256 }]
  */
 async function collectBrainFiles(projectPath, { includeCache = true } = {}) {
@@ -122,12 +122,12 @@ async function collectBrainFiles(projectPath, { includeCache = true } = {}) {
     try {
       entries = await fsp.readdir(dirAbs, { withFileTypes: true });
     } catch (e) {
-      return; // 目录不存在则跳过（不抛错）
+      return; // 目錄不存在則跳過（不拋錯）
     }
     for (const entry of entries) {
       if (entry.name.startsWith(".")) {
-        // 隐藏文件 / 隐藏目录：跳过 .DS_Store, .DS-Backup, . 开头 backup
-        // 例外：.project-brain 内的子文件都是合法的，不会有 . 开头的；这里只跳过 .DS_Store 等
+        // 隱藏檔案 / 隱藏目錄：跳過 .DS_Store, .DS-Backup, . 開頭 backup
+        // 例外：.project-brain 內的子檔案都是合法的，不會有 . 開頭的；這裡只跳過 .DS_Store 等
         if (entry.name === ".DS_Store") continue;
         if (entry.name.startsWith(".backup")) continue;
       }
@@ -137,7 +137,7 @@ async function collectBrainFiles(projectPath, { includeCache = true } = {}) {
       // 排除 cache/（若 includeCache=false）
       if (!includeCache && rel.split("/")[0] === "cache") continue;
 
-      // 排除特定文件名
+      // 排除特定檔名
       if (BUNDLE_EXCLUDED_FILES.some((rx) => rx.test(entry.name))) continue;
 
       if (entry.isDirectory()) {
@@ -152,7 +152,7 @@ async function collectBrainFiles(projectPath, { includeCache = true } = {}) {
             absPath: abs,
             size: stat.size,
             sha256: sha,
-            _buf: buf, // 内部用，外部不导出
+            _buf: buf, // 內部用，外部不匯出
           });
         } catch (e) { /* skip unreadable */ }
       }
@@ -163,7 +163,7 @@ async function collectBrainFiles(projectPath, { includeCache = true } = {}) {
   return out;
 }
 
-// ─── Zip 写入器 ───
+// ─── Zip 寫入器 ───
 class ZipWriter {
   constructor() {
     /** @type {Buffer[]} */
@@ -184,7 +184,7 @@ class ZipWriter {
     const crc = crc32(data);
     const raw = Buffer.from(data); // copy（data 可能是共享 Buffer）
     const compressed = deflateRawSync(raw, { level: 6 });
-    // 极端情况下压缩后更大（极小文件），fallback 到 store
+    // 極端情況下壓縮後更大（極小檔案），fallback 到 store
     const useDeflate = compressed.length < raw.length;
     const compData = useDeflate ? compressed : raw;
     const method = useDeflate ? 8 : 0;
@@ -255,12 +255,12 @@ class ZipWriter {
   }
 }
 
-// ─── Zip 解析器（最小化：只读 EOCD + Central Directory，提取文件数据） ───
+// ─── Zip 解析器（最小化：只讀 EOCD + Central Directory，提取檔案資料） ───
 async function parseZip(buf) {
   if (!Buffer.isBuffer(buf) || buf.length < 22) {
     throw new Error("E_BUNDLE_INVALID: not a zip file");
   }
-  // 找 EOCD（从末尾搜 signature 0x06054b50）
+  // 找 EOCD（從末尾搜 signature 0x06054b50）
   let eocdOffset = -1;
   for (let i = buf.length - 22; i >= Math.max(0, buf.length - 65557); i--) {
     if (buf.readUInt32LE(i) === 0x06054b50) {
@@ -274,7 +274,7 @@ async function parseZip(buf) {
   const cdSize = buf.readUInt32LE(eocdOffset + 12);
   const cdStart = buf.readUInt32LE(eocdOffset + 16);
 
-  // 遍历 Central Directory
+  // 遍歷 Central Directory
   const entries = [];
   let p = cdStart;
   for (let i = 0; i < totalEntries; i++) {
@@ -294,10 +294,10 @@ async function parseZip(buf) {
     p += 46 + nameLen + extraLen + commentLen;
   }
 
-  // 提取每个 entry 的文件数据
+  // 提取每個 entry 的檔案資料
   const files = [];
   for (const e of entries) {
-    // 读 Local File Header
+    // 讀 Local File Header
     const lhSig = buf.readUInt32LE(e.localOffset);
     if (lhSig !== 0x04034b50) throw new Error("E_BUNDLE_INVALID: bad local header");
     const lhNameLen = buf.readUInt16LE(e.localOffset + 26);
@@ -312,7 +312,7 @@ async function parseZip(buf) {
     } else {
       throw new Error(`E_BUNDLE_INVALID: unsupported compression method ${e.method}`);
     }
-    // 校验 CRC32
+    // 校驗 CRC32
     const actualCrc = crc32(data);
     if (actualCrc !== e.crc) {
       throw new Error(`E_BUNDLE_INVALID: CRC32 mismatch on ${e.name}`);
@@ -336,28 +336,28 @@ function isSafeBundleEntry(name) {
 }
 
 /**
- * 构造 bundle zip 的 Buffer（不写盘）
+ * 構造 bundle zip 的 Buffer（不寫盤）
  */
 export async function buildBundleBuffer({ projectPath, pluginVersion, includeCache = true }) {
   const safePath = assertSafeProjectPath(projectPath);
   const projectMeta = await readJsonFile(path.join(safePath, ".project-brain", "project.json"));
   if (!projectMeta || projectMeta.__error) {
-    const err = new Error("项目未初始化，请先调用 project_init");
+    const err = new Error("專案未初始化，請先呼叫 project_init");
     err.code = "E_BRAIN_NOT_FOUND";
     throw err;
   }
 
   const files = await collectBrainFiles(safePath, { includeCache });
   if (files.length === 0) {
-    const err = new Error(".project-brain 目录为空");
+    const err = new Error(".project-brain 目錄為空");
     err.code = "E_BRAIN_EMPTY";
     throw err;
   }
 
-  // 构建 manifest
+  // 構建 manifest
   const checksum = { algorithm: "sha256", files: {} };
   for (const f of files) {
-    // manifest 里的 path 用相对 .project-brain 的路径（不带前缀）
+    // manifest 裡的 path 用相對 .project-brain 的路徑（不帶字首）
     const relInside = f.relPath.replace(/^\.project-brain\//, "");
     checksum.files[relInside] = f.sha256;
   }
@@ -377,10 +377,10 @@ export async function buildBundleBuffer({ projectPath, pluginVersion, includeCac
     fileCount: files.length,
   };
 
-  // 构建 zip
+  // 構建 zip
   const zw = new ZipWriter();
   const mtime = new Date(exportedAt);
-  // manifest 必须先入 zip（约定俗成）
+  // manifest 必須先入 zip（約定俗成）
   zw.addFile("manifest.json", Buffer.from(JSON.stringify(manifest, null, 2), "utf8"), mtime);
   for (const f of files) {
     zw.addFile(f.relPath, f._buf, mtime);
@@ -396,7 +396,7 @@ export async function buildBundleBuffer({ projectPath, pluginVersion, includeCac
 }
 
 /**
- * 默认 bundle 文件名
+ * 預設 bundle 檔名
  */
 export function defaultBundleName(projectMeta) {
   const name = sanitizeProjectName(projectMeta && projectMeta.name);
@@ -404,9 +404,9 @@ export function defaultBundleName(projectMeta) {
 }
 
 /**
- * 打包并写到磁盘。Dashboard RPC 必须走这条路径：
- * tools.execute 在 DSH Connection 里可以返回 ok 却不真正跑 tool.execute，
- * 结果就是「导出成功 / 未写出文件」。
+ * 打包並寫到磁碟。Dashboard RPC 必須走這條路徑：
+ * tools.execute 在 DSH Connection 裡可以返回 ok 卻不真正跑 tool.execute，
+ * 結果就是「匯出成功 / 未寫出檔案」。
  */
 export async function writeBundleFile({ projectPath, outputPath, pluginVersion, includeCache = true }) {
   if (!outputPath || typeof outputPath !== "string") {
@@ -421,12 +421,12 @@ export async function writeBundleFile({ projectPath, outputPath, pluginVersion, 
   try {
     st = await fsp.stat(outputPath);
   } catch (e) {
-    const err = new Error("zip 写入后无法读取：" + outputPath + "（" + String((e && e.message) || e) + "）");
+    const err = new Error("zip 寫入後無法讀取：" + outputPath + "（" + String((e && e.message) || e) + "）");
     err.code = "E_BUNDLE_WRITE_FAILED";
     throw err;
   }
   if (!st.isFile() || st.size <= 0) {
-    const err = new Error("zip 写入后文件无效：" + outputPath);
+    const err = new Error("zip 寫入後文件無效：" + outputPath);
     err.code = "E_BUNDLE_WRITE_FAILED";
     throw err;
   }
@@ -441,7 +441,7 @@ export async function writeBundleFile({ projectPath, outputPath, pluginVersion, 
 }
 
 /**
- * 解析 bundle：读 zip → 校验 manifest → 校验 checksum
+ * 解析 bundle：讀 zip → 校驗 manifest → 校驗 checksum
  * @returns {Promise<{ manifest, files: Map<string, Buffer> }>}
  */
 export async function parseBundle(bundlePath) {
@@ -449,7 +449,7 @@ export async function parseBundle(bundlePath) {
   try {
     buf = await fsp.readFile(bundlePath);
   } catch (e) {
-    const err = new Error(`bundle 文件不存在或不可读：${bundlePath}`);
+    const err = new Error(`bundle 檔案不存在或不可讀：${bundlePath}`);
     err.code = "E_BUNDLE_NOT_FOUND";
     throw err;
   }
@@ -458,7 +458,7 @@ export async function parseBundle(bundlePath) {
   try {
     files = await parseZip(buf);
   } catch (e) {
-    const err = new Error("bundle 文件损坏或格式无效");
+    const err = new Error("bundle 檔案損壞或格式無效");
     err.code = "E_BUNDLE_INVALID";
     err.detail = e.message;
     throw err;
@@ -476,7 +476,7 @@ export async function parseBundle(bundlePath) {
   try {
     manifest = JSON.parse(manifestEntry.data.toString("utf8"));
   } catch (e) {
-    const err = new Error("bundle manifest.json 解析失败");
+    const err = new Error("bundle manifest.json 解析失敗");
     err.code = "E_BUNDLE_INVALID";
     err.detail = e.message;
     throw err;
@@ -484,20 +484,20 @@ export async function parseBundle(bundlePath) {
 
   if (!manifest.schemaVersion || manifest.schemaVersion > BUNDLE_SCHEMA_VERSION) {
     const err = new Error(
-      `bundle 由更新版本 dsh-project-brain v${manifest.pluginVersion || "?"} 导出，` +
-      `当前插件仅支持 schemaVersion<=${BUNDLE_SCHEMA_VERSION}，请先升级插件再导入。`
+      `bundle 由更新版本 dsh-project-brain v${manifest.pluginVersion || "?"} 匯出，` +
+      `當前外掛僅支援 schemaVersion<=${BUNDLE_SCHEMA_VERSION}，請先升級外掛再匯入。`
     );
     err.code = "E_BUNDLE_SCHEMA_UNSUPPORTED";
     err.detail = `bundle.schemaVersion=${manifest.schemaVersion}, supported<=${BUNDLE_SCHEMA_VERSION}`;
     throw err;
   }
 
-  // 校验每个文件的 sha256
+  // 校驗每個檔案的 sha256
   const fileMap = new Map();
   for (const f of files) {
     const zipName = String(f.name || "").replace(/\\/g, "/");
     if (!isSafeBundleEntry(zipName)) {
-      const err = new Error("bundle 含有非法路径（禁止写到 .project-brain/ 之外）：" + zipName);
+      const err = new Error("bundle 含有非法路徑（禁止寫到 .project-brain/ 之外）：" + zipName);
       err.code = "E_BUNDLE_INVALID";
       err.detail = "zip-slip:" + zipName;
       throw err;
@@ -507,7 +507,7 @@ export async function parseBundle(bundlePath) {
     const relInside = zipName.replace(/^\.project-brain\//, "");
     const expected = manifest.checksum && manifest.checksum.files && manifest.checksum.files[relInside];
     if (expected && expected !== sha) {
-      const err = new Error(`bundle 文件 ${relInside} 校验和不一致`);
+      const err = new Error(`bundle 檔案 ${relInside} 校驗和不一致`);
       err.code = "E_BUNDLE_CHECKSUM_MISMATCH";
       err.detail = `expected=${expected}, actual=${sha}`;
       throw err;
@@ -515,7 +515,7 @@ export async function parseBundle(bundlePath) {
     fileMap.set(zipName, f.data);
   }
 
-  // 校验 project.json 是否在 manifest checksum 中
+  // 校驗 project.json 是否在 manifest checksum 中
   if (!fileMap.has(".project-brain/project.json")) {
     const err = new Error("bundle 缺少 .project-brain/project.json");
     err.code = "E_BUNDLE_INVALID";
@@ -527,7 +527,7 @@ export async function parseBundle(bundlePath) {
 }
 
 /**
- * 预览：解析 bundle + 读当前脑 → 返回 impact
+ * 預覽：解析 bundle + 讀當前腦 → 返回 impact
  */
 export async function previewBundle({ bundlePath, destProjectPath }) {
   const safeDest = assertSafeProjectPath(destProjectPath);
@@ -558,7 +558,7 @@ export async function previewBundle({ bundlePath, destProjectPath }) {
         currentBrain.archExists = true;
       } catch (e) {}
     }
-  } catch (e) { /* 读不到就当作空 */ }
+  } catch (e) { /* 讀不到就當作空 */ }
 
   const incomingProjectBuf = files.get(".project-brain/project.json");
   let incomingProject = null;
@@ -598,7 +598,7 @@ export async function previewBundle({ bundlePath, destProjectPath }) {
 }
 
 /**
- * 应用 bundle：备份 → 解压 → 改写 rootPath → 触发 rescan
+ * 應用 bundle：備份 → 解壓 → 改寫 rootPath → 觸發 rescan
  */
 export async function applyBundle({
   bundlePath,
@@ -613,7 +613,7 @@ export async function applyBundle({
   let actualBackupPath = null;
   let rescanTriggered = false;
 
-  // 1) 备份当前脑（若存在）——走 backup.js，目录名才能被 list/rollback 识别
+  // 1) 備份當前腦（若存在）——走 backup.js，目錄名才能被 list/rollback 識別
   const brainExists = await fsp.stat(brainDir).then(() => true).catch(() => false);
   if (brainExists) {
     const { createBackup } = await import("./backup.js");
@@ -621,7 +621,7 @@ export async function applyBundle({
     actualBackupPath = r.backupPath;
   }
 
-  // 2) 写新脑
+  // 2) 寫新腦
   await fsp.mkdir(brainDir, { recursive: true });
   for (const [relPath, data] of files.entries()) {
     const zipName = String(relPath || "").replace(/\\/g, "/");
@@ -636,7 +636,7 @@ export async function applyBundle({
     await fsp.writeFile(abs, data);
   }
 
-  // 3) 改写 project.json.rootPath
+  // 3) 改寫 project.json.rootPath
   const projectPath = path.join(brainDir, "project.json");
   try {
     const projBuf = await fsp.readFile(projectPath, "utf8");
@@ -646,12 +646,12 @@ export async function applyBundle({
     if (!proj.lastScannedAt) proj.lastScannedAt = proj.updatedAt;
     await fsp.writeFile(projectPath, JSON.stringify(proj, null, 2));
   } catch (e) {
-    // 改写失败不算致命，import 已经完成
+    // 改寫失敗不算致命，import 已經完成
   }
 
-  // 4) rescan 触发（异步，不抛错）
+  // 4) rescan 觸發（非同步，不拋錯）
   if (triggerRescan) {
-    rescanTriggered = true; // 标记已触发（实际由调用方调度）
+    rescanTriggered = true; // 標記已觸發（實際由呼叫方排程）
   }
 
   return {
@@ -667,7 +667,7 @@ export async function applyBundle({
   };
 }
 
-// 暴露给 smoke 测试的内部函数
+// 暴露給 smoke 測試的內部函式
 export const _internal = {
   crc32,
   ZipWriter,

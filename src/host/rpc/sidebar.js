@@ -1,12 +1,12 @@
 // SidebarPreview RPC handlers
-// - project_brain/sidebar.getPreview: 按 sessionId 反查 cwd，聚合数据（5 区块）
-// - project_brain/initProject: 桥接 project_init tool（给 Onboarding 按钮用）
-// - project_brain/continueSession: 桥接 project_continue tool（给"继续上次开发"按钮用）
+// - project_brain/sidebar.getPreview: 按 sessionId 反查 cwd，聚合資料（5 區塊）
+// - project_brain/initProject: 橋接 project_init tool（給 Onboarding 按鈕用）
+// - project_brain/continueSession: 橋接 project_continue tool（給"繼續上次開發"按鈕用）
 //
-// harness 来自 host builtin（DSH 启动时 cordis-loader 注入）。
-// dshmarket 热挂载的子 fiber 不注入 host builtin，所以 harness 可能 undefined。
-// 这里做降级：harness 缺失时仅 warn，不注册 RPC，apply 不会抛错。
-// ctx 用于可选探测 sessions service（按 sessionId 反查 cwd 拿到"当前 workspace"）。
+// harness 來自 host builtin（DSH 啟動時 cordis-loader 注入）。
+// dshmarket 熱掛載的子 fiber 不注入 host builtin，所以 harness 可能 undefined。
+// 這裡做降級：harness 缺失時僅 warn，不註冊 RPC，apply 不會拋錯。
+// ctx 用於可選探測 sessions service（按 sessionId 反查 cwd 拿到"當前 workspace"）。
 
 import { buildSidebarPreview, buildWorkspacePreview, invalidateAggregatorCache } from "../sidebar/aggregator.js";
 import { scanAndWrite } from "../scan-and-write.js";
@@ -23,7 +23,7 @@ import { brainTxKey, withWriteLock } from "../store/write-lock.js";
 import { promises as fsp } from "node:fs";
 import path from "node:path";
 
-// 把 normalizeMemoryConfig 的冻结对象转成可 JSON 序列化的普通对象（供 RPC 传回 Client）。
+// 把 normalizeMemoryConfig 的凍結物件轉成可 JSON 序列化的普通物件（供 RPC 傳回 Client）。
 function sanitizeSettings(config) {
   const source = normalizeMemoryConfig(config);
   return {
@@ -90,12 +90,12 @@ function rpcOk(value) {
   return { ok: true, value };
 }
 
-// DSH Connection RPC 的 result 类型用 schemastery discriminated union：
+// DSH Connection RPC 的 result 型別用 schemastery discriminated union：
 //   - ok=true  → value
 //   - ok=false → { code: <one of DSH_ERROR_CODES>, message, details }
-//   任何 ok=false 的 error.code 不在 DSH_ERROR_CODES 里都会被 schemastery 拒绝，
-//   reject 到客户端 .catch，让用户看到一坨 invalid_union 错误。
-// 修复：自动把不在白名单的 code 降级到 "internal"，并把原 code 放进 details.originalCode。
+//   任何 ok=false 的 error.code 不在 DSH_ERROR_CODES 裡都會被 schemastery 拒絕，
+//   reject 到客戶端 .catch，讓使用者看到一坨 invalid_union 錯誤。
+// 修復：自動把不在白名單的 code 降級到 "internal"，並把原 code 放進 details.originalCode。
 const DSH_ERROR_CODES = new Set([
   "bad-request", "cancelled", "session-not-found", "model-unavailable", "session-conflict", "invalid-time-zone",
   "workspace-attach-failed", "workspace-not-found", "workspace-invalid-path", "workspace-name-conflict", "workspace-move-invalid",
@@ -113,7 +113,7 @@ function normalizeDshErrorCode(code, details) {
   if (typeof code === "string" && DSH_ERROR_CODES.has(code)) {
     return { code, details: details && typeof details === "object" ? details : {} };
   }
-  // 不在白名单 → 降级到 "internal"，保留原 code 供 client 端诊断
+  // 不在白名單 → 降級到 "internal"，保留原 code 供 client 端診斷
   const merged = Object.assign({}, details && typeof details === "object" ? details : {});
   if (typeof code === "string" && code.length > 0 && !merged.originalCode) merged.originalCode = code;
   return { code: "internal", details: merged };
@@ -131,9 +131,9 @@ function rpcError(code, message, details) {
   };
 }
 
-// v1.1.x-fix：DSH 冷启动 race condition —— sessions service 异步注册 session workspace，
-//   第一次 getCwdBySession 可能返回 null（切到全新 session 后 ~300~500ms 才到位）。
-//   一次短暂重试（500ms 后）能消除绝大多数切项目/切 session 时的 workspace-not-found 闪退。
+// v1.1.x-fix：DSH 冷啟動 race condition —— sessions service 非同步註冊 session workspace，
+//   第一次 getCwdBySession 可能返回 null（切到全新 session 後 ~300~500ms 才到位）。
+//   一次短暫重試（500ms 後）能消除絕大多數切專案/切 session 時的 workspace-not-found 閃退。
 const PROJECT_PATH_RETRY_DELAY_MS = 500;
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -145,7 +145,7 @@ async function resolveRpcProjectPath(ctx, payload) {
   const sid = payload && payload.sessionId;
   const first = getCwdBySession(ctx, sid);
   if (first) return first;
-  // 第一次 null → 等 500ms 再读一次（DSH 内部通常几百 ms 内完成注册）
+  // 第一次 null → 等 500ms 再讀一次（DSH 內部通常幾百 ms 內完成註冊）
   await sleep(PROJECT_PATH_RETRY_DELAY_MS);
   return getCwdBySession(ctx, sid);
 }
@@ -177,7 +177,7 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
         sessionId: payload && payload.sessionId,
       };
 
-      // 插件级设置：不依赖 session workspace，放在此处在 workspace 校验之前处理。
+      // 外掛級設定：不依賴 session workspace，放在此處在 workspace 校驗之前處理。
       if (endpoint === "settings") {
         const rawAction = payload && payload.action;
         const action = rawAction === "update" || rawAction === "probe" ? rawAction : "get";
@@ -205,7 +205,7 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
             });
             return rpcOk({ probe: Object.assign({ target: "llm" }, probe) });
           }
-          return rpcError("bad-request", "未知探测目标，应为 embedding 或 llm", { target: target || null });
+          return rpcError("bad-request", "未知探測目標，應為 embedding 或 llm", { target: target || null });
         }
         if (action === "get") {
           return rpcOk({
@@ -217,13 +217,13 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
         // action === "update"
         const patch = payload && payload.patch && typeof payload.patch === "object" ? payload.patch : null;
         if (!patch || Object.keys(patch).length === 0) {
-          return rpcError("EMPTY_PATCH", "没有可保存的字段", {});
+          return rpcError("EMPTY_PATCH", "沒有可儲存的欄位", {});
         }
         if (!updateSettings || typeof updateSettings !== "function") {
-          return rpcError("SETTINGS_UNAVAILABLE", "当前运行时 settings 服务不可用，配置为只读", { writable: false });
+          return rpcError("SETTINGS_UNAVAILABLE", "當前執行時 settings 服務不可用，配置為只讀", { writable: false });
         }
         if (!writable) {
-          return rpcError("SETTINGS_READONLY", "settings provider 只读，无法保存", { writable: false });
+          return rpcError("SETTINGS_READONLY", "settings provider 只讀，無法儲存", { writable: false });
         }
         try {
           const next = await updateSettings(patch);
@@ -244,7 +244,7 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
       if (!projectPath) {
         return rpcError(
           "WORKSPACE_NOT_FOUND",
-          "无法从当前 Session 解析 workspace 路径",
+          "無法從當前 Session 解析 workspace 路徑",
           { sessionId: payload && payload.sessionId ? payload.sessionId : null },
         );
       }
@@ -270,7 +270,7 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
           const error = result && result.data && result.data.error;
           return rpcError(
             (error && error.code) || "INIT_FAILED",
-            (error && error.message) || "项目大脑初始化失败",
+            (error && error.message) || "專案大腦初始化失敗",
             { projectPath },
           );
         }
@@ -284,7 +284,7 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
         });
       }
 
-      // v0.4.15：智能续接 — Session 开始 / Dashboard 加载时调一次
+      // v0.4.15：智慧續接 — Session 開始 / Dashboard 載入時調一次
       if (endpoint === "suggest") {
         const useLLM = !(payload && payload.useLLM === false);
         const suggestTool = buildSuggestTool({
@@ -292,12 +292,12 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
           sandboxPolicy,
           getLlm: architectureRuntime.getLlm,
         });
-        // v0.4.17：客户端已传 workspacePath（来自 data._workspacePath），用它作为权威路径。
-        // 不同 session 调同一 endpoint 都拿相同内容（同一 .project-brain/）。
+        // v0.4.17：客戶端已傳 workspacePath（來自 data._workspacePath），用它作為權威路徑。
+        // 不同 session 調同一 endpoint 都拿相同內容（同一 .project-brain/）。
         const trustedPath = (payload && typeof payload.workspacePath === "string" && payload.workspacePath.trim()) ? payload.workspacePath : projectPath;
         const args = { path: trustedPath };
         if (!useLLM) args.useLLM = false;
-        // 直接调 suggestTool.execute（session 上下文用于 LLM route / 错误日志，但 projectPath 取 trustedPath）
+        // 直接調 suggestTool.execute（session 上下文用於 LLM route / 錯誤日誌，但 projectPath 取 trustedPath）
         let toolResult;
         try {
           toolResult = await suggestTool.execute(args, {
@@ -313,7 +313,7 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
           const error = toolResult && toolResult.data && toolResult.data.error;
           return rpcError(
             (error && error.code) || "SUGGEST_FAILED",
-            (error && error.message) || "智能续接失败",
+            (error && error.message) || "智慧續接失敗",
             { endpoint, projectPath: trustedPath },
           );
         }
@@ -323,14 +323,14 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
         });
       }
 
-      // v0.4.x: Git 历史 — Dashboard Git Tab 数据源（无 .git 时 available=false 让 Client 不渲染 tab）
+      // v0.4.x: Git 歷史 — Dashboard Git Tab 資料來源（無 .git 時 available=false 讓 Client 不渲染 tab）
       if (endpoint === "git") {
         const limit = Math.max(1, Math.min(500, Number(payload && payload.limit) || 50));
         const branch = (payload && typeof payload.branch === "string" && payload.branch.trim()) ? payload.branch.trim() : null;
         try {
           const history = getGitHistory({ projectPath, limit, branch });
           const branches = getGitBranches(projectPath);
-          // 工作树 vs HEAD tree 对比（不依赖 git binary）：untracked / deleted
+          // 工作樹 vs HEAD tree 對比（不依賴 git binary）：untracked / deleted
           let workTree = { available: false };
           try {
             workTree = getWorkTreeChanges({ projectPath, maxFiles: 50 });
@@ -381,7 +381,7 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
             const error = result && result.data && result.data.error;
             return rpcError(
               (error && error.code) || "RESCAN_FAILED",
-              (error && error.message) || "重新扫描失败",
+              (error && error.message) || "重新掃描失敗",
               { action, projectPath },
             );
           }
@@ -398,7 +398,7 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
 
         const definition = toolActions[action];
         if (!definition) {
-          return rpcError("ACTION_NOT_ALLOWED", "不支持的 Project Brain 操作：" + action, { action });
+          return rpcError("ACTION_NOT_ALLOWED", "不支援的 Project Brain 操作：" + action, { action });
         }
         if (!tools || typeof tools.execute !== "function") {
           return rpcError("TOOLS_UNAVAILABLE", "DSH tools service unavailable", { action });
@@ -421,7 +421,7 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
           const nested = result && result.data && result.data.error;
           return rpcError(
             (nested && nested.code) || (result && result.code) || "ACTION_FAILED",
-            (nested && nested.message) || (result && result.message) || "操作执行失败",
+            (nested && nested.message) || (result && result.message) || "操作執行失敗",
             { action, tool: definition.name },
           );
         }
@@ -436,7 +436,7 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
         });
       }
 
-      // ─── 人工维护记忆：编辑 / 归档 / 恢复 / 永久删除 ───
+      // ─── 人工維護記憶：編輯 / 歸檔 / 恢復 / 永久刪除 ───
       if (endpoint === "memory.update" || endpoint === "memory.status" || endpoint === "memory.delete") {
         return handleMemoryMutation({
           endpoint,
@@ -448,11 +448,11 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
         });
       }
 
-      // ─── v1.3.1：导入导出 / 备份恢复 RPC ───
-      // 不走 tools.execute：Connection RPC 里它可能 ok 却不调用 tool.execute。
+      // ─── v1.3.1：匯入匯出 / 備份恢復 RPC ───
+      // 不走 tools.execute：Connection RPC 裡它可能 ok 卻不呼叫 tool.execute。
 
       if (endpoint === "export.run") {
-        // 不走 tools.execute：DSH Connection 里它可能 ok 却不调用 tool.execute，zip 根本不会落盘。
+        // 不走 tools.execute：DSH Connection 裡它可能 ok 卻不呼叫 tool.execute，zip 根本不會落盤。
         let outputPath = payload && typeof payload.outputPath === "string" ? payload.outputPath : "";
         try {
           const { defaultBundleName, writeBundleFile } = await import("../transfer/bundle.js");
@@ -462,7 +462,7 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
               const raw = await fsp.readFile(path.join(projectPath, ".project-brain", "project.json"), "utf8");
               const meta = JSON.parse(raw);
               if (meta && meta.name) projectName = String(meta.name);
-            } catch (e) { /* 用目录名即可 */ }
+            } catch (e) { /* 用目錄名即可 */ }
             outputPath = path.join(projectPath, "dist-backups", defaultBundleName({ name: projectName }));
           }
           const includeCache = payload && payload.includeCache !== undefined ? !!payload.includeCache : true;
@@ -476,7 +476,7 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
             const now = Date.now();
             await appendJsonl(fs, brainPath(projectPath, "timeline.jsonl"), {
               id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-              title: "导出 bundle：" + written.bundleName,
+              title: "匯出 bundle：" + written.bundleName,
               eventType: "export",
               occurredAt: now,
               payload: {
@@ -485,7 +485,7 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
                 fileCount: written.fileCount,
               },
             });
-          } catch (e) { /* timeline 失败不阻断导出 */ }
+          } catch (e) { /* timeline 失敗不阻斷匯出 */ }
           invalidateAggregatorCache(projectPath);
           const preview = await buildWorkspacePreview(fs, projectPath);
           preview.retrieval = publicMemoryConfig(getMemoryConfig ? getMemoryConfig() : {});
@@ -538,15 +538,15 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
         const bundlePath = payload && typeof payload.bundlePath === "string" ? payload.bundlePath : "";
         const confirmToken = payload && typeof payload.confirmToken === "string" ? payload.confirmToken : "";
         if (!bundlePath) return rpcError("bad-request", "bundlePath 必填", {});
-        if (!confirmToken) return rpcError("bad-request", "confirmToken 必填（先调 import.preview 拿 token）", {});
+        if (!confirmToken) return rpcError("bad-request", "confirmToken 必填（先調 import.preview 拿 token）", {});
         try {
           const { getTokenStore } = await import("../transfer/confirm-tokens.js");
           const tokenPayload = getTokenStore().consume(confirmToken, { kind: "import" });
           if (!tokenPayload) {
-            return rpcError("bad-request", "confirmToken 无效、已过期或类型不匹配（请重新预览）", {});
+            return rpcError("bad-request", "confirmToken 無效、已過期或型別不匹配（請重新預覽）", {});
           }
           if (tokenPayload.bundlePath !== bundlePath || tokenPayload.destProjectPath !== projectPath) {
-            return rpcError("bad-request", "confirmToken 与当前参数不匹配（请重新预览）", {});
+            return rpcError("bad-request", "confirmToken 與當前引數不匹配（請重新預覽）", {});
           }
           const { applyBundle } = await import("../transfer/bundle.js");
           const applied = await applyBundle({ bundlePath, destProjectPath: projectPath, triggerRescan: false });
@@ -556,8 +556,8 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
             await appendJsonl(fs, brainPath(projectPath, "timeline.jsonl"), {
               id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
               title: applied.backupPath
-                ? "导入 bundle（已备份旧脑到 " + path.basename(applied.backupPath) + "）"
-                : "导入 bundle（首次）",
+                ? "匯入 bundle（已備份舊腦到 " + path.basename(applied.backupPath) + "）"
+                : "匯入 bundle（首次）",
               eventType: "import",
               occurredAt: now,
               payload: {
@@ -566,7 +566,7 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
                 sourceManifest: applied.sourceManifest,
               },
             });
-          } catch (e) { /* timeline 失败不阻断导入 */ }
+          } catch (e) { /* timeline 失敗不阻斷匯入 */ }
           const data = {
             mode: "applied",
             bundlePath,
@@ -589,7 +589,7 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
       }
 
       if (endpoint === "backup.list") {
-        // 只读列表，不走 cleanup tool（避免误删）
+        // 只讀列表，不走 cleanup tool（避免誤刪）
         try {
           const { listBackups } = await import("../transfer/backup.js");
           const backups = await listBackups({ projectPath });
@@ -643,15 +643,15 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
         const ts = payload && typeof payload.backupTimestamp === "string" ? payload.backupTimestamp : "";
         const confirmToken = payload && typeof payload.confirmToken === "string" ? payload.confirmToken : "";
         if (!ts) return rpcError("bad-request", "backupTimestamp 必填", {});
-        if (!confirmToken) return rpcError("bad-request", "confirmToken 必填（先调 backup.rollback.preview 拿 token）", {});
+        if (!confirmToken) return rpcError("bad-request", "confirmToken 必填（先調 backup.rollback.preview 拿 token）", {});
         try {
           const { getTokenStore } = await import("../transfer/confirm-tokens.js");
           const tokenPayload = getTokenStore().consume(confirmToken, { kind: "rollback" });
           if (!tokenPayload) {
-            return rpcError("bad-request", "confirmToken 无效、已过期或类型不匹配（请重新选择）", {});
+            return rpcError("bad-request", "confirmToken 無效、已過期或型別不匹配（請重新選擇）", {});
           }
           if (tokenPayload.projectPath !== projectPath || tokenPayload.backupTimestamp !== ts) {
-            return rpcError("bad-request", "confirmToken 与当前参数不匹配（请重新选择）", {});
+            return rpcError("bad-request", "confirmToken 與當前引數不匹配（請重新選擇）", {});
           }
           const { applyRollback } = await import("../transfer/backup.js");
           const applied = await applyRollback({ projectPath, backupTimestamp: ts, triggerRescan: false });
@@ -660,7 +660,7 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
             const now = Date.now();
             await appendJsonl(fs, brainPath(projectPath, "timeline.jsonl"), {
               id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-              title: "回滚到备份 " + ts,
+              title: "回滾到備份 " + ts,
               eventType: "rollback",
               occurredAt: now,
               payload: {
@@ -668,7 +668,7 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
                 preRollbackBackupPath: applied.preRollbackBackupPath,
               },
             });
-          } catch (e) { /* timeline 失败不阻断回滚 */ }
+          } catch (e) { /* timeline 失敗不阻斷回滾 */ }
           const data = {
             mode: "applied",
             backupTimestamp: ts,
@@ -690,27 +690,27 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
         }
       }
 
-      // v1.3.1：用 Electron shell.openPath 在文件管理器中打开文件夹
-      // 失败兜底：返回错误，让 Client 降级到复制路径
+      // v1.3.1：用 Electron shell.openPath 在檔案管理器中開啟資料夾
+      // 失敗兜底：返回錯誤，讓 Client 降級到複製路徑
       if (endpoint === "export.openFolder") {
         const folderPath = payload && typeof payload.folderPath === "string" ? payload.folderPath : "";
         if (!folderPath) return rpcError("BAD_REQUEST", "folderPath 必填", {});
         try {
-          // 安全检查：必须是绝对路径，且不能包含 ..（防穿越）
+          // 安全檢查：必須是絕對路徑，且不能包含 ..（防穿越）
           if (!/^([A-Za-z]:[\\/]|\/)/.test(folderPath) || folderPath.includes("..")) {
-            return rpcError("BAD_REQUEST", "folderPath 必须是绝对路径且不含 ..", { folderPath });
+            return rpcError("BAD_REQUEST", "folderPath 必須是絕對路徑且不含 ..", { folderPath });
           }
-          // 优先用 DSH 提供的 shell service；fallback 到 electron
+          // 優先用 DSH 提供的 shell service；fallback 到 electron
           let shellModule = null;
           let opened = false;
           try {
-            // 方案 1：通过 ctx.get('shell') 探测 DSH 是否暴露了 shell service
+            // 方案 1：通過 ctx.get('shell') 探測 DSH 是否暴露了 shell service
             const shell = ctx.get ? ctx.get("shell") : ctx.shell;
             if (shell && typeof shell.openPath === "function") {
               const r = await shell.openPath(folderPath);
               opened = r === "" || r === undefined || r === null;
               if (!opened) {
-                return rpcError("OPEN_FAILED", "shell.openPath 返回错误：" + String(r), { folderPath });
+                return rpcError("OPEN_FAILED", "shell.openPath 返回錯誤：" + String(r), { folderPath });
               }
               return rpcOk({ opened: true, folderPath });
             }
@@ -734,7 +734,7 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
             spawn(cmd, [folderPath], { detached: true, stdio: "ignore" }).unref();
             return rpcOk({ opened: true, folderPath, method: cmd });
           } catch (e) {
-            return rpcError("OPEN_FAILED", "无法打开文件夹：" + String((e && e.message) || e), { folderPath });
+            return rpcError("OPEN_FAILED", "無法開啟資料夾：" + String((e && e.message) || e), { folderPath });
           }
         } catch (e) {
           return rpcError("OPEN_FAILED", String((e && e.message) || e), { folderPath });
@@ -752,13 +752,13 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
             BrowserWindow = mod && mod.BrowserWindow;
           } catch (e) { /* electron not available */ }
           if (!dialog || typeof dialog.showOpenDialog !== "function") {
-            return rpcError("directory-picker-unavailable", "系统文件选择器不可用，请粘贴 zip 的完整路径", {});
+            return rpcError("directory-picker-unavailable", "系統檔案選擇器不可用，請貼上 zip 的完整路徑", {});
           }
           const win = (BrowserWindow && typeof BrowserWindow.getFocusedWindow === "function" && BrowserWindow.getFocusedWindow())
             || (BrowserWindow && typeof BrowserWindow.getAllWindows === "function" && (BrowserWindow.getAllWindows()[0] || null))
             || undefined;
           const picked = await dialog.showOpenDialog(win || undefined, {
-            title: "选择 Project Brain bundle",
+            title: "選擇 Project Brain bundle",
             properties: ["openFile"],
             filters: [
               { name: "Brain bundle", extensions: ["zip"] },
@@ -770,7 +770,7 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
           }
           return rpcOk({ canceled: false, bundlePath: picked.filePaths[0] });
         } catch (e) {
-          return rpcError("directory-picker-unavailable", "无法打开文件选择器：" + String((e && e.message) || e), {});
+          return rpcError("directory-picker-unavailable", "無法開啟檔案選擇器：" + String((e && e.message) || e), {});
         }
       }
 
@@ -782,26 +782,26 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
 }
 
 const MEMORY_TIMELINE_EVENTS = {
-  edit: { eventType: "memory_edit", verb: "编辑记忆" },
-  archived: { eventType: "memory_archive", verb: "归档记忆" },
-  active: { eventType: "memory_restore", verb: "恢复记忆" },
-  dormant: { eventType: "memory_archive", verb: "休眠记忆" },
-  delete: { eventType: "memory_delete", verb: "永久删除记忆" },
+  edit: { eventType: "memory_edit", verb: "編輯記憶" },
+  archived: { eventType: "memory_archive", verb: "歸檔記憶" },
+  active: { eventType: "memory_restore", verb: "恢復記憶" },
+  dormant: { eventType: "memory_archive", verb: "休眠記憶" },
+  delete: { eventType: "memory_delete", verb: "永久刪除記憶" },
 };
 
-// 编辑 / 归档 / 恢复 / 永久删除共用一条通道。
+// 編輯 / 歸檔 / 恢復 / 永久刪除共用一條通道。
 //
-// 分两段很关键：锁内只做「读整表 → 改 → 写整表」，preview 必须留在锁外——
-// buildWorkspacePreview 内部会调 persistHousekeep，那也要抢 memory.jsonl 的事务锁，
-// 在锁里调它就是自己等自己：数据写进去了，RPC 却永远不返回，前端一直转圈。
+// 分兩段很關鍵：鎖內只做「讀整表 → 改 → 寫整表」，preview 必須留在鎖外——
+// buildWorkspacePreview 內部會調 persistHousekeep，那也要搶 memory.jsonl 的事務鎖，
+// 在鎖裡調它就是自己等自己：資料寫進去了，RPC 卻永遠不返回，前端一直轉圈。
 export async function handleMemoryMutation(args) {
   const { endpoint, projectPath, fs, ctx, getMemoryConfig } = args;
   const id = typeof args.payload.id === "string" ? args.payload.id.trim() : "";
   if (!id) return rpcError("bad-request", "id 必填", { endpoint });
 
-  // 和 admit / housekeep 抢同一把事务锁，避免人工编辑和自动写入互相覆盖。
+  // 和 admit / housekeep 搶同一把事務鎖，避免人工編輯和自動寫入互相覆蓋。
   const result = await withWriteLock(brainTxKey(projectPath, "memory.jsonl"), () => mutateMemoryFile(args, id));
-  if (!result.ok) return rpcError(result.code || "internal", result.message || "记忆操作失败", { endpoint, id });
+  if (!result.ok) return rpcError(result.code || "internal", result.message || "記憶操作失敗", { endpoint, id });
 
   const { outcome, changed, now, timelineKey } = result;
 
@@ -815,15 +815,15 @@ export async function handleMemoryMutation(args) {
         occurredAt: now,
         detail: "id=" + outcome.entry.id + " by=user",
       });
-    } catch (e) { /* timeline 失败不阻断本次操作 */ }
+    } catch (e) { /* timeline 失敗不阻斷本次操作 */ }
 
     invalidateAggregatorCache(projectPath);
-    // 注入用的是 injector 自己的缓存，只认这个事件。不发的话页面已经变了、模型那边还是旧的。
+    // 注入用的是 injector 自己的快取，只認這個事件。不發的話頁面已經變了、模型那邊還是舊的。
     try {
       if (ctx && typeof ctx.emit === "function") {
         ctx.emit("project_brain/preview.changed", { projectPath });
       }
-    } catch (e) { /* emit 失败不阻断本次操作 */ }
+    } catch (e) { /* emit 失敗不阻斷本次操作 */ }
   }
 
   const preview = await buildWorkspacePreview(fs, projectPath);
@@ -837,14 +837,14 @@ export async function handleMemoryMutation(args) {
   });
 }
 
-// 锁内的那一段。只碰 memory.jsonl，不做任何可能再次取锁的事。
+// 鎖內的那一段。只碰 memory.jsonl，不做任何可能再次取鎖的事。
 async function mutateMemoryFile({ endpoint, payload, projectPath, fs }, id) {
   const memoryFile = brainPath(projectPath, "memory.jsonl");
   let rows;
   try {
     rows = await readJsonl(fs, memoryFile);
   } catch (e) {
-    return { ok: false, code: "internal", message: "读取 memory.jsonl 失败：" + String((e && e.message) || e) };
+    return { ok: false, code: "internal", message: "讀取 memory.jsonl 失敗：" + String((e && e.message) || e) };
   }
 
   const now = Date.now();
@@ -864,9 +864,9 @@ async function mutateMemoryFile({ endpoint, payload, projectPath, fs }, id) {
     outcome = applyMemoryStatus(rows, { id, status, reason, now });
     timelineKey = status;
   } else {
-    // 物理删除不可恢复，要求调用方显式带上 confirm，避免误点或脏调用直接抹掉数据。
+    // 物理刪除不可恢復，要求呼叫方顯式帶上 confirm，避免誤點或髒呼叫直接抹掉資料。
     if (payload.confirm !== true) {
-      return { ok: false, code: "bad-request", message: "永久删除需要 confirm=true" };
+      return { ok: false, code: "bad-request", message: "永久刪除需要 confirm=true" };
     }
     outcome = applyMemoryDelete(rows, { id });
     timelineKey = "delete";
@@ -876,7 +876,7 @@ async function mutateMemoryFile({ endpoint, payload, projectPath, fs }, id) {
   if (outcome.changed === false) return { ok: true, outcome, changed: false, now, timelineKey };
 
   const wrote = await writeJsonl(fs, memoryFile, outcome.rows);
-  if (!wrote) return { ok: false, code: "internal", message: "写入 memory.jsonl 失败" };
+  if (!wrote) return { ok: false, code: "internal", message: "寫入 memory.jsonl 失敗" };
   return { ok: true, outcome, changed: true, now, timelineKey };
 }
 
@@ -908,16 +908,16 @@ async function attachRescanAndPreview({ result, projectPath, fs, sandboxPolicy, 
     const preview = await buildWorkspacePreview(fs, projectPath);
     preview.retrieval = publicMemoryConfig(getMemoryConfig ? getMemoryConfig() : {});
     if (result && result.value) result.value.preview = preview;
-  } catch (e) { /* preview 刷新失败不阻断导入/回滚 */ }
+  } catch (e) { /* preview 重新整理失敗不阻斷匯入/回滾 */ }
   return result;
 }
 
-// Helper: 把 tools.execute 的结果包装成 connection RPC 的 ok 响应
-//   兼容两种 tools.execute 返回格式：
-//     A) { ok: true, data: { ... }, code?, message? }  ← 标准（v0.x DSH）
-//     B) { ...dataField... }                            ← 部分 DSH 版本直接返回数据
+// Helper: 把 tools.execute 的結果包裝成 connection RPC 的 ok 響應
+//   相容兩種 tools.execute 返回格式：
+//     A) { ok: true, data: { ... }, code?, message? }  ← 標準（v0.x DSH）
+//     B) { ...dataField... }                            ← 部分 DSH 版本直接返回資料
 //   rpcOk 返回 { ok: true, value: { name, result: <data> } }
-// 失败：把 code/message 传给 rpcError，并在 details 里保留原 data
+// 失敗：把 code/message 傳給 rpcError，並在 details 裡保留原 data
 async function executeTool(tools, name, args) {
   if (!tools || typeof tools.execute !== "function") {
     return rpcError("TOOLS_UNAVAILABLE", "DSH tools service unavailable", { name });
@@ -932,7 +932,7 @@ async function executeTool(tools, name, args) {
         Object.assign({ name, toolData: result.data }, result.data || {}),
       );
     }
-    // unwrap data：兼容 A 格式、B 格式，以及 DSH 再包一层 {ok,data:{ok,data}}
+    // unwrap data：相容 A 格式、B 格式，以及 DSH 再包一層 {ok,data:{ok,data}}
     const data = unwrapToolResult(result);
     if (data && data.error === true) {
       return rpcError(
@@ -941,7 +941,7 @@ async function executeTool(tools, name, args) {
         Object.assign({ name }, data.data || {}),
       );
     }
-    // 保持 tools.execute 的 { ok, data } 形状（Dashboard Quick Action 已验证可过 DSH schema）
+    // 保持 tools.execute 的 { ok, data } 形狀（Dashboard Quick Action 已驗證可過 DSH schema）
     return rpcOk({ name, result: { ok: true, data } });
   } catch (error) {
     return rpcError(
@@ -963,8 +963,8 @@ export function registerSidebarRpc({ harness, ctx, fs, tools, getDefaultProjectP
     return disposers;
   }
 
-  // 1) SidebarPreview 数据
-  //    优先按 sessionId 反查当前 workspace 的 cwd（避免 sandboxPolicy.workspaceRoot 是固定值的坑）
+  // 1) SidebarPreview 資料
+  //    優先按 sessionId 反查當前 workspace 的 cwd（避免 sandboxPolicy.workspaceRoot 是固定值的坑）
   //    回退 getDefaultProjectPath（sandboxPolicy.workspaceRoot）
   const getPreviewDisposer = harness.handle("project_brain/sidebar.getPreview", async (args) => {
     let projectPath = null;
@@ -978,10 +978,10 @@ export function registerSidebarRpc({ harness, ctx, fs, tools, getDefaultProjectP
   });
   disposers.push(getPreviewDisposer);
 
-  // 2) 桥接 project_init tool（Onboarding 启动按钮）
-  //    v0.5.1 修复：支持 sessionId fallback——当 args.path 缺失时（常见于 build-time
+  // 2) 橋接 project_init tool（Onboarding 啟動按鈕）
+  //    v0.5.1 修復：支援 sessionId fallback——當 args.path 缺失時（常見於 build-time
   //    sessionToWorkspaceId map miss 的全新 workspace），用 args.sessionId 反查 cwd
-  //    （getCwdBySession 已存在，避免每个新建 workspace 都必须先重启 DSH 让 build 重新纳入）
+  //    （getCwdBySession 已存在，避免每個新建 workspace 都必須先重啟 DSH 讓 build 重新納入）
   const initDisposer = harness.handle("project_brain/initProject", async (args) => {
     if (!tools || typeof tools.execute !== "function") {
       return { ok: false, code: "E_NO_TOOLS", message: "tools service unavailable" };
@@ -1003,7 +1003,7 @@ export function registerSidebarRpc({ harness, ctx, fs, tools, getDefaultProjectP
         name: "project_init",
         args: userArgs,
       });
-      // project_init 内部已 emit preview.changed；缓存会通过 ctx.on('project_brain/preview.changed') 清空
+      // project_init 內部已 emit preview.changed；快取會通過 ctx.on('project_brain/preview.changed') 清空
       return result;
     } catch (e) {
       return { ok: false, code: "E_INIT_FAILED", message: String((e && e.message) || e) };
@@ -1011,7 +1011,7 @@ export function registerSidebarRpc({ harness, ctx, fs, tools, getDefaultProjectP
   });
   disposers.push(initDisposer);
 
-  // 3) 桥接 project_continue tool（"继续上次开发"按钮）
+  // 3) 橋接 project_continue tool（"繼續上次開發"按鈕）
   const continueDisposer = harness.handle("project_brain/continueSession", async (args) => {
     if (!tools || typeof tools.execute !== "function") {
       return { ok: false, code: "E_NO_TOOLS", message: "tools service unavailable" };

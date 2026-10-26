@@ -1,4 +1,4 @@
-// 一次性 Embedding 烟雾测试：直接命中用户配置的 endpoint + 从 ~/.dsh/.credentials.yaml 读到的 API key
+// 一次性 Embedding 煙霧測試：直接命中使用者配置的 endpoint + 從 ~/.dsh/.credentials.yaml 讀到的 API key
 // 用法：node scripts/embedding-smoke.mjs
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -9,10 +9,10 @@ const REF_NAME = "ARK_CODE_LATEST_API_KEY"; // ref 名（不是 value）
 
 function loadApiKey() {
   const txt = readFileSync(CREDS_PATH, "utf8");
-  // 极简 YAML 解析：只匹配 "  KEY: value" 形式
+  // 極簡 YAML 解析：只匹配 "  KEY: value" 形式
   const re = new RegExp(`^\\s*${REF_NAME}:\\s*(.+)$`, "m");
   const m = txt.match(re);
-  if (!m) throw new Error("凭证里找不到 " + REF_NAME);
+  if (!m) throw new Error("憑證裡找不到 " + REF_NAME);
   return m[1].trim().replace(/^['"]|['"]$/g, "");
 }
 

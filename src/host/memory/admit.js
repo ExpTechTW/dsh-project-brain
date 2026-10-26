@@ -1,5 +1,5 @@
-// admit.js — Durable Core 唯一事实写入入口。
-// 生产路径里只有这里可以对 memory.jsonl 做 appendJsonl。
+// admit.js — Durable Core 唯一事實寫入入口。
+// 生產路徑裡只有這裡可以對 memory.jsonl 做 appendJsonl。
 
 import { createHash } from "node:crypto";
 
@@ -19,12 +19,12 @@ import {
 export const CORE_MAX_ITEMS = 25;
 export const CORE_MAX_TOKENS = 1500;
 export const TITLE_JACCARD_SUGGEST = 0.85;
-// 置顶占掉一半配额就封顶。全都置顶等于没有置顶——淘汰时挑不出victim，
-// 只能回头去淘汰置顶项，那条保证就作废了。
+// 置頂佔掉一半配額就封頂。全都置頂等於沒有置頂——淘汰時挑不出victim，
+// 只能回頭去淘汰置頂項，那條保證就作廢了。
 export const PINNED_RATIO = 0.5;
 
-// Core 限额是插件级配置，不是每次调用的参数。集中放一份，让 injector、
-// aggregator、dream 这些拿不到 config 的路径也能跟用户设置保持一致。
+// Core 限額是外掛級配置，不是每次呼叫的引數。集中放一份，讓 injector、
+// aggregator、dream 這些拿不到 config 的路徑也能跟使用者設定保持一致。
 let coreLimits = { maxItems: CORE_MAX_ITEMS, maxTokens: CORE_MAX_TOKENS };
 
 export function setCoreLimits(config) {
@@ -52,13 +52,13 @@ export function pinnedMemories(rows) {
 
 const DURABLE_TYPES = new Set(["decision", "requirement", "architecture", "bug", "lesson", "preference"]);
 
-// 指代词：正文出现这些，说明作者默认读者刚看过上下文。跨会话读的人没有那个上下文。
-const DEIXIS_RE = /(这个|这些|这条|这段|这句|这点|这样|这种|这方面|这角度|那个|那些|上述|上面(?:说|提|讲)?的|前面(?:说|提|讲)?的|刚才(?:说|提|讲)?的|如上|此事|本次讨论|你说的|我说的|上文)|\b(?:this|these|those|the above)\b/i;
+// 指代詞：正文出現這些，說明作者預設讀者剛看過上下文。跨會話讀的人沒有那個上下文。
+const DEIXIS_RE = /(這個|這些|這條|這段|這句|這點|這樣|這種|這方面|這角度|那個|那些|上述|上面(?:說|提|講)?的|前面(?:說|提|講)?的|剛才(?:說|提|講)?的|如上|此事|本次討論|你說的|我說的|上文)|\b(?:this|these|those|the above)\b/i;
 
-// 锚点 = 标识符、路径、引号里的专名。带锚点的正文即使有指代词也仍然认得出说的是什么。
+// 錨點 = 識別符號、路徑、引號裡的專名。帶錨點的正文即使有指代詞也仍然認得出說的是什麼。
 const ANCHOR_RE = /[A-Za-z][A-Za-z0-9._/-]{1,}|[「『《"'`\[(][^\s」』》"'`\])]{2,}[」』》"'`\])]/;
 
-// 既无锚点、又短到这个程度，指代词就是正文的全部内容。
+// 既無錨點、又短到這個程度，指代詞就是正文的全部內容。
 export const DEIXIS_SELF_CONTAINED_CHARS = 30;
 
 export function findDeixis(text) {
@@ -119,13 +119,13 @@ export function isActivityReport(title, content) {
   const t = String(title || "");
   const c = String(content || "");
   const blob = t + "\n" + c;
-  if (/改了\s*\d+\s*个文件/.test(blob)) return true;
-  if (/本次\s*session\s*改动/i.test(blob)) return true;
+  if (/改了\s*\d+\s*個檔案/.test(blob)) return true;
+  if (/本次\s*session\s*改動/i.test(blob)) return true;
   if (fileListHeavy(c)) return true;
-  if (/^(本次完成|本次工作|完成情况|验收清单|工作总结)/.test(t.trim()) && /(验收|PASS|git 快进|改了)/.test(c)) return true;
-  const reportHits = (blob.match(/验收\s*\d+\s*\/\s*\d+|全套 smoke|git 快进|同步至 v\d/gi) || []).length;
+  if (/^(本次完成|本次工作|完成情況|驗收清單|工作總結)/.test(t.trim()) && /(驗收|PASS|git 快進|改了)/.test(c)) return true;
+  const reportHits = (blob.match(/驗收\s*\d+\s*\/\s*\d+|全套 smoke|git 快進|同步至 v\d/gi) || []).length;
   if (reportHits >= 3) return true;
-  if (reportHits >= 2 && !/根因/.test(c) && !/以后/.test(c)) return true;
+  if (reportHits >= 2 && !/根因/.test(c) && !/以後/.test(c)) return true;
   return false;
 }
 
@@ -134,14 +134,14 @@ export function isChangelogGenre(title, content) {
   const c = String(content || "");
   const versionLed = /^\s*v?\d+\.\d+(?:\.\d+)?\b/i.test(t);
   if (fileListHeavy(c)) return true;
-  if (/改了\s*\d+\s*个文件/.test(t) || /改了\s*\d+\s*个文件/.test(c)) return true;
-  if (/本次\s*session\s*改动/i.test(t) || /本次\s*session\s*改动/i.test(c)) return true;
+  if (/改了\s*\d+\s*個檔案/.test(t) || /改了\s*\d+\s*個檔案/.test(c)) return true;
+  if (/本次\s*session\s*改動/i.test(t) || /本次\s*session\s*改動/i.test(c)) return true;
   if (/^(git\s+)?commit\b/i.test(t.trim()) || /^PR\s*#\s*\d+/i.test(t.trim())) return true;
   if (/\b(changelog|release notes)\b/i.test(t)) return true;
   // patch #N is release-notes genre even if the body has a lesson.
   if (/\bpatch\s*#\s*\d+/i.test(t)) return true;
-  // Version-led "release / 改动 / 验收" titles are changelog only when the body is a report.
-  if (versionLed && /(release|改动|验收)/i.test(t) && isActivityReport(t, c)) return true;
+  // Version-led "release / 改動 / 驗收" titles are changelog only when the body is a report.
+  if (versionLed && /(release|改動|驗收)/i.test(t) && isActivityReport(t, c)) return true;
   if (isActivityReport(t, c)) return true;
   return false;
 }
@@ -191,8 +191,8 @@ export function ruleGate(candidate) {
   } else if (!DURABLE_TYPES.has(type)) {
     return { ok: false, code: "E_ADMIT_RULE", reason: "type_forbidden" };
   }
-  // user_explicit 的正文是从用户原话提炼的，可以很短但依然自包含（「PostgreSQL 是首选数据库」）。
-  // 把关口从长度挪到「是否解开了指代」上，见下面的 unresolved_reference。
+  // user_explicit 的正文是從使用者原話提煉的，可以很短但依然自包含（「PostgreSQL 是首選資料庫」）。
+  // 把關口從長度挪到「是否解開了指代」上，見下面的 unresolved_reference。
   const minContent = sourceKind === "user_explicit" ? 12 : 20;
   if (content.length < minContent) {
     return { ok: false, code: "E_ADMIT_RULE", reason: "content_too_short" };
@@ -212,14 +212,14 @@ function coreTokenSum(rows) {
   }, 0);
 }
 
-// 用户亲手写下或明确要求记住的，比自动抓来的更该留在 Core 里。
+// 使用者親手寫下或明確要求記住的，比自動抓來的更該留在 Core 裡。
 function isUserAuthored(memory) {
   const source = memory && memory.source;
   if (!source) return false;
   return source.kind === "user_explicit" || source.editedBy === "user";
 }
 
-// 最近被检索命中过 = 还在用，别急着挤走。
+// 最近被檢索命中過 = 還在用，別急著擠走。
 export const RECENT_ACCESS_WINDOW_MS = 7 * 86_400_000;
 
 function wasRecentlyAccessed(memory, now) {
@@ -238,8 +238,8 @@ export function enforceCoreCap(rows, { pinnedIds = [], now = Date.now(), limits 
   }
 
   function pickVictim(active) {
-    // 依次放宽：先只考虑没置顶的，再考虑没被本次调用临时 pin 的，最后才是全量。
-    // 置顶有数量上限，正常情况下第一层就能挑出人来。
+    // 依次放寬：先只考慮沒置頂的，再考慮沒被本次呼叫臨時 pin 的，最後才是全量。
+    // 置頂有數量上限，正常情況下第一層就能挑出人來。
     const pools = [
       active.filter((m) => !pinned.has(m.id) && m.pinned !== true),
       active.filter((m) => !pinned.has(m.id)),
@@ -316,7 +316,7 @@ function collectSuggestSupersede(rows) {
         action: "suggest_supersede",
         ids: [a.id, b.id],
         titles: [a.title, b.title],
-        note: "title Jaccard ≥ " + TITLE_JACCARD_SUGGEST + "；需显式 supersede，自动路径不合并",
+        note: "title Jaccard ≥ " + TITLE_JACCARD_SUGGEST + "；需顯式 supersede，自動路徑不合並",
       });
     }
   }
@@ -362,7 +362,7 @@ export function evaluateAdmit(candidate, ctx) {
     return { action: "reject", code: "E_NOT_INITIALIZED", reason: "project not initialized" };
   }
   const working = compactCandidate(Object.assign({}, candidate), channel);
-  // 校验 compact 之后的那份：落盘的是 working，拿原文过门会让判定和实际内容对不上。
+  // 校驗 compact 之後的那份：落盤的是 working，拿原文過門會讓判定和實際內容對不上。
   const gated = ruleGate(working);
   if (!gated.ok) {
     return { action: "reject", code: gated.code, reason: gated.reason, route: gated.route };
@@ -444,10 +444,10 @@ export function parseAdmitConfirm(text) {
 
 function admitPrompt(candidate) {
   return [
-    "判断下面这条候选是否应写入项目长期记忆（跨会话仍为真的决策/约束/架构事实/教训）。",
-    "changelog、本次改了哪些文件、会话流水账不要 admit。",
-    "只输出严格 JSON：" + JSON.stringify({ admit: true, type: "decision", reason: "why", supersedes: null }),
-    "候选：" + JSON.stringify({
+    "判斷下面這條候選是否應寫入專案長期記憶（跨會話仍為真的決策/約束/架構事實/教訓）。",
+    "changelog、本次改了哪些檔案、會話流水賬不要 admit。",
+    "只輸出嚴格 JSON：" + JSON.stringify({ admit: true, type: "decision", reason: "why", supersedes: null }),
+    "候選：" + JSON.stringify({
       type: candidate.type,
       title: candidate.title,
       content: String(candidate.content || "").slice(0, 800),
@@ -502,7 +502,7 @@ export async function admitMemory(options = {}) {
   if (!fs || !projectPath) {
     return { ok: false, code: "E_NOT_INITIALIZED", message: "missing fs/projectPath" };
   }
-  // readBrain 到写回之间不能插进别的写入序列，否则两个并发 admit 会各自基于旧快照落盘。
+  // readBrain 到寫回之間不能插進別的寫入序列，否則兩個併發 admit 會各自基於舊快照落盤。
   return withWriteLock(brainTxKey(projectPath, "memory.jsonl"), () => admitMemoryTx(options));
 }
 
@@ -628,7 +628,7 @@ async function persistHousekeepTx(fs, projectPath, { now = Date.now(), pinnedIds
     const evicted = hk.actions.filter((a) => a.action === "evict_to_dormant").length;
     await appendJsonl(fs, brainPath(projectPath, "timeline.jsonl"), {
       id: makeId("evt", now),
-      title: "记忆整理完成（归档 " + archived + " · 休眠 " + evicted + "）",
+      title: "記憶整理完成（歸檔 " + archived + " · 休眠 " + evicted + "）",
       eventType: "dream",
       occurredAt: now,
       detail: "trigger=housekeep archived=" + archived + " evicted=" + evicted,
