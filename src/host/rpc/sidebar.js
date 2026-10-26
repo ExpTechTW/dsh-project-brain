@@ -150,23 +150,157 @@ async function resolveRpcProjectPath(ctx, payload) {
   return getCwdBySession(ctx, sid);
 }
 
+const ENDPOINT_SEGMENT_PATTERN = /^[A-Za-z0-9_$.-]+$/;
+const RPC_BODY_LIMIT_BYTES = 64 * 1024 * 1024;
+
+function endpointFromPath(channel, pathname) {
+  if (typeof pathname !== "string" || !pathname.startsWith(channel + "/")) return undefined;
+  const endpoint = pathname.slice(channel.length + 1);
+  if (endpoint.split("/").some((segment) => segment === "" || segment === "." || segment === ".." || !ENDPOINT_SEGMENT_PATTERN.test(segment))) {
+    return undefined;
+  }
+  return endpoint;
+}
+
+function readRequestBody(req, limitBytes = RPC_BODY_LIMIT_BYTES) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    let size = 0;
+    req.on("data", (chunk) => {
+      size += chunk.length;
+      if (size > limitBytes) {
+        reject(new Error("request body too large"));
+        req.destroy();
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
+    req.on("error", reject);
+  });
+}
+
+/**
+ * Mirror of the Connection RPC wire protocol, mounted as a plain webServer
+ * prefix route.  Used when `connection.rpc.handle` is not usable on this Host
+ * build, so the Client's `rpc.call("/project-brain", endpoint, payload)` keeps
+ * working unchanged: POST <channel>/<endpoint> with a `client-request`
+ * envelope, answered with a `server-response` envelope.
+ */
+function createConnectionHttpRouteHandler(handler, connection) {
+  return async (req, res) => {
+    const sendJson = (status, body) => {
+      const text = JSON.stringify(body);
+      res.writeHead(status, { "content-type": "application/json" });
+      res.end(text);
+    };
+    let peer;
+    if (connection && typeof connection.admit === "function") {
+      try {
+        const admission = connection.admit(req);
+        if (admission && "rejection" in admission) {
+          const rejection = admission.rejection;
+          res.writeHead(rejection);
+          res.end(rejection === 401 ? "unauthorized" : "forbidden");
+          return;
+        }
+        peer = admission && admission.peer;
+      } catch (error) {
+        // Host builds without a usable admission hook still serve the route;
+        // the Desktop binds to loopback by default.
+      }
+    }
+    const url = new URL(String(req.url || "/"), "http://127.0.0.1");
+    const endpoint = endpointFromPath(PROJECT_BRAIN_RPC_CHANNEL, url.pathname);
+    if (req.method !== "POST" || endpoint === undefined) {
+      res.writeHead(404);
+      res.end("not found");
+      return;
+    }
+    const contentType = String(req.headers && req.headers["content-type"] || "").split(";", 1)[0].trim().toLowerCase();
+    if (contentType !== "application/json") {
+      res.writeHead(415);
+      res.end("content type must be application/json");
+      return;
+    }
+    let message;
+    try {
+      message = JSON.parse(await readRequestBody(req));
+    } catch (error) {
+      res.writeHead(400);
+      res.end("body is not JSON");
+      return;
+    }
+    const rpcId = message && typeof message.rpcId === "string" ? message.rpcId : "invalid-request";
+    if (!message || message.type !== "client-request" || typeof message.method !== "string") {
+      sendJson(200, {
+        type: "server-response",
+        rpcId,
+        result: {
+          ok: false,
+          error: { code: "gateway/bad-request", message: "invalid client-request message", details: { issues: [] } },
+        },
+      });
+      return;
+    }
+    if (message.method !== endpoint) {
+      sendJson(200, {
+        type: "server-response",
+        rpcId,
+        result: {
+          ok: false,
+          error: {
+            code: "gateway/bad-request",
+            message: "method " + JSON.stringify(message.method) + " does not match endpoint " + JSON.stringify(endpoint),
+            details: { issues: [] },
+          },
+        },
+      });
+      return;
+    }
+    try {
+      const result = await handler(endpoint, message.payload, undefined, peer);
+      sendJson(200, { type: "server-response", rpcId, result });
+    } catch (error) {
+      res.writeHead(500);
+      res.end("handler failure: " + String(error));
+    }
+  };
+}
+
+function registerConnectionHttpRoute({ webCtx, handler, connection, logger }) {
+  const route = {
+    kind: "prefix",
+    path: PROJECT_BRAIN_RPC_CHANNEL,
+    handler: createConnectionHttpRouteHandler(handler, connection),
+  };
+  webCtx.effect(() => webCtx.webServer.register(route), "dsh-project-brain: " + PROJECT_BRAIN_RPC_CHANNEL + " rpc channel");
+  if (logger && typeof logger.info === "function") {
+    logger.info("[dsh-project-brain] direct webserver route registered for " + PROJECT_BRAIN_RPC_CHANNEL);
+  }
+  return true;
+}
+
 /**
  * Register the supported Client↔Host bridge on DSH's canonical Connection RPC.
  * Unlike the build-time session map, this resolves the live Session header on
  * every request, so Sessions created after the bundle was built work without a
  * rebuild or a Desktop restart.
  */
-export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tools, logger, getMemoryConfig, updateSettings, settingsWritable, getLlm, resolveEmbeddingCredential }) {
+export function registerConnectionRpc({ connection, webCtx, ctx, fs, sandboxPolicy, tools, logger, getMemoryConfig, updateSettings, settingsWritable, getLlm, resolveEmbeddingCredential }) {
   if (!connection || !connection.rpc || typeof connection.rpc.handle !== "function") {
-    if (logger && typeof logger.warn === "function") {
-      logger.warn("[dsh-project-brain] connection.rpc unavailable; runtime preview disabled");
+    if (!webCtx) {
+      if (logger && typeof logger.warn === "function") {
+        logger.warn("[dsh-project-brain] connection.rpc unavailable; runtime preview disabled");
+      }
+      return false;
     }
-    return false;
+    if (logger && typeof logger.warn === "function") {
+      logger.warn("[dsh-project-brain] connection.rpc unavailable; falling back to a direct webserver route");
+    }
   }
 
-  connection.rpc.handle(
-    PROJECT_BRAIN_RPC_CHANNEL,
-    async (endpoint, payload) => {
+  const dispatchRpc = async (endpoint, payload) => {
       const projectPath = await resolveRpcProjectPath(ctx, payload || {});
       const session = getSession(ctx, payload && payload.sessionId);
       const architectureRuntime = {
@@ -775,10 +909,32 @@ export function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tool
       }
 
       return rpcError("METHOD_NOT_FOUND", "未知 Project Brain RPC 方法：" + endpoint, { endpoint });
-    },
-    { authority: "loopback" },
-  );
-  return true;
+  };
+
+  // 原生 Connection RPC 通道在某些 0.2.x 版本裡會因為 service 的 owner context 沒有
+  // `webServer` inject 而拋錯（cannot get property "webServer" without inject）。
+  // 我們優先走原生通道；失敗時改用自家 webServer 路由提供同樣的 wire protocol。
+  if (!connection || !connection.rpc || typeof connection.rpc.handle !== "function") {
+    registerConnectionHttpRoute({ webCtx, handler: dispatchRpc, connection, logger });
+    return true;
+  }
+  try {
+    connection.rpc.handle(PROJECT_BRAIN_RPC_CHANNEL, dispatchRpc, { authority: "loopback" });
+    if (logger && typeof logger.info === "function") {
+      logger.info("[dsh-project-brain] connection RPC channel registered");
+    }
+    return true;
+  } catch (error) {
+    if (!webCtx) throw error;
+    registerConnectionHttpRoute({ webCtx, handler: dispatchRpc, connection, logger });
+    if (logger && typeof logger.warn === "function") {
+      logger.warn(
+        "[dsh-project-brain] connection.rpc.handle unavailable (" + String((error && error.message) || error) +
+        "); serving /project-brain over a direct webserver route",
+      );
+    }
+    return true;
+  }
 }
 
 const MEMORY_TIMELINE_EVENTS = {

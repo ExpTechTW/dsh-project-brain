@@ -5,6 +5,17 @@
 
 ---
 
+## [v1.4.3] - 2026-10-27
+
+### Fixed（修復）
+
+- **`/project-brain/*` 的 Host RPC 在 DSH 0.2.1-rc.3 仍然 404/405**：`1.4.2` 把 `connection` 的讀取移進 `ctx.inject(["connection", "webServer"], …)` 子 Context，實測仍然失敗。原因是 `HostConnectionService` 的 `rpc.handle()` 綁定的 owner 是 **service 自己建立時的那個 context**（`const owner = this.ctx`，而 `this` 是原始實例、不是 traceable proxy），因此 `register()` 內的 `owner.effect(() => owner.webServer.register(route))` 一定拿到 `cannot get property "webServer" without inject` —— 也就是說任何第三方外掛在 0.2.1-rc.3 都無法透過 `connection.rpc.handle` 掛上 channel（宿主 bug，與本外掛無關）。
+- 現在改為**雙軌**：先試原生 `connection.rpc.handle`；一旦拋錯，就在同一個 `webServer` 子 Context 上用 `webServer.register({ kind: "prefix", path: "/project-brain", handler })` 自建路由，並完整複製 Connection 的 wire protocol（`POST /project-brain/<endpoint>`、`{ type: "client-request", rpcId, method, payload }` 進、`{ type: "server-response", rpcId, result: { ok, value | error } }` 出、415/400/404 的錯誤碼、`endpointFromPath` 的段落校驗），也沿用 `connection.admit(req)` 做同一套瀏覽器 cookie 鑑權。Client 端程式碼零改動。
+- 實測（`DSH_HOME` 指向獨立沙盒、`dsh --port 0`）：`POST /project-brain/settings` 回 `{"ok":true,"value":{"writable":false,"config":{…}}}`；未帶 cookie 時正確回 `401 unauthorized`。
+- 版本升到 `1.4.3`。
+
+---
+
 ## [v1.4.2] - 2026-10-27
 
 ### Fixed（修復）

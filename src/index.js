@@ -50,7 +50,7 @@ export const name = "dsh-project-brain";
 // `llm` is a first-class dependency: architecture analysis is expected to
 // reuse the model already selected by the current DSH Session. Declaring it
 // here gives this plugin fiber lawful access to ctx.llm/ctx.get("llm").
-export const inject = ["tools", "fs", "sandboxPolicy", "connection", "sessions", "llm"];
+export const inject = ["tools", "fs", "sandboxPolicy", "connection", "webServer", "sessions", "llm"];
 
 // Arrow（不能是 function declaration，否則 cordis 4 會當 class 構造）
 export const apply = (ctx, config) => {
@@ -196,6 +196,7 @@ function applyImpl(ctx, config) {
     try {
       const mounted = registerConnectionRpc({
         connection: rpcConnection,
+        webCtx: rpcCtx,
         ctx,
         fs,
         sandboxPolicy,

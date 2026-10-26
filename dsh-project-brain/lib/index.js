@@ -10697,586 +10697,723 @@ async function resolveRpcProjectPath(ctx, payload) {
   await sleep(PROJECT_PATH_RETRY_DELAY_MS);
   return getCwdBySession(ctx, sid);
 }
-function registerConnectionRpc({ connection, ctx, fs, sandboxPolicy, tools, logger, getMemoryConfig, updateSettings, settingsWritable, getLlm, resolveEmbeddingCredential }) {
-  if (!connection || !connection.rpc || typeof connection.rpc.handle !== "function") {
-    if (logger && typeof logger.warn === "function") {
-      logger.warn("[dsh-project-brain] connection.rpc unavailable; runtime preview disabled");
-    }
-    return false;
+var ENDPOINT_SEGMENT_PATTERN = /^[A-Za-z0-9_$.-]+$/;
+var RPC_BODY_LIMIT_BYTES = 64 * 1024 * 1024;
+function endpointFromPath(channel, pathname) {
+  if (typeof pathname !== "string" || !pathname.startsWith(channel + "/")) return void 0;
+  const endpoint = pathname.slice(channel.length + 1);
+  if (endpoint.split("/").some((segment) => segment === "" || segment === "." || segment === ".." || !ENDPOINT_SEGMENT_PATTERN.test(segment))) {
+    return void 0;
   }
-  connection.rpc.handle(
-    PROJECT_BRAIN_RPC_CHANNEL,
-    async (endpoint, payload) => {
-      const projectPath = await resolveRpcProjectPath(ctx, payload || {});
-      const session = getSession(ctx, payload && payload.sessionId);
-      const architectureRuntime = {
-        getMemoryConfig,
-        getLlm,
-        llmRoute: resolveSessionRoute(session),
-        getLlmRoute: () => resolveSessionRoute(getSession(ctx, payload && payload.sessionId)),
-        sessionId: payload && payload.sessionId
-      };
-      if (endpoint === "settings") {
-        const rawAction = payload && payload.action;
-        const action = rawAction === "update" || rawAction === "probe" ? rawAction : "get";
-        const config = getMemoryConfig ? getMemoryConfig() : normalizeMemoryConfig({});
-        const writable = settingsWritable ? settingsWritable() : false;
-        if (action === "probe") {
-          const target = payload && payload.target;
-          const overlay = payload && payload.config && typeof payload.config === "object" ? payload.config : {};
-          const merged = normalizeMemoryConfig(Object.assign({}, config, overlay));
-          if (target === "embedding") {
-            const probe = await probeEmbedding({
-              config: merged,
-              resolveCredential: resolveEmbeddingCredential
-            });
-            return rpcOk({ probe: Object.assign({ target: "embedding" }, probe) });
-          }
-          if (target === "llm") {
-            const llm = getLlm ? getLlm() : null;
-            const route = resolveSessionRoute(getSession(ctx, payload && payload.sessionId));
-            const probe = await probeSessionLlm({
-              llm,
-              route,
-              sessionId: payload && payload.sessionId,
-              timeoutMs: 12e3
-            });
-            return rpcOk({ probe: Object.assign({ target: "llm" }, probe) });
-          }
-          return rpcError("bad-request", "\u672A\u77E5\u63A2\u6E2C\u76EE\u6A19\uFF0C\u61C9\u70BA embedding \u6216 llm", { target: target || null });
-        }
-        if (action === "get") {
-          return rpcOk({
-            writable,
-            config: sanitizeSettings(config),
-            retrieval: publicMemoryConfig(config)
-          });
-        }
-        const patch = payload && payload.patch && typeof payload.patch === "object" ? payload.patch : null;
-        if (!patch || Object.keys(patch).length === 0) {
-          return rpcError("EMPTY_PATCH", "\u6C92\u6709\u53EF\u5132\u5B58\u7684\u6B04\u4F4D", {});
-        }
-        if (!updateSettings || typeof updateSettings !== "function") {
-          return rpcError("SETTINGS_UNAVAILABLE", "\u7576\u524D\u57F7\u884C\u6642 settings \u670D\u52D9\u4E0D\u53EF\u7528\uFF0C\u914D\u7F6E\u70BA\u53EA\u8B80", { writable: false });
-        }
-        if (!writable) {
-          return rpcError("SETTINGS_READONLY", "settings provider \u53EA\u8B80\uFF0C\u7121\u6CD5\u5132\u5B58", { writable: false });
-        }
-        try {
-          const next = await updateSettings(patch);
-          return rpcOk({
-            writable,
-            config: sanitizeSettings(next),
-            retrieval: publicMemoryConfig(next)
-          });
-        } catch (error) {
-          return rpcError(
-            error && error.code || "SETTINGS_UPDATE_FAILED",
-            String(error && error.message || error),
-            { writable }
-          );
-        }
+  return endpoint;
+}
+function readRequestBody(req, limitBytes = RPC_BODY_LIMIT_BYTES) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    let size = 0;
+    req.on("data", (chunk) => {
+      size += chunk.length;
+      if (size > limitBytes) {
+        reject(new Error("request body too large"));
+        req.destroy();
+        return;
       }
-      if (!projectPath) {
-        return rpcError(
-          "WORKSPACE_NOT_FOUND",
-          "\u7121\u6CD5\u5F9E\u7576\u524D Session \u89E3\u6790 workspace \u8DEF\u5F91",
-          { sessionId: payload && payload.sessionId ? payload.sessionId : null }
-        );
+      chunks.push(chunk);
+    });
+    req.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
+    req.on("error", reject);
+  });
+}
+function createConnectionHttpRouteHandler(handler, connection) {
+  return async (req, res) => {
+    const sendJson = (status, body) => {
+      const text = JSON.stringify(body);
+      res.writeHead(status, { "content-type": "application/json" });
+      res.end(text);
+    };
+    let peer;
+    if (connection && typeof connection.admit === "function") {
+      try {
+        const admission = connection.admit(req);
+        if (admission && "rejection" in admission) {
+          const rejection = admission.rejection;
+          res.writeHead(rejection);
+          res.end(rejection === 401 ? "unauthorized" : "forbidden");
+          return;
+        }
+        peer = admission && admission.peer;
+      } catch (error) {
       }
-      if (endpoint === "preview") {
-        const preview = await buildWorkspacePreview(fs, projectPath);
-        preview.retrieval = publicMemoryConfig(getMemoryConfig ? getMemoryConfig() : {});
+    }
+    const url = new URL(String(req.url || "/"), "http://127.0.0.1");
+    const endpoint = endpointFromPath(PROJECT_BRAIN_RPC_CHANNEL, url.pathname);
+    if (req.method !== "POST" || endpoint === void 0) {
+      res.writeHead(404);
+      res.end("not found");
+      return;
+    }
+    const contentType = String(req.headers && req.headers["content-type"] || "").split(";", 1)[0].trim().toLowerCase();
+    if (contentType !== "application/json") {
+      res.writeHead(415);
+      res.end("content type must be application/json");
+      return;
+    }
+    let message;
+    try {
+      message = JSON.parse(await readRequestBody(req));
+    } catch (error) {
+      res.writeHead(400);
+      res.end("body is not JSON");
+      return;
+    }
+    const rpcId = message && typeof message.rpcId === "string" ? message.rpcId : "invalid-request";
+    if (!message || message.type !== "client-request" || typeof message.method !== "string") {
+      sendJson(200, {
+        type: "server-response",
+        rpcId,
+        result: {
+          ok: false,
+          error: { code: "gateway/bad-request", message: "invalid client-request message", details: { issues: [] } }
+        }
+      });
+      return;
+    }
+    if (message.method !== endpoint) {
+      sendJson(200, {
+        type: "server-response",
+        rpcId,
+        result: {
+          ok: false,
+          error: {
+            code: "gateway/bad-request",
+            message: "method " + JSON.stringify(message.method) + " does not match endpoint " + JSON.stringify(endpoint),
+            details: { issues: [] }
+          }
+        }
+      });
+      return;
+    }
+    try {
+      const result = await handler(endpoint, message.payload, void 0, peer);
+      sendJson(200, { type: "server-response", rpcId, result });
+    } catch (error) {
+      res.writeHead(500);
+      res.end("handler failure: " + String(error));
+    }
+  };
+}
+function registerConnectionHttpRoute({ webCtx, handler, connection, logger }) {
+  const route = {
+    kind: "prefix",
+    path: PROJECT_BRAIN_RPC_CHANNEL,
+    handler: createConnectionHttpRouteHandler(handler, connection)
+  };
+  webCtx.effect(() => webCtx.webServer.register(route), "dsh-project-brain: " + PROJECT_BRAIN_RPC_CHANNEL + " rpc channel");
+  if (logger && typeof logger.info === "function") {
+    logger.info("[dsh-project-brain] direct webserver route registered for " + PROJECT_BRAIN_RPC_CHANNEL);
+  }
+  return true;
+}
+function registerConnectionRpc({ connection, webCtx, ctx, fs, sandboxPolicy, tools, logger, getMemoryConfig, updateSettings, settingsWritable, getLlm, resolveEmbeddingCredential }) {
+  if (!connection || !connection.rpc || typeof connection.rpc.handle !== "function") {
+    if (!webCtx) {
+      if (logger && typeof logger.warn === "function") {
+        logger.warn("[dsh-project-brain] connection.rpc unavailable; runtime preview disabled");
+      }
+      return false;
+    }
+    if (logger && typeof logger.warn === "function") {
+      logger.warn("[dsh-project-brain] connection.rpc unavailable; falling back to a direct webserver route");
+    }
+  }
+  const dispatchRpc = async (endpoint, payload) => {
+    const projectPath = await resolveRpcProjectPath(ctx, payload || {});
+    const session = getSession(ctx, payload && payload.sessionId);
+    const architectureRuntime = {
+      getMemoryConfig,
+      getLlm,
+      llmRoute: resolveSessionRoute(session),
+      getLlmRoute: () => resolveSessionRoute(getSession(ctx, payload && payload.sessionId)),
+      sessionId: payload && payload.sessionId
+    };
+    if (endpoint === "settings") {
+      const rawAction = payload && payload.action;
+      const action = rawAction === "update" || rawAction === "probe" ? rawAction : "get";
+      const config = getMemoryConfig ? getMemoryConfig() : normalizeMemoryConfig({});
+      const writable = settingsWritable ? settingsWritable() : false;
+      if (action === "probe") {
+        const target = payload && payload.target;
+        const overlay = payload && payload.config && typeof payload.config === "object" ? payload.config : {};
+        const merged = normalizeMemoryConfig(Object.assign({}, config, overlay));
+        if (target === "embedding") {
+          const probe = await probeEmbedding({
+            config: merged,
+            resolveCredential: resolveEmbeddingCredential
+          });
+          return rpcOk({ probe: Object.assign({ target: "embedding" }, probe) });
+        }
+        if (target === "llm") {
+          const llm = getLlm ? getLlm() : null;
+          const route = resolveSessionRoute(getSession(ctx, payload && payload.sessionId));
+          const probe = await probeSessionLlm({
+            llm,
+            route,
+            sessionId: payload && payload.sessionId,
+            timeoutMs: 12e3
+          });
+          return rpcOk({ probe: Object.assign({ target: "llm" }, probe) });
+        }
+        return rpcError("bad-request", "\u672A\u77E5\u63A2\u6E2C\u76EE\u6A19\uFF0C\u61C9\u70BA embedding \u6216 llm", { target: target || null });
+      }
+      if (action === "get") {
         return rpcOk({
-          projectPath,
-          preview
+          writable,
+          config: sanitizeSettings(config),
+          retrieval: publicMemoryConfig(config)
         });
       }
-      if (endpoint === "init") {
-        const result = await scanAndWrite(
+      const patch = payload && payload.patch && typeof payload.patch === "object" ? payload.patch : null;
+      if (!patch || Object.keys(patch).length === 0) {
+        return rpcError("EMPTY_PATCH", "\u6C92\u6709\u53EF\u5132\u5B58\u7684\u6B04\u4F4D", {});
+      }
+      if (!updateSettings || typeof updateSettings !== "function") {
+        return rpcError("SETTINGS_UNAVAILABLE", "\u7576\u524D\u57F7\u884C\u6642 settings \u670D\u52D9\u4E0D\u53EF\u7528\uFF0C\u914D\u7F6E\u70BA\u53EA\u8B80", { writable: false });
+      }
+      if (!writable) {
+        return rpcError("SETTINGS_READONLY", "settings provider \u53EA\u8B80\uFF0C\u7121\u6CD5\u5132\u5B58", { writable: false });
+      }
+      try {
+        const next = await updateSettings(patch);
+        return rpcOk({
+          writable,
+          config: sanitizeSettings(next),
+          retrieval: publicMemoryConfig(next)
+        });
+      } catch (error) {
+        return rpcError(
+          error && error.code || "SETTINGS_UPDATE_FAILED",
+          String(error && error.message || error),
+          { writable }
+        );
+      }
+    }
+    if (!projectPath) {
+      return rpcError(
+        "WORKSPACE_NOT_FOUND",
+        "\u7121\u6CD5\u5F9E\u7576\u524D Session \u89E3\u6790 workspace \u8DEF\u5F91",
+        { sessionId: payload && payload.sessionId ? payload.sessionId : null }
+      );
+    }
+    if (endpoint === "preview") {
+      const preview = await buildWorkspacePreview(fs, projectPath);
+      preview.retrieval = publicMemoryConfig(getMemoryConfig ? getMemoryConfig() : {});
+      return rpcOk({
+        projectPath,
+        preview
+      });
+    }
+    if (endpoint === "init") {
+      const result = await scanAndWrite(
+        fs,
+        sandboxPolicy,
+        { path: projectPath, dryRun: false },
+        "project_init",
+        architectureRuntime
+      );
+      if (!result || !result.ok) {
+        const error = result && result.data && result.data.error;
+        return rpcError(
+          error && error.code || "INIT_FAILED",
+          error && error.message || "\u5C08\u6848\u5927\u8166\u521D\u59CB\u5316\u5931\u6557",
+          { projectPath }
+        );
+      }
+      invalidateAggregatorCache(projectPath);
+      const preview = await buildWorkspacePreview(fs, projectPath);
+      preview.retrieval = publicMemoryConfig(getMemoryConfig ? getMemoryConfig() : {});
+      return rpcOk({
+        projectPath,
+        scan: result.data,
+        preview
+      });
+    }
+    if (endpoint === "suggest") {
+      const useLLM = !(payload && payload.useLLM === false);
+      const suggestTool = buildSuggestTool({
+        fs,
+        sandboxPolicy,
+        getLlm: architectureRuntime.getLlm
+      });
+      const trustedPath = payload && typeof payload.workspacePath === "string" && payload.workspacePath.trim() ? payload.workspacePath : projectPath;
+      const args = { path: trustedPath };
+      if (!useLLM) args.useLLM = false;
+      let toolResult;
+      try {
+        toolResult = await suggestTool.execute(args, {
+          session,
+          sessionId: payload && payload.sessionId,
+          agent: ctx && ctx.agent || null,
+          ctx
+        });
+      } catch (error) {
+        return rpcError("SUGGEST_FAILED", String(error && error.message || error), { endpoint });
+      }
+      if (!toolResult || toolResult.ok === false) {
+        const error = toolResult && toolResult.data && toolResult.data.error;
+        return rpcError(
+          error && error.code || "SUGGEST_FAILED",
+          error && error.message || "\u667A\u6167\u7E8C\u63A5\u5931\u6557",
+          { endpoint, projectPath: trustedPath }
+        );
+      }
+      return rpcOk({
+        projectPath: trustedPath,
+        suggestion: toolResult.data
+      });
+    }
+    if (endpoint === "git") {
+      const limit = Math.max(1, Math.min(500, Number(payload && payload.limit) || 50));
+      const branch = payload && typeof payload.branch === "string" && payload.branch.trim() ? payload.branch.trim() : null;
+      try {
+        const history = getGitHistory({ projectPath, limit, branch });
+        const branches = getGitBranches(projectPath);
+        let workTree = { available: false };
+        try {
+          workTree = getWorkTreeChanges({ projectPath, maxFiles: 50 });
+        } catch (e) {
+          workTree = { available: false, error: String(e && e.message || e) };
+        }
+        return rpcOk({
+          projectPath,
+          available: history.available === true,
+          currentBranch: history.currentBranch || branches && branches.currentBranch || null,
+          head: history.head || null,
+          total: history.total || 0,
+          commits: history.commits || [],
+          branches: branches && branches.branches || [],
+          workTree,
+          error: history.error || null
+        });
+      } catch (error) {
+        return rpcError(
+          "GIT_HISTORY_FAILED",
+          String(error && error.message || error),
+          { endpoint, projectPath }
+        );
+      }
+    }
+    if (endpoint === "action") {
+      const action = payload && typeof payload.action === "string" ? payload.action : "";
+      const toolActions = {
+        todos: { name: "project_todo_list", args: { limit: 50 }, mutates: false },
+        dream: { name: "project_dream", args: { mode: "light", dryRun: true }, mutates: false },
+        dreamCommit: { name: "project_dream", args: { mode: "light", dryRun: false }, mutates: true },
+        overview: { name: "project_continue", args: {}, mutates: false }
+      };
+      if (action === "rescan") {
+        const result2 = await scanAndWrite(
           fs,
           sandboxPolicy,
           { path: projectPath, dryRun: false },
-          "project_init",
+          "project_rescan",
           architectureRuntime
         );
-        if (!result || !result.ok) {
-          const error = result && result.data && result.data.error;
+        if (!result2 || !result2.ok) {
+          const error = result2 && result2.data && result2.data.error;
           return rpcError(
-            error && error.code || "INIT_FAILED",
-            error && error.message || "\u5C08\u6848\u5927\u8166\u521D\u59CB\u5316\u5931\u6557",
-            { projectPath }
+            error && error.code || "RESCAN_FAILED",
+            error && error.message || "\u91CD\u65B0\u6383\u63CF\u5931\u6557",
+            { action, projectPath }
           );
+        }
+        invalidateAggregatorCache(projectPath);
+        const preview2 = await buildWorkspacePreview(fs, projectPath);
+        preview2.retrieval = publicMemoryConfig(getMemoryConfig ? getMemoryConfig() : {});
+        return rpcOk({
+          action,
+          projectPath,
+          result: result2,
+          preview: preview2
+        });
+      }
+      const definition = toolActions[action];
+      if (!definition) {
+        return rpcError("ACTION_NOT_ALLOWED", "\u4E0D\u652F\u63F4\u7684 Project Brain \u64CD\u4F5C\uFF1A" + action, { action });
+      }
+      if (!tools || typeof tools.execute !== "function") {
+        return rpcError("TOOLS_UNAVAILABLE", "DSH tools service unavailable", { action });
+      }
+      let result;
+      try {
+        result = await tools.execute({
+          name: definition.name,
+          args: Object.assign({}, definition.args, { path: projectPath })
+        });
+      } catch (error) {
+        return rpcError(
+          "ACTION_FAILED",
+          String(error && error.message || error),
+          { action, tool: definition.name }
+        );
+      }
+      if (!result || result.ok === false) {
+        const nested = result && result.data && result.data.error;
+        return rpcError(
+          nested && nested.code || result && result.code || "ACTION_FAILED",
+          nested && nested.message || result && result.message || "\u64CD\u4F5C\u57F7\u884C\u5931\u6557",
+          { action, tool: definition.name }
+        );
+      }
+      if (definition.mutates) invalidateAggregatorCache(projectPath);
+      const preview = await buildWorkspacePreview(fs, projectPath);
+      preview.retrieval = publicMemoryConfig(getMemoryConfig ? getMemoryConfig() : {});
+      return rpcOk({
+        action,
+        projectPath,
+        result,
+        preview
+      });
+    }
+    if (endpoint === "memory.update" || endpoint === "memory.status" || endpoint === "memory.delete") {
+      return handleMemoryMutation({
+        endpoint,
+        payload: payload || {},
+        projectPath,
+        fs,
+        ctx,
+        getMemoryConfig
+      });
+    }
+    if (endpoint === "export.run") {
+      let outputPath = payload && typeof payload.outputPath === "string" ? payload.outputPath : "";
+      try {
+        const { defaultBundleName: defaultBundleName2, writeBundleFile: writeBundleFile2 } = await Promise.resolve().then(() => (init_bundle(), bundle_exports));
+        if (!outputPath) {
+          let projectName = path6.basename(projectPath);
+          try {
+            const raw = await fsp4.readFile(path6.join(projectPath, ".project-brain", "project.json"), "utf8");
+            const meta = JSON.parse(raw);
+            if (meta && meta.name) projectName = String(meta.name);
+          } catch (e) {
+          }
+          outputPath = path6.join(projectPath, "dist-backups", defaultBundleName2({ name: projectName }));
+        }
+        const includeCache = payload && payload.includeCache !== void 0 ? !!payload.includeCache : true;
+        const written = await writeBundleFile2({
+          projectPath,
+          outputPath,
+          includeCache
+        });
+        try {
+          const { appendJsonl: appendJsonl2, brainPath: brainPath3 } = await Promise.resolve().then(() => (init_brain_files(), brain_files_exports));
+          const now = Date.now();
+          await appendJsonl2(fs, brainPath3(projectPath, "timeline.jsonl"), {
+            id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
+            title: "\u532F\u51FA bundle\uFF1A" + written.bundleName,
+            eventType: "export",
+            occurredAt: now,
+            payload: {
+              bundlePath: written.bundlePath,
+              sizeBytes: written.sizeBytes,
+              fileCount: written.fileCount
+            }
+          });
+        } catch (e) {
         }
         invalidateAggregatorCache(projectPath);
         const preview = await buildWorkspacePreview(fs, projectPath);
         preview.retrieval = publicMemoryConfig(getMemoryConfig ? getMemoryConfig() : {});
         return rpcOk({
           projectPath,
-          scan: result.data,
-          preview
+          preview,
+          bundlePath: written.bundlePath,
+          bundleName: written.bundleName,
+          defaultDirPath: written.defaultDirPath,
+          sizeBytes: written.sizeBytes,
+          result: {
+            ok: true,
+            data: {
+              bundlePath: written.bundlePath,
+              bundleName: written.bundleName,
+              defaultDirPath: written.defaultDirPath,
+              sizeBytes: written.sizeBytes,
+              fileCount: written.fileCount
+            }
+          }
         });
+      } catch (e) {
+        return rpcError(
+          e && e.code || "internal",
+          String(e && e.message || e),
+          { outputPath: outputPath || null, projectPath }
+        );
       }
-      if (endpoint === "suggest") {
-        const useLLM = !(payload && payload.useLLM === false);
-        const suggestTool = buildSuggestTool({
+    }
+    if (endpoint === "import.preview") {
+      const bundlePath = payload && typeof payload.bundlePath === "string" ? payload.bundlePath : "";
+      if (!bundlePath) return rpcError("bad-request", "bundlePath \u5FC5\u586B", {});
+      try {
+        const { previewBundle: previewBundle2 } = await Promise.resolve().then(() => (init_bundle(), bundle_exports));
+        const { getTokenStore: getTokenStore2 } = await Promise.resolve().then(() => (init_confirm_tokens(), confirm_tokens_exports));
+        const preview = await previewBundle2({ bundlePath, destProjectPath: projectPath });
+        const confirmToken = getTokenStore2().issue({
+          kind: "import",
+          payload: { bundlePath, destProjectPath: projectPath }
+        });
+        const data = shapeImportPreviewData(preview, bundlePath, confirmToken);
+        return rpcOk(Object.assign({ projectPath, result: { ok: true, data } }, data));
+      } catch (e) {
+        return rpcError(e && e.code || "internal", String(e && e.message || e), { bundlePath, projectPath });
+      }
+    }
+    if (endpoint === "import.apply") {
+      const bundlePath = payload && typeof payload.bundlePath === "string" ? payload.bundlePath : "";
+      const confirmToken = payload && typeof payload.confirmToken === "string" ? payload.confirmToken : "";
+      if (!bundlePath) return rpcError("bad-request", "bundlePath \u5FC5\u586B", {});
+      if (!confirmToken) return rpcError("bad-request", "confirmToken \u5FC5\u586B\uFF08\u5148\u8ABF import.preview \u62FF token\uFF09", {});
+      try {
+        const { getTokenStore: getTokenStore2 } = await Promise.resolve().then(() => (init_confirm_tokens(), confirm_tokens_exports));
+        const tokenPayload = getTokenStore2().consume(confirmToken, { kind: "import" });
+        if (!tokenPayload) {
+          return rpcError("bad-request", "confirmToken \u7121\u6548\u3001\u5DF2\u904E\u671F\u6216\u578B\u5225\u4E0D\u5339\u914D\uFF08\u8ACB\u91CD\u65B0\u9810\u89BD\uFF09", {});
+        }
+        if (tokenPayload.bundlePath !== bundlePath || tokenPayload.destProjectPath !== projectPath) {
+          return rpcError("bad-request", "confirmToken \u8207\u7576\u524D\u5F15\u6578\u4E0D\u5339\u914D\uFF08\u8ACB\u91CD\u65B0\u9810\u89BD\uFF09", {});
+        }
+        const { applyBundle: applyBundle2 } = await Promise.resolve().then(() => (init_bundle(), bundle_exports));
+        const applied = await applyBundle2({ bundlePath, destProjectPath: projectPath, triggerRescan: false });
+        try {
+          const { appendJsonl: appendJsonl2, brainPath: brainPath3 } = await Promise.resolve().then(() => (init_brain_files(), brain_files_exports));
+          const now = Date.now();
+          await appendJsonl2(fs, brainPath3(projectPath, "timeline.jsonl"), {
+            id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
+            title: applied.backupPath ? "\u532F\u5165 bundle\uFF08\u5DF2\u5099\u4EFD\u820A\u8166\u5230 " + path6.basename(applied.backupPath) + "\uFF09" : "\u532F\u5165 bundle\uFF08\u9996\u6B21\uFF09",
+            eventType: "import",
+            occurredAt: now,
+            payload: {
+              bundlePath,
+              backupPath: applied.backupPath,
+              sourceManifest: applied.sourceManifest
+            }
+          });
+        } catch (e) {
+        }
+        const data = {
+          mode: "applied",
+          bundlePath,
+          backupPath: applied.backupPath || "",
+          fileCount: applied.fileCount || 0
+        };
+        const result = rpcOk(Object.assign({ projectPath, result: { ok: true, data } }, data));
+        await attachRescanAndPreview({
+          result,
+          projectPath,
           fs,
           sandboxPolicy,
-          getLlm: architectureRuntime.getLlm
-        });
-        const trustedPath = payload && typeof payload.workspacePath === "string" && payload.workspacePath.trim() ? payload.workspacePath : projectPath;
-        const args = { path: trustedPath };
-        if (!useLLM) args.useLLM = false;
-        let toolResult;
-        try {
-          toolResult = await suggestTool.execute(args, {
-            session,
-            sessionId: payload && payload.sessionId,
-            agent: ctx && ctx.agent || null,
-            ctx
-          });
-        } catch (error) {
-          return rpcError("SUGGEST_FAILED", String(error && error.message || error), { endpoint });
-        }
-        if (!toolResult || toolResult.ok === false) {
-          const error = toolResult && toolResult.data && toolResult.data.error;
-          return rpcError(
-            error && error.code || "SUGGEST_FAILED",
-            error && error.message || "\u667A\u6167\u7E8C\u63A5\u5931\u6557",
-            { endpoint, projectPath: trustedPath }
-          );
-        }
-        return rpcOk({
-          projectPath: trustedPath,
-          suggestion: toolResult.data
-        });
-      }
-      if (endpoint === "git") {
-        const limit = Math.max(1, Math.min(500, Number(payload && payload.limit) || 50));
-        const branch = payload && typeof payload.branch === "string" && payload.branch.trim() ? payload.branch.trim() : null;
-        try {
-          const history = getGitHistory({ projectPath, limit, branch });
-          const branches = getGitBranches(projectPath);
-          let workTree = { available: false };
-          try {
-            workTree = getWorkTreeChanges({ projectPath, maxFiles: 50 });
-          } catch (e) {
-            workTree = { available: false, error: String(e && e.message || e) };
-          }
-          return rpcOk({
-            projectPath,
-            available: history.available === true,
-            currentBranch: history.currentBranch || branches && branches.currentBranch || null,
-            head: history.head || null,
-            total: history.total || 0,
-            commits: history.commits || [],
-            branches: branches && branches.branches || [],
-            workTree,
-            error: history.error || null
-          });
-        } catch (error) {
-          return rpcError(
-            "GIT_HISTORY_FAILED",
-            String(error && error.message || error),
-            { endpoint, projectPath }
-          );
-        }
-      }
-      if (endpoint === "action") {
-        const action = payload && typeof payload.action === "string" ? payload.action : "";
-        const toolActions = {
-          todos: { name: "project_todo_list", args: { limit: 50 }, mutates: false },
-          dream: { name: "project_dream", args: { mode: "light", dryRun: true }, mutates: false },
-          dreamCommit: { name: "project_dream", args: { mode: "light", dryRun: false }, mutates: true },
-          overview: { name: "project_continue", args: {}, mutates: false }
-        };
-        if (action === "rescan") {
-          const result2 = await scanAndWrite(
-            fs,
-            sandboxPolicy,
-            { path: projectPath, dryRun: false },
-            "project_rescan",
-            architectureRuntime
-          );
-          if (!result2 || !result2.ok) {
-            const error = result2 && result2.data && result2.data.error;
-            return rpcError(
-              error && error.code || "RESCAN_FAILED",
-              error && error.message || "\u91CD\u65B0\u6383\u63CF\u5931\u6557",
-              { action, projectPath }
-            );
-          }
-          invalidateAggregatorCache(projectPath);
-          const preview2 = await buildWorkspacePreview(fs, projectPath);
-          preview2.retrieval = publicMemoryConfig(getMemoryConfig ? getMemoryConfig() : {});
-          return rpcOk({
-            action,
-            projectPath,
-            result: result2,
-            preview: preview2
-          });
-        }
-        const definition = toolActions[action];
-        if (!definition) {
-          return rpcError("ACTION_NOT_ALLOWED", "\u4E0D\u652F\u63F4\u7684 Project Brain \u64CD\u4F5C\uFF1A" + action, { action });
-        }
-        if (!tools || typeof tools.execute !== "function") {
-          return rpcError("TOOLS_UNAVAILABLE", "DSH tools service unavailable", { action });
-        }
-        let result;
-        try {
-          result = await tools.execute({
-            name: definition.name,
-            args: Object.assign({}, definition.args, { path: projectPath })
-          });
-        } catch (error) {
-          return rpcError(
-            "ACTION_FAILED",
-            String(error && error.message || error),
-            { action, tool: definition.name }
-          );
-        }
-        if (!result || result.ok === false) {
-          const nested = result && result.data && result.data.error;
-          return rpcError(
-            nested && nested.code || result && result.code || "ACTION_FAILED",
-            nested && nested.message || result && result.message || "\u64CD\u4F5C\u57F7\u884C\u5931\u6557",
-            { action, tool: definition.name }
-          );
-        }
-        if (definition.mutates) invalidateAggregatorCache(projectPath);
-        const preview = await buildWorkspacePreview(fs, projectPath);
-        preview.retrieval = publicMemoryConfig(getMemoryConfig ? getMemoryConfig() : {});
-        return rpcOk({
-          action,
-          projectPath,
-          result,
-          preview
-        });
-      }
-      if (endpoint === "memory.update" || endpoint === "memory.status" || endpoint === "memory.delete") {
-        return handleMemoryMutation({
-          endpoint,
-          payload: payload || {},
-          projectPath,
-          fs,
-          ctx,
+          architectureRuntime,
           getMemoryConfig
         });
+        return result;
+      } catch (e) {
+        return rpcError(e && e.code || "internal", String(e && e.message || e), { bundlePath, projectPath });
       }
-      if (endpoint === "export.run") {
-        let outputPath = payload && typeof payload.outputPath === "string" ? payload.outputPath : "";
+    }
+    if (endpoint === "backup.list") {
+      try {
+        const { listBackups: listBackups2 } = await Promise.resolve().then(() => (init_backup(), backup_exports));
+        const backups = await listBackups2({ projectPath });
+        return rpcOk({ projectPath, backups });
+      } catch (error) {
+        return rpcError(
+          error && error.code || "BACKUP_LIST_FAILED",
+          String(error && error.message || error),
+          { projectPath }
+        );
+      }
+    }
+    if (endpoint === "backup.cleanup") {
+      const keepLast = payload && typeof payload.keepLast === "number" ? payload.keepLast : 3;
+      const olderThanMs = payload && typeof payload.olderThanMs === "number" ? payload.olderThanMs : void 0;
+      try {
+        const { cleanupBackups: cleanupBackups2 } = await Promise.resolve().then(() => (init_backup(), backup_exports));
+        const cleaned = await cleanupBackups2({ projectPath, keepLast, olderThanMs });
+        const data = {
+          keptCount: Array.isArray(cleaned.kept) ? cleaned.kept.length : 0,
+          deletedCount: Array.isArray(cleaned.deleted) ? cleaned.deleted.length : 0,
+          kept: cleaned.kept || [],
+          deleted: cleaned.deleted || []
+        };
+        return rpcOk(Object.assign({ projectPath, result: { ok: true, data } }, data));
+      } catch (e) {
+        return rpcError(e && e.code || "internal", String(e && e.message || e), { projectPath });
+      }
+    }
+    if (endpoint === "backup.rollback.preview") {
+      const ts = payload && typeof payload.backupTimestamp === "string" ? payload.backupTimestamp : "";
+      if (!ts) return rpcError("bad-request", "backupTimestamp \u5FC5\u586B", {});
+      try {
+        const { previewRollback: previewRollback2 } = await Promise.resolve().then(() => (init_backup(), backup_exports));
+        const { getTokenStore: getTokenStore2 } = await Promise.resolve().then(() => (init_confirm_tokens(), confirm_tokens_exports));
+        const preview = await previewRollback2({ projectPath, backupTimestamp: ts });
+        const confirmToken = getTokenStore2().issue({
+          kind: "rollback",
+          payload: { projectPath, backupTimestamp: ts }
+        });
+        const data = shapeRollbackPreviewData(preview, ts, confirmToken);
+        return rpcOk(Object.assign({ projectPath, result: { ok: true, data } }, data));
+      } catch (e) {
+        return rpcError(e && e.code || "internal", String(e && e.message || e), { projectPath });
+      }
+    }
+    if (endpoint === "backup.rollback.apply") {
+      const ts = payload && typeof payload.backupTimestamp === "string" ? payload.backupTimestamp : "";
+      const confirmToken = payload && typeof payload.confirmToken === "string" ? payload.confirmToken : "";
+      if (!ts) return rpcError("bad-request", "backupTimestamp \u5FC5\u586B", {});
+      if (!confirmToken) return rpcError("bad-request", "confirmToken \u5FC5\u586B\uFF08\u5148\u8ABF backup.rollback.preview \u62FF token\uFF09", {});
+      try {
+        const { getTokenStore: getTokenStore2 } = await Promise.resolve().then(() => (init_confirm_tokens(), confirm_tokens_exports));
+        const tokenPayload = getTokenStore2().consume(confirmToken, { kind: "rollback" });
+        if (!tokenPayload) {
+          return rpcError("bad-request", "confirmToken \u7121\u6548\u3001\u5DF2\u904E\u671F\u6216\u578B\u5225\u4E0D\u5339\u914D\uFF08\u8ACB\u91CD\u65B0\u9078\u64C7\uFF09", {});
+        }
+        if (tokenPayload.projectPath !== projectPath || tokenPayload.backupTimestamp !== ts) {
+          return rpcError("bad-request", "confirmToken \u8207\u7576\u524D\u5F15\u6578\u4E0D\u5339\u914D\uFF08\u8ACB\u91CD\u65B0\u9078\u64C7\uFF09", {});
+        }
+        const { applyRollback: applyRollback2 } = await Promise.resolve().then(() => (init_backup(), backup_exports));
+        const applied = await applyRollback2({ projectPath, backupTimestamp: ts, triggerRescan: false });
         try {
-          const { defaultBundleName: defaultBundleName2, writeBundleFile: writeBundleFile2 } = await Promise.resolve().then(() => (init_bundle(), bundle_exports));
-          if (!outputPath) {
-            let projectName = path6.basename(projectPath);
-            try {
-              const raw = await fsp4.readFile(path6.join(projectPath, ".project-brain", "project.json"), "utf8");
-              const meta = JSON.parse(raw);
-              if (meta && meta.name) projectName = String(meta.name);
-            } catch (e) {
+          const { appendJsonl: appendJsonl2, brainPath: brainPath3 } = await Promise.resolve().then(() => (init_brain_files(), brain_files_exports));
+          const now = Date.now();
+          await appendJsonl2(fs, brainPath3(projectPath, "timeline.jsonl"), {
+            id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
+            title: "\u56DE\u6EFE\u5230\u5099\u4EFD " + ts,
+            eventType: "rollback",
+            occurredAt: now,
+            payload: {
+              restoredFrom: applied.restoredFrom,
+              preRollbackBackupPath: applied.preRollbackBackupPath
             }
-            outputPath = path6.join(projectPath, "dist-backups", defaultBundleName2({ name: projectName }));
-          }
-          const includeCache = payload && payload.includeCache !== void 0 ? !!payload.includeCache : true;
-          const written = await writeBundleFile2({
-            projectPath,
-            outputPath,
-            includeCache
           });
-          try {
-            const { appendJsonl: appendJsonl2, brainPath: brainPath3 } = await Promise.resolve().then(() => (init_brain_files(), brain_files_exports));
-            const now = Date.now();
-            await appendJsonl2(fs, brainPath3(projectPath, "timeline.jsonl"), {
-              id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-              title: "\u532F\u51FA bundle\uFF1A" + written.bundleName,
-              eventType: "export",
-              occurredAt: now,
-              payload: {
-                bundlePath: written.bundlePath,
-                sizeBytes: written.sizeBytes,
-                fileCount: written.fileCount
-              }
-            });
-          } catch (e) {
-          }
-          invalidateAggregatorCache(projectPath);
-          const preview = await buildWorkspacePreview(fs, projectPath);
-          preview.retrieval = publicMemoryConfig(getMemoryConfig ? getMemoryConfig() : {});
-          return rpcOk({
-            projectPath,
-            preview,
-            bundlePath: written.bundlePath,
-            bundleName: written.bundleName,
-            defaultDirPath: written.defaultDirPath,
-            sizeBytes: written.sizeBytes,
-            result: {
-              ok: true,
-              data: {
-                bundlePath: written.bundlePath,
-                bundleName: written.bundleName,
-                defaultDirPath: written.defaultDirPath,
-                sizeBytes: written.sizeBytes,
-                fileCount: written.fileCount
-              }
+        } catch (e) {
+        }
+        const data = {
+          mode: "applied",
+          backupTimestamp: ts,
+          restoredFrom: applied.restoredFrom || "",
+          preRollbackBackupPath: applied.preRollbackBackupPath || ""
+        };
+        const result = rpcOk(Object.assign({ projectPath, result: { ok: true, data } }, data));
+        await attachRescanAndPreview({
+          result,
+          projectPath,
+          fs,
+          sandboxPolicy,
+          architectureRuntime,
+          getMemoryConfig
+        });
+        return result;
+      } catch (e) {
+        return rpcError(e && e.code || "internal", String(e && e.message || e), { projectPath });
+      }
+    }
+    if (endpoint === "export.openFolder") {
+      const folderPath = payload && typeof payload.folderPath === "string" ? payload.folderPath : "";
+      if (!folderPath) return rpcError("BAD_REQUEST", "folderPath \u5FC5\u586B", {});
+      try {
+        if (!/^([A-Za-z]:[\\/]|\/)/.test(folderPath) || folderPath.includes("..")) {
+          return rpcError("BAD_REQUEST", "folderPath \u5FC5\u9808\u662F\u7D55\u5C0D\u8DEF\u5F91\u4E14\u4E0D\u542B ..", { folderPath });
+        }
+        let shellModule = null;
+        let opened = false;
+        try {
+          const shell = ctx.get ? ctx.get("shell") : ctx.shell;
+          if (shell && typeof shell.openPath === "function") {
+            const r = await shell.openPath(folderPath);
+            opened = r === "" || r === void 0 || r === null;
+            if (!opened) {
+              return rpcError("OPEN_FAILED", "shell.openPath \u8FD4\u56DE\u932F\u8AA4\uFF1A" + String(r), { folderPath });
             }
-          });
+            return rpcOk({ opened: true, folderPath });
+          }
         } catch (e) {
-          return rpcError(
-            e && e.code || "internal",
-            String(e && e.message || e),
-            { outputPath: outputPath || null, projectPath }
-          );
         }
-      }
-      if (endpoint === "import.preview") {
-        const bundlePath = payload && typeof payload.bundlePath === "string" ? payload.bundlePath : "";
-        if (!bundlePath) return rpcError("bad-request", "bundlePath \u5FC5\u586B", {});
         try {
-          const { previewBundle: previewBundle2 } = await Promise.resolve().then(() => (init_bundle(), bundle_exports));
-          const { getTokenStore: getTokenStore2 } = await Promise.resolve().then(() => (init_confirm_tokens(), confirm_tokens_exports));
-          const preview = await previewBundle2({ bundlePath, destProjectPath: projectPath });
-          const confirmToken = getTokenStore2().issue({
-            kind: "import",
-            payload: { bundlePath, destProjectPath: projectPath }
-          });
-          const data = shapeImportPreviewData(preview, bundlePath, confirmToken);
-          return rpcOk(Object.assign({ projectPath, result: { ok: true, data } }, data));
-        } catch (e) {
-          return rpcError(e && e.code || "internal", String(e && e.message || e), { bundlePath, projectPath });
-        }
-      }
-      if (endpoint === "import.apply") {
-        const bundlePath = payload && typeof payload.bundlePath === "string" ? payload.bundlePath : "";
-        const confirmToken = payload && typeof payload.confirmToken === "string" ? payload.confirmToken : "";
-        if (!bundlePath) return rpcError("bad-request", "bundlePath \u5FC5\u586B", {});
-        if (!confirmToken) return rpcError("bad-request", "confirmToken \u5FC5\u586B\uFF08\u5148\u8ABF import.preview \u62FF token\uFF09", {});
-        try {
-          const { getTokenStore: getTokenStore2 } = await Promise.resolve().then(() => (init_confirm_tokens(), confirm_tokens_exports));
-          const tokenPayload = getTokenStore2().consume(confirmToken, { kind: "import" });
-          if (!tokenPayload) {
-            return rpcError("bad-request", "confirmToken \u7121\u6548\u3001\u5DF2\u904E\u671F\u6216\u578B\u5225\u4E0D\u5339\u914D\uFF08\u8ACB\u91CD\u65B0\u9810\u89BD\uFF09", {});
-          }
-          if (tokenPayload.bundlePath !== bundlePath || tokenPayload.destProjectPath !== projectPath) {
-            return rpcError("bad-request", "confirmToken \u8207\u7576\u524D\u5F15\u6578\u4E0D\u5339\u914D\uFF08\u8ACB\u91CD\u65B0\u9810\u89BD\uFF09", {});
-          }
-          const { applyBundle: applyBundle2 } = await Promise.resolve().then(() => (init_bundle(), bundle_exports));
-          const applied = await applyBundle2({ bundlePath, destProjectPath: projectPath, triggerRescan: false });
-          try {
-            const { appendJsonl: appendJsonl2, brainPath: brainPath3 } = await Promise.resolve().then(() => (init_brain_files(), brain_files_exports));
-            const now = Date.now();
-            await appendJsonl2(fs, brainPath3(projectPath, "timeline.jsonl"), {
-              id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-              title: applied.backupPath ? "\u532F\u5165 bundle\uFF08\u5DF2\u5099\u4EFD\u820A\u8166\u5230 " + path6.basename(applied.backupPath) + "\uFF09" : "\u532F\u5165 bundle\uFF08\u9996\u6B21\uFF09",
-              eventType: "import",
-              occurredAt: now,
-              payload: {
-                bundlePath,
-                backupPath: applied.backupPath,
-                sourceManifest: applied.sourceManifest
-              }
-            });
-          } catch (e) {
-          }
-          const data = {
-            mode: "applied",
-            bundlePath,
-            backupPath: applied.backupPath || "",
-            fileCount: applied.fileCount || 0
-          };
-          const result = rpcOk(Object.assign({ projectPath, result: { ok: true, data } }, data));
-          await attachRescanAndPreview({
-            result,
-            projectPath,
-            fs,
-            sandboxPolicy,
-            architectureRuntime,
-            getMemoryConfig
-          });
-          return result;
-        } catch (e) {
-          return rpcError(e && e.code || "internal", String(e && e.message || e), { bundlePath, projectPath });
-        }
-      }
-      if (endpoint === "backup.list") {
-        try {
-          const { listBackups: listBackups2 } = await Promise.resolve().then(() => (init_backup(), backup_exports));
-          const backups = await listBackups2({ projectPath });
-          return rpcOk({ projectPath, backups });
-        } catch (error) {
-          return rpcError(
-            error && error.code || "BACKUP_LIST_FAILED",
-            String(error && error.message || error),
-            { projectPath }
-          );
-        }
-      }
-      if (endpoint === "backup.cleanup") {
-        const keepLast = payload && typeof payload.keepLast === "number" ? payload.keepLast : 3;
-        const olderThanMs = payload && typeof payload.olderThanMs === "number" ? payload.olderThanMs : void 0;
-        try {
-          const { cleanupBackups: cleanupBackups2 } = await Promise.resolve().then(() => (init_backup(), backup_exports));
-          const cleaned = await cleanupBackups2({ projectPath, keepLast, olderThanMs });
-          const data = {
-            keptCount: Array.isArray(cleaned.kept) ? cleaned.kept.length : 0,
-            deletedCount: Array.isArray(cleaned.deleted) ? cleaned.deleted.length : 0,
-            kept: cleaned.kept || [],
-            deleted: cleaned.deleted || []
-          };
-          return rpcOk(Object.assign({ projectPath, result: { ok: true, data } }, data));
-        } catch (e) {
-          return rpcError(e && e.code || "internal", String(e && e.message || e), { projectPath });
-        }
-      }
-      if (endpoint === "backup.rollback.preview") {
-        const ts = payload && typeof payload.backupTimestamp === "string" ? payload.backupTimestamp : "";
-        if (!ts) return rpcError("bad-request", "backupTimestamp \u5FC5\u586B", {});
-        try {
-          const { previewRollback: previewRollback2 } = await Promise.resolve().then(() => (init_backup(), backup_exports));
-          const { getTokenStore: getTokenStore2 } = await Promise.resolve().then(() => (init_confirm_tokens(), confirm_tokens_exports));
-          const preview = await previewRollback2({ projectPath, backupTimestamp: ts });
-          const confirmToken = getTokenStore2().issue({
-            kind: "rollback",
-            payload: { projectPath, backupTimestamp: ts }
-          });
-          const data = shapeRollbackPreviewData(preview, ts, confirmToken);
-          return rpcOk(Object.assign({ projectPath, result: { ok: true, data } }, data));
-        } catch (e) {
-          return rpcError(e && e.code || "internal", String(e && e.message || e), { projectPath });
-        }
-      }
-      if (endpoint === "backup.rollback.apply") {
-        const ts = payload && typeof payload.backupTimestamp === "string" ? payload.backupTimestamp : "";
-        const confirmToken = payload && typeof payload.confirmToken === "string" ? payload.confirmToken : "";
-        if (!ts) return rpcError("bad-request", "backupTimestamp \u5FC5\u586B", {});
-        if (!confirmToken) return rpcError("bad-request", "confirmToken \u5FC5\u586B\uFF08\u5148\u8ABF backup.rollback.preview \u62FF token\uFF09", {});
-        try {
-          const { getTokenStore: getTokenStore2 } = await Promise.resolve().then(() => (init_confirm_tokens(), confirm_tokens_exports));
-          const tokenPayload = getTokenStore2().consume(confirmToken, { kind: "rollback" });
-          if (!tokenPayload) {
-            return rpcError("bad-request", "confirmToken \u7121\u6548\u3001\u5DF2\u904E\u671F\u6216\u578B\u5225\u4E0D\u5339\u914D\uFF08\u8ACB\u91CD\u65B0\u9078\u64C7\uFF09", {});
-          }
-          if (tokenPayload.projectPath !== projectPath || tokenPayload.backupTimestamp !== ts) {
-            return rpcError("bad-request", "confirmToken \u8207\u7576\u524D\u5F15\u6578\u4E0D\u5339\u914D\uFF08\u8ACB\u91CD\u65B0\u9078\u64C7\uFF09", {});
-          }
-          const { applyRollback: applyRollback2 } = await Promise.resolve().then(() => (init_backup(), backup_exports));
-          const applied = await applyRollback2({ projectPath, backupTimestamp: ts, triggerRescan: false });
-          try {
-            const { appendJsonl: appendJsonl2, brainPath: brainPath3 } = await Promise.resolve().then(() => (init_brain_files(), brain_files_exports));
-            const now = Date.now();
-            await appendJsonl2(fs, brainPath3(projectPath, "timeline.jsonl"), {
-              id: "evt-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8),
-              title: "\u56DE\u6EFE\u5230\u5099\u4EFD " + ts,
-              eventType: "rollback",
-              occurredAt: now,
-              payload: {
-                restoredFrom: applied.restoredFrom,
-                preRollbackBackupPath: applied.preRollbackBackupPath
-              }
-            });
-          } catch (e) {
-          }
-          const data = {
-            mode: "applied",
-            backupTimestamp: ts,
-            restoredFrom: applied.restoredFrom || "",
-            preRollbackBackupPath: applied.preRollbackBackupPath || ""
-          };
-          const result = rpcOk(Object.assign({ projectPath, result: { ok: true, data } }, data));
-          await attachRescanAndPreview({
-            result,
-            projectPath,
-            fs,
-            sandboxPolicy,
-            architectureRuntime,
-            getMemoryConfig
-          });
-          return result;
-        } catch (e) {
-          return rpcError(e && e.code || "internal", String(e && e.message || e), { projectPath });
-        }
-      }
-      if (endpoint === "export.openFolder") {
-        const folderPath = payload && typeof payload.folderPath === "string" ? payload.folderPath : "";
-        if (!folderPath) return rpcError("BAD_REQUEST", "folderPath \u5FC5\u586B", {});
-        try {
-          if (!/^([A-Za-z]:[\\/]|\/)/.test(folderPath) || folderPath.includes("..")) {
-            return rpcError("BAD_REQUEST", "folderPath \u5FC5\u9808\u662F\u7D55\u5C0D\u8DEF\u5F91\u4E14\u4E0D\u542B ..", { folderPath });
-          }
-          let shellModule = null;
-          let opened = false;
-          try {
-            const shell = ctx.get ? ctx.get("shell") : ctx.shell;
-            if (shell && typeof shell.openPath === "function") {
-              const r = await shell.openPath(folderPath);
-              opened = r === "" || r === void 0 || r === null;
-              if (!opened) {
-                return rpcError("OPEN_FAILED", "shell.openPath \u8FD4\u56DE\u932F\u8AA4\uFF1A" + String(r), { folderPath });
-              }
-              return rpcOk({ opened: true, folderPath });
+          shellModule = await import("electron");
+          if (shellModule && shellModule.shell && typeof shellModule.shell.openPath === "function") {
+            const errMsg = await shellModule.shell.openPath(folderPath);
+            if (errMsg) {
+              return rpcError("OPEN_FAILED", errMsg, { folderPath });
             }
-          } catch (e) {
-          }
-          try {
-            shellModule = await import("electron");
-            if (shellModule && shellModule.shell && typeof shellModule.shell.openPath === "function") {
-              const errMsg = await shellModule.shell.openPath(folderPath);
-              if (errMsg) {
-                return rpcError("OPEN_FAILED", errMsg, { folderPath });
-              }
-              return rpcOk({ opened: true, folderPath });
-            }
-          } catch (e) {
-          }
-          try {
-            const { spawn } = await import("node:child_process");
-            const isWin = process.platform === "win32";
-            const cmd = isWin ? "explorer" : process.platform === "darwin" ? "open" : "xdg-open";
-            spawn(cmd, [folderPath], { detached: true, stdio: "ignore" }).unref();
-            return rpcOk({ opened: true, folderPath, method: cmd });
-          } catch (e) {
-            return rpcError("OPEN_FAILED", "\u7121\u6CD5\u958B\u555F\u8CC7\u6599\u593E\uFF1A" + String(e && e.message || e), { folderPath });
+            return rpcOk({ opened: true, folderPath });
           }
         } catch (e) {
-          return rpcError("OPEN_FAILED", String(e && e.message || e), { folderPath });
         }
-      }
-      if (endpoint === "import.pickBundle") {
         try {
-          let dialog = null;
-          let BrowserWindow = null;
-          try {
-            const electron = await import("electron");
-            const mod = electron && electron.default ? electron.default : electron;
-            dialog = mod && mod.dialog;
-            BrowserWindow = mod && mod.BrowserWindow;
-          } catch (e) {
-          }
-          if (!dialog || typeof dialog.showOpenDialog !== "function") {
-            return rpcError("directory-picker-unavailable", "\u7CFB\u7D71\u6A94\u6848\u9078\u64C7\u5668\u4E0D\u53EF\u7528\uFF0C\u8ACB\u8CBC\u4E0A zip \u7684\u5B8C\u6574\u8DEF\u5F91", {});
-          }
-          const win = BrowserWindow && typeof BrowserWindow.getFocusedWindow === "function" && BrowserWindow.getFocusedWindow() || BrowserWindow && typeof BrowserWindow.getAllWindows === "function" && (BrowserWindow.getAllWindows()[0] || null) || void 0;
-          const picked = await dialog.showOpenDialog(win || void 0, {
-            title: "\u9078\u64C7 Project Brain bundle",
-            properties: ["openFile"],
-            filters: [
-              { name: "Brain bundle", extensions: ["zip"] },
-              { name: "All files", extensions: ["*"] }
-            ]
-          });
-          if (!picked || picked.canceled || !picked.filePaths || !picked.filePaths[0]) {
-            return rpcOk({ canceled: true, bundlePath: null });
-          }
-          return rpcOk({ canceled: false, bundlePath: picked.filePaths[0] });
+          const { spawn } = await import("node:child_process");
+          const isWin = process.platform === "win32";
+          const cmd = isWin ? "explorer" : process.platform === "darwin" ? "open" : "xdg-open";
+          spawn(cmd, [folderPath], { detached: true, stdio: "ignore" }).unref();
+          return rpcOk({ opened: true, folderPath, method: cmd });
         } catch (e) {
-          return rpcError("directory-picker-unavailable", "\u7121\u6CD5\u958B\u555F\u6A94\u6848\u9078\u64C7\u5668\uFF1A" + String(e && e.message || e), {});
+          return rpcError("OPEN_FAILED", "\u7121\u6CD5\u958B\u555F\u8CC7\u6599\u593E\uFF1A" + String(e && e.message || e), { folderPath });
         }
+      } catch (e) {
+        return rpcError("OPEN_FAILED", String(e && e.message || e), { folderPath });
       }
-      return rpcError("METHOD_NOT_FOUND", "\u672A\u77E5 Project Brain RPC \u65B9\u6CD5\uFF1A" + endpoint, { endpoint });
-    },
-    { authority: "loopback" }
-  );
-  return true;
+    }
+    if (endpoint === "import.pickBundle") {
+      try {
+        let dialog = null;
+        let BrowserWindow = null;
+        try {
+          const electron = await import("electron");
+          const mod = electron && electron.default ? electron.default : electron;
+          dialog = mod && mod.dialog;
+          BrowserWindow = mod && mod.BrowserWindow;
+        } catch (e) {
+        }
+        if (!dialog || typeof dialog.showOpenDialog !== "function") {
+          return rpcError("directory-picker-unavailable", "\u7CFB\u7D71\u6A94\u6848\u9078\u64C7\u5668\u4E0D\u53EF\u7528\uFF0C\u8ACB\u8CBC\u4E0A zip \u7684\u5B8C\u6574\u8DEF\u5F91", {});
+        }
+        const win = BrowserWindow && typeof BrowserWindow.getFocusedWindow === "function" && BrowserWindow.getFocusedWindow() || BrowserWindow && typeof BrowserWindow.getAllWindows === "function" && (BrowserWindow.getAllWindows()[0] || null) || void 0;
+        const picked = await dialog.showOpenDialog(win || void 0, {
+          title: "\u9078\u64C7 Project Brain bundle",
+          properties: ["openFile"],
+          filters: [
+            { name: "Brain bundle", extensions: ["zip"] },
+            { name: "All files", extensions: ["*"] }
+          ]
+        });
+        if (!picked || picked.canceled || !picked.filePaths || !picked.filePaths[0]) {
+          return rpcOk({ canceled: true, bundlePath: null });
+        }
+        return rpcOk({ canceled: false, bundlePath: picked.filePaths[0] });
+      } catch (e) {
+        return rpcError("directory-picker-unavailable", "\u7121\u6CD5\u958B\u555F\u6A94\u6848\u9078\u64C7\u5668\uFF1A" + String(e && e.message || e), {});
+      }
+    }
+    return rpcError("METHOD_NOT_FOUND", "\u672A\u77E5 Project Brain RPC \u65B9\u6CD5\uFF1A" + endpoint, { endpoint });
+  };
+  if (!connection || !connection.rpc || typeof connection.rpc.handle !== "function") {
+    registerConnectionHttpRoute({ webCtx, handler: dispatchRpc, connection, logger });
+    return true;
+  }
+  try {
+    connection.rpc.handle(PROJECT_BRAIN_RPC_CHANNEL, dispatchRpc, { authority: "loopback" });
+    if (logger && typeof logger.info === "function") {
+      logger.info("[dsh-project-brain] connection RPC channel registered");
+    }
+    return true;
+  } catch (error) {
+    if (!webCtx) throw error;
+    registerConnectionHttpRoute({ webCtx, handler: dispatchRpc, connection, logger });
+    if (logger && typeof logger.warn === "function") {
+      logger.warn(
+        "[dsh-project-brain] connection.rpc.handle unavailable (" + String(error && error.message || error) + "); serving /project-brain over a direct webserver route"
+      );
+    }
+    return true;
+  }
 }
 var MEMORY_TIMELINE_EVENTS = {
   edit: { eventType: "memory_edit", verb: "\u7DE8\u8F2F\u8A18\u61B6" },
@@ -12764,7 +12901,7 @@ function readPluginVersion() {
 }
 var PLUGIN_VERSION = readPluginVersion();
 var name = "dsh-project-brain";
-var inject = ["tools", "fs", "sandboxPolicy", "connection", "sessions", "llm"];
+var inject = ["tools", "fs", "sandboxPolicy", "connection", "webServer", "sessions", "llm"];
 var apply = (ctx, config) => {
   try {
     return applyImpl(ctx, config);
@@ -12905,6 +13042,7 @@ function applyImpl(ctx, config) {
     try {
       const mounted = registerConnectionRpc({
         connection: rpcConnection,
+        webCtx: rpcCtx,
         ctx,
         fs,
         sandboxPolicy,
